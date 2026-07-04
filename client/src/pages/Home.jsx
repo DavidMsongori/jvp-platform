@@ -1,5 +1,5 @@
 import Navbar from "../components/Layout/navbar";
-import Hero from "../components/home/Hero";
+import Hero from "../components/Home/Hero";
 import Stats from "../components/Home/Stats";
 import About from "../components/Home/About";
 import Programs from "../components/Home/Programs";
@@ -10,9 +10,10 @@ import Partners from "../components/Home/Partners";
 function Home() {
   return (
     <>
-      <navbar />
+      <Navbar />
       <Hero />
       <Stats />
+      <About />
       <Programs />
       <Events />
       <News />
