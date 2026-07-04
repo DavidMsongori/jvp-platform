@@ -1,329 +1,206 @@
-:root{
+/* =========================
+   NAVBAR
+========================= */
 
-    --primary:#159447;
-    --secondary:#005DAA;
-    --dark:#1f2937;
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  z-index: 1000;
+
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(14px);
+
+  transition: all .35s ease;
+
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
+.navbar.scrolled {
+  box-shadow: 0 12px 30px rgba(0,0,0,.08);
+}
+
+.navbar-container {
+  width: min(1320px,92%);
+  margin: auto;
+
+  height: 82px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  text-decoration: none;
+}
+
+.logo img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.logo h2 {
+  font-size: 1.8rem;
+  color: #1565c0;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.logo span {
+  color: #6b7280;
+  font-size: .9rem;
+}
+
+/* =========================
+   NAV LINKS
+========================= */
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.nav-links a {
+  text-decoration: none;
+
+  color: #1f2937;
+
+  font-weight: 600;
+
+  transition: .3s;
+}
+
+.nav-links a:hover {
+  color: #16a34a;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.login-link {
+  text-decoration: none;
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.join-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  text-decoration: none;
+
+  background: #16a34a;
+  color: white;
+
+  padding: 14px 24px;
+
+  border-radius: 14px;
+
+  font-weight: 600;
+
+  transition: .3s;
+}
+
+.join-btn:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+}
+
+.menu-btn {
+  display: none;
+
+  border: none;
+  background: transparent;
+
+  font-size: 1.7rem;
+
+  cursor: pointer;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 992px) {
+
+  .menu-btn {
+    display: block;
+  }
+
+  .nav-links {
+
+    position: fixed;
+
+    top: 82px;
+    right: -100%;
+
+    width: 280px;
+    height: calc(100vh - 82px);
+
+    background: white;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    gap: 28px;
+
+    padding: 40px 30px;
+
+    transition: .35s;
+
+    box-shadow: -8px 0 25px rgba(0,0,0,.08);
+  }
+
+  .nav-links.active {
+    right: 0;
+  }
 
 }
 
-/* -------------------- */
-
-.navbar{
-
-    position:fixed;
-
-    top:0;
-
-    left:0;
-
-    width:100%;
-
-    z-index:1000;
-
-    transition:.35s ease;
-
-}
-
-/* -------------------- */
-
-.navbar.scrolled{
-
-    background:#ffffff;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-
-}
-
-/* -------------------- */
-
-.navbar:not(.scrolled){
-
-    background:rgba(15,23,42,.22);
-
-    backdrop-filter:blur(18px);
-
-}
-
-/* -------------------- */
-
-.nav-container{
-
-    width:min(1400px,92%);
-
-    height:78px;
-
-    margin:auto;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-}
-
-/* -------------------- */
-
-.logo{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-}
-
-.logo img{
-
-    width:52px;
-
-    height:52px;
-
-    object-fit:contain;
-
-}
-
-.logo-text h2{
-
-    font-size:18px;
-
-    color:#ffffff;
-
-    margin-bottom:2px;
-
-    font-weight:700;
-
-}
-
-.logo-text p{
-
-    font-size:11px;
-
-    color:#e5e7eb;
-
-}
-
-/* -------------------- */
-
-.navbar.scrolled .logo-text h2{
-
-    color:var(--secondary);
-
-}
-
-.navbar.scrolled .logo-text p{
-
-    color:#666;
-
-}
-
-/* -------------------- */
-
-.nav-links{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:28px;
-
-}
-
-.nav-links a{
-
-    color:white;
-
-    font-size:15px;
-
-    font-weight:500;
-
-    transition:.25s;
-
-    position:relative;
-
-}
-
-.nav-links a:hover{
-
-    color:#4ade80;
-
-}
-
-.nav-links a::after{
-
-    content:"";
-
-    position:absolute;
-
-    bottom:-8px;
-
-    left:0;
-
-    width:0;
-
-    height:2px;
-
-    background:#4ade80;
-
-    transition:.3s;
-
-}
-
-.nav-links a:hover::after{
-
-    width:100%;
-
-}
-
-/* -------------------- */
-
-.navbar.scrolled .nav-links a{
-
-    color:#222;
-
-}
-
-/* -------------------- */
-
-.nav-actions{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:14px;
-
-}
-
-/* -------------------- */
-
-.login-btn{
-
-    color:white;
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-.navbar.scrolled .login-btn{
-
-    color:var(--secondary);
-
-}
-
-/* -------------------- */
-
-.join-btn{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    background:var(--primary);
-
-    color:white;
-
-    padding:12px 22px;
-
-    border-radius:12px;
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-.join-btn:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:0 12px 24px rgba(0,0,0,.2);
-
-}
-
-/* -------------------- */
-
-.mobile-menu{
-
-    display:none;
-
-    border:none;
-
-    background:none;
-
-    color:white;
-
-    font-size:28px;
-
-    cursor:pointer;
-
-}
-
-.navbar.scrolled .mobile-menu{
-
-    color:#222;
-
-}
-
-/* -------------------- */
-
-@media(max-width:1100px){
-
-.nav-links{
-
-    position:absolute;
-
-    top:78px;
-
-    left:0;
-
-    width:100%;
-
-    background:white;
-
-    display:none;
-
-    flex-direction:column;
-
-    padding:30px;
-
-    box-shadow:0 15px 35px rgba(0,0,0,.12);
-
-}
-
-.nav-links.active{
-
-    display:flex;
-
-}
-
-.nav-links a{
-
-    color:#222;
-
-}
-
-.nav-actions{
-
-    display:none;
-
-}
-
-.mobile-menu{
-
-    display:block;
-
-}
-
-.logo-text p{
-
-    display:none;
-
-}
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .logo h2 {
+    font-size: 1.35rem;
+  }
+
+  .logo span {
+    display: none;
+  }
+
+  .login-link {
+    display: none;
+  }
+
+  .join-btn {
+    padding: 12px 18px;
+  }
 
 }

@@ -1,0 +1,45 @@
+.section-title{
+
+    text-align:center;
+
+    max-width:750px;
+
+    margin:0 auto 70px;
+
+}
+
+.section-title span{
+
+    display:inline-block;
+
+    color:var(--primary);
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    margin-bottom:18px;
+
+}
+
+.section-title h2{
+
+    font-size:clamp(2.5rem,5vw,3.5rem);
+
+    line-height:1.2;
+
+    margin-bottom:22px;
+
+    color:var(--dark);
+
+}
+
+.section-title p{
+
+    color:var(--gray);
+
+    line-height:1.9;
+
+    font-size:1.05rem;
+
+}

@@ -1,54 +1,142 @@
 .programs{
 
-    padding:80px 8%;
+    padding:120px 0;
 
-    text-align:center;
-
-}
-
-.programs h2{
-
-    font-size:42px;
-
-    margin-bottom:20px;
-
-    color:var(--primary);
+    background:white;
 
 }
 
-.programs p{
+.section-title{
 
-    max-width:700px;
+    width:min(750px,90%);
 
     margin:auto;
 
-    margin-bottom:50px;
+    text-align:center;
 
-    color:var(--text-secondary);
+    margin-bottom:70px;
+
+}
+
+.section-title span{
+
+    color:#16a34a;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+}
+
+.section-title h2{
+
+    font-size:3rem;
+
+    margin:18px 0;
+
+    color:#111827;
+
+}
+
+.section-title p{
+
+    color:#6b7280;
+
+    line-height:1.9;
 
 }
 
 .program-grid{
 
+    width:min(1300px,90%);
+
+    margin:auto;
+
     display:grid;
 
     grid-template-columns:repeat(3,1fr);
 
-    gap:25px;
+    gap:30px;
 
 }
 
 .program-card{
 
-    background:white;
+    background:#f8fafc;
+
+    border-radius:24px;
 
     padding:40px;
 
+    transition:.35s;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.05);
+
+}
+
+.program-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 25px 50px rgba(0,0,0,.10);
+
+}
+
+.program-icon{
+
+    width:70px;
+
+    height:70px;
+
     border-radius:18px;
 
-    box-shadow:var(--shadow-sm);
+    background:#16a34a;
 
-    font-size:20px;
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:30px;
+
+    margin-bottom:25px;
+
+}
+
+.program-card h3{
+
+    margin-bottom:18px;
+
+    color:#111827;
+
+}
+
+.program-card p{
+
+    color:#6b7280;
+
+    line-height:1.8;
+
+    margin-bottom:30px;
+
+}
+
+.program-card button{
+
+    border:none;
+
+    background:#1565c0;
+
+    color:white;
+
+    padding:14px 28px;
+
+    border-radius:12px;
+
+    cursor:pointer;
 
     font-weight:600;
 
@@ -56,12 +144,34 @@
 
 }
 
-.program-card:hover{
+.program-card button:hover{
 
-    background:var(--primary);
+    background:#0d47a1;
 
-    color:white;
+}
 
-    transform:translateY(-8px);
+@media(max-width:992px){
+
+.program-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.section-title h2{
+
+font-size:2.3rem;
+
+}
+
+.program-grid{
+
+grid-template-columns:1fr;
+
+}
 
 }

@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { FaBars, FaTimes, FaUserPlus } from "react-icons/fa";
-
-import logo from "../../assets/images/jvp-logo.png";
 import "./Navbar.css";
 
+import logo from "../../assets/images/jvp-logo.png";
+
 function Navbar() {
+  const [mobileMenu, setMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,75 +15,61 @@ function Navbar() {
 
     window.addEventListener("scroll", handleScroll);
 
-    return () =>
-      window.removeEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
-      <div className="nav-container">
+      <div className="navbar-container">
 
-        {/* Logo */}
-
-        <Link to="/" className="logo">
-
+        <a href="/" className="logo">
           <img src={logo} alt="JVP Logo" />
 
-          <div className="logo-text">
-
+          <div>
             <h2>JVP Connect</h2>
-
-            <p>Jumuiya ya Vijana wa Pwani</p>
-
+            <span>Jumuiya ya Vijana wa Pwani</span>
           </div>
+        </a>
 
-        </Link>
+        <nav className={mobileMenu ? "nav-links active" : "nav-links"}>
 
-        {/* Navigation */}
+          <a href="/">Home</a>
 
-        <nav className={menuOpen ? "nav-links active" : "nav-links"}>
+          <a href="#about">About Us</a>
 
-          <Link to="/">Home</Link>
+          <a href="#programs">Programs</a>
 
-          <Link to="/about">About Us</Link>
+          <a href="#summit">Summit 2026</a>
 
-          <Link to="/programs">Programs</Link>
+          <a href="#events">Events</a>
 
-          <Link to="/summit">Summit 2026</Link>
+          <a href="#news">News</a>
 
-          <Link to="/events">Events</Link>
+          <a href="#membership">Membership</a>
 
-          <Link to="/news">News</Link>
-
-          <Link to="/membership">Membership</Link>
-
-          <Link to="/contact">Contact</Link>
+          <a href="#contact">Contact</a>
 
         </nav>
 
-        {/* Right Buttons */}
+        <div className="navbar-actions">
 
-        <div className="nav-actions">
-
-          <Link className="login-btn" to="/login">
+          <a href="/login" className="login-link">
             Login
-          </Link>
+          </a>
 
-          <Link className="join-btn" to="/register">
+          <a href="/register" className="join-btn">
             Join JVP
             <FaUserPlus />
-          </Link>
+          </a>
+
+          <button
+            className="menu-btn"
+            onClick={() => setMobileMenu(!mobileMenu)}
+          >
+            {mobileMenu ? <FaTimes /> : <FaBars />}
+          </button>
 
         </div>
-
-        {/* Mobile */}
-
-        <button
-          className="mobile-menu"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <FaTimes /> : <FaBars />}
-        </button>
 
       </div>
     </header>

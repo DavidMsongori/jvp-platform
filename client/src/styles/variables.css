@@ -1,0 +1,38 @@
+:root{
+
+    /* COLORS */
+
+    --primary:#16a34a;
+    --primary-dark:#15803d;
+
+    --secondary:#0f766e;
+
+    --dark:#0f172a;
+
+    --gray:#64748b;
+
+    --light:#f8fafc;
+
+    --white:#ffffff;
+
+    /* SHADOWS */
+
+    --shadow-sm:0 10px 25px rgba(0,0,0,.08);
+
+    --shadow-md:0 15px 35px rgba(0,0,0,.12);
+
+    --shadow-lg:0 25px 55px rgba(0,0,0,.18);
+
+    /* BORDER */
+
+    --radius:22px;
+
+    /* TRANSITION */
+
+    --transition:.35s ease;
+
+    /* WIDTH */
+
+    --container:1300px;
+
+}

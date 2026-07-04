@@ -1,41 +1,66 @@
 import "./Events.css";
 
+const events = [
+  {
+    date: "12-08 Aug 2026",
+    title: "Coastal Youth Summit 2026",
+    location: "Kilifi County",
+    description:
+      "The flagship regional summit bringing together young leaders, innovators, entrepreneurs and development partners from across the Coast Region.",
+  },
+  {
+    date: "15 Sept 2026",
+    title: "Climate Action & Tree Planting",
+    location: "Taita Taveta",
+    description:
+      "Youth-led environmental conservation initiative focusing on ecosystem restoration and climate resilience.",
+  },
+  {
+    date: "22 Oct 2026",
+    title: "Blue Economy Forum",
+    location: "Mombasa",
+    description:
+      "A forum connecting youth with opportunities in fisheries, marine innovation and sustainable coastal enterprises.",
+  },
+];
+
 function Events() {
-  const events = [
-    {
-      title: "Coastal Youth Summit 2026",
-      location: "Kilifi County",
-      date: "6 - 8 August 2026",
-    },
-    {
-      title: "Blue Economy Forum",
-      location: "Mombasa",
-      date: "September 2026",
-    },
-    {
-      title: "Climate Action Campaign",
-      location: "Kwale",
-      date: "October 2026",
-    },
-  ];
-
   return (
-    <section className="events">
+    <section className="events" id="events">
 
-      <h2>Upcoming Events</h2>
+      <div className="section-title">
+        <span>UPCOMING EVENTS</span>
 
-      <div className="events-grid">
+        <h2>Join Our Upcoming Activities</h2>
+
+        <p>
+          Discover opportunities to participate, network,
+          learn and make a lasting impact across the Coast Region.
+        </p>
+      </div>
+
+      <div className="events-container">
 
         {events.map((event, index) => (
+
           <div className="event-card" key={index}>
+
+            <div className="event-date">
+              {event.date}
+            </div>
 
             <h3>{event.title}</h3>
 
-            <p>{event.location}</p>
+            <h4>{event.location}</h4>
 
-            <span>{event.date}</span>
+            <p>{event.description}</p>
+
+            <button>
+              Register
+            </button>
 
           </div>
+
         ))}
 
       </div>

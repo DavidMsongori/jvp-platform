@@ -1,51 +1,74 @@
 import "./News.css";
 
+const news = [
+  {
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+    title: "JVP Launches Youth Leadership Programme",
+    date: "July 2026",
+    description:
+      "A new leadership programme designed to equip coastal youth with governance, advocacy and community leadership skills.",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+    title: "Climate Action Campaign Expands",
+    date: "June 2026",
+    description:
+      "Thousands of trees planted across the Coast Region as part of JVP's environmental restoration initiative.",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72",
+    title: "Registration Opens for Coastal Youth Summit",
+    date: "May 2026",
+    description:
+      "Applications are now open for delegates, exhibitors and partners attending the Coastal Youth Summit 2026.",
+  },
+];
+
 function News() {
+  return (
+    <section className="news" id="news">
 
-    return(
+      <div className="section-title">
 
-        <section className="news">
+        <span>LATEST NEWS</span>
 
-            <h2>Latest News</h2>
+        <h2>News & Updates</h2>
 
-            <div className="news-grid">
+        <p>
+          Stay informed with the latest stories, programmes,
+          opportunities and announcements from JVP.
+        </p>
 
-                <div className="news-card">
+      </div>
 
-                    <h3>Youth Leadership Forum</h3>
+      <div className="news-container">
 
-                    <p>
-                        Empowering young leaders across the Coast Region.
-                    </p>
+        {news.map((item, index) => (
 
-                </div>
+          <div className="news-card" key={index}>
 
-                <div className="news-card">
+            <img src={item.image} alt={item.title} />
 
-                    <h3>Climate Action Initiative</h3>
+            <div className="news-content">
 
-                    <p>
-                        Thousands of trees planted through JVP programs.
-                    </p>
+              <small>{item.date}</small>
 
-                </div>
+              <h3>{item.title}</h3>
 
-                <div className="news-card">
+              <p>{item.description}</p>
 
-                    <h3>Scholarship Opportunities</h3>
-
-                    <p>
-                        Supporting youth access to education and skills.
-                    </p>
-
-                </div>
+              <button>Read More</button>
 
             </div>
 
-        </section>
+          </div>
 
-    );
+        ))}
 
+      </div>
+
+    </section>
+  );
 }
 
 export default News;

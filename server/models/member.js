@@ -1,135 +1,291 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const memberSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      unique: true,
+    /* ===================================================
+       ACCOUNT
+    =================================================== */
+
+    role: {
+      type: String,
+      enum: [
+        "member",
+        "ward_leader",
+        "constituency_leader",
+        "county_leader",
+        "regional_leader",
+        "secretariat",
+        "admin",
+        "super_admin",
+      ],
+      default: "member",
     },
 
     membershipNumber: {
       type: String,
-      required: [true, "Membership number is required"],
       unique: true,
-      immutable: true,
+      sparse: true,
       trim: true,
     },
 
+    legacyMember: {
+      type: Boolean,
+      default: false,
+    },
+
+    migrationCompleted: {
+      type: Boolean,
+      default: false,
+    },
+
+    profileCompleted: {
+      type: Boolean,
+      default: false,
+    },
+
+    activationStatus: {
+      type: String,
+      enum: [
+        "Not Activated",
+        "Pending OTP",
+        "Activated",
+      ],
+      default: "Not Activated",
+    },
+
+    activationDate: Date,
+
+    membershipStatus: {
+      type: String,
+      enum: [
+        "Pending",
+        "Active",
+        "Suspended",
+        "Expired",
+      ],
+      default: "Pending",
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: [
+        "Pending",
+        "Paid",
+        "Exempt",
+      ],
+      default: "Pending",
+    },
+
+    memberSince: Date,
+
+    /* ===================================================
+       PERSONAL INFORMATION
+    =================================================== */
+
     firstName: {
       type: String,
-      required: [true, "First name is required"],
+      required: true,
       trim: true,
     },
 
     middleName: {
       type: String,
       trim: true,
-      default: "",
     },
 
     lastName: {
       type: String,
-      required: [true, "Last name is required"],
+      required: true,
       trim: true,
     },
 
+    gender: String,
+
+    dob: Date,
+
     nationalId: {
       type: String,
-      required: [true, "National ID is required"],
-      unique: true,
-      immutable: true,
-      trim: true,
+      sparse: true,
     },
 
     phone: {
       type: String,
-      required: [true, "Phone number is required"],
+      required: true,
       unique: true,
       trim: true,
     },
 
-    gender: {
+    email: {
       type: String,
-      enum: ["Male", "Female", "Prefer not to say"],
-      required: [true, "Gender is required"],
+      unique: true,
+      sparse: true,
+      lowercase: true,
+      trim: true,
     },
 
-    dateOfBirth: {
-      type: Date,
-      required: [true, "Date of birth is required"],
+    password: {
+      type: String,
+      required: true,
     },
 
-    county: {
+    profilePhoto: String,
+
+    /* ===================================================
+       LOCATION
+    =================================================== */
+
+    county: String,
+
+    constituency: String,
+
+    ward: String,
+
+    village: String,
+
+    /* ===================================================
+       EDUCATION
+    =================================================== */
+
+    institution: String,
+
+    course: String,
+
+    level: String,
+
+    graduationYear: Number,
+
+    studentRegistrationNumber: String,
+
+    /* ===================================================
+       EMPLOYMENT
+    =================================================== */
+
+    employmentStatus: String,
+
+    occupation: String,
+
+    employer: String,
+
+    /* ===================================================
+       LEADERSHIP
+    =================================================== */
+
+    leadershipExperience: String,
+
+    leadershipPosition: String,
+
+    leadershipOrganization: String,
+
+    /* ===================================================
+       JVP PROFILE
+    =================================================== */
+
+    skills: {
+      type: [String],
+      default: [],
+    },
+
+    interests: {
+      type: [String],
+      default: [],
+    },
+
+    languages: {
+      type: [String],
+      default: [],
+    },
+
+    bio: {
+      type: String,
+      maxlength: 500,
+    },
+
+    availability: {
       type: String,
       enum: [
-        "Mombasa",
-        "Kilifi",
-        "Kwale",
-        "Lamu",
-        "Taita Taveta",
-        "Tana River",
+        "",
+        "Weekdays",
+        "Weekends",
+        "Evenings",
+        "Any Time",
       ],
-      required: [true, "County is required"],
-    },
-
-    subCounty: {
-      type: String,
-      required: [true, "Sub-county is required"],
-      trim: true,
-    },
-
-    ward: {
-      type: String,
-      required: [true, "Ward is required"],
-      trim: true,
-    },
-
-    occupation: {
-      type: String,
-      default: "",
-      trim: true,
-    },
-
-    profilePhoto: {
-      type: String,
       default: "",
     },
 
-    membershipStatus: {
-    type: String,
-    enum: [
-        "PENDING_PAYMENT",
-        "ACTIVE",
-        "EXPIRED",
-        "SUSPENDED",
-        "REJECTED",
-    ],
-    default: "PENDING_PAYMENT",
-},
+    /* ===================================================
+       SOCIAL MEDIA
+    =================================================== */
 
-    membershipStatus: {
-      type: String,
-      enum: ["ACTIVE", "EXPIRED", "SUSPENDED"],
-      default: "ACTIVE",
+    facebook: String,
+
+    instagram: String,
+
+    linkedin: String,
+
+    x: String,
+
+    tiktok: String,
+
+    /* ===================================================
+       SECURITY
+    =================================================== */
+
+    lastLogin: Date,
+
+    loginCount: {
+      type: Number,
+      default: 0,
     },
 
-    joinedAt: {
-      type: Date,
-      default: Date.now,
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
 
-    expiresAt: {
-      type: Date,
-      required: [true, "Membership expiry date is required"],
-    },
+    otp: String,
+
+    otpExpires: Date,
+
+    refreshToken: String,
   },
   {
     timestamps: true,
   }
 );
 
+/* ===================================================
+   HASH PASSWORD
+=================================================== */
 
+memberSchema.pre("save", async function (next) {
 
-module.exports = mongoose.model("Member", memberSchema);
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  next();
+
+});
+
+/* ===================================================
+   COMPARE PASSWORD
+=================================================== */
+
+memberSchema.methods.comparePassword = async function (
+  enteredPassword
+) {
+
+  return await bcrypt.compare(
+    enteredPassword,
+    this.password
+  );
+
+};
+
+module.exports = mongoose.model(
+  "Member",
+  memberSchema
+);

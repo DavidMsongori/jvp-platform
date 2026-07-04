@@ -1,0 +1,188 @@
+/* ==========================================
+   STATISTICS
+========================================== */
+
+.statistics{
+
+    position:relative;
+
+    margin-top:-70px;
+
+    margin-bottom:100px;
+
+    z-index:100;
+
+}
+
+.statistics-wrapper{
+
+    width:min(1280px,92%);
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    background:rgba(15,23,42,.92);
+
+    backdrop-filter:blur(18px);
+
+    border-radius:24px;
+
+    overflow:hidden;
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.28);
+
+    border:1px solid rgba(255,255,255,.08);
+
+}
+
+.stat-item{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:18px;
+
+    padding:36px 20px;
+
+    transition:.35s;
+
+    position:relative;
+
+}
+
+.stat-item:hover{
+
+    background:rgba(255,255,255,.05);
+
+}
+
+.stat-item:not(:last-child)::after{
+
+    content:"";
+
+    position:absolute;
+
+    right:0;
+
+    top:25%;
+
+    width:1px;
+
+    height:50%;
+
+    background:rgba(255,255,255,.12);
+
+}
+
+.stat-icon{
+
+    width:65px;
+
+    height:65px;
+
+    border-radius:50%;
+
+    background:#16a34a;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:26px;
+
+    flex-shrink:0;
+
+}
+
+.stat-item h2{
+
+    color:white;
+
+    font-size:2rem;
+
+    margin-bottom:6px;
+
+    font-weight:700;
+
+}
+
+.stat-item p{
+
+    color:#cbd5e1;
+
+    font-size:.95rem;
+
+}
+
+
+/* ==========================
+   TABLET
+========================== */
+
+@media(max-width:992px){
+
+.statistics{
+
+margin-top:-50px;
+
+}
+
+.statistics-wrapper{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.stat-item:nth-child(2)::after{
+
+display:none;
+
+}
+
+}
+
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media(max-width:768px){
+
+.statistics{
+
+margin-top:-30px;
+
+}
+
+.statistics-wrapper{
+
+grid-template-columns:1fr;
+
+}
+
+.stat-item{
+
+padding:28px;
+
+justify-content:flex-start;
+
+}
+
+.stat-item::after{
+
+display:none;
+
+}
+
+}

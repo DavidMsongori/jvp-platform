@@ -1,31 +1,28 @@
-import Navbar from "../components/Layout/navbar";
+import Navbar from "../components/layout/Navbar";
 
-import Hero from "../components/Home/Hero";
-import Stats from "../components/Home/Stats";
-import About from "../components/Home/About";
-import Programs from "../components/Home/Programs";
-import Events from "../components/Home/Events";
-import News from "../components/Home/News";
-import Partners from "../components/Home/Partners";
+import Hero from "../components/home/Hero";
+import Statistics from "../components/home/Statistics";
+import About from "../components/home/About";
+import Programs from "../components/home/Programs";
+import Events from "../components/home/Events";
+import News from "../components/home/News";
+import Partners from "../components/home/Partners";
+import CTA from "../components/home/CTA";
+import Footer from "../components/layout/Footer";
 
 function Home() {
   return (
     <>
       <Navbar />
-
       <Hero />
-
-      <Stats />
-
+      <Statistics />
       <About />
-
       <Programs />
-
       <Events />
-
       <News />
-
       <Partners />
+      <CTA />
+      <Footer />
     </>
   );
 }
