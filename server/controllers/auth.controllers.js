@@ -3,7 +3,7 @@ const generateToken = require("../utils/generateToken");
 const generateOTP = require("../utils/generateOTP");
 
 /* ==========================================
-   Activate Existing Member
+   ACTIVATE EXISTING MEMBER
 ========================================== */
 
 const activateMembership = async (req, res) => {
@@ -31,7 +31,6 @@ const activateMembership = async (req, res) => {
       });
     }
 
-    // Generate OTP
     const otp = generateOTP();
 
     member.activationStatus = "Pending OTP";
@@ -40,12 +39,11 @@ const activateMembership = async (req, res) => {
 
     await member.save();
 
-    // Temporary until Email/SMS is added
-    console.log("=================================");
+    console.log("====================================");
     console.log("JVP CONNECT OTP");
     console.log("Member:", member.firstName, member.lastName);
     console.log("OTP:", otp);
-    console.log("=================================");
+    console.log("====================================");
 
     return res.json({
       success: true,
@@ -56,9 +54,9 @@ const activateMembership = async (req, res) => {
         id: member._id,
         firstName: member.firstName,
         lastName: member.lastName,
-        county: member.county,
         phone: member.phone,
         email: member.email,
+        county: member.county,
       },
     });
   } catch (error) {
@@ -72,12 +70,19 @@ const activateMembership = async (req, res) => {
 };
 
 /* ==========================================
-   Verify OTP
+   VERIFY OTP
 ========================================== */
 
 const verifyOTP = async (req, res) => {
   try {
     const { phone, email, otp } = req.body;
+
+    if ((!phone && !email) || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone/Email and OTP are required.",
+      });
+    }
 
     const member = await Member.findOne({
       $or: [
@@ -114,6 +119,10 @@ const verifyOTP = async (req, res) => {
       });
     }
 
+    member.activationStatus = "OTP Verified";
+
+    await member.save();
+
     return res.json({
       success: true,
       message: "OTP verified successfully.",
@@ -122,9 +131,13 @@ const verifyOTP = async (req, res) => {
         id: member._id,
         firstName: member.firstName,
         lastName: member.lastName,
+        phone: member.phone,
+        email: member.email,
       },
     });
   } catch (error) {
+    console.error(error);
+
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -133,243 +146,171 @@ const verifyOTP = async (req, res) => {
 };
 
 /* ==========================================
-   Create Password
+   CREATE PASSWORD
 ========================================== */
 
 const createPassword = async (req, res) => {
-
   try {
-
     const { memberId, password } = req.body;
 
     if (!memberId || !password) {
-
       return res.status(400).json({
-
         success: false,
-
-        message: "Member ID and password are required."
-
+        message: "Member ID and password are required.",
       });
-
     }
 
     if (password.length < 8) {
-
       return res.status(400).json({
-
         success: false,
-
-        message: "Password must be at least 8 characters."
-
+        message: "Password must be at least 8 characters.",
       });
-
     }
 
     const member = await Member.findById(memberId);
 
     if (!member) {
-
       return res.status(404).json({
-
         success: false,
-
-        message: "Member not found."
-
+        message: "Member not found.",
       });
-
     }
 
     member.password = password;
 
     member.activationStatus = "Activated";
+    member.activationDate = new Date();
+
+    member.memberSince = new Date();
+
+    member.membershipStatus = "Active";
 
     member.migrationCompleted = true;
-    
-    member.passwordCreatedAt = new Date();
 
     member.profileCompleted = false;
 
-    member.otp = undefined;
+    member.passwordCreatedAt = new Date();
 
-    member.otpExpires = undefined;
+    member.otp = null;
+    member.otpExpires = null;
 
     await member.save();
 
     const token = generateToken(member);
 
     return res.json({
-
       success: true,
-
       message: "Password created successfully.",
 
       token,
 
       member: {
-
         id: member._id,
-
         firstName: member.firstName,
-
         lastName: member.lastName,
-
         phone: member.phone,
-
         email: member.email,
-
         county: member.county,
-
         membershipNumber: member.membershipNumber,
-
         membershipStatus: member.membershipStatus,
-
-        profileCompleted: member.profileCompleted
-
-      }
-
+        profileCompleted: member.profileCompleted,
+      },
     });
-
-  }
-
-  catch (error) {
-
+  } catch (error) {
     console.error(error);
 
     return res.status(500).json({
-
       success: false,
-
-      message: error.message
-
+      message: error.message,
     });
-
   }
-
 };
 
 /* ==========================================
-   Member Login
+   MEMBER LOGIN
 ========================================== */
 
 const login = async (req, res) => {
-
   try {
-
     const { phone, email, password } = req.body;
 
     if ((!phone && !email) || !password) {
-
       return res.status(400).json({
-
         success: false,
-
-        message: "Phone/Email and password are required."
-
+        message: "Phone/Email and password are required.",
       });
-
     }
 
     const member = await Member.findOne({
-
       $or: [
-
         ...(phone ? [{ phone }] : []),
-
-        ...(email ? [{ email: email.toLowerCase() }] : [])
-
-      ]
-
+        ...(email ? [{ email: email.toLowerCase() }] : []),
+      ],
     });
 
     if (!member) {
-
       return res.status(404).json({
-
         success: false,
-
-        message: "Member not found."
-
+        message: "Member not found.",
       });
+    }
 
+    if (!member.password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please activate your account first.",
+      });
     }
 
     const validPassword = await member.comparePassword(password);
 
     if (!validPassword) {
+      member.failedLoginAttempts += 1;
+
+      await member.save();
 
       return res.status(401).json({
-
         success: false,
-
-        message: "Incorrect password."
-
+        message: "Incorrect password.",
       });
-
     }
 
+    member.failedLoginAttempts = 0;
     member.lastLogin = new Date();
-
-    member.loginCount = (member.loginCount || 0) + 1;
+    member.loginCount += 1;
 
     await member.save();
 
     const token = generateToken(member);
 
     return res.json({
-
       success: true,
-
       message: "Login successful.",
 
       token,
 
       member: {
-
         id: member._id,
-
         firstName: member.firstName,
-
         lastName: member.lastName,
-
-        email: member.email,
-
         phone: member.phone,
-
-        membershipNumber: member.membershipNumber,
-
-        membershipStatus: member.membershipStatus,
-
+        email: member.email,
         county: member.county,
-
-        profilePhoto: member.profilePhoto
-
-      }
-
+        membershipNumber: member.membershipNumber,
+        membershipStatus: member.membershipStatus,
+        profilePhoto: member.profilePhoto,
+        role: member.role,
+      },
     });
-
-  }
-
-  catch (error) {
-
+  } catch (error) {
     console.error(error);
 
-    member.activationStatus = "OTP Verified";
-
-await member.save();
-
-return res.json({
-  success: true,
-  message: "OTP verified successfully.",
-
-  member: {
-    id: member._id,
-    firstName: member.firstName,
-    lastName: member.lastName,
-    email: member.email,
-    phone: member.phone,
-  },
-});
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   activateMembership,
