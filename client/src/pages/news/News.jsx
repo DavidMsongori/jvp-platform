@@ -2,25 +2,26 @@ import PageLayout from "../../components/common/PageLayout";
 import PageHero from "../../components/common/PageHero";
 import PageSection from "../../components/common/PageSection";
 
-function Register() {
+function News() {
   return (
     <PageLayout>
       <PageHero
-        title="Register"
-        subtitle="Create your JVP Connect account."
+        title="Latest News"
+        subtitle="News, announcements and success stories from JVP."
       />
 
       <PageSection
-        title="Registration"
-        subtitle="Registration page coming soon."
+        title="News Updates"
+        subtitle="Stay informed."
       >
         <p>
-          This page will allow new members to register
-          and existing members to complete their profiles.
+          Latest announcements, opportunities,
+          scholarships and organizational news
+          will be published here.
         </p>
       </PageSection>
     </PageLayout>
   );
 }
 
-export default Register;
+export default News;

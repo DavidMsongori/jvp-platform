@@ -1,102 +1,120 @@
-const [member, setMember] = useState({
+import { createContext, useContext, useState } from "react";
 
-  /* ===========================
-     ACCOUNT
-  ============================ */
+const MemberContext = createContext();
 
-  legacyMember: false,
-  migrationCompleted: false,
-  profileCompleted: false,
+export function MemberProvider({ children }) {
+  const [member, setMember] = useState({
+    /* ===========================
+       ACCOUNT
+    ============================ */
 
-  role: "member",
-  membershipNumber: "",
-  membershipStatus: "Pending",
-  paymentStatus: "Pending",
-  memberSince: "",
+    legacyMember: false,
+    migrationCompleted: false,
+    profileCompleted: false,
 
-  /* ===========================
-     PERSONAL
-  ============================ */
+    role: "member",
+    membershipNumber: "",
+    membershipStatus: "Pending",
+    paymentStatus: "Pending",
+    memberSince: "",
 
-  firstName: "",
-  middleName: "",
-  lastName: "",
+    /* ===========================
+       PERSONAL
+    ============================ */
 
-  gender: "",
-  dob: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
 
-  nationalId: "",
+    gender: "",
+    dob: "",
 
-  phone: "",
-  email: "",
+    nationalId: "",
 
-  profilePhoto: "",
+    phone: "",
+    email: "",
 
-  /* ===========================
-     LOCATION
-  ============================ */
+    profilePhoto: "",
 
-  county: "",
-  constituency: "",
-  ward: "",
-  village: "",
+    /* ===========================
+       LOCATION
+    ============================ */
 
-  /* ===========================
-     EDUCATION
-  ============================ */
+    county: "",
+    constituency: "",
+    ward: "",
+    village: "",
 
-  institution: "",
-  course: "",
-  level: "",
-  graduationYear: "",
-  studentRegistrationNumber: "",
+    /* ===========================
+       EDUCATION
+    ============================ */
 
-  /* ===========================
-     EMPLOYMENT
-  ============================ */
+    institution: "",
+    course: "",
+    level: "",
+    graduationYear: "",
+    studentRegistrationNumber: "",
 
-  occupation: "",
-  employer: "",
-  employmentStatus: "",
-  businessName: "",
-  yearsExperience: "",
+    /* ===========================
+       EMPLOYMENT
+    ============================ */
 
-  /* ===========================
-     LEADERSHIP
-  ============================ */
+    occupation: "",
+    employer: "",
+    employmentStatus: "",
+    businessName: "",
+    yearsExperience: "",
 
-  leadershipExperience: "",
-  leadershipPosition: "",
-  leadershipOrganization: "",
+    /* ===========================
+       LEADERSHIP
+    ============================ */
 
-  /* ===========================
-     SKILLS
-  ============================ */
+    leadershipExperience: "",
+    leadershipPosition: "",
+    leadershipOrganization: "",
 
-  skills: [],
+    /* ===========================
+       SKILLS
+    ============================ */
 
-  interests: [],
+    skills: [],
+    interests: [],
+    languages: [],
 
-  languages: [],
+    bio: "",
 
-  bio: "",
+    /* ===========================
+       SOCIAL MEDIA
+    ============================ */
 
-  /* ===========================
-     SOCIAL MEDIA
-  ============================ */
+    facebook: "",
+    instagram: "",
+    linkedin: "",
+    x: "",
+    tiktok: "",
 
-  facebook: "",
-  instagram: "",
-  linkedin: "",
-  x: "",
-  tiktok: "",
+    /* ===========================
+       SYSTEM
+    ============================ */
 
+    createdAt: "",
+    updatedAt: "",
+  });
 
-  /* ===========================
-     SYSTEM
-  ============================ */
+  return (
+    <MemberContext.Provider
+      value={{
+        member,
+        setMember,
+      }}
+    >
+      {children}
+    </MemberContext.Provider>
+  );
+}
 
-  createdAt: "",
-  updatedAt: "",
+export function useMember() {
+  return useContext(MemberContext);
+}
 
-});
+export default MemberContext;

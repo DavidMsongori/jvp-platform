@@ -1,0 +1,23 @@
+.page-section{
+    padding:90px 0;
+}
+
+.section-header{
+    max-width:750px;
+    margin:auto;
+    text-align:center;
+    margin-bottom:60px;
+}
+
+.section-header h2{
+    font-size:2.5rem;
+    font-weight:700;
+    color:var(--dark);
+    margin-bottom:15px;
+}
+
+.section-header p{
+    color:#666;
+    line-height:1.8;
+    font-size:1.05rem;
+}
