@@ -1,4 +1,4 @@
-import Navbar from "../components/layout/Navbar";
+import Navbar from "../components/Layout/Navbar";
 
 import Hero from "../components/Home/Hero";
 import Statistics from "../components/Home/Statistics";
@@ -8,7 +8,7 @@ import Events from "../components/Home/Events";
 import News from "../components/Home/News";
 import Partners from "../components/Home/Partners";
 import CTA from "../components/Home/CTA";
-import Footer from "../components/layout/Footer";
+import Footer from "../components/Layout/Footer";
 
 function Home() {
   return (
