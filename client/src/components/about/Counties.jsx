@@ -1,119 +1,200 @@
+import { useState } from "react";
 import "./Counties.css";
 
-import {
-  FaMapMarkerAlt,
-  FaUsers,
-  FaLeaf,
-} from "react-icons/fa";
+import kenyaMap from "../../assets/images/kenya-counties.png";
+import counties from "./countiesData";
 
-const counties = [
+function Counties() {
 
-{
-name:"Mombasa",
-description:"The commercial hub of Kenya's Coast Region.",
-},
+  const [selectedCounty, setSelectedCounty] = useState("Mombasa");
 
-{
-name:"Kilifi",
-description:"Home of innovation, tourism and the Coastal Youth Summit.",
-},
+  const county = counties[selectedCounty];
 
-{
-name:"Kwale",
-description:"Empowering youth through entrepreneurship and community development.",
-},
+  const displayNames = {
+    Mombasa: "Mombasa",
+    Kwale: "Kwale",
+    Kilifi: "Kilifi",
+    TanaRiver: "Tana River",
+    Lamu: "Lamu",
+    TaitaTaveta: "Taita Taveta",
+  };
 
-{
-name:"Tana River",
-description:"Building opportunities through agriculture and environmental conservation.",
-},
+  return (
 
-{
-name:"Lamu",
-description:"Promoting culture, heritage and the Blue Economy.",
-},
+    <section className="counties">
 
-{
-name:"Taita Taveta",
-description:"Connecting youth through leadership and sustainable development.",
-},
+      <div className="container">
 
-];
+        <div className="section-title">
 
-function Counties(){
+          <span>OUR PRESENCE</span>
 
-return(
+          <h2>Across Kenya's Coast Region</h2>
 
-<section className="counties">
+          <p>
+            Hover over any county to discover JVP programmes,
+            opportunities, partnerships and upcoming activities.
+          </p>
 
-<div className="counties-container">
+        </div>
 
-<div className="section-title">
+        <div className="counties-wrapper">
 
-<span>SERVING THE COAST REGION</span>
+          {/* ===========================
+              LEFT - MAP
+          ============================ */}
 
-<h2>
+          <div className="map-container">
 
-One Movement. Six Counties.
+            <img
+              src={kenyaMap}
+              alt="Kenya Counties"
+              className="kenya-map"
+            />
 
-</h2>
+            {/* Mombasa */}
 
-<p>
+            <button
+              className="county-marker mombasa"
+              onMouseEnter={() => setSelectedCounty("Mombasa")}
+            >
+              <span>Mombasa</span>
+            </button>
 
-JVP proudly brings together young people from all six coastal counties,
-creating opportunities for collaboration, leadership and sustainable development.
+            {/* Kwale */}
 
-</p>
+            <button
+              className="county-marker kwale"
+              onMouseEnter={() => setSelectedCounty("Kwale")}
+            >
+              <span>Kwale</span>
+            </button>
 
-</div>
+            {/* Kilifi */}
 
-<div className="counties-grid">
+            <button
+              className="county-marker kilifi"
+              onMouseEnter={() => setSelectedCounty("Kilifi")}
+            >
+              <span>Kilifi</span>
+            </button>
 
-{counties.map((county,index)=>(
+            {/* Tana River */}
 
-<div className="county-card" key={index}>
+            <button
+              className="county-marker tana"
+              onMouseEnter={() => setSelectedCounty("TanaRiver")}
+            >
+              <span>Tana River</span>
+            </button>
 
-<div className="county-icon">
+            {/* Lamu */}
 
-<FaMapMarkerAlt/>
+            <button
+              className="county-marker lamu"
+              onMouseEnter={() => setSelectedCounty("Lamu")}
+            >
+              <span>Lamu</span>
+            </button>
 
-</div>
+            {/* Taita Taveta */}
 
-<h3>{county.name}</h3>
+            <button
+              className="county-marker taita"
+              onMouseEnter={() => setSelectedCounty("TaitaTaveta")}
+            >
+              <span>Taita Taveta</span>
+            </button>
 
-<p>{county.description}</p>
+          </div>
 
-<div className="county-stats">
+          {/* ===========================
+              RIGHT - INFORMATION CARD
+          ============================ */}
 
-<div>
+          <div
+            className="county-card"
+            key={selectedCounty}
+          >
 
-<FaUsers/>
+            <h3>
+              📍 {displayNames[selectedCounty]}
+            </h3>
 
-<span>Growing Membership</span>
+            <div className="county-stat">
 
-</div>
+              <div>
 
-<div>
+                <h2>{county.members}</h2>
 
-<FaLeaf/>
+                <small>Registered Members</small>
 
-<span>Active Projects</span>
+              </div>
 
-</div>
+              <div>
 
-</div>
+                <h2>{county.opportunities}</h2>
 
-</div>
+                <small>Opportunities</small>
 
-))}
+              </div>
 
-</div>
+            </div>
 
-</div>
+            <h4>Current Programmes</h4>
 
-</section>
+            <div className="program-list">
 
-);
+              {county.programs.map((program, index) => (
+
+                <div
+                  className="program-chip"
+                  key={index}
+                >
+
+                  {program}
+
+                </div>
+
+              ))}
+
+            </div>
+
+            <div className="county-extra">
+
+              <p>
+
+                <strong>Partner:</strong>{" "}
+
+                {county.partner}
+
+              </p>
+
+              <p>
+
+                <strong>Upcoming Event:</strong>{" "}
+
+                {county.upcoming}
+
+              </p>
+
+            </div>
+
+            <button>
+
+              Explore {displayNames[selectedCounty]}
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  );
 
 }
 

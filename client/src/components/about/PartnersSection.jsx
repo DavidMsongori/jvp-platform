@@ -26,81 +26,56 @@ const partners = [
   partner11,
 ];
 
-function PartnersSection(){
+function PartnersSection() {
+  return (
+    <section className="partners-section">
 
-return(
+      <div className="container">
 
-<section className="about-partners">
+        <div className="section-title">
 
-<div className="partners-container">
+          <span>OUR PARTNERS</span>
 
-<div className="section-title">
+          <h2>Working Together For Greater Impact</h2>
 
-<span>OUR PARTNERS</span>
+          <p>
+            We collaborate with government institutions,
+            development partners, private sector,
+            educational institutions and civil society
+            organizations to create opportunities for
+            young people.
+          </p>
 
-<h2>
+        </div>
 
-Working Together
-For Greater Impact
+        <div className="partners-slider">
 
-</h2>
+          <div className="partners-track">
 
-<p>
+            {[...partners, ...partners].map((logo, index) => (
 
-JVP values collaboration with development
-partners, government institutions, private
-sector organizations, educational institutions
-and community stakeholders to empower young
-people across Kenya's Coast Region.
+              <div
+                className="partner-logo"
+                key={index}
+              >
 
-</p>
+                <img
+                  src={logo}
+                  alt="Partner"
+                />
 
-</div>
+              </div>
 
-<div className="partners-grid">
+            ))}
 
-{partners.map((partner,index)=>(
+          </div>
 
-<div className="partner-box" key={index}>
+        </div>
 
-<img src={partner} alt="Partner"/>
+      </div>
 
-</div>
-
-))}
-
-</div>
-
-<div className="partner-cta">
-
-<h3>
-
-Become a Strategic Partner
-
-</h3>
-
-<p>
-
-Join us in creating opportunities,
-building leadership and transforming
-communities across Kenya's Coast Region.
-
-</p>
-
-<a href="/contact">
-
-Partner With JVP
-
-</a>
-
-</div>
-
-</div>
-
-</section>
-
-);
-
+    </section>
+  );
 }
 
 export default PartnersSection;
