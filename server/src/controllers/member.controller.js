@@ -1,68 +1,231 @@
-const Member = require("../models/Member");
+const memberService = require("../services/member.service");
 
-/* ==========================================
-   GET ALL MEMBERS
-========================================== */
+/* =====================================================
+   GET CURRENT MEMBER PROFILE
+===================================================== */
 
-const getAllMembers = async (req, res) => {
+const getProfile = async (req, res) => {
   try {
-    const members = await Member.find()
-      .select("-password -otp -otpExpires")
-      .sort({ firstName: 1 });
+
+    const result = await memberService.getProfile(
+      req.member._id
+    );
 
     return res.status(200).json({
-      success: true,
-      total: members.length,
-      members,
+      success: result.success,
+      message: result.message,
+      data: result.member,
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Get Profile:", error.message);
 
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
+      errors: [],
     });
 
   }
 };
 
-/* ==========================================
-   GET MEMBER BY ID
-========================================== */
+/* =====================================================
+   UPDATE MEMBER PROFILE
+===================================================== */
 
-const getMemberById = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
 
-    const member = await Member.findById(req.params.id)
-      .select("-password -otp -otpExpires");
-
-    if (!member) {
-      return res.status(404).json({
-        success: false,
-        message: "Member not found.",
-      });
-    }
+    const result =
+      await memberService.updateProfile(
+        req.member._id,
+        req.body
+      );
 
     return res.status(200).json({
-      success: true,
-      member,
+      success: result.success,
+      message: result.message,
+      data: result.member,
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Update Profile:", error.message);
 
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
+      errors: [],
+    });
+
+  }
+};
+
+/* =====================================================
+   UPLOAD PROFILE PHOTO
+===================================================== */
+
+const uploadProfilePhoto = async (req, res) => {
+  try {
+
+    const result =
+      await memberService.uploadProfilePhoto(
+        req.member._id,
+        req.file
+      );
+
+    return res.status(200).json({
+      success: result.success,
+      message: result.message,
+      data: {
+        member: result.member,
+        profilePhoto: result.member.profilePhoto,
+      },
+    });
+
+  } catch (error) {
+
+    console.error("Upload Photo:", error.message);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+      errors: [],
+    });
+
+  }
+};
+
+/* =====================================================
+   MEMBER DASHBOARD
+===================================================== */
+
+const getDashboard = async (req, res) => {
+  try {
+
+    const result =
+      await memberService.getDashboard(
+        req.member._id
+      );
+
+    return res.status(200).json({
+      success: result.success,
+      message: result.message,
+      data: result.dashboard,
+    });
+
+  } catch (error) {
+
+    console.error("Dashboard:", error.message);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+      errors: [],
+    });
+
+  }
+};
+
+/* =====================================================
+   MEMBERSHIP CARD
+===================================================== */
+
+const getMembershipCard = async (req, res) => {
+  try {
+
+    const result =
+      await memberService.getMembershipCard(
+        req.member._id
+      );
+
+    return res.status(200).json({
+      success: result.success,
+      message: result.message,
+      data: result.card,
+    });
+
+  } catch (error) {
+
+    console.error("Membership Card:", error.message);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+      errors: [],
+    });
+
+  }
+};
+
+/* =====================================================
+   ADMIN - GET ALL MEMBERS
+===================================================== */
+
+const getAllMembers = async (req, res) => {
+  try {
+
+    const result =
+      await memberService.getAllMembers();
+
+    return res.status(200).json({
+      success: result.success,
+      message: result.message,
+      total: result.total,
+      data: result.members,
+    });
+
+  } catch (error) {
+
+    console.error("Get Members:", error.message);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+      errors: [],
+    });
+
+  }
+};
+
+/* =====================================================
+   ADMIN - GET MEMBER BY ID
+===================================================== */
+
+const getMemberById = async (req, res) => {
+  try {
+
+    const result =
+      await memberService.getMemberById(
+        req.params.id
+      );
+
+    return res.status(200).json({
+      success: result.success,
+      message: result.message,
+      data: result.member,
+    });
+
+  } catch (error) {
+
+    console.error("Get Member:", error.message);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+      errors: [],
     });
 
   }
 };
 
 module.exports = {
+  getProfile,
+  updateProfile,
+  uploadProfilePhoto,
+  getDashboard,
+  getMembershipCard,
   getAllMembers,
   getMemberById,
 };

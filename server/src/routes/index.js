@@ -2,24 +2,28 @@ const express = require("express");
 
 const router = express.Router();
 
+const authRoutes = require("./auth.routes");
 const memberRoutes = require("./member.routes");
 
-/* ==========================================
-   API HEALTH
-========================================== */
+/* =====================================================
+   API ROUTES
+===================================================== */
 
-router.get("/health", (req, res) => {
-  res.json({
+router.use("/auth", authRoutes);
+
+router.use("/member", memberRoutes);
+
+/* =====================================================
+   API ROOT
+===================================================== */
+
+router.get("/", (req, res) => {
+  res.status(200).json({
     success: true,
-    message: "JVP Connect API is running.",
-    timestamp: new Date(),
+    application: "JVP Connect API",
+    version: "1.0.0",
+    status: "Running",
   });
 });
-
-/* ==========================================
-   ROUTES
-========================================== */
-
-router.use("/members", memberRoutes);
 
 module.exports = router;
