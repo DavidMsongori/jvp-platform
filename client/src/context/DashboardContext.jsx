@@ -5,20 +5,30 @@ import {
   useState,
 } from "react";
 
-import { getDashboard } from "../../../server/src/services/member.service";
+import {
+  getDashboard,
+} from "../services/member.service";
 
-const DashboardContext = createContext();
+const DashboardContext =
+  createContext();
 
-export function DashboardProvider({ children }) {
+export function DashboardProvider({
+  children,
+}) {
 
-  const [dashboard, setDashboard] = useState(null);
+  const [dashboard, setDashboard] =
+    useState(null);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
+
     loadDashboard();
+
   }, []);
 
   const loadDashboard = async () => {
@@ -37,8 +47,11 @@ export function DashboardProvider({ children }) {
       console.error(err);
 
       setError(
+
         err.response?.data?.message ||
+
         "Unable to load dashboard."
+
       );
 
     } finally {
@@ -52,12 +65,20 @@ export function DashboardProvider({ children }) {
   return (
 
     <DashboardContext.Provider
+
       value={{
+
         dashboard,
+
         loading,
+
         error,
-        reloadDashboard: loadDashboard,
+
+        reloadDashboard:
+          loadDashboard,
+
       }}
+
     >
 
       {children}
@@ -70,8 +91,19 @@ export function DashboardProvider({ children }) {
 
 export function useDashboard() {
 
-  return useContext(
-    DashboardContext
-  );
+  const context =
+    useContext(DashboardContext);
+
+  if (!context) {
+
+    throw new Error(
+
+      "useDashboard must be used inside DashboardProvider."
+
+    );
+
+  }
+
+  return context;
 
 }
