@@ -3,7 +3,7 @@ import Hero from "../../components/summit/hero/Hero";
 import About from "../../components/summit/about/About";
 import WhyAttend from "../../components/summit/WhyAttend/WhyAttend";
 import Tracks from "../../components/summit/tracks/Tracks";
-import Programme from "../../components/summit/programme/programme";
+import Programme from "../../components/summit/programme/Programme";
 import Speakers from "../../components/summit/speakers/Speakers";
 import Venue from "../../components/summit/venue/Venue";
 import FAQ from "../../components/summit/FAQ/FAQ";
