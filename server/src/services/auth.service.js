@@ -270,21 +270,22 @@ export const register = async (data) => {
        CREATE OTP
     ---------------------------------------- */
 
-    const otp = await otpService.createOTP({
-      user,
-      email: user.email,
-      purpose: OTP_PURPOSE.ACCOUNT_ACTIVATION,
-    });
+   const otpResult = await otpService.createOTP({
+  user,
+  email: user.email,
+  purpose: OTP_PURPOSE.ACCOUNT_ACTIVATION,
+});
 
-    /* ----------------------------------------
-       SEND OTP EMAIL
-    ---------------------------------------- */
+/* ----------------------------------------
+   SEND OTP EMAIL
+---------------------------------------- */
 
-    await emailService.sendOTPEmail({
-      email: user.email,
-      firstName: member.firstName,
-      otp: otp.otp,
-    });
+await emailService.sendOTPEmail({
+  email: user.email,
+  firstName: member.firstName,
+  otp: otpResult.plainOtp,
+});
+
 
     /* ----------------------------------------
        LOG ACTIVITY
@@ -296,26 +297,19 @@ export const register = async (data) => {
       session
     );
 
-    /* ----------------------------------------
-       COMMIT
-    ---------------------------------------- */
+   /* ----------------------------------------
+   COMMIT
+---------------------------------------- */
 
-    await session.commitTransaction();
+await session.commitTransaction();
 
-    user.password = undefined;
+user.password = undefined;
 
-    return {
+return {
   email: user.email,
   nextStep: "verify-otp",
-  expiresAt: otp.expiresAt,
-};
-
-  } catch (error) {
-    await session.abortTransaction();
-    throw error;
-  } finally {
-    await session.endSession();
-  }
+  otpId: otpResult.otpRecord._id,
+  expiresAt: otpResult.otpRecord.expiresAt,
 };
 
 
@@ -437,22 +431,6 @@ await emailService.sendOTPEmail({
 
 });
 
-/* ----------------------------------------
-   RESPONSE
----------------------------------------- */
-
-return {
-
-  email: user.email,
-
-  nextStep: "verify-otp",
-
-  otpId: otpResult.otpRecord._id,
-
-  expiresAt: otpResult.otpRecord.expiresAt,
-
-};
-
     /* ----------------------------------------
        LOG ACTIVITY
     ---------------------------------------- */
@@ -473,31 +451,19 @@ return {
 
     await session.commitTransaction();
 
-    /* ----------------------------------------
-       RESPONSE
-    ---------------------------------------- */
+  /* ----------------------------------------
+   RESPONSE
+---------------------------------------- */
 
-    return {
+return {
 
-      email: user.email,
+  email: user.email,
 
-      nextStep: "verify-otp",
+  nextStep: "verify-otp",
 
-      expiresAt: otp.expiresAt,
+  otpId: otpResult.otpRecord._id,
 
-    };
-
-  } catch (error) {
-
-    await session.abortTransaction();
-
-    throw error;
-
-  } finally {
-
-    await session.endSession();
-
-  }
+  expiresAt: otpResult.otpRecord.expiresAt,
 
 };
 
@@ -996,58 +962,57 @@ export const forgotPassword = async (data) => {
      GENERATE OTP
   ---------------------------------------- */
 
-  const otp = await otpService.createOTP({
+  const otpResult = await otpService.createOTP({
 
-    user,
+  user,
 
-    email: user.email,
+  email: user.email,
 
-    purpose: OTP_PURPOSE.PASSWORD_RESET,
+  purpose: OTP_PURPOSE.PASSWORD_RESET,
 
-  });
+});
 
-  /* ----------------------------------------
-     SEND EMAIL
-  ---------------------------------------- */
+/* ----------------------------------------
+   SEND EMAIL
+---------------------------------------- */
 
-  await emailService.sendOTPEmail({
+await emailService.sendOTPEmail({
 
-    email: user.email,
+  email: user.email,
 
-    firstName: member.firstName,
+  firstName: member.firstName,
 
-    otp: otp.otp,
+  otp: otpResult.plainOtp,
 
-  });
+});
 
-  /* ----------------------------------------
-     LOG ACTIVITY
-  ---------------------------------------- */
+/* ----------------------------------------
+   LOG ACTIVITY
+---------------------------------------- */
 
-  await logActivity(
+await logActivity(
 
-    user._id,
+  user._id,
 
-    "Requested password reset"
+  "Requested password reset"
 
-  );
+);
 
-  /* ----------------------------------------
-     RESPONSE
-  ---------------------------------------- */
+/* ----------------------------------------
+   RESPONSE
+---------------------------------------- */
 
-  return {
+return {
 
-    email: user.email,
+  email: user.email,
 
-    nextStep: "reset-password",
+  nextStep: "reset-password",
 
-    expiresAt: otp.expiresAt,
+  otpId: otpResult.otpRecord._id,
 
-  };
+  expiresAt: otpResult.otpRecord.expiresAt,
 
 };
-
 
 
 /* ==========================================================
