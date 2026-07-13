@@ -382,35 +382,7 @@ export async function createOTP({
 
     });
 
-    // ----------------------------------------
-    // Return Response
-    // ----------------------------------------
-
-    const response = {
-
-        success: true,
-
-        message: "OTP generated successfully.",
-
-        otpId: otpRecord._id,
-
-        expiresAt: otpRecord.expiresAt
-
-    };
-
-    /**
-     * Development Convenience
-     *
-     * Never expose the OTP in production.
-     */
-
-    if (process.env.NODE_ENV === "development") {
-
-        response.otp = otp;
-
-    }
-
-    /* ----------------------------------------
+  /* ----------------------------------------
    DEVELOPMENT ONLY
 ---------------------------------------- */
 
@@ -425,9 +397,17 @@ if (process.env.NODE_ENV === "development") {
 
 }
 
-    return response;
+/* ----------------------------------------
+   RETURN
+---------------------------------------- */
 
-}
+return {
+
+    otpRecord,
+
+    plainOtp: otp,
+
+};
 /* ==========================================================
    VERIFY OTP
 ========================================================== */
