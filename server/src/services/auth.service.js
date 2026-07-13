@@ -660,11 +660,10 @@ export const verifyOTP = async (data) => {
 
       user,
 
-      email: normalizedEmail,
-
-      otp,
-
       purpose,
+
+      code: otp,
+
 
     });
 
