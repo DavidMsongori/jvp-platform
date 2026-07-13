@@ -1087,7 +1087,7 @@ export const createPassword = async (data) => {
     ---------------------------------------- */
 
     const token =
-  generateToken(user);
+  generateToken(user._id);
 
 return buildAuthResponse(
   user,
@@ -1148,9 +1148,9 @@ export const login = async (data) => {
 
   if (value.includes("@")) {
 
-    user = await User.findOne({
-      email: value.toLowerCase(),
-    });
+   user = await User.findOne({
+  email: value.toLowerCase(),
+}).select("+password");
 
   } else {
 
@@ -1164,7 +1164,9 @@ export const login = async (data) => {
 
     if (member) {
 
-      user = await User.findById(member.user);
+     user = await User.findById(
+  member.user
+).select("+password");
 
     }
 
