@@ -3,154 +3,188 @@ import bcrypt from "bcrypt";
 
 import User from "../models/User.js";
 import Member from "../models/Member.js";
-import ActivityLog from "../models/ActivityLog.js";
+import OTP from "../models/OTP.js";
 
 import AppError from "../utils/AppError.js";
 
-import { generateToken } from "../utils/jwt.js";
+import * as otpService from "./otp.service.js";
+import * as emailService from "./email.service.js";
 
-import generateMemberNumber from "../utils/memberNumber.js";
+import {
+  generateToken,
+  verifyToken,
+} from "../utils/jwt.js";
 
-import otpService from "./otp.service.js";
-import emailService from "./email.service.js";
+import {
+  generateMembershipNumber,
+} from "../utils/membershipNumber.js";
+
+import ActivityLog from "../models/ActivityLog.js";
 
 /* ==========================================================
    OTP PURPOSES
 ========================================================== */
 
-export const OTP_PURPOSE = Object.freeze({
-  EMAIL_VERIFICATION: "EMAIL_VERIFICATION",
+const OTP_PURPOSE = {
   ACCOUNT_ACTIVATION: "ACCOUNT_ACTIVATION",
   PASSWORD_RESET: "PASSWORD_RESET",
-  LOGIN: "LOGIN",
-  CHANGE_EMAIL: "CHANGE_EMAIL",
-  CHANGE_PHONE: "CHANGE_PHONE",
-});
+};
+
+/* ==========================================================
+   PASSWORD SETTINGS
+========================================================== */
+
+const SALT_ROUNDS = 12;
 
 /* ==========================================================
    START DATABASE TRANSACTION
 ========================================================== */
 
-async function startTransaction() {
+const startTransaction = async () => {
+
   const session = await mongoose.startSession();
 
   session.startTransaction();
 
   return session;
-}
+
+};
 
 /* ==========================================================
    HASH PASSWORD
 ========================================================== */
 
-async function hashPassword(password) {
-  return bcrypt.hash(password, 12);
-}
+const hashPassword = async (password) => {
+
+  return bcrypt.hash(password, SALT_ROUNDS);
+
+};
 
 /* ==========================================================
    COMPARE PASSWORD
 ========================================================== */
 
-async function comparePassword(
+const comparePassword = async (
   password,
-  hashedPassword
-) {
-  return bcrypt.compare(
-    password,
-    hashedPassword
-  );
-}
+  hash
+) => {
+
+  return bcrypt.compare(password, hash);
+
+};
+
+
 
 /* ==========================================================
-   FIND USER BY EMAIL
+   LOG ACTIVITY
 ========================================================== */
 
-async function findUserByEmail(email) {
-  return User.findOne({
-    email: email.toLowerCase().trim(),
-  }).select("+password");
-}
-
-/* ==========================================================
-   FIND MEMBER BY USER ID
-========================================================== */
-
-async function findMemberByUser(userId) {
-  return Member.findOne({
-    user: userId,
-  });
-}
-
-/* ==========================================================
-   VALIDATE OTP PURPOSE
-========================================================== */
-
-function validateOTPPurpose(purpose) {
-  const allowedPurposes = Object.values(
-    OTP_PURPOSE
-  );
-
-  if (!allowedPurposes.includes(purpose)) {
-    throw new AppError(
-      "Invalid OTP purpose.",
-      400
-    );
-  }
-
-  return purpose;
-}
-
-/* ==========================================================
-   LOG USER ACTIVITY
-========================================================== */
-
-async function logActivity(
+const logActivity = async (
   userId,
   action,
-  session = null
-) {
+  session = null,
+  module = "auth",
+  description = "",
+  metadata = {}
+) => {
+
   const payload = {
+
     user: userId,
+
     action,
+
+    module,
+
+    description,
+
+    metadata,
+
   };
 
   if (session) {
+
     await ActivityLog.create(
       [payload],
       { session }
     );
-  } else {
-    await ActivityLog.create(payload);
+
+    return;
+
   }
-}
+
+  await ActivityLog.create(payload);
+
+};
 
 /* ==========================================================
    BUILD AUTH RESPONSE
 ========================================================== */
 
-function buildAuthResponse(
+const buildAuthResponse = (
   user,
-  member
-) {
+  member,
+  token
+) => {
+
   return {
-    token: generateToken(user._id),
-    user,
-    member,
+
+    token,
+
+    user: {
+
+      id: user._id,
+
+      email: user.email,
+
+      role: user.role,
+
+      isActive: user.isActive,
+
+      emailVerified: user.emailVerified,
+
+    },
+
+    member: {
+
+      id: member._id,
+
+      membershipNumber: member.membershipNumber,
+
+      firstName: member.firstName,
+
+      middleName: member.middleName,
+
+      lastName: member.lastName,
+
+      county: member.county,
+
+      membershipType: member.membershipType,
+
+      membershipStatus: member.membershipStatus,
+
+      membershipFeePaid: member.membershipFeePaid,
+
+      profilePhoto: member.profilePhoto,
+
+      joinedAt: member.joinedAt,
+
+    },
+
   };
-}
 
-
-
-
+};
 
 /* ==========================================================
    REGISTER NEW MEMBER
 ========================================================== */
 
 export const register = async (data) => {
+
   const session = await startTransaction();
 
   try {
+
     const {
       firstName,
       middleName,
@@ -165,49 +199,60 @@ export const register = async (data) => {
       email,
     } = data;
 
+    const normalizedEmail =
+      email.toLowerCase().trim();
+
     /* ----------------------------------------
-       CHECK EMAIL
+       EMAIL EXISTS
     ---------------------------------------- */
 
     const existingUser = await User.findOne({
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
     }).session(session);
 
     if (existingUser) {
+
       throw new AppError(
         "Email address is already registered.",
         409
       );
+
     }
 
     /* ----------------------------------------
-       CHECK NATIONAL ID
+       NATIONAL ID EXISTS
     ---------------------------------------- */
 
-    const existingNationalId = await Member.findOne({
-      nationalId,
-    }).session(session);
+    const existingNationalId =
+      await Member.findOne({
+        nationalId,
+      }).session(session);
 
     if (existingNationalId) {
+
       throw new AppError(
         "National ID already exists.",
         409
       );
+
     }
 
     /* ----------------------------------------
-       CHECK PHONE
+       PHONE EXISTS
     ---------------------------------------- */
 
-    const existingPhone = await Member.findOne({
-      phone,
-    }).session(session);
+    const existingPhone =
+      await Member.findOne({
+        phone,
+      }).session(session);
 
     if (existingPhone) {
+
       throw new AppError(
         "Phone number already exists.",
         409
       );
+
     }
 
     /* ----------------------------------------
@@ -215,16 +260,19 @@ export const register = async (data) => {
     ---------------------------------------- */
 
     const [user] = await User.create(
+
       [
         {
-          email: email.toLowerCase().trim(),
+          email: normalizedEmail,
           password: null,
           role: "member",
           isActive: false,
           emailVerified: false,
         },
       ],
+
       { session }
+
     );
 
     /* ----------------------------------------
@@ -232,17 +280,21 @@ export const register = async (data) => {
     ---------------------------------------- */
 
     const [member] = await Member.create(
+
       [
         {
           user: user._id,
 
+          source: "new",
+
           accountActivated: false,
 
-          source: "new",
+          membershipNumber: null,
 
           membershipType,
 
-          membershipStatus: "pending_payment",
+          membershipStatus:
+            "pending_payment",
 
           membershipFeePaid: false,
 
@@ -256,6 +308,7 @@ export const register = async (data) => {
           dateOfBirth,
 
           nationalId,
+
           phone,
 
           occupation,
@@ -263,55 +316,92 @@ export const register = async (data) => {
           county,
         },
       ],
+
       { session }
+
     );
 
     /* ----------------------------------------
-       CREATE OTP
+       GENERATE OTP
     ---------------------------------------- */
 
-   const otpResult = await otpService.createOTP({
-  user,
-  email: user.email,
-  purpose: OTP_PURPOSE.ACCOUNT_ACTIVATION,
-});
+    const otpResult =
+      await otpService.createOTP({
 
-/* ----------------------------------------
-   SEND OTP EMAIL
----------------------------------------- */
+        user,
 
-await emailService.sendOTPEmail({
-  email: user.email,
-  firstName: member.firstName,
-  otp: otpResult.plainOtp,
-});
+        email: user.email,
 
+        purpose:
+          OTP_PURPOSE.ACCOUNT_ACTIVATION,
+
+      });
+
+    /* ----------------------------------------
+       SEND OTP EMAIL
+    ---------------------------------------- */
+
+    await emailService.sendOTPEmail({
+
+      email: user.email,
+
+      firstName: member.firstName,
+
+      otp: otpResult.plainOtp,
+
+    });
 
     /* ----------------------------------------
        LOG ACTIVITY
     ---------------------------------------- */
 
     await logActivity(
+
       user._id,
-      "Registered a new account",
-      session
+
+      "Registered account",
+
+      session,
+
+      "auth",
+
+      "New member registration"
+
     );
 
-   /* ----------------------------------------
-   COMMIT
----------------------------------------- */
+    /* ----------------------------------------
+       COMMIT
+    ---------------------------------------- */
 
-await session.commitTransaction();
+    await session.commitTransaction();
 
-user.password = undefined;
+    return {
 
-return {
-  email: user.email,
-  nextStep: "verify-otp",
-  otpId: otpResult.otpRecord._id,
-  expiresAt: otpResult.otpRecord.expiresAt,
+      email: user.email,
+
+      nextStep: "verify-otp",
+
+      otpId:
+        otpResult.otpRecord._id,
+
+      expiresAt:
+        otpResult.otpRecord.expiresAt,
+
+    };
+
+  } catch (error) {
+
+    await session.abortTransaction();
+
+    throw error;
+
+  } finally {
+
+    await session.endSession();
+
+  }
+
 };
-
 
 /* ==========================================================
    ACTIVATE IMPORTED MEMBER
@@ -328,73 +418,108 @@ export const activateExistingMember = async (data) => {
       email,
     } = data;
 
+    const normalizedEmail = email
+      .toLowerCase()
+      .trim();
+
+    const normalizedPhone = phone.trim();
+
     /* ----------------------------------------
        FIND IMPORTED MEMBER
     ---------------------------------------- */
 
     const member = await Member.findOne({
-      phone: phone.trim(),
+
+      phone: normalizedPhone,
+
       source: "imported",
+
     }).session(session);
 
     if (!member) {
 
       throw new AppError(
-        "No imported membership was found with the provided phone number.",
+
+        "No imported member was found with the provided phone number.",
+
         404
+
       );
 
     }
 
     /* ----------------------------------------
-       ACCOUNT ALREADY ACTIVATED?
+       ALREADY ACTIVATED?
     ---------------------------------------- */
 
-    if (member.user || member.accountActivated) {
+    if (
+
+      member.accountActivated ||
+
+      member.user
+
+    ) {
 
       throw new AppError(
+
         "This membership has already been activated.",
+
         409
+
       );
 
     }
 
     /* ----------------------------------------
-       EMAIL ALREADY USED?
+       EMAIL ALREADY EXISTS?
     ---------------------------------------- */
 
     const existingUser = await User.findOne({
-      email: email.toLowerCase().trim(),
+
+      email: normalizedEmail,
+
     }).session(session);
 
     if (existingUser) {
 
       throw new AppError(
+
         "Email address is already registered.",
+
         409
+
       );
 
     }
 
     /* ----------------------------------------
-       CREATE USER
+       CREATE USER ACCOUNT
     ---------------------------------------- */
 
     const [user] = await User.create(
+
       [
         {
-          email: email.toLowerCase().trim(),
+
+          email: normalizedEmail,
+
           password: null,
+
           role: "member",
+
           isActive: false,
+
           emailVerified: false,
+
         },
       ],
+
       { session }
+
     );
 
     /* ----------------------------------------
-       LINK MEMBER ACCOUNT
+       LINK MEMBER
     ---------------------------------------- */
 
     member.user = user._id;
@@ -404,32 +529,34 @@ export const activateExistingMember = async (data) => {
     await member.save({ session });
 
     /* ----------------------------------------
-       CREATE OTP
+       GENERATE OTP
     ---------------------------------------- */
 
-   const otpResult = await otpService.createOTP({
+    const otpResult =
+      await otpService.createOTP({
 
-  user,
+        user,
 
-  email: user.email,
+        email: user.email,
 
-  purpose: OTP_PURPOSE.ACCOUNT_ACTIVATION,
+        purpose:
+          OTP_PURPOSE.ACCOUNT_ACTIVATION,
 
-});
+      });
 
-/* ----------------------------------------
-   SEND OTP EMAIL
----------------------------------------- */
+    /* ----------------------------------------
+       SEND OTP EMAIL
+    ---------------------------------------- */
 
-await emailService.sendOTPEmail({
+    await emailService.sendOTPEmail({
 
-  email: user.email,
+      email: user.email,
 
-  firstName: member.firstName,
+      firstName: member.firstName,
 
-  otp: otpResult.plainOtp,
+      otp: otpResult.plainOtp,
 
-});
+    });
 
     /* ----------------------------------------
        LOG ACTIVITY
@@ -441,82 +568,328 @@ await emailService.sendOTPEmail({
 
       "Activated imported membership",
 
-      session
+      session,
+
+      "auth",
+
+      "Imported member activation"
 
     );
 
     /* ----------------------------------------
-       COMMIT TRANSACTION
+       COMMIT
     ---------------------------------------- */
 
     await session.commitTransaction();
 
-  /* ----------------------------------------
-   RESPONSE
----------------------------------------- */
+    return {
 
-return {
+      email: user.email,
 
-  email: user.email,
+      nextStep: "verify-otp",
 
-  nextStep: "verify-otp",
+      otpId:
+        otpResult.otpRecord._id,
 
-  otpId: otpResult.otpRecord._id,
+      expiresAt:
+        otpResult.otpRecord.expiresAt,
 
-  expiresAt: otpResult.otpRecord.expiresAt,
+    };
+
+  } catch (error) {
+
+    await session.abortTransaction();
+
+    throw error;
+
+  } finally {
+
+    await session.endSession();
+
+  }
 
 };
-
 
 /* ==========================================================
    VERIFY OTP
 ========================================================== */
 
 export const verifyOTP = async (data) => {
+
+  const session = await startTransaction();
+
+  try {
+
+    const {
+      email,
+      otp,
+      purpose = OTP_PURPOSE.ACCOUNT_ACTIVATION,
+    } = data;
+
+    const normalizedEmail = email
+      .toLowerCase()
+      .trim();
+
+    /* ----------------------------------------
+       FIND USER
+    ---------------------------------------- */
+
+    const user = await User.findOne({
+
+      email: normalizedEmail,
+
+    }).session(session);
+
+    if (!user) {
+
+      throw new AppError(
+
+        "Account not found.",
+
+        404
+
+      );
+
+    }
+
+    /* ----------------------------------------
+       VERIFY OTP
+    ---------------------------------------- */
+
+    await otpService.verifyOTP({
+
+      user,
+
+      email: normalizedEmail,
+
+      otp,
+
+      purpose,
+
+    });
+
+    /* ----------------------------------------
+       ACCOUNT ACTIVATION
+    ---------------------------------------- */
+
+    if (
+
+      purpose ===
+      OTP_PURPOSE.ACCOUNT_ACTIVATION
+
+    ) {
+
+      user.emailVerified = true;
+
+      await user.save({ session });
+
+      const member =
+        await Member.findOne({
+
+          user: user._id,
+
+        }).session(session);
+
+      if (!member) {
+
+        throw new AppError(
+
+          "Member profile not found.",
+
+          404
+
+        );
+
+      }
+
+      member.accountActivated = true;
+
+      await member.save({ session });
+
+      await emailService.sendWelcomeEmail({
+
+        email: user.email,
+
+        firstName: member.firstName,
+
+      });
+
+    }
+
+    /* ----------------------------------------
+       LOG ACTIVITY
+    ---------------------------------------- */
+
+    await logActivity(
+
+      user._id,
+
+      "Verified OTP",
+
+      session,
+
+      "auth",
+
+      "OTP verification completed"
+
+    );
+
+    /* ----------------------------------------
+       COMMIT
+    ---------------------------------------- */
+
+    await session.commitTransaction();
+
+    return {
+
+      success: true,
+
+      verified: true,
+
+      nextStep:
+
+        purpose ===
+        OTP_PURPOSE.ACCOUNT_ACTIVATION
+
+          ? "create-password"
+
+          : "reset-password",
+
+    };
+
+  } catch (error) {
+
+    await session.abortTransaction();
+
+    throw error;
+
+  } finally {
+
+    await session.endSession();
+
+  }
+
+};
+
+/* ==========================================================
+   RESEND OTP
+========================================================== */
+
+export const resendOTP = async (data) => {
+
   const {
     email,
-    code,
-    purpose,
+    purpose = OTP_PURPOSE.ACCOUNT_ACTIVATION,
   } = data;
 
-  /* ----------------------------------------
-     VALIDATE PURPOSE
-  ---------------------------------------- */
-
-  validateOTPPurpose(purpose);
+  const normalizedEmail = email
+    .toLowerCase()
+    .trim();
 
   /* ----------------------------------------
      FIND USER
   ---------------------------------------- */
 
   const user = await User.findOne({
-    email: email.toLowerCase().trim(),
+
+    email: normalizedEmail,
+
   });
 
   if (!user) {
+
     throw new AppError(
+
       "Account not found.",
+
       404
+
     );
+
   }
 
   /* ----------------------------------------
-     VERIFY OTP
+     FIND MEMBER
   ---------------------------------------- */
 
-  await otpService.verifyOTP({
-    user,
-    purpose,
-    code,
+  const member = await Member.findOne({
+
+    user: user._id,
+
   });
 
   /* ----------------------------------------
-     VERIFY EMAIL
+     ACCOUNT ALREADY VERIFIED?
   ---------------------------------------- */
 
-  if (!user.emailVerified) {
-    user.emailVerified = true;
-    await user.save();
+  if (
+
+    purpose === OTP_PURPOSE.ACCOUNT_ACTIVATION &&
+
+    user.emailVerified
+
+  ) {
+
+    throw new AppError(
+
+      "Your email has already been verified.",
+
+      400
+
+    );
+
+  }
+
+  /* ----------------------------------------
+     GENERATE NEW OTP
+  ---------------------------------------- */
+
+  const otpResult =
+    await otpService.createOTP({
+
+      user,
+
+      email: user.email,
+
+      purpose,
+
+    });
+
+  /* ----------------------------------------
+     SEND EMAIL
+  ---------------------------------------- */
+
+  if (
+
+    purpose ===
+    OTP_PURPOSE.ACCOUNT_ACTIVATION
+
+  ) {
+
+    await emailService.sendOTPEmail({
+
+      email: user.email,
+
+      firstName:
+        member?.firstName || "Member",
+
+      otp: otpResult.plainOtp,
+
+    });
+
+  } else {
+
+    await emailService.sendPasswordResetEmail({
+
+      email: user.email,
+
+      firstName:
+        member?.firstName || "Member",
+
+      otp: otpResult.plainOtp,
+
+    });
+
   }
 
   /* ----------------------------------------
@@ -524,8 +897,17 @@ export const verifyOTP = async (data) => {
   ---------------------------------------- */
 
   await logActivity(
+
     user._id,
-    "Verified email address"
+
+    "Resent OTP",
+
+    null,
+
+    "auth",
+
+    purpose
+
   );
 
   /* ----------------------------------------
@@ -533,42 +915,67 @@ export const verifyOTP = async (data) => {
   ---------------------------------------- */
 
   return {
+
     email: user.email,
-    verified: true,
-    nextStep: "create-password",
+
+    otpId:
+      otpResult.otpRecord._id,
+
+    expiresAt:
+      otpResult.otpRecord.expiresAt,
+
+    nextStep:
+
+      purpose ===
+      OTP_PURPOSE.ACCOUNT_ACTIVATION
+
+        ? "verify-otp"
+
+        : "reset-password",
+
   };
+
 };
-
-
 
 /* ==========================================================
    CREATE PASSWORD
 ========================================================== */
 
 export const createPassword = async (data) => {
+
   const session = await startTransaction();
 
   try {
+
     const {
       email,
       password,
     } = data;
+
+    const normalizedEmail = email
+      .toLowerCase()
+      .trim();
 
     /* ----------------------------------------
        FIND USER
     ---------------------------------------- */
 
     const user = await User.findOne({
-      email: email.toLowerCase().trim(),
-    })
-      .select("+password")
-      .session(session);
+
+      email: normalizedEmail,
+
+    }).session(session);
 
     if (!user) {
+
       throw new AppError(
+
         "Account not found.",
+
         404
+
       );
+
     }
 
     /* ----------------------------------------
@@ -576,10 +983,15 @@ export const createPassword = async (data) => {
     ---------------------------------------- */
 
     if (!user.emailVerified) {
+
       throw new AppError(
-        "Please verify your email first.",
+
+        "Please verify your email before creating a password.",
+
         400
+
       );
+
     }
 
     /* ----------------------------------------
@@ -587,10 +999,15 @@ export const createPassword = async (data) => {
     ---------------------------------------- */
 
     if (user.password) {
+
       throw new AppError(
+
         "Password has already been created.",
+
         409
+
       );
+
     }
 
     /* ----------------------------------------
@@ -598,53 +1015,52 @@ export const createPassword = async (data) => {
     ---------------------------------------- */
 
     const member = await Member.findOne({
+
       user: user._id,
+
     }).session(session);
 
     if (!member) {
+
       throw new AppError(
+
         "Member profile not found.",
+
         404
+
       );
+
     }
 
     /* ----------------------------------------
        HASH PASSWORD
     ---------------------------------------- */
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      12
-    );
-
-    user.password = hashedPassword;
-
-    /* ----------------------------------------
-       ACTIVATE ACCOUNT
-    ---------------------------------------- */
+    user.password = await hashPassword(password);
 
     user.isActive = true;
 
     /* ----------------------------------------
-       ACTIVATE MEMBER
+       COMPLETE ACCOUNT SETUP
     ---------------------------------------- */
 
     member.accountActivated = true;
 
-    /* ----------------------------------------
-       GENERATE MEMBER NUMBER
-    ---------------------------------------- */
+    if (!member.membershipNumber) {
 
-    if (!member.memberNumber) {
-      member.memberNumber =
-        await generateMemberNumber(
-          member.county
+      member.membershipNumber =
+        await generateMembershipNumber(
+          member.county,
+          session
         );
+
     }
 
-    /* ----------------------------------------
-       SAVE
-    ---------------------------------------- */
+    if (!member.joinedAt) {
+
+      member.joinedAt = new Date();
+
+    }
 
     await user.save({ session });
 
@@ -655,9 +1071,17 @@ export const createPassword = async (data) => {
     ---------------------------------------- */
 
     await logActivity(
+
       user._id,
-      "Created account password",
-      session
+
+      "Completed account activation",
+
+      session,
+
+      "auth",
+
+      "Password created and membership activated"
+
     );
 
     /* ----------------------------------------
@@ -671,27 +1095,25 @@ export const createPassword = async (data) => {
     ---------------------------------------- */
 
     await emailService.sendWelcomeEmail({
+
       email: user.email,
+
       firstName: member.firstName,
+
     });
 
     /* ----------------------------------------
-       GENERATE TOKEN
+       AUTO LOGIN
     ---------------------------------------- */
 
-    const token = generateToken(user._id);
+    const token =
+  generateToken(user);
 
-    user.password = undefined;
-
-    /* ----------------------------------------
-       RESPONSE
-    ---------------------------------------- */
-
-    return {
-      token,
-      user,
-      member,
-    };
+return buildAuthResponse(
+  user,
+  member,
+  token
+);
 
   } catch (error) {
 
@@ -704,9 +1126,8 @@ export const createPassword = async (data) => {
     await session.endSession();
 
   }
+
 };
-
-
 
 /* ==========================================================
    LOGIN
@@ -715,82 +1136,48 @@ export const createPassword = async (data) => {
 export const login = async (data) => {
 
   const {
-    identifier,
+    email,
     password,
   } = data;
+
+  const normalizedEmail = email
+    .toLowerCase()
+    .trim();
 
   /* ----------------------------------------
      FIND USER
   ---------------------------------------- */
 
-  let user;
+  const user = await User.findOne({
 
-  // Login using Email
+    email: normalizedEmail,
 
-  if (identifier.includes("@")) {
-
-    user = await User.findOne({
-      email: identifier
-        .toLowerCase()
-        .trim(),
-    }).select("+password");
-
-  }
-
-  // Login using Phone Number
-
-  else {
-
-    const member = await Member.findOne({
-      phone: identifier.trim(),
-    });
-
-    if (!member) {
-
-      throw new AppError(
-        "Invalid credentials.",
-        401
-      );
-
-    }
-
-    user = await User.findById(
-      member.user
-    ).select("+password");
-
-  }
+  });
 
   if (!user) {
 
     throw new AppError(
-      "Invalid credentials.",
+
+      "Invalid email or password.",
+
       401
+
     );
 
   }
 
   /* ----------------------------------------
-     ACCOUNT LOCKED?
+     PASSWORD CREATED?
   ---------------------------------------- */
 
-  if (user.accountLocked) {
+  if (!user.password) {
 
     throw new AppError(
-      "Your account has been locked. Please contact support.",
-      403
-    );
 
-  }
+      "Please complete account activation first.",
 
-  /* ----------------------------------------
-     ACCOUNT ACTIVE?
-  ---------------------------------------- */
+      400
 
-  if (!user.isActive) {
-
-    throw new AppError(
-      "Please complete account activation.",
-      403
     );
 
   }
@@ -802,8 +1189,27 @@ export const login = async (data) => {
   if (!user.emailVerified) {
 
     throw new AppError(
-      "Please verify your email address.",
+
+      "Please verify your email first.",
+
       403
+
+    );
+
+  }
+
+  /* ----------------------------------------
+     ACCOUNT ACTIVE?
+  ---------------------------------------- */
+
+  if (!user.isActive) {
+
+    throw new AppError(
+
+      "Your account has been deactivated.",
+
+      403
+
     );
 
   }
@@ -813,65 +1219,83 @@ export const login = async (data) => {
   ---------------------------------------- */
 
   const passwordMatches =
-    await bcrypt.compare(
+    await comparePassword(
       password,
       user.password
     );
 
   if (!passwordMatches) {
 
-    user.failedLoginAttempts += 1;
-
-    if (user.failedLoginAttempts >= 5) {
-
-      user.accountLocked = true;
-
-    }
-
-    await user.save();
-
     throw new AppError(
-      "Invalid credentials.",
+
+      "Invalid email or password.",
+
       401
+
     );
 
   }
-
-  /* ----------------------------------------
-     RESET FAILED ATTEMPTS
-  ---------------------------------------- */
-
-  user.failedLoginAttempts = 0;
-
-  user.lastLogin = new Date();
-
-  await user.save();
 
   /* ----------------------------------------
      MEMBER PROFILE
   ---------------------------------------- */
 
   const member = await Member.findOne({
+
     user: user._id,
+
   });
 
+  if (!member) {
+
+    throw new AppError(
+
+      "Member profile not found.",
+
+      404
+
+    );
+
+  }
+
   /* ----------------------------------------
-     ACTIVITY LOG
+     UPDATE LAST LOGIN
+  ---------------------------------------- */
+
+  user.lastLogin = new Date();
+
+  await user.save();
+
+  /* ----------------------------------------
+     LOG ACTIVITY
   ---------------------------------------- */
 
   await logActivity(
+
     user._id,
-    "Logged into the system"
+
+    "Logged in",
+
+    null,
+
+    "auth",
+
+    "Member logged into JVP Connect"
+
   );
 
   /* ----------------------------------------
-     JWT
+     TOKENS
   ---------------------------------------- */
 
-  const token =
-    generateToken(user._id);
+ const token =
+  generateToken(user);
 
-  user.password = undefined;
+return buildAuthResponse(
+  user,
+  member,
+  token
+);
 
   /* ----------------------------------------
      RESPONSE
@@ -879,16 +1303,67 @@ export const login = async (data) => {
 
   return {
 
-    token,
+    token: accessToken,
 
-    user,
+    refreshToken,
 
-    member,
+    user: {
+
+      id: user._id,
+
+      email: user.email,
+
+      role: user.role,
+
+      isActive: user.isActive,
+
+      emailVerified:
+        user.emailVerified,
+
+      lastLogin:
+        user.lastLogin,
+
+    },
+
+    member: {
+
+      id: member._id,
+
+      membershipNumber:
+        member.membershipNumber,
+
+      firstName:
+        member.firstName,
+
+      middleName:
+        member.middleName,
+
+      lastName:
+        member.lastName,
+
+      county:
+        member.county,
+
+      membershipType:
+        member.membershipType,
+
+      membershipStatus:
+        member.membershipStatus,
+
+      membershipFeePaid:
+        member.membershipFeePaid,
+
+      profilePhoto:
+        member.profilePhoto,
+
+      joinedAt:
+        member.joinedAt,
+
+    },
 
   };
 
 };
-
 
 /* ==========================================================
    FORGOT PASSWORD
@@ -898,122 +1373,144 @@ export const forgotPassword = async (data) => {
 
   const { email } = data;
 
+  const normalizedEmail = email
+    .toLowerCase()
+    .trim();
+
   /* ----------------------------------------
      FIND USER
   ---------------------------------------- */
 
   const user = await User.findOne({
-    email: email.toLowerCase().trim(),
+
+    email: normalizedEmail,
+
   });
+
+  /*
+     SECURITY:
+     Never reveal whether an account exists.
+  */
 
   if (!user) {
 
-    throw new AppError(
-      "Account not found.",
-      404
-    );
+    return {
+
+      success: true,
+
+      message:
+        "If the account exists, a verification code has been sent.",
+
+    };
 
   }
 
   /* ----------------------------------------
-     ACCOUNT ACTIVE?
+     FIND MEMBER
   ---------------------------------------- */
 
-  if (!user.isActive) {
+  const member = await Member.findOne({
+
+    user: user._id,
+
+  });
+
+  /* ----------------------------------------
+     ACCOUNT READY?
+  ---------------------------------------- */
+
+  if (!user.password) {
 
     throw new AppError(
-      "This account has not been activated.",
+
+      "Please complete account activation first.",
+
       400
+
     );
 
   }
-
-  /* ----------------------------------------
-     EMAIL VERIFIED?
-  ---------------------------------------- */
 
   if (!user.emailVerified) {
 
     throw new AppError(
-      "Please verify your email first.",
+
+      "Email address has not been verified.",
+
       400
+
     );
 
   }
 
   /* ----------------------------------------
-     MEMBER PROFILE
+     CREATE PASSWORD RESET OTP
   ---------------------------------------- */
 
-  const member = await Member.findOne({
-    user: user._id,
+  const otpResult =
+    await otpService.createOTP({
+
+      user,
+
+      email: user.email,
+
+      purpose:
+        OTP_PURPOSE.PASSWORD_RESET,
+
+    });
+
+  /* ----------------------------------------
+     SEND EMAIL
+  ---------------------------------------- */
+
+  await emailService.sendPasswordResetEmail({
+
+    email: user.email,
+
+    firstName:
+      member?.firstName || "Member",
+
+    otp: otpResult.plainOtp,
+
   });
 
-  if (!member) {
-
-    throw new AppError(
-      "Member profile not found.",
-      404
-    );
-
-  }
-
   /* ----------------------------------------
-     GENERATE OTP
+     LOG ACTIVITY
   ---------------------------------------- */
 
-  const otpResult = await otpService.createOTP({
+  await logActivity(
 
-  user,
+    user._id,
 
-  email: user.email,
+    "Requested password reset",
 
-  purpose: OTP_PURPOSE.PASSWORD_RESET,
+    null,
 
-});
+    "auth",
 
-/* ----------------------------------------
-   SEND EMAIL
----------------------------------------- */
+    "Password reset OTP sent"
 
-await emailService.sendOTPEmail({
+  );
 
-  email: user.email,
+  /* ----------------------------------------
+     RESPONSE
+  ---------------------------------------- */
 
-  firstName: member.firstName,
+  return {
 
-  otp: otpResult.plainOtp,
+    email: user.email,
 
-});
+    otpId:
+      otpResult.otpRecord._id,
 
-/* ----------------------------------------
-   LOG ACTIVITY
----------------------------------------- */
+    expiresAt:
+      otpResult.otpRecord.expiresAt,
 
-await logActivity(
+    nextStep: "reset-password",
 
-  user._id,
-
-  "Requested password reset"
-
-);
-
-/* ----------------------------------------
-   RESPONSE
----------------------------------------- */
-
-return {
-
-  email: user.email,
-
-  nextStep: "reset-password",
-
-  otpId: otpResult.otpRecord._id,
-
-  expiresAt: otpResult.otpRecord.expiresAt,
+  };
 
 };
-
 
 /* ==========================================================
    RESET PASSWORD
@@ -1021,31 +1518,38 @@ return {
 
 export const resetPassword = async (data) => {
 
-  const {
-    email,
-    code,
-    password,
-  } = data;
-
   const session = await startTransaction();
 
   try {
+
+    const {
+      email,
+      otp,
+      password,
+    } = data;
+
+    const normalizedEmail = email
+      .toLowerCase()
+      .trim();
 
     /* ----------------------------------------
        FIND USER
     ---------------------------------------- */
 
     const user = await User.findOne({
-      email: email.toLowerCase().trim(),
-    })
-      .select("+password")
-      .session(session);
+
+      email: normalizedEmail,
+
+    }).session(session);
 
     if (!user) {
 
       throw new AppError(
+
         "Account not found.",
+
         404
+
       );
 
     }
@@ -1058,34 +1562,48 @@ export const resetPassword = async (data) => {
 
       user,
 
-      purpose: OTP_PURPOSE.PASSWORD_RESET,
+      email: normalizedEmail,
 
-      code,
+      otp,
+
+      purpose: OTP_PURPOSE.PASSWORD_RESET,
 
     });
 
     /* ----------------------------------------
-       HASH PASSWORD
+       UPDATE PASSWORD
     ---------------------------------------- */
 
-    const hashedPassword =
+    user.password =
       await hashPassword(password);
 
-    user.password = hashedPassword;
-
-    /* ----------------------------------------
-       UNLOCK ACCOUNT
-    ---------------------------------------- */
-
-    user.accountLocked = false;
-
-    user.failedLoginAttempts = 0;
-
-    /* ----------------------------------------
-       SAVE
-    ---------------------------------------- */
+    user.isActive = true;
 
     await user.save({ session });
+
+  
+
+    /* ----------------------------------------
+       MEMBER PROFILE
+    ---------------------------------------- */
+
+    const member = await Member.findOne({
+
+      user: user._id,
+
+    }).session(session);
+
+    if (!member) {
+
+      throw new AppError(
+
+        "Member profile not found.",
+
+        404
+
+      );
+
+    }
 
     /* ----------------------------------------
        LOG ACTIVITY
@@ -1095,9 +1613,13 @@ export const resetPassword = async (data) => {
 
       user._id,
 
-      "Reset account password",
+      "Reset password",
 
-      session
+      session,
+
+      "auth",
+
+      "Password successfully reset"
 
     );
 
@@ -1108,15 +1630,72 @@ export const resetPassword = async (data) => {
     await session.commitTransaction();
 
     /* ----------------------------------------
+       AUTO LOGIN
+    ---------------------------------------- */
+
+   const token =
+  generateToken(user);
+
+return buildAuthResponse(
+  user,
+  member,
+  token
+);
+
+    /* ----------------------------------------
        RESPONSE
     ---------------------------------------- */
 
     return {
 
-      success: true,
+      token: accessToken,
 
-      message:
-        "Password reset successfully. Please log in.",
+      refreshToken,
+
+      user: {
+
+        id: user._id,
+
+        email: user.email,
+
+        role: user.role,
+
+        isActive: user.isActive,
+
+        emailVerified:
+          user.emailVerified,
+
+      },
+
+      member: {
+
+        id: member._id,
+
+        membershipNumber:
+          member.membershipNumber,
+
+        firstName:
+          member.firstName,
+
+        lastName:
+          member.lastName,
+
+        county:
+          member.county,
+
+        membershipType:
+          member.membershipType,
+
+        membershipStatus:
+          member.membershipStatus,
+
+        membershipFeePaid:
+          member.membershipFeePaid,
+
+        profilePhoto:
+          member.profilePhoto,
+
+      },
 
     };
 
@@ -1134,12 +1713,31 @@ export const resetPassword = async (data) => {
 
 };
 
-
 /* ==========================================================
    LOGOUT
 ========================================================== */
 
-export const logout = async () => {
+export const logout = async (data = {}) => {
+
+  const { userId } = data;
+
+  if (userId) {
+
+    await logActivity(
+
+      userId,
+
+      "Logged out",
+
+      null,
+
+      "auth",
+
+      "User logged out"
+
+    );
+
+  }
 
   return {
 

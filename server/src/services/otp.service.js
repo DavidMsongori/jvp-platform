@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-import OTP from "../models/otp.model.js";
+import OTP from "../models/OTP.js";
 
 /**
  * ==========================================================
