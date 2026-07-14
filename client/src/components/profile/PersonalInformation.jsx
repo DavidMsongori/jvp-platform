@@ -1,328 +1,448 @@
-import "./Profile.css";
+import { useEffect, useState } from "react";
 
-/* =====================================================
-   PERSONAL INFORMATION
-===================================================== */
+import {
+  User,
+  Briefcase,
+  Save,
+  Pencil,
+  X,
+} from "lucide-react";
 
-function PersonalInformation({
+import {
+  updateMyProfile,
+} from "../../services/member.service";
 
-  formData,
+import {
+  useProfile,
+} from "../../context/ProfileContext";
 
-  updateField,
+import "./PersonalInformation.css";
 
-}) {
+function PersonalInformation() {
+
+  const {
+
+    profile,
+
+    reloadProfile,
+
+  } = useProfile();
+
+  const [editing, setEditing] =
+    useState(false);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [success, setSuccess] =
+    useState("");
+
+  const [form, setForm] =
+    useState({
+
+      firstName: "",
+
+      middleName: "",
+
+      lastName: "",
+
+      gender: "",
+
+      dateOfBirth: "",
+
+      occupation: "",
+
+    });
+
+  useEffect(() => {
+
+    if (!profile) return;
+
+    setForm({
+
+      firstName:
+        profile.firstName || "",
+
+      middleName:
+        profile.middleName || "",
+
+      lastName:
+        profile.lastName || "",
+
+      gender:
+        profile.gender || "",
+
+      dateOfBirth:
+        profile.dateOfBirth
+          ? profile.dateOfBirth.substring(0,10)
+          : "",
+
+      occupation:
+        profile.occupation || "",
+
+    });
+
+  }, [profile]);
+
+  const handleChange = (event) => {
+
+    setForm({
+
+      ...form,
+
+      [event.target.name]:
+        event.target.value,
+
+    });
+
+  };
+
+  const handleSubmit = async (event) => {
+
+    event.preventDefault();
+
+    try {
+
+      setSaving(true);
+
+      setError("");
+
+      setSuccess("");
+
+      await updateMyProfile(form);
+
+      await reloadProfile();
+
+      setEditing(false);
+
+      setSuccess(
+
+        "Personal information updated successfully."
+
+      );
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+
+        err.response?.data?.message ||
+
+        "Unable to update profile."
+
+      );
+
+    } finally {
+
+      setSaving(false);
+
+    }
+
+  };
 
   return (
 
-    <section className="profile-section">
+    <section className="personal-information">
 
-      <div className="profile-section-header">
+      <div className="section-header">
 
-        <h2>
+        <div>
 
-          Personal Information
+          <h2>
 
-        </h2>
+            <User size={22} />
 
-        <p>
+            Personal Information
 
-          Update your basic personal details.
+          </h2>
 
-        </p>
+          <p>
+
+            Manage your personal details.
+
+          </p>
+
+        </div>
+
+        {
+
+          !editing ? (
+
+            <button
+
+              className="edit-btn"
+
+              onClick={() =>
+
+                setEditing(true)
+
+              }
+
+            >
+
+              <Pencil size={16} />
+
+              Edit Profile
+
+            </button>
+
+          ) : (
+
+            <button
+
+              className="cancel-btn"
+
+              onClick={() =>
+
+                setEditing(false)
+
+              }
+
+            >
+
+              <X size={16} />
+
+              Cancel
+
+            </button>
+
+          )
+
+        }
 
       </div>
 
-      <div className="profile-grid">
+      <form
+        onSubmit={handleSubmit}
+      >
 
-        {/* First Name */}
+        <div className="profile-grid">
 
-        <div className="form-group">
+          <div className="form-group">
 
-          <label>
+            <label>
 
-            First Name
+              First Name
 
-          </label>
+            </label>
 
-          <input
+            <input
 
-            type="text"
+              name="firstName"
 
-            value={formData.firstName || ""}
+              value={form.firstName}
 
-            onChange={(e) =>
+              onChange={handleChange}
 
-              updateField(
+              disabled={!editing}
 
-                "firstName",
+            />
 
-                e.target.value
+          </div>
 
-              )
+          <div className="form-group">
 
-            }
+            <label>
 
-          />
+              Middle Name
+
+            </label>
+
+            <input
+
+              name="middleName"
+
+              value={form.middleName}
+
+              onChange={handleChange}
+
+              disabled={!editing}
+
+            />
+
+          </div>
+
+          <div className="form-group">
+
+            <label>
+
+              Last Name
+
+            </label>
+
+            <input
+
+              name="lastName"
+
+              value={form.lastName}
+
+              onChange={handleChange}
+
+              disabled={!editing}
+
+            />
+
+          </div>
+
+          <div className="form-group">
+
+            <label>
+
+              Gender
+
+            </label>
+
+            <select
+
+              name="gender"
+
+              value={form.gender}
+
+              onChange={handleChange}
+
+              disabled={!editing}
+
+            >
+
+              <option value="">
+
+                Select Gender
+
+              </option>
+
+              <option value="male">
+
+                Male
+
+              </option>
+
+              <option value="female">
+
+                Female
+
+              </option>
+
+            </select>
+
+          </div>
+
+          <div className="form-group">
+
+            <label>
+
+              Date of Birth
+
+            </label>
+
+            <input
+
+              type="date"
+
+              name="dateOfBirth"
+
+              value={form.dateOfBirth}
+
+              onChange={handleChange}
+
+              disabled={!editing}
+
+            />
+
+          </div>
+
+          <div className="form-group">
+
+            <label>
+
+              Occupation
+
+            </label>
+
+            <div className="input-icon">
+
+              <Briefcase size={18} />
+
+              <input
+
+                name="occupation"
+
+                value={form.occupation}
+
+                onChange={handleChange}
+
+                disabled={!editing}
+
+              />
+
+            </div>
+
+          </div>
 
         </div>
 
-        {/* Middle Name */}
+        {
 
-        <div className="form-group">
+          error &&
 
-          <label>
+          <div className="form-error">
 
-            Middle Name
+            {error}
 
-          </label>
+          </div>
 
-          <input
+        }
 
-            type="text"
+        {
 
-            value={formData.middleName || ""}
+          success &&
 
-            onChange={(e) =>
+          <div className="form-success">
 
-              updateField(
+            {success}
 
-                "middleName",
+          </div>
 
-                e.target.value
+        }
 
-              )
+        {
 
-            }
+          editing && (
 
-          />
+            <div className="form-actions">
 
-        </div>
+              <button
 
-        {/* Last Name */}
+                className="save-btn"
 
-        <div className="form-group">
+                disabled={saving}
 
-          <label>
+              >
 
-            Last Name
+                <Save size={18} />
 
-          </label>
+                {
 
-          <input
+                  saving
 
-            type="text"
+                    ? "Saving..."
 
-            value={formData.lastName || ""}
+                    : "Save Changes"
 
-            onChange={(e) =>
+                }
 
-              updateField(
+              </button>
 
-                "lastName",
+            </div>
 
-                e.target.value
+          )
 
-              )
+        }
 
-            }
-
-          />
-
-        </div>
-
-        {/* Gender */}
-
-        <div className="form-group">
-
-          <label>
-
-            Gender
-
-          </label>
-
-          <select
-
-            value={formData.gender || ""}
-
-            onChange={(e) =>
-
-              updateField(
-
-                "gender",
-
-                e.target.value
-
-              )
-
-            }
-
-          >
-
-            <option value="">
-
-              Select Gender
-
-            </option>
-
-            <option value="Male">
-
-              Male
-
-            </option>
-
-            <option value="Female">
-
-              Female
-
-            </option>
-
-            <option value="Other">
-
-              Other
-
-            </option>
-
-          </select>
-
-        </div>
-
-        {/* Date of Birth */}
-
-        <div className="form-group">
-
-          <label>
-
-            Date of Birth
-
-          </label>
-
-          <input
-
-            type="date"
-
-            value={
-
-              formData.dateOfBirth
-
-                ? formData.dateOfBirth.substring(0,10)
-
-                : ""
-
-            }
-
-            onChange={(e) =>
-
-              updateField(
-
-                "dateOfBirth",
-
-                e.target.value
-
-              )
-
-            }
-
-          />
-
-        </div>
-
-        {/* National ID */}
-
-        <div className="form-group">
-
-          <label>
-
-            National ID
-
-          </label>
-
-          <input
-
-            type="text"
-
-            value={formData.nationalId || ""}
-
-            onChange={(e) =>
-
-              updateField(
-
-                "nationalId",
-
-                e.target.value
-
-              )
-
-            }
-
-          />
-
-        </div>
-
-        {/* Phone */}
-
-        <div className="form-group">
-
-          <label>
-
-            Phone Number
-
-          </label>
-
-          <input
-
-            type="tel"
-
-            value={formData.phone || ""}
-
-            onChange={(e) =>
-
-              updateField(
-
-                "phone",
-
-                e.target.value
-
-              )
-
-            }
-
-          />
-
-        </div>
-
-        {/* Email */}
-
-        <div className="form-group">
-
-          <label>
-
-            Email Address
-
-          </label>
-
-          <input
-
-            type="email"
-
-            value={formData.email || ""}
-
-            onChange={(e) =>
-
-              updateField(
-
-                "email",
-
-                e.target.value
-
-              )
-
-            }
-
-          />
-
-        </div>
-
-      </div>
+      </form>
 
     </section>
 

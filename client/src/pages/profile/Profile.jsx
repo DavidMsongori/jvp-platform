@@ -1,14 +1,13 @@
 import { useProfile } from "../../context/ProfileContext";
 
-import ProfileHero from "../profile/components/ProfileHero";
-import ProfileSidebar from "../profile/components/ProfileSidebar";
-import ProfileTabs from "../profile/components/ProfileTabs";
+import ProfileHeader from "../../components/profile/ProfileHeader";
+import ProfileCompletion from "../../components/profile/ProfileCompletion";
+import MembershipInformation from "../../components/profile/MembershipInformation";
+import PersonalInformation from "../../components/profile/PersonalInformation";
+import ContactInformation from "../../components/profile/ContactInformation";
+import SecuritySettings from "../../components/profile/SecuritySettings";
 
 import "./Profile.css";
-
-/* =====================================================
-   PROFILE PAGE
-===================================================== */
 
 function Profile() {
 
@@ -28,15 +27,13 @@ function Profile() {
 
     return (
 
-      <div className="profile-loading">
+      <div className="profile-page">
 
-        <div className="profile-spinner" />
+        <div className="profile-loading">
 
-        <h3>
+          Loading profile...
 
-          Loading your profile...
-
-        </h3>
+        </div>
 
       </div>
 
@@ -52,19 +49,13 @@ function Profile() {
 
     return (
 
-      <div className="profile-error">
+      <div className="profile-page">
 
-        <h2>
-
-          Unable to load profile
-
-        </h2>
-
-        <p>
+        <div className="profile-error">
 
           {error}
 
-        </p>
+        </div>
 
       </div>
 
@@ -81,38 +72,48 @@ function Profile() {
     <div className="profile-page">
 
       {/* ======================================
-          HERO
+          PROFILE HEADER
       ====================================== */}
 
-      <ProfileHero />
+      <ProfileHeader />
 
       {/* ======================================
-          CONTENT
+          OVERVIEW
       ====================================== */}
 
-      <div className="profile-content">
+      <div className="profile-overview">
 
-        {/* ==============================
-            SIDEBAR
-        =============================== */}
+        <div>
 
-        <aside className="profile-sidebar-column">
+          <ProfileCompletion />
 
-          <ProfileSidebar />
+        </div>
 
-        </aside>
+        <div>
 
-        {/* ==============================
-            MAIN CONTENT
-        =============================== */}
+          <MembershipInformation />
 
-        <section className="profile-main">
-
-          <ProfileTabs />
-
-        </section>
+        </div>
 
       </div>
+
+      {/* ======================================
+          PERSONAL INFORMATION
+      ====================================== */}
+
+      <PersonalInformation />
+
+      {/* ======================================
+          CONTACT INFORMATION
+      ====================================== */}
+
+      <ContactInformation />
+
+      {/* ======================================
+          SECURITY
+      ====================================== */}
+
+      <SecuritySettings />
 
     </div>
 

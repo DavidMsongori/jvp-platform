@@ -4,6 +4,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
 } from "react";
 
 import {
@@ -24,6 +25,10 @@ export function ProfileProvider({
   children,
 }) {
 
+  /* ======================================
+     STATE
+  ====================================== */
+
   const [profile, setProfile] =
     useState(null);
 
@@ -33,9 +38,9 @@ export function ProfileProvider({
   const [error, setError] =
     useState("");
 
-  /* ==========================================
+  /* ======================================
      LOAD PROFILE
-  ========================================== */
+  ====================================== */
 
   const loadProfile = useCallback(async () => {
 
@@ -70,9 +75,9 @@ export function ProfileProvider({
 
   }, []);
 
-  /* ==========================================
+  /* ======================================
      INITIAL LOAD
-  ========================================== */
+  ====================================== */
 
   useEffect(() => {
 
@@ -80,21 +85,141 @@ export function ProfileProvider({
 
   }, [loadProfile]);
 
-  /* ==========================================
+  /* ======================================
      COMPUTED VALUES
-  ========================================== */
+  ====================================== */
 
   const fullName = profile
+
     ? [
+
         profile.firstName,
+
         profile.middleName,
+
         profile.lastName,
+
       ]
+
         .filter(Boolean)
+
         .join(" ")
+
     : "";
 
-  const value = {
+  const initials = profile
+
+    ? `${
+
+        profile.firstName?.charAt(0) || ""
+
+      }${
+
+        profile.lastName?.charAt(0) || ""
+
+      }`.toUpperCase()
+
+    : "";
+
+  const memberNumber =
+
+    profile?.memberNumber ||
+
+    profile?.membershipNumber ||
+
+    "";
+
+  const joinedDate =
+
+    profile?.joinedAt ||
+
+    null;
+
+  /* ======================================
+     PROFILE COMPLETION
+  ====================================== */
+
+  const completionFields = [
+
+    profile?.profilePhoto,
+
+    profile?.occupation,
+
+    profile?.phone,
+
+    profile?.dateOfBirth,
+
+    profile?.county,
+
+  ];
+
+  const completedFields =
+
+    completionFields.filter(Boolean).length;
+
+  const profileCompletion =
+
+    Math.round(
+
+      (completedFields /
+
+        completionFields.length) *
+
+      100
+
+    );
+
+  const isProfileComplete =
+
+    profileCompletion === 100;
+
+  /* ======================================
+     CONTEXT VALUE
+  ====================================== */
+
+  const value = useMemo(() => ({
+
+    /* Profile */
+
+    profile,
+
+    setProfile,
+
+    /* Status */
+
+    loading,
+
+    error,
+
+    /* Actions */
+
+    reloadProfile:
+
+      loadProfile,
+
+    /* Computed */
+
+    fullName,
+
+    initials,
+
+    profilePhoto:
+
+      profile?.profilePhoto || null,
+
+    membershipStatus:
+
+      profile?.membershipStatus || "",
+
+    memberNumber,
+
+    joinedDate,
+
+    profileCompletion,
+
+    isProfileComplete,
+
+  }), [
 
     profile,
 
@@ -102,17 +227,21 @@ export function ProfileProvider({
 
     error,
 
-    reloadProfile: loadProfile,
+    loadProfile,
 
     fullName,
 
-    profilePhoto:
-      profile?.profilePhoto || null,
+    initials,
 
-    membershipStatus:
-      profile?.membershipStatus || "",
+    memberNumber,
 
-  };
+    joinedDate,
+
+    profileCompletion,
+
+    isProfileComplete,
+
+  ]);
 
   return (
 
@@ -140,7 +269,9 @@ export function useProfile() {
   if (!context) {
 
     throw new Error(
+
       "useProfile must be used inside ProfileProvider."
+
     );
 
   }
@@ -148,3 +279,5 @@ export function useProfile() {
   return context;
 
 }
+
+export default ProfileContext;

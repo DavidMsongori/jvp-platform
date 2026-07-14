@@ -1,259 +1,73 @@
-/* =====================================================
+/* ==========================================================
    PROFILE PAGE
-===================================================== */
+========================================================== */
 
-.profile-page {
+.profile-page{
 
-  display: flex;
+    display:flex;
 
-  flex-direction: column;
+    flex-direction:column;
 
-  gap: 30px;
-
-  padding: 30px;
-
-  background: #f5f7fb;
-
-  min-height: 100vh;
+    gap:2rem;
 
 }
 
-/* =====================================================
-   CONTENT LAYOUT
-===================================================== */
+/* ==========================================================
+   TOP GRID
+========================================================== */
 
-.profile-content {
+.profile-overview{
 
-  display: grid;
+    display:grid;
 
-  grid-template-columns: 340px 1fr;
+    grid-template-columns:1fr 1fr;
 
-  gap: 30px;
+    gap:2rem;
 
-  align-items: flex-start;
-
-}
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
-.profile-sidebar-column {
-
-  position: sticky;
-
-  top: 90px;
+    align-items:start;
 
 }
 
-/* =====================================================
-   MAIN CONTENT
-===================================================== */
+/* ==========================================================
+   STATES
+========================================================== */
 
-.profile-main {
+.profile-loading,
 
-  display: flex;
+.profile-error{
 
-  flex-direction: column;
+    background:#ffffff;
 
-  gap: 24px;
+    border-radius:20px;
 
-}
+    padding:3rem;
 
-/* =====================================================
-   LOADING
-===================================================== */
+    text-align:center;
 
-.profile-loading {
+    font-size:1.05rem;
 
-  min-height: 80vh;
+    border:1px solid #e5e7eb;
 
-  display: flex;
-
-  flex-direction: column;
-
-  justify-content: center;
-
-  align-items: center;
-
-  gap: 20px;
-
-  color: #64748b;
+    box-shadow:0 10px 25px rgba(15,23,42,.05);
 
 }
 
-.profile-spinner {
+.profile-error{
 
-  width: 60px;
-
-  height: 60px;
-
-  border: 5px solid #dbeafe;
-
-  border-top: 5px solid #1565d8;
-
-  border-radius: 50%;
-
-  animation: profile-spin 1s linear infinite;
+    color:#dc2626;
 
 }
 
-@keyframes profile-spin {
-
-  from {
-
-    transform: rotate(0deg);
-
-  }
-
-  to {
-
-    transform: rotate(360deg);
-
-  }
-
-}
-
-/* =====================================================
-   ERROR
-===================================================== */
-
-.profile-error {
-
-  max-width: 600px;
-
-  margin: 80px auto;
-
-  background: #ffffff;
-
-  padding: 40px;
-
-  border-radius: 18px;
-
-  text-align: center;
-
-  box-shadow: 0 12px 35px rgba(0,0,0,.08);
-
-}
-
-.profile-error h2 {
-
-  color: #dc2626;
-
-  margin-bottom: 15px;
-
-}
-
-.profile-error p {
-
-  color: #64748b;
-
-}
-
-/* =====================================================
-   CARD STYLE
-===================================================== */
-
-.profile-card {
-
-  background: #ffffff;
-
-  border-radius: 20px;
-
-  box-shadow: 0 10px 30px rgba(0,0,0,.06);
-
-  padding: 28px;
-
-}
-
-/* =====================================================
-   BUTTONS
-===================================================== */
-
-.profile-btn {
-
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 10px;
-
-  padding: 12px 20px;
-
-  border: none;
-
-  border-radius: 12px;
-
-  background: #1565d8;
-
-  color: #ffffff;
-
-  cursor: pointer;
-
-  font-weight: 600;
-
-  transition: .25s;
-
-}
-
-.profile-btn:hover {
-
-  background: #0d47a1;
-
-  transform: translateY(-2px);
-
-}
-
-/* =====================================================
+/* ==========================================================
    RESPONSIVE
-===================================================== */
+========================================================== */
 
-@media (max-width: 1200px) {
+@media (max-width:1100px){
 
-  .profile-content {
+    .profile-overview{
 
-    grid-template-columns: 300px 1fr;
+        grid-template-columns:1fr;
 
-  }
-
-}
-
-@media (max-width: 992px) {
-
-  .profile-content {
-
-    grid-template-columns: 1fr;
-
-  }
-
-  .profile-sidebar-column {
-
-    position: static;
-
-  }
-
-}
-
-@media (max-width: 768px) {
-
-  .profile-page {
-
-    padding: 20px;
-
-    gap: 20px;
-
-  }
-
-}
-
-@media (max-width: 576px) {
-
-  .profile-page {
-
-    padding: 15px;
-
-  }
+    }
 
 }

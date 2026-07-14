@@ -1,0 +1,213 @@
+/* ==========================================================
+   PROFILE COMPLETION
+========================================================== */
+
+.profile-completion{
+
+    margin-top:2rem;
+
+    background:#ffffff;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:24px;
+
+    padding:2rem;
+
+    box-shadow:0 10px 25px rgba(15,23,42,.05);
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.completion-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:2rem;
+
+    margin-bottom:1.5rem;
+
+}
+
+.completion-header h2{
+
+    margin:0;
+
+    color:#16213e;
+
+    font-size:1.4rem;
+
+}
+
+.completion-header p{
+
+    margin-top:.5rem;
+
+    color:#64748b;
+
+    line-height:1.5;
+
+}
+
+.completion-percentage{
+
+    width:78px;
+
+    height:78px;
+
+    border-radius:50%;
+
+    background:#2563eb;
+
+    color:#ffffff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:1.25rem;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   PROGRESS
+========================================================== */
+
+.completion-progress{
+
+    height:12px;
+
+    background:#e5e7eb;
+
+    border-radius:999px;
+
+    overflow:hidden;
+
+    margin-bottom:1rem;
+
+}
+
+.completion-progress-fill{
+
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #2563eb,
+        #22c55e
+    );
+
+    transition:width .4s ease;
+
+}
+
+/* ==========================================================
+   STATUS
+========================================================== */
+
+.completion-status{
+
+    margin-bottom:1.5rem;
+
+    color:#475569;
+
+    font-weight:500;
+
+}
+
+/* ==========================================================
+   LIST
+========================================================== */
+
+.completion-list{
+
+    display:grid;
+
+    gap:1rem;
+
+}
+
+.completion-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:1rem;
+
+    padding:1rem 1.2rem;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:16px;
+
+    transition:.25s;
+
+}
+
+.completion-item:hover{
+
+    border-color:#2563eb;
+
+    transform:translateY(-2px);
+
+}
+
+.completion-item.completed{
+
+    background:#f0fdf4;
+
+    border-color:#bbf7d0;
+
+}
+
+.completion-icon{
+
+    color:#22c55e;
+
+}
+
+.completion-info{
+
+    flex:1;
+
+}
+
+.completion-info strong{
+
+    color:#16213e;
+
+}
+
+.completion-item svg:last-child{
+
+    color:#64748b;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:768px){
+
+    .completion-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+}

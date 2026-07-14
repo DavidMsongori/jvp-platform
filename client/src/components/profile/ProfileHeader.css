@@ -1,241 +1,241 @@
-/* ==========================================
+/* ==========================================================
    PROFILE HEADER
-========================================== */
+========================================================== */
 
-.profile-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  border-radius: 18px;
-  background: var(--card-bg, #ffffff);
-  box-shadow: var(--card-shadow, 0 8px 24px rgba(0, 0, 0, 0.08));
+.profile-header{
+
+    background:#ffffff;
+
+    border-radius:24px;
+
+    padding:2rem;
+
+    display:flex;
+
+    gap:2rem;
+
+    align-items:center;
+
+    border:1px solid #e5e7eb;
+
+    box-shadow:0 10px 25px rgba(15,23,42,.05);
+
 }
 
-.profile-header-left {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-/* ==========================================
+/* ==========================================================
    AVATAR
-========================================== */
+========================================================== */
 
-.profile-avatar {
-  position: relative;
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #f3f5f7;
-  border: 4px solid #008751;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
+.profile-avatar{
 
-.profile-avatar:hover {
-  transform: scale(1.03);
-}
+    position:relative;
 
-.profile-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+    width:140px;
 
-.profile-avatar svg {
-  width: 60px;
-  height: 60px;
-  color: #9aa5b1;
-  position: absolute;
-  inset: 0;
-  margin: auto;
-}
+    height:140px;
 
-/* ==========================================
-   CAMERA OVERLAY
-========================================== */
-
-.camera-overlay {
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #008751;
-  color: #ffffff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 135, 81, 0.3);
-  transition: 0.25s ease;
-}
-
-.profile-avatar:hover .camera-overlay {
-  transform: scale(1.1);
-}
-
-/* ==========================================
-   MEMBER DETAILS
-========================================== */
-
-.profile-details h1 {
-  margin: 0;
-  color: #1d3557;
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.profile-details p {
-  margin: 10px 0 5px;
-  color: #666;
-  font-size: 1rem;
-}
-
-.profile-details span {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 6px 14px;
-  background: rgba(0, 135, 81, 0.1);
-  color: #008751;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-/* ==========================================
-   STATUS PANEL
-========================================== */
-
-.profile-status {
-  display: flex;
-  gap: 2rem;
-}
-
-.profile-status > div {
-  min-width: 150px;
-  padding: 1rem;
-  border-radius: 12px;
-  background: #f8fafc;
-  text-align: center;
-}
-
-.profile-status small {
-  display: block;
-  color: #7b8794;
-  font-size: 0.85rem;
-  margin-bottom: 6px;
-}
-
-.profile-status strong {
-  color: #1d3557;
-  font-size: 1.15rem;
-}
-
-/* ==========================================
-   LOADER
-========================================== */
-
-.spin {
-  animation: profileSpin 1s linear infinite;
-}
-
-@keyframes profileSpin {
-
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+    flex-shrink:0;
 
 }
 
-/* ==========================================
+.profile-avatar img,
+
+.avatar-placeholder{
+
+    width:100%;
+
+    height:100%;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#2563eb;
+
+    color:#ffffff;
+
+    font-size:3rem;
+
+    font-weight:700;
+
+}
+
+.change-photo-btn{
+
+    position:absolute;
+
+    right:4px;
+
+    bottom:4px;
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#2563eb;
+
+    color:#ffffff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.change-photo-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+.spin{
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    from{
+
+        transform:rotate(0deg);
+
+    }
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+/* ==========================================================
+   DETAILS
+========================================================== */
+
+.profile-details{
+
+    flex:1;
+
+}
+
+.profile-details h1{
+
+    margin:0;
+
+    color:#16213e;
+
+    font-size:2rem;
+
+}
+
+.member-number{
+
+    margin-top:.5rem;
+
+    color:#64748b;
+
+    font-size:1rem;
+
+}
+
+.status-row{
+
+    margin:1rem 0;
+
+}
+
+.status-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:.45rem;
+
+    background:#dcfce7;
+
+    color:#166534;
+
+    padding:.45rem .9rem;
+
+    border-radius:999px;
+
+    font-weight:600;
+
+    text-transform:capitalize;
+
+}
+
+.member-meta{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:2rem;
+
+    margin-top:1rem;
+
+    color:#64748b;
+
+}
+
+.member-meta span{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:.5rem;
+
+}
+
+.upload-error{
+
+    margin-top:1rem;
+
+    color:#dc2626;
+
+    font-size:.9rem;
+
+}
+
+/* ==========================================================
    RESPONSIVE
-========================================== */
+========================================================== */
 
-@media (max-width: 992px) {
+@media(max-width:768px){
 
-  .profile-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+    .profile-header{
 
-  .profile-status {
-    width: 100%;
-    justify-content: space-between;
-  }
+        flex-direction:column;
 
-}
+        text-align:center;
 
-@media (max-width: 768px) {
+    }
 
-  .profile-header {
-    padding: 1.5rem;
-  }
+    .member-meta{
 
-  .profile-header-left {
-    flex-direction: column;
-    text-align: center;
-    width: 100%;
-  }
+        justify-content:center;
 
-  .profile-avatar {
-    width: 110px;
-    height: 110px;
-    margin: auto;
-  }
-
-  .profile-details {
-    width: 100%;
-    text-align: center;
-  }
-
-  .profile-details h1 {
-    font-size: 1.6rem;
-  }
-
-  .profile-status {
-    flex-direction: column;
-    width: 100%;
-    gap: 1rem;
-  }
-
-  .profile-status > div {
-    width: 100%;
-  }
-
-}
-
-@media (max-width: 480px) {
-
-  .profile-header {
-    padding: 1.25rem;
-  }
-
-  .profile-avatar {
-    width: 95px;
-    height: 95px;
-  }
-
-  .camera-overlay {
-    width: 34px;
-    height: 34px;
-  }
-
-  .profile-details h1 {
-    font-size: 1.35rem;
-  }
-
-  .profile-details p {
-    font-size: 0.9rem;
-  }
+    }
 
 }

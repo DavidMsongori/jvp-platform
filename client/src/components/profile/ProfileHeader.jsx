@@ -1,20 +1,24 @@
+import { useRef, useState } from "react";
+
 import {
-  BadgeCheck,
-  CalendarDays,
-  CreditCard,
+  Camera,
+  LoaderCircle,
   MapPin,
-  ShieldCheck,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  XCircle,
 } from "lucide-react";
+
+import {
+  uploadProfilePhoto,
+} from "../../services/member.service";
 
 import {
   useProfile,
 } from "../../context/ProfileContext";
 
-import "./Profile.css";
-
-/* =====================================================
-   PROFILE HEADER
-===================================================== */
+import "./ProfileHeader.css";
 
 function ProfileHeader() {
 
@@ -24,197 +28,341 @@ function ProfileHeader() {
 
     fullName,
 
-    profilePhoto,
+    initials,
+
+    memberNumber,
 
     membershipStatus,
 
+    profilePhoto,
+
+    joinedDate,
+
+    reloadProfile,
+
   } = useProfile();
 
-  if (!profile) return null;
+  const inputRef = useRef(null);
 
-  const memberSince =
+  const [uploading, setUploading] =
+    useState(false);
 
-    profile.joinedAt
+  const [error, setError] =
+    useState("");
 
-      ? new Date(
+  const [imageFailed, setImageFailed] =
+    useState(false);
 
-          profile.joinedAt
+  /* ==========================================
+     STATUS
+  ========================================== */
 
-        ).getFullYear()
+  const status = (
+    membershipStatus || "inactive"
+  ).toLowerCase();
 
-      : "-";
+  const statusMap = {
+
+    active: {
+
+      label: "Active Member",
+
+      className: "active",
+
+      icon: <CheckCircle2 size={16} />,
+
+    },
+
+    pending_payment: {
+
+      label: "Pending Payment",
+
+      className: "pending",
+
+      icon: <Clock3 size={16} />,
+
+    },
+
+    inactive: {
+
+      label: "Inactive",
+
+      className: "inactive",
+
+      icon: <XCircle size={16} />,
+
+    },
+
+    expired: {
+
+      label: "Expired",
+
+      className: "expired",
+
+      icon: <XCircle size={16} />,
+
+    },
+
+  };
+
+  const badge =
+    statusMap[status] ||
+    statusMap.inactive;
+
+  /* ==========================================
+     PHOTO UPLOAD
+  ========================================== */
+
+  const handleUpload = async (
+    event
+  ) => {
+
+    const file =
+      event.target.files?.[0];
+
+    if (!file) return;
+
+    try {
+
+      setUploading(true);
+
+      setError("");
+
+      const formData =
+        new FormData();
+
+      formData.append(
+        "photo",
+        file
+      );
+
+      await uploadProfilePhoto(
+        formData
+      );
+
+      setImageFailed(false);
+
+      await reloadProfile();
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+
+        err.response?.data?.message ||
+
+        "Unable to upload profile photo."
+
+      );
+
+    } finally {
+
+      setUploading(false);
+
+    }
+
+  };
 
   return (
 
     <section className="profile-header">
 
       {/* ======================================
-          LEFT
+          PROFILE PHOTO
       ====================================== */}
 
-      <div className="profile-header-left">
+      <div className="profile-avatar">
 
-        <div className="profile-header-photo">
+        {
 
-          <img
+          profilePhoto &&
 
-            src={
-              profilePhoto ||
-              "/images/default-avatar.png"
-            }
+          !imageFailed && (
 
-            alt={
+            <img
 
-              fullName ||
+              src={profilePhoto}
 
-              "JVP Member"
+              alt={fullName}
 
-            }
+              onError={() =>
 
-            onError={(event) => {
+                setImageFailed(true)
 
-              event.target.src =
-                "/images/default-avatar.png";
+              }
 
-            }}
+            />
 
-          />
+          )
+
+        }
+
+        {
+
+          (!profilePhoto ||
+
+            imageFailed) && (
+
+            <div className="avatar-placeholder">
+
+              {initials || "M"}
+
+            </div>
+
+          )
+
+        }
+
+        <button
+
+          type="button"
+
+          className="change-photo-btn"
+
+          onClick={() =>
+
+            inputRef.current.click()
+
+          }
+
+          disabled={uploading}
+
+          title="Change Profile Photo"
+
+        >
+
+          {
+
+            uploading
+
+              ? (
+
+                <LoaderCircle
+
+                  size={18}
+
+                  className="spin"
+
+                />
+
+              )
+
+              : (
+
+                <Camera size={18} />
+
+              )
+
+          }
+
+        </button>
+
+        <input
+
+          ref={inputRef}
+
+          type="file"
+
+          accept="image/jpeg,image/png,image/webp"
+
+          hidden
+
+          onChange={handleUpload}
+
+        />
+
+      </div>
+
+      {/* ======================================
+          DETAILS
+      ====================================== */}
+
+      <div className="profile-details">
+
+        <h1>
+
+          {fullName}
+
+        </h1>
+
+        <p className="member-number">
+
+          {
+
+            memberNumber ||
+
+            "Membership Number Pending"
+
+          }
+
+        </p>
+
+        <div
+          className={`status-badge ${badge.className}`}
+        >
+
+          {badge.icon}
+
+          {badge.label}
 
         </div>
 
-        <div className="profile-header-details">
+        <div className="member-meta">
 
-          <h1>
+          <span>
 
-            {fullName || "JVP Member"}
+            <MapPin size={16} />
 
-          </h1>
+            {
 
-          <span className="profile-role">
+              profile?.county ||
 
-            {profile.role || "Member"}
+              "County Not Set"
+
+            }
 
           </span>
 
-          <p>
+          <span>
 
-            Welcome to your JVP Connect profile.
+            <CalendarDays size={16} />
 
-            Keep your information updated to
+            {
 
-            enjoy all membership services.
+              joinedDate
 
-          </p>
+                ? `Joined ${new Date(
+                    joinedDate
+                  ).toLocaleDateString(
+                    "en-KE",
+                    {
+                      month: "long",
+                      year: "numeric",
+                    }
+                  )}`
 
-        </div>
+                : "Join Date Pending"
 
-      </div>
+            }
 
-      {/* ======================================
-          RIGHT
-      ====================================== */}
-
-      <div className="profile-header-summary">
-
-        <div className="summary-card">
-
-          <CreditCard size={18} />
-
-          <div>
-
-            <small>
-
-              Membership Number
-
-            </small>
-
-            <strong>
-
-              {profile.memberNumber || "-"}
-
-            </strong>
-
-          </div>
+          </span>
 
         </div>
 
-        <div className="summary-card">
+        {
 
-          <ShieldCheck size={18} />
+          error && (
 
-          <div>
+            <div className="upload-error">
 
-            <small>
+              {error}
 
-              Status
+            </div>
 
-            </small>
+          )
 
-            <strong>
-
-              {membershipStatus || "-"}
-
-            </strong>
-
-          </div>
-
-        </div>
-
-        <div className="summary-card">
-
-          <MapPin size={18} />
-
-          <div>
-
-            <small>
-
-              County
-
-            </small>
-
-            <strong>
-
-              {profile.county || "-"}
-
-            </strong>
-
-          </div>
-
-        </div>
-
-        <div className="summary-card">
-
-          <CalendarDays size={18} />
-
-          <div>
-
-            <small>
-
-              Member Since
-
-            </small>
-
-            <strong>
-
-              {memberSince}
-
-            </strong>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* ======================================
-          VERIFIED BADGE
-      ====================================== */}
-
-      <div className="profile-verified">
-
-        <BadgeCheck size={18} />
-
-        Verified Member
+        }
 
       </div>
 
