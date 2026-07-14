@@ -28,7 +28,7 @@ source: {
   default: "new",
 },
 
-    membershipNumber: {
+    memberNumber: {
       type: String,
       unique: true,
       sparse: true,

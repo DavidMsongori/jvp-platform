@@ -294,7 +294,7 @@ export const getDashboard = async (
 
   id: member._id,
 
-  membershipNumber: member.membershipNumber,
+  memberNumber: member.memberNumber,
 
   firstName: member.firstName,
 

@@ -149,7 +149,7 @@ const buildAuthResponse = (
 
       id: member._id,
 
-      membershipNumber: member.membershipNumber,
+      memberNumber: member.memberNumber,
 
       firstName: member.firstName,
 
@@ -1026,9 +1026,9 @@ export const createPassword = async (data) => {
 
     member.accountActivated = true;
 
-    if (!member.membershipNumber) {
+    if (!member.memberNumber) {
 
-      member.membershipNumber =
+      member.memberNumber =
         await generateMembershipNumber(
           member.county,
           session
