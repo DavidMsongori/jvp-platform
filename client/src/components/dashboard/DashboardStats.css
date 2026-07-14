@@ -1,0 +1,151 @@
+/* ==========================================================
+   DASHBOARD STATS
+========================================================== */
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ==========================================================
+   CARD
+========================================================== */
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  background: #ffffff;
+
+  border-radius: 20px;
+
+  padding: 1.5rem;
+
+  border: 1px solid #edf2f7;
+
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+
+  transition: all .3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 35px rgba(15,23,42,.08);
+}
+
+/* ==========================================================
+   ICON
+========================================================== */
+
+.stat-icon {
+  width: 64px;
+  height: 64px;
+
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-title {
+  display: block;
+
+  font-size: .9rem;
+
+  color: #64748b;
+
+  margin-bottom: .45rem;
+}
+
+.stat-value {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 1.35rem;
+
+  font-weight: 700;
+
+  word-break: break-word;
+}
+
+/* ==========================================================
+   COLORS
+========================================================== */
+
+.stat-card.blue .stat-icon{
+  background:#dbeafe;
+  color:#2563eb;
+}
+
+.stat-card.green .stat-icon{
+  background:#dcfce7;
+  color:#16a34a;
+}
+
+.stat-card.orange .stat-icon{
+  background:#ffedd5;
+  color:#ea580c;
+}
+
+.stat-card.purple .stat-icon{
+  background:#ede9fe;
+  color:#7c3aed;
+}
+
+.stat-card.teal .stat-icon{
+  background:#ccfbf1;
+  color:#0f766e;
+}
+
+.stat-card.yellow .stat-icon{
+  background:#fef9c3;
+  color:#ca8a04;
+}
+
+.stat-card.red .stat-icon{
+  background:#fee2e2;
+  color:#dc2626;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+  .dashboard-stats{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .stat-card{
+
+    padding:1.25rem;
+
+  }
+
+  .stat-icon{
+
+    width:56px;
+    height:56px;
+
+  }
+
+  .stat-value{
+
+    font-size:1.15rem;
+
+  }
+
+}
