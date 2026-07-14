@@ -54,7 +54,7 @@ function ProfileHeader() {
     useState(false);
 
   /* ==========================================
-     STATUS
+     MEMBERSHIP STATUS
   ========================================== */
 
   const status = (
@@ -83,21 +83,21 @@ function ProfileHeader() {
 
     },
 
-    inactive: {
-
-      label: "Inactive",
-
-      className: "inactive",
-
-      icon: <XCircle size={16} />,
-
-    },
-
     expired: {
 
       label: "Expired",
 
       className: "expired",
+
+      icon: <XCircle size={16} />,
+
+    },
+
+    inactive: {
+
+      label: "Inactive",
+
+      className: "inactive",
 
       icon: <XCircle size={16} />,
 
@@ -128,21 +128,23 @@ function ProfileHeader() {
 
       setError("");
 
-      const formData =
-        new FormData();
+      /*
+        Pass the File directly.
+        member.service.js creates the FormData.
+      */
 
-      formData.append(
-        "photo",
-        file
-      );
+      await uploadProfilePhoto(file);
 
-      await uploadProfilePhoto(
-        formData
-      );
+      await reloadProfile();
 
       setImageFailed(false);
 
-      await reloadProfile();
+      /*
+        Allow uploading the same image again
+        if the user wants.
+      */
+
+      event.target.value = "";
 
     } catch (err) {
 
@@ -164,6 +166,10 @@ function ProfileHeader() {
 
   };
 
+  /* ==========================================
+     RENDER
+  ========================================== */
+
   return (
 
     <section className="profile-header">
@@ -178,7 +184,7 @@ function ProfileHeader() {
 
           profilePhoto &&
 
-          !imageFailed && (
+          !imageFailed ? (
 
             <img
 
@@ -194,15 +200,7 @@ function ProfileHeader() {
 
             />
 
-          )
-
-        }
-
-        {
-
-          (!profilePhoto ||
-
-            imageFailed) && (
+          ) : (
 
             <div className="avatar-placeholder">
 
@@ -222,37 +220,33 @@ function ProfileHeader() {
 
           onClick={() =>
 
-            inputRef.current.click()
+            inputRef.current?.click()
 
           }
 
           disabled={uploading}
 
-          title="Change Profile Photo"
+          title="Upload Profile Photo"
 
         >
 
           {
 
-            uploading
+            uploading ? (
 
-              ? (
+              <LoaderCircle
 
-                <LoaderCircle
+                size={18}
 
-                  size={18}
+                className="spin"
 
-                  className="spin"
+              />
 
-                />
+            ) : (
 
-              )
+              <Camera size={18} />
 
-              : (
-
-                <Camera size={18} />
-
-              )
+            )
 
           }
 
@@ -264,7 +258,7 @@ function ProfileHeader() {
 
           type="file"
 
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
 
           hidden
 
@@ -275,14 +269,14 @@ function ProfileHeader() {
       </div>
 
       {/* ======================================
-          DETAILS
+          MEMBER DETAILS
       ====================================== */}
 
       <div className="profile-details">
 
         <h1>
 
-          {fullName}
+          {fullName || "Member"}
 
         </h1>
 
@@ -299,12 +293,18 @@ function ProfileHeader() {
         </p>
 
         <div
+
           className={`status-badge ${badge.className}`}
+
         >
 
           {badge.icon}
 
-          {badge.label}
+          <span>
+
+            {badge.label}
+
+          </span>
 
         </div>
 
@@ -333,13 +333,21 @@ function ProfileHeader() {
               joinedDate
 
                 ? `Joined ${new Date(
+
                     joinedDate
+
                   ).toLocaleDateString(
+
                     "en-KE",
+
                     {
+
                       month: "long",
+
                       year: "numeric",
+
                     }
+
                   )}`
 
                 : "Join Date Pending"

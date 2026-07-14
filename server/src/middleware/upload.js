@@ -27,7 +27,7 @@ const storage = new CloudinaryStorage({
 
     ],
 
-    public_id: `member-${req.user._id}`,
+    public_id: `member-${req.member.memberNumber || req.member._id}`,
 
     overwrite: true,
 
