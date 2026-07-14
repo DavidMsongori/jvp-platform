@@ -1,19 +1,27 @@
+import { useEffect, useRef, useState } from "react";
+
 import {
   Bell,
   Search,
+  ChevronDown,
+  User,
+  CreditCard,
+  Settings,
+  LogOut,
 } from "lucide-react";
 
-import {
-  useProfile,
-} from "../../context/ProfileContext";
+import { Link } from "react-router-dom";
 
-import {
-  useDashboardUI,
-} from "../../context/DashboardUIContext";
+import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../context/ProfileContext";
+import { useDashboard } from "../../context/DashboardContext";
+import { useDashboardUI } from "../../context/DashboardUIContext";
 
 import "./Topbar.css";
 
 const Topbar = () => {
+
+  const { logout } = useAuth();
 
   const {
 
@@ -27,11 +35,94 @@ const Topbar = () => {
 
   const {
 
+    summary,
+
+  } = useDashboard();
+
+  const {
+
     search,
 
     setSearch,
 
   } = useDashboardUI();
+
+  const [menuOpen, setMenuOpen] =
+    useState(false);
+
+  const menuRef = useRef(null);
+
+  /* ==========================================
+     GREETING
+  ========================================== */
+
+  const hour = new Date().getHours();
+
+  const greeting =
+
+    hour < 12
+
+      ? "Good Morning"
+
+      : hour < 18
+
+      ? "Good Afternoon"
+
+      : "Good Evening";
+
+  /* ==========================================
+     CLOSE MENU
+  ========================================== */
+
+  useEffect(() => {
+
+    const handleClickOutside = (event) => {
+
+      if (
+
+        menuRef.current &&
+
+        !menuRef.current.contains(event.target)
+
+      ) {
+
+        setMenuOpen(false);
+
+      }
+
+    };
+
+    document.addEventListener(
+
+      "mousedown",
+
+      handleClickOutside
+
+    );
+
+    return () =>
+
+      document.removeEventListener(
+
+        "mousedown",
+
+        handleClickOutside
+
+      );
+
+  }, []);
+
+  /* ==========================================
+     LOGOUT
+  ========================================== */
+
+  const handleLogout = () => {
+
+    setMenuOpen(false);
+
+    logout();
+
+  };
 
   return (
 
@@ -41,11 +132,11 @@ const Topbar = () => {
           LEFT
       ====================================== */}
 
-      <div>
+      <div className="topbar-left">
 
         <h2>
 
-          Welcome back,
+          {greeting},
 
           {" "}
 
@@ -55,7 +146,7 @@ const Topbar = () => {
 
         <small>
 
-          JVP Connect Member Portal
+          Welcome to JVP Connect
 
         </small>
 
@@ -77,7 +168,7 @@ const Topbar = () => {
 
             type="text"
 
-            placeholder="Search..."
+            placeholder="Search events, programmes, news..."
 
             value={search}
 
@@ -99,49 +190,173 @@ const Topbar = () => {
 
           type="button"
 
+          aria-label="Notifications"
+
         >
 
           <Bell size={20} />
+
+          {
+
+            summary.unreadNotifications > 0 && (
+
+              <span className="notification-badge">
+
+                {summary.unreadNotifications}
+
+              </span>
+
+            )
+
+          }
 
         </button>
 
         {/* PROFILE */}
 
-        <div className="profile-chip">
+        <div
 
-          <img
+          className="profile-menu"
 
-            src={
+          ref={menuRef}
 
-              profilePhoto ||
+        >
 
-              "/images/default-avatar.png"
+          <button
+
+            type="button"
+
+            className="profile-chip"
+
+            onClick={() =>
+
+              setMenuOpen(
+
+                (previous) => !previous
+
+              )
 
             }
 
-            alt={
+          >
 
-              fullName ||
+            <img
 
-              "Member"
+              src={
 
-            }
+                profilePhoto ||
 
-            onError={(event) => {
+                "/images/default-avatar.png"
 
-              event.target.src =
+              }
 
-                "/images/default-avatar.png";
+              alt={
 
-            }}
+                fullName ||
 
-          />
+                "Member"
 
-          <span>
+              }
 
-            {fullName || "Member"}
+              onError={(event) => {
 
-          </span>
+                event.target.src =
+
+                  "/images/default-avatar.png";
+
+              }}
+
+            />
+
+            <span>
+
+              {fullName || "Member"}
+
+            </span>
+
+            <ChevronDown size={16} />
+
+          </button>
+
+          {
+
+            menuOpen && (
+
+              <div className="profile-dropdown">
+
+                <Link
+
+                  to="/dashboard/profile"
+
+                  onClick={() =>
+
+                    setMenuOpen(false)
+
+                  }
+
+                >
+
+                  <User size={18} />
+
+                  My Profile
+
+                </Link>
+
+                <Link
+
+                  to="/dashboard/membership-card"
+
+                  onClick={() =>
+
+                    setMenuOpen(false)
+
+                  }
+
+                >
+
+                  <CreditCard size={18} />
+
+                  Membership Card
+
+                </Link>
+
+                <Link
+
+                  to="/dashboard/settings"
+
+                  onClick={() =>
+
+                    setMenuOpen(false)
+
+                  }
+
+                >
+
+                  <Settings size={18} />
+
+                  Settings
+
+                </Link>
+
+                <button
+
+                  type="button"
+
+                  onClick={handleLogout}
+
+                >
+
+                  <LogOut size={18} />
+
+                  Logout
+
+                </button>
+
+              </div>
+
+            )
+
+          }
 
         </div>
 

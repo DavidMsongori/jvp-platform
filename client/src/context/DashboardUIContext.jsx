@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -41,6 +42,18 @@ export function DashboardUIProvider({
 
   const [search, setSearch] =
     useState("");
+
+  /* ======================================
+     PROFILE MENU
+  ====================================== */
+
+  const [
+
+    profileMenuOpen,
+
+    setProfileMenuOpen,
+
+  ] = useState(false);
 
   /* ======================================
      NOTIFICATIONS
@@ -115,12 +128,16 @@ export function DashboardUIProvider({
   }, [theme]);
 
   /* ======================================
-     ACTIONS
+     SIDEBAR ACTIONS
   ====================================== */
 
   const toggleSidebar = () =>
 
-    setSidebarOpen((prev) => !prev);
+    setSidebarOpen(
+
+      (previous) => !previous
+
+    );
 
   const openSidebar = () =>
 
@@ -130,31 +147,73 @@ export function DashboardUIProvider({
 
     setSidebarOpen(false);
 
+  /* ======================================
+     THEME ACTIONS
+  ====================================== */
+
   const toggleTheme = () =>
 
-    setTheme((prev) =>
+    setTheme(
 
-      prev === "light"
+      (previous) =>
 
-        ? "dark"
+        previous === "light"
 
-        : "light"
+          ? "dark"
+
+          : "light"
 
     );
+
+  /* ======================================
+     SEARCH ACTIONS
+  ====================================== */
+
+  const clearSearch = () =>
+
+    setSearch("");
+
+  /* ======================================
+     PROFILE MENU
+  ====================================== */
+
+  const toggleProfileMenu = () =>
+
+    setProfileMenuOpen(
+
+      (previous) => !previous
+
+    );
+
+  /* ======================================
+     NOTIFICATIONS
+  ====================================== */
 
   const toggleNotifications = () =>
 
     setNotificationsOpen(
 
-      (prev) => !prev
+      (previous) => !previous
 
     );
+
+  /* ======================================
+     CLOSE ALL MENUS
+  ====================================== */
+
+  const closeMenus = () => {
+
+    setProfileMenuOpen(false);
+
+    setNotificationsOpen(false);
+
+  };
 
   /* ======================================
      CONTEXT VALUE
   ====================================== */
 
-  const value = {
+  const value = useMemo(() => ({
 
     /* Sidebar */
 
@@ -178,20 +237,46 @@ export function DashboardUIProvider({
 
     setSearch,
 
+    clearSearch,
+
+    /* Profile Menu */
+
+    profileMenuOpen,
+
+    setProfileMenuOpen,
+
+    toggleProfileMenu,
+
     /* Notifications */
 
     notificationsOpen,
 
+    setNotificationsOpen,
+
     toggleNotifications,
 
-  };
+    /* Helpers */
+
+    closeMenus,
+
+  }), [
+
+    sidebarOpen,
+
+    theme,
+
+    search,
+
+    profileMenuOpen,
+
+    notificationsOpen,
+
+  ]);
 
   return (
 
     <DashboardUIContext.Provider
-
       value={value}
-
     >
 
       {children}

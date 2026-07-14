@@ -100,6 +100,55 @@ export function DashboardProvider({
   const upcomingEvents =
     dashboard?.upcomingEvents || [];
 
+  const recentActivity =
+    dashboard?.recentActivity || [];
+
+  const notifications =
+    dashboard?.notifications || [];
+
+  const news =
+    dashboard?.news || [];
+
+  /* ======================================
+     DASHBOARD SUMMARY
+  ====================================== */
+
+  const summary = {
+
+    unreadNotifications:
+
+      notifications.filter(
+
+        (notification) => !notification.read
+
+      ).length,
+
+    pendingPayments:
+
+      recentPayments.filter(
+
+        (payment) =>
+
+          payment.status === "pending"
+
+      ).length,
+
+    upcomingEvents:
+
+      upcomingEvents.length,
+
+    totalNews:
+
+      news.length,
+
+    profileCompletion:
+
+      dashboard?.summary?.profileCompletion ||
+
+      0,
+
+  };
+
   /* ======================================
      CONTEXT VALUE
   ====================================== */
@@ -118,11 +167,21 @@ export function DashboardProvider({
 
     statistics,
 
-    /* Dashboard Data */
+    /* Dashboard Collections */
 
     recentPayments,
 
     upcomingEvents,
+
+    recentActivity,
+
+    notifications,
+
+    news,
+
+    /* Dashboard Summary */
+
+    summary,
 
     /* Status */
 
@@ -140,9 +199,7 @@ export function DashboardProvider({
   return (
 
     <DashboardContext.Provider
-
       value={value}
-
     >
 
       {children}
