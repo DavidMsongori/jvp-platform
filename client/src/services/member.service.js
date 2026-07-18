@@ -31,32 +31,15 @@ export const updateMyProfile = async (
    PROFILE PHOTO
 ========================================== */
 
-export const uploadProfilePhoto = async (
-  file
-) => {
+export const uploadProfilePhoto = async (file) => {
 
   const formData = new FormData();
 
-  /*
-    Must match:
-    upload.single("photo")
-    in middleware/upload.js
-  */
-
-  formData.append(
-    "photo",
-    file
-  );
+  formData.append("photo", file);
 
   const response = await api.post(
     "/member/photo",
-    formData,
-    {
-      headers: {
-        "Content-Type":
-          "multipart/form-data",
-      },
-    }
+    formData
   );
 
   return response.data;

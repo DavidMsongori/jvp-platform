@@ -1,8 +1,8 @@
 import {
   FaUsers,
   FaUserCheck,
-  FaUserClock,
-  FaUserTimes,
+  FaFileImport,
+  FaUserPlus,
 } from "react-icons/fa";
 
 import "./Members.css";
@@ -11,33 +11,36 @@ function MemberSummary({ summary = {} }) {
   const cards = [
     {
       title: "Total Members",
+      subtitle: "All registered members",
       value: summary.totalMembers || 0,
       icon: <FaUsers />,
       color: "blue",
     },
     {
-      title: "Active Members",
-      value: summary.activeMembers || 0,
+      title: "Activated Accounts",
+      subtitle: "Can access JVP Connect",
+      value: summary.activatedMembers || 0,
       icon: <FaUserCheck />,
       color: "green",
     },
     {
-      title: "Pending Members",
-      value: summary.pendingMembers || 0,
-      icon: <FaUserClock />,
+      title: "Imported Members",
+      subtitle: "Awaiting account activation",
+      value: summary.importedMembers || 0,
+      icon: <FaFileImport />,
       color: "orange",
     },
     {
-      title: "Expired Members",
-      value: summary.expiredMembers || 0,
-      icon: <FaUserTimes />,
-      color: "red",
+      title: "New Registrations",
+      subtitle: "Registered through the platform",
+      value: summary.newMembers || 0,
+      icon: <FaUserPlus />,
+      color: "purple",
     },
   ];
 
   return (
     <div className="member-summary">
-
       {cards.map((card) => (
         <div
           key={card.title}
@@ -48,12 +51,14 @@ function MemberSummary({ summary = {} }) {
           </div>
 
           <div className="summary-content">
-            <h3>{card.value}</h3>
+            <h3>{card.value.toLocaleString()}</h3>
+
             <p>{card.title}</p>
+
+            <small>{card.subtitle}</small>
           </div>
         </div>
       ))}
-
     </div>
   );
 }

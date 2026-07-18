@@ -9,11 +9,9 @@ import {
 import "./MemberCardPreview.css";
 
 function MemberCardPreview({ profile }) {
-
   if (!profile) return null;
 
   return (
-
     <section className="member-card-preview">
 
       <div className="widget-header">
@@ -23,15 +21,13 @@ function MemberCardPreview({ profile }) {
           <h2>Digital Membership Card</h2>
 
           <p>
-
             Your official JVP membership card.
-
           </p>
 
         </div>
 
         <Link
-          to="/membership-card"
+          to="/dashboard/membership-card"
           className="widget-link"
         >
 
@@ -43,13 +39,17 @@ function MemberCardPreview({ profile }) {
 
       </div>
 
-      <div className="membership-card">
+      <div className="preview-card">
 
-        <div className="card-top">
+        {/* ==========================
+            TOP
+        ========================== */}
+
+        <div className="preview-card-top">
 
           <div>
 
-            <span className="card-brand">
+            <span className="preview-card-brand">
 
               JVP CONNECT
 
@@ -67,35 +67,25 @@ function MemberCardPreview({ profile }) {
 
         </div>
 
-        <div className="card-member">
+        {/* ==========================
+            MEMBER
+        ========================== */}
 
-          <div className="member-avatar">
+        <div className="preview-card-member">
+
+          <div className="preview-avatar">
 
             {
-
-              profile.profilePhoto ?
-
-              (
-
+              profile.profilePhoto ? (
                 <img
                   src={profile.profilePhoto}
                   alt={profile.firstName}
                 />
-
-              )
-
-              :
-
-              (
-
-                <div className="avatar-placeholder">
-
+              ) : (
+                <div className="preview-avatar-placeholder">
                   {profile.firstName?.charAt(0)}
-
                 </div>
-
               )
-
             }
 
           </div>
@@ -105,7 +95,6 @@ function MemberCardPreview({ profile }) {
             <h2>
 
               {profile.firstName}{" "}
-
               {profile.lastName}
 
             </h2>
@@ -113,7 +102,6 @@ function MemberCardPreview({ profile }) {
             <p>
 
               {profile.memberNumber ||
-
                 "Pending Number"}
 
             </p>
@@ -122,7 +110,11 @@ function MemberCardPreview({ profile }) {
 
         </div>
 
-        <div className="card-footer">
+        {/* ==========================
+            FOOTER
+        ========================== */}
+
+        <div className="preview-card-footer">
 
           <div>
 
@@ -148,7 +140,7 @@ function MemberCardPreview({ profile }) {
 
           </div>
 
-          <div className="qr-box">
+          <div className="preview-qr-box">
 
             <QrCode size={40} />
 
@@ -158,7 +150,11 @@ function MemberCardPreview({ profile }) {
 
       </div>
 
-      <div className="card-actions">
+      {/* ==========================
+          ACTIONS
+      ========================== */}
+
+      <div className="preview-card-actions">
 
         <button>
 
@@ -171,9 +167,7 @@ function MemberCardPreview({ profile }) {
       </div>
 
     </section>
-
   );
-
 }
 
 export default MemberCardPreview;

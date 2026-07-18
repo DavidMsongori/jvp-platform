@@ -1,0 +1,243 @@
+/* ==========================================================
+   MEMBERSHIP SETTINGS
+========================================================== */
+
+.membership-settings {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2rem;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.membership-header {
+
+    display: flex;
+    align-items: center;
+
+    gap: 1rem;
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 18px;
+
+    padding: 1.75rem;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,.05);
+
+}
+
+.membership-header svg {
+
+    color: var(--primary-color);
+
+}
+
+.membership-header h2 {
+
+    margin: 0 0 .35rem;
+
+    color: var(--text-primary);
+
+}
+
+.membership-header p {
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+}
+
+/* ==========================================================
+   CARD
+========================================================== */
+
+.membership-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 18px;
+
+    padding: 2rem;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,.05);
+
+}
+
+/* ==========================================================
+   GRID
+========================================================== */
+
+.membership-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+
+    gap: 1.5rem;
+
+}
+
+.membership-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 1rem;
+
+    padding: 1rem;
+
+    border-radius: 14px;
+
+    background: #f8fafc;
+
+}
+
+.membership-item svg {
+
+    color: var(--primary-color);
+
+    flex-shrink: 0;
+
+}
+
+.membership-item span {
+
+    display: block;
+
+    margin-bottom: .35rem;
+
+    color: var(--text-secondary);
+
+    font-size: .85rem;
+
+}
+
+.membership-item strong {
+
+    color: var(--text-primary);
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+}
+
+/* ==========================================================
+   STATUS COLORS
+========================================================== */
+
+.membership-item strong.active {
+
+    color: #16a34a;
+
+}
+
+.membership-item strong.pending {
+
+    color: #f59e0b;
+
+}
+
+.membership-item strong.expired {
+
+    color: #dc2626;
+
+}
+
+.membership-item strong.suspended {
+
+    color: #7c3aed;
+
+}
+
+/* ==========================================================
+   NOTE
+========================================================== */
+
+.membership-note {
+
+    display: flex;
+
+    gap: 1rem;
+
+    align-items: flex-start;
+
+    background: rgba(15,76,129,.08);
+
+    border-left: 4px solid var(--primary-color);
+
+    border-radius: 16px;
+
+    padding: 1.5rem;
+
+}
+
+.membership-note svg {
+
+    color: var(--primary-color);
+
+    flex-shrink: 0;
+
+}
+
+.membership-note h4 {
+
+    margin: 0 0 .5rem;
+
+    color: var(--text-primary);
+
+}
+
+.membership-note p {
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+    line-height: 1.7;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .membership-card{
+
+        padding:1.5rem;
+
+    }
+
+    .membership-header{
+
+        align-items:flex-start;
+
+    }
+
+    .membership-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .membership-item{
+
+        align-items:flex-start;
+
+    }
+
+}

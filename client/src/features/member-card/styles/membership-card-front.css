@@ -1,0 +1,415 @@
+/* ==========================================================
+   CARD FRONT
+========================================================== */
+
+.card-front {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 2rem;
+
+  border-radius: 24px;
+
+  background:
+    radial-gradient(circle at top right,
+      rgba(255,255,255,.18),
+      transparent 35%),
+    linear-gradient(
+      145deg,
+      #003366 0%,
+      #0056b3 45%,
+      #0d6efd 100%
+    );
+
+  color: #fff;
+}
+
+/* ==========================================================
+   BACKGROUND DECORATIONS
+========================================================== */
+
+.card-glow{
+  position:absolute;
+  width:280px;
+  height:280px;
+
+  top:-140px;
+  right:-120px;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,.10);
+
+  filter:blur(40px);
+}
+
+.card-wave{
+  position:absolute;
+
+  border-radius:50%;
+
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.card-wave-one{
+
+  width:520px;
+  height:520px;
+
+  bottom:-360px;
+  left:-220px;
+}
+
+.card-wave-two{
+
+  width:700px;
+  height:700px;
+
+  bottom:-500px;
+  right:-350px;
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.card-header{
+
+  position:relative;
+
+  z-index:2;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+.brand{
+
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
+
+.brand-logo{
+
+  width:56px;
+  height:56px;
+
+  border-radius:16px;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  font-weight:700;
+  font-size:1.15rem;
+
+  background:rgba(255,255,255,.16);
+
+  backdrop-filter:blur(12px);
+
+  border:1px solid rgba(255,255,255,.18);
+}
+
+.brand h4{
+
+  margin:0;
+
+  font-size:1.05rem;
+
+  letter-spacing:.12em;
+}
+
+.brand span{
+
+  opacity:.75;
+
+  font-size:.8rem;
+}
+
+.verification-badge{
+
+  display:flex;
+  align-items:center;
+  gap:.45rem;
+
+  padding:.55rem .9rem;
+
+  border-radius:999px;
+
+  background:rgba(40,167,69,.18);
+
+  border:1px solid rgba(40,167,69,.45);
+
+  backdrop-filter:blur(10px);
+
+  font-size:.78rem;
+
+  font-weight:600;
+}
+
+/* ==========================================================
+   BODY
+========================================================== */
+
+.card-body{
+
+  position:relative;
+
+  z-index:2;
+
+  display:flex;
+  align-items:center;
+
+  gap:1.75rem;
+}
+
+.member-photo{
+
+  width:110px;
+  height:110px;
+
+  border-radius:50%;
+
+  overflow:hidden;
+
+  border:4px solid rgba(255,255,255,.25);
+
+  background:rgba(255,255,255,.15);
+
+  flex-shrink:0;
+
+  box-shadow:0 15px 35px rgba(0,0,0,.25);
+}
+
+.member-photo img{
+
+  width:100%;
+  height:100%;
+
+  object-fit:cover;
+}
+
+.member-initials{
+
+  width:100%;
+  height:100%;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  font-size:2.3rem;
+  font-weight:700;
+}
+
+.member-details{
+
+  flex:1;
+}
+
+.member-details h2{
+
+  margin:0 0 .5rem;
+
+  font-size:1.85rem;
+
+  font-weight:700;
+
+  line-height:1.2;
+}
+
+.member-status{
+
+  display:inline-flex;
+
+  padding:.45rem .9rem;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,.18);
+
+  backdrop-filter:blur(12px);
+
+  font-size:.82rem;
+
+  font-weight:600;
+
+  margin-bottom:1rem;
+}
+
+.member-number{
+
+  display:flex;
+  align-items:center;
+
+  gap:.6rem;
+
+  opacity:.95;
+
+  font-size:.95rem;
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.card-footer{
+
+  position:relative;
+
+  z-index:2;
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr auto;
+
+  gap:1.5rem;
+
+  align-items:end;
+}
+
+.card-info{
+
+  display:flex;
+  flex-direction:column;
+}
+
+.card-info .label{
+
+  font-size:.7rem;
+
+  letter-spacing:.15em;
+
+  opacity:.7;
+
+  margin-bottom:.4rem;
+}
+
+.card-info .value{
+
+  display:flex;
+  align-items:center;
+
+  gap:.45rem;
+
+  font-size:.95rem;
+
+  font-weight:500;
+}
+
+/* ==========================================================
+   EMV CHIP
+========================================================== */
+
+.card-chip{
+
+  width:72px;
+  height:56px;
+
+  border-radius:12px;
+
+  background:linear-gradient(
+      145deg,
+      #f8d66d,
+      #d9a631
+  );
+
+  display:grid;
+
+  grid-template-columns:repeat(2,1fr);
+
+  gap:4px;
+
+  padding:7px;
+
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.45),
+    inset 0 -2px 4px rgba(0,0,0,.15);
+}
+
+.chip-line{
+
+  border:1px solid rgba(90,60,0,.35);
+
+  border-radius:4px;
+}
+
+/* ==========================================================
+   WATERMARK
+========================================================== */
+
+.card-watermark{
+
+  position:absolute;
+
+  right:-25px;
+  bottom:-35px;
+
+  font-size:9rem;
+
+  font-weight:800;
+
+  color:rgba(255,255,255,.05);
+
+  letter-spacing:.2em;
+
+  user-select:none;
+
+  pointer-events:none;
+}
+
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+  .card-front{
+
+    padding:1.35rem;
+  }
+
+  .card-body{
+
+    gap:1rem;
+  }
+
+  .member-photo{
+
+    width:80px;
+    height:80px;
+  }
+
+  .member-details h2{
+
+    font-size:1.35rem;
+  }
+
+  .card-footer{
+
+    grid-template-columns:1fr;
+
+    gap:1rem;
+  }
+
+  .card-chip{
+
+    justify-self:start;
+  }
+
+  .verification-badge{
+
+    display:none;
+  }
+
+}

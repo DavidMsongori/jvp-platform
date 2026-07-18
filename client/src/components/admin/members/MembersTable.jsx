@@ -1,47 +1,64 @@
+import { useNavigate } from "react-router-dom";
 import MemberActions from "./MemberActions";
-
 import "./Members.css";
 
 function MembersTable({
-
   members = [],
-
   loading,
-
   pagination = {},
-
   filters,
-
   setFilters,
-
 }) {
+  const navigate = useNavigate();
 
   /* ==========================================
      PAGINATION
   ========================================== */
 
   const goToPage = (page) => {
-
     if (
-
       page < 1 ||
-
       page > (pagination.totalPages || 1)
-
     ) {
-
       return;
-
     }
 
     setFilters((previous) => ({
-
       ...previous,
-
       page,
-
     }));
+  };
 
+  /* ==========================================
+     MEMBER STATUS
+  ========================================== */
+
+  const getMemberStatus = (member) => {
+    if (member.membershipStatus === "expired") {
+      return {
+        label: "Expired",
+        className: "expired",
+      };
+    }
+
+    if (member.accountActivated) {
+      return {
+        label: "Activated",
+        className: "activated",
+      };
+    }
+
+    if (member.source === "imported") {
+      return {
+        label: "Imported",
+        className: "imported",
+      };
+    }
+
+    return {
+      label: "New",
+      className: "new",
+    };
   };
 
   /* ==========================================
@@ -49,17 +66,11 @@ function MembersTable({
   ========================================== */
 
   if (loading) {
-
     return (
-
       <div className="table-loading">
-
         Loading members...
-
       </div>
-
     );
-
   }
 
   /* ==========================================
@@ -67,299 +78,190 @@ function MembersTable({
   ========================================== */
 
   if (!members.length) {
-
     return (
-
       <div className="table-empty">
-
         <h3>No Members Found</h3>
-
-        <p>
-
-          Try changing your search or filters.
-
-        </p>
-
+        <p>Try changing your search or filters.</p>
       </div>
-
     );
-
   }
 
   return (
-
     <div className="table-container">
-
       <table className="members-table">
-
         <thead>
-
           <tr>
-
             <th>Member</th>
-
-            <th>Membership No.</th>
-
+            <th>Member No.</th>
             <th>County</th>
-
             <th>Phone</th>
-
-            <th>Category</th>
-
+            <th>Membership</th>
             <th>Status</th>
-
             <th>Joined</th>
-
             <th>Actions</th>
-
           </tr>
-
         </thead>
 
         <tbody>
+          {members.map((member) => {
+            const status = getMemberStatus(member);
 
-          {members.map((member) => (
+            return (
+              <tr
+                key={member._id}
+                className="clickable-row"
+                onClick={() =>
+                  navigate(`/admin/members/${member._id}`)
+                }
+              >
+                {/* ======================================
+                    MEMBER
+                ====================================== */}
 
-            <tr key={member._id}>
+                <td>
+                  <div className="member-cell">
+                    {member.profilePhoto ? (
+                      <img
+                        src={member.profilePhoto}
+                        alt={`${member.firstName} ${member.lastName}`}
+                        className="member-avatar"
+                      />
+                    ) : (
+                      <div className="member-avatar initials">
+                        {(member.firstName?.charAt(0) || "")}
+                        {(member.lastName?.charAt(0) || "")}
+                      </div>
+                    )}
 
-              {/* ======================================
-                  MEMBER
-              ====================================== */}
+                    <div>
+                      <strong>
+                        {member.firstName}{" "}
+                        {member.middleName
+                          ? `${member.middleName} `
+                          : ""}
+                        {member.lastName}
+                      </strong>
 
-              <td>
-
-                <div className="member-cell">
-
-                  <img
-
-                    src={
-                      member.profilePhoto ||
-
-                      "/images/avatar.png"
-                    }
-
-                    alt={`${member.firstName} ${member.lastName}`}
-
-                    className="member-avatar"
-
-                  />
-
-                  <div>
-
-                    <strong>
-
-                      {member.firstName}{" "}
-
-                      {member.middleName
-                        ? `${member.middleName} `
-                        : ""}
-
-                      {member.lastName}
-
-                    </strong>
-
-                    <small>
-
-                      {member.user?.email ||
-
-                        "No email"}
-
-                    </small>
-
+                      <small>
+                        {member.user?.email || "No email"}
+                      </small>
+                    </div>
                   </div>
+                </td>
 
-                </div>
+                {/* ======================================
+                    MEMBER NUMBER
+                ====================================== */}
 
-              </td>
+                <td>
+                  {member.memberNumber ||
+                  member.membershipNumber ? (
+                    member.memberNumber ||
+                    member.membershipNumber
+                  ) : (
+                    <span className="badge not-assigned">
+                      Not Assigned
+                    </span>
+                  )}
+                </td>
 
-              {/* ======================================
-                  MEMBERSHIP NUMBER
-              ====================================== */}
+                {/* ======================================
+                    COUNTY
+                ====================================== */}
 
-              <td>
+                <td>{member.county || "-"}</td>
 
-                {member.membershipNumber || "-"}
+                {/* ======================================
+                    PHONE
+                ====================================== */}
 
-              </td>
+                <td>{member.phone || "-"}</td>
 
-              {/* ======================================
-                  COUNTY
-              ====================================== */}
+                {/* ======================================
+                    MEMBERSHIP
+                ====================================== */}
 
-              <td>
+                <td>
+                  <span
+                    className={`badge membership ${(
+                      member.membershipType || ""
+                    )
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}`}
+                  >
+                    {member.membershipType || "-"}
+                  </span>
+                </td>
 
-                {member.county || "-"}
+                {/* ======================================
+                    STATUS
+                ====================================== */}
 
-              </td>
+                <td>
+                  <span
+                    className={`badge status ${status.className}`}
+                  >
+                    {status.label}
+                  </span>
+                </td>
 
-              {/* ======================================
-                  PHONE
-              ====================================== */}
+                {/* ======================================
+                    JOINED
+                ====================================== */}
 
-              <td>
+                <td>
+                  {member.joinedAt
+                    ? new Date(
+                        member.joinedAt
+                      ).toLocaleDateString()
+                    : "-"}
+                </td>
 
-                {member.phone || "-"}
+                {/* ======================================
+                    ACTIONS
+                ====================================== */}
 
-              </td>
-
-              {/* ======================================
-                  MEMBERSHIP CATEGORY
-              ====================================== */}
-
-              <td>
-
-                <span
-
-                  className={`badge membership ${(
-
-                    member.membershipCategory ||
-
-                    ""
-
-                  )
-
-                    .toLowerCase()
-
-                    .replace(/\s+/g, "-")}`}
-
+                <td
+                  onClick={(e) =>
+                    e.stopPropagation()
+                  }
                 >
-
-                  {member.membershipCategory ||
-
-                    "-"}
-
-                </span>
-
-              </td>
-
-              {/* ======================================
-                  MEMBERSHIP STATUS
-              ====================================== */}
-
-              <td>
-
-                <span
-
-                  className={`badge status ${(
-
-                    member.membershipStatus ||
-
-                    ""
-
-                  )
-
-                    .toLowerCase()
-
-                    .replace(/\s+/g, "-")}`}
-
-                >
-
-                  {member.membershipStatus ||
-
-                    "-"}
-
-                </span>
-
-              </td>
-
-              {/* ======================================
-                  JOIN DATE
-              ====================================== */}
-
-              <td>
-
-                {member.createdAt
-
-                  ? new Date(
-
-                      member.createdAt
-
-                    ).toLocaleDateString()
-
-                  : "-"}
-
-              </td>
-
-              {/* ======================================
-                  ACTIONS
-              ====================================== */}
-
-              <td>
-
-                <MemberActions
-
-                  member={member}
-
-                  onView={(member) => {
-
-                    console.log(
-
-                      "View",
-
-                      member
-
-                    );
-
-                  }}
-
-                  onEdit={(member) => {
-
-                    console.log(
-
-                      "Edit",
-
-                      member
-
-                    );
-
-                  }}
-
-                  onActivate={(member) => {
-
-                    console.log(
-
-                      "Activate",
-
-                      member
-
-                    );
-
-                  }}
-
-                  onDeactivate={(member) => {
-
-                    console.log(
-
-                      "Deactivate",
-
-                      member
-
-                    );
-
-                  }}
-
-                  onDelete={(member) => {
-
-                    console.log(
-
-                      "Delete",
-
-                      member
-
-                    );
-
-                  }}
-
-                />
-
-              </td>
-
-            </tr>
-
-          ))}
-
+                  <MemberActions
+                    member={member}
+                    onView={(member) =>
+                      navigate(
+                        `/admin/members/${member._id}`
+                      )
+                    }
+                    onEdit={(member) =>
+                      navigate(
+                        `/admin/members/${member._id}/edit`
+                      )
+                    }
+                    onActivate={(member) =>
+                      console.log(
+                        "Activate",
+                        member
+                      )
+                    }
+                    onDeactivate={(member) =>
+                      console.log(
+                        "Deactivate",
+                        member
+                      )
+                    }
+                    onDelete={(member) =>
+                      console.log(
+                        "Delete",
+                        member
+                      )
+                    }
+                  />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
-
       </table>
 
       {/* ==========================================
@@ -367,71 +269,41 @@ function MembersTable({
       ========================================== */}
 
       <div className="table-pagination">
-
         <button
-
-          disabled={
-
-            !pagination.hasPreviousPage
-
-          }
-
+          disabled={!pagination.hasPreviousPage}
           onClick={() =>
-
-            goToPage(
-
-              pagination.page - 1
-
-            )
-
+            goToPage(pagination.page - 1)
           }
-
         >
-
           Previous
-
         </button>
 
         <span>
-
-          Page {pagination.page || 1}
-
+          Showing{" "}
+          {((pagination.page || 1) - 1) *
+            (pagination.limit || 10) +
+            1}
+          {" - "}
+          {Math.min(
+            (pagination.page || 1) *
+              (pagination.limit || 10),
+            pagination.total || members.length
+          )}
           {" "}of{" "}
-
-          {pagination.totalPages || 1}
-
+          {pagination.total || members.length}
         </span>
 
         <button
-
-          disabled={
-
-            !pagination.hasNextPage
-
-          }
-
+          disabled={!pagination.hasNextPage}
           onClick={() =>
-
-            goToPage(
-
-              pagination.page + 1
-
-            )
-
+            goToPage(pagination.page + 1)
           }
-
         >
-
           Next
-
         </button>
-
       </div>
-
     </div>
-
   );
-
 }
 
 export default MembersTable;

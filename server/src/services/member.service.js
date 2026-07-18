@@ -3,6 +3,8 @@ import Payment from "../models/Payment.js";
 import Registration from "../models/Registration.js";
 import ActivityLog from "../models/ActivityLog.js";
 import AppError from "../utils/AppError.js";
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
 
 /* ==========================================================
    GET MY PROFILE
@@ -339,34 +341,112 @@ export const getDashboard = async (
 ========================================================== */
 
 export const uploadProfilePhoto = async (
-
   memberId,
-
-  imageUrl
-
+  file
 ) => {
 
-  const member = await Member.findById(
-
-    memberId
-
-  );
+  const member = await Member.findById(memberId);
 
   if (!member) {
-
     throw new AppError(
-
       "Member profile not found.",
-
       404
-
     );
+  }
+
+  if (!file || !file.buffer) {
+    throw new AppError(
+      "Please upload a profile photo.",
+      400
+    );
+  }
+
+  /* ==========================================
+     DELETE PREVIOUS PHOTO
+  ========================================== */
+
+  if (member.profilePhotoPublicId) {
+    try {
+      await cloudinary.uploader.destroy(
+        member.profilePhotoPublicId
+      );
+    } catch (error) {
+      console.error(
+        "Failed to delete previous profile photo:",
+        error.message
+      );
+    }
+  }
+
+  /* ==========================================
+     UPLOAD NEW PHOTO
+  ========================================== */
+
+  const result = await new Promise((resolve, reject) => {
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+
+      {
+        folder: "jvp-connect/profile",
+
+        public_id:
+  member.memberNumber
+    ? `member-${member.memberNumber.replace(/\//g, "-")}`
+    : `member-${member._id}`,
+
+        overwrite: true,
+
+        invalidate: true,
+
+  transformation: [
+    {
+      width: 500,
+      height: 500,
+      crop: "fill",
+      gravity: "face",
+      quality: "auto",
+      fetch_format: "auto",
+    },
+  ],
+        resource_type: "image",
+      },
+
+      (error, result) => {
+
+  if (error) {
+
+    console.log("========== CLOUDINARY ERROR ==========");
+    console.dir(error, { depth: null });
+    console.log("======================================");
+
+    return reject(error);
 
   }
 
-  member.profilePhoto = imageUrl;
+  resolve(result);
+
+}
+
+    );
+
+    streamifier
+      .createReadStream(file.buffer)
+      .pipe(uploadStream);
+
+  });
+
+  /* ==========================================
+     SAVE MEMBER
+  ========================================== */
+
+  member.profilePhoto = result.secure_url;
+  member.profilePhotoPublicId = result.public_id;
 
   await member.save();
+
+  /* ==========================================
+     ACTIVITY LOG
+  ========================================== */
 
   await ActivityLog.create({
 
@@ -382,16 +462,15 @@ export const uploadProfilePhoto = async (
 
   });
 
+  /* ==========================================
+     RETURN UPDATED MEMBER
+  ========================================== */
+
   return await Member.findById(
-
     member._id
-
   ).populate(
-
     "user",
-
-    "email role"
-
+    "email role isActive createdAt"
   );
 
 };

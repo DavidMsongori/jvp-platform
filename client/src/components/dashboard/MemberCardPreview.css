@@ -2,82 +2,79 @@
    MEMBER CARD PREVIEW
 ========================================================== */
 
-.member-card-preview{
+.member-card-preview {
 
-    display:flex;
+    display: flex;
+    flex-direction: column;
 
-    flex-direction:column;
-
-    gap:1.5rem;
+    gap: 1.5rem;
 
 }
 
 /* ==========================================================
-   CARD
+   PREVIEW CARD
 ========================================================== */
 
-.membership-card{
+.preview-card {
 
-    position:relative;
+    position: relative;
 
-    overflow:hidden;
+    overflow: hidden;
 
-    border-radius:24px;
+    border-radius: 24px;
 
-    padding:2rem;
+    padding: 2rem;
 
-    background:linear-gradient(
+    background: linear-gradient(
         135deg,
         #0F4C81,
         #0066CC,
         #1E88E5
     );
 
-    color:#fff;
+    color: #ffffff;
 
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
-
-}
-
-/* Decorative circles */
-
-.membership-card::before{
-
-    content:"";
-
-    position:absolute;
-
-    width:320px;
-
-    height:320px;
-
-    border-radius:50%;
-
-    background:rgba(255,255,255,.08);
-
-    right:-120px;
-
-    top:-120px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.15);
 
 }
 
-.membership-card::after{
+/* ==========================================================
+   DECORATION
+========================================================== */
 
-    content:"";
+.preview-card::before {
 
-    position:absolute;
+    content: "";
 
-    width:220px;
+    position: absolute;
 
-    height:220px;
+    width: 320px;
+    height: 320px;
 
-    border-radius:50%;
+    top: -120px;
+    right: -120px;
 
-    background:rgba(255,255,255,.05);
+    border-radius: 50%;
 
-    left:-90px;
+    background: rgba(255,255,255,.08);
 
-    bottom:-90px;
+}
+
+.preview-card::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    left: -90px;
+    bottom: -90px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.05);
 
 }
 
@@ -85,35 +82,32 @@
    TOP
 ========================================================== */
 
-.card-top{
+.preview-card-top {
 
-    display:flex;
+    position: relative;
+    z-index: 2;
 
-    justify-content:space-between;
-
-    align-items:center;
-
-    position:relative;
-
-    z-index:2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
 }
 
-.card-brand{
+.preview-card-brand {
 
-    font-size:.8rem;
+    font-size: .8rem;
 
-    letter-spacing:2px;
+    letter-spacing: 2px;
 
-    opacity:.9;
+    opacity: .9;
 
 }
 
-.card-top h3{
+.preview-card-top h3 {
 
-    margin-top:.4rem;
+    margin-top: .4rem;
 
-    font-size:1.3rem;
+    font-size: 1.3rem;
 
 }
 
@@ -121,81 +115,73 @@
    MEMBER
 ========================================================== */
 
-.card-member{
+.preview-card-member {
 
-    display:flex;
+    position: relative;
+    z-index: 2;
 
-    align-items:center;
+    display: flex;
+    align-items: center;
 
-    gap:1.25rem;
+    gap: 1.25rem;
 
-    margin:2.5rem 0;
-
-    position:relative;
-
-    z-index:2;
+    margin: 2.5rem 0;
 
 }
 
-.member-avatar{
+.preview-avatar {
 
-    width:80px;
+    width: 80px;
+    height: 80px;
 
-    height:80px;
+    border-radius: 50%;
 
-    border-radius:50%;
+    overflow: hidden;
 
-    overflow:hidden;
-
-    border:3px solid rgba(255,255,255,.3);
-
-}
-
-.member-avatar img{
-
-    width:100%;
-
-    height:100%;
-
-    object-fit:cover;
+    border: 3px solid rgba(255,255,255,.3);
 
 }
 
-.avatar-placeholder{
+.preview-avatar img {
 
-    width:100%;
+    width: 100%;
+    height: 100%;
 
-    height:100%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    background:#ffffff;
-
-    color:#0F4C81;
-
-    font-size:2rem;
-
-    font-weight:700;
+    object-fit: cover;
 
 }
 
-.card-member h2{
+.preview-avatar-placeholder {
 
-    margin:0;
+    width: 100%;
+    height: 100%;
 
-    font-size:1.6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #ffffff;
+
+    color: #0F4C81;
+
+    font-size: 2rem;
+    font-weight: 700;
 
 }
 
-.card-member p{
+.preview-card-member h2 {
 
-    margin-top:.4rem;
+    margin: 0;
 
-    opacity:.9;
+    font-size: 1.6rem;
+
+}
+
+.preview-card-member p {
+
+    margin-top: .4rem;
+
+    opacity: .9;
 
 }
 
@@ -203,57 +189,51 @@
    FOOTER
 ========================================================== */
 
-.card-footer{
+.preview-card-footer {
 
-    display:flex;
+    position: relative;
+    z-index: 2;
 
-    justify-content:space-between;
-
-    align-items:flex-end;
-
-    position:relative;
-
-    z-index:2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 
 }
 
-.card-footer span{
+.preview-card-footer span {
 
-    display:block;
+    display: block;
 
-    opacity:.8;
+    opacity: .8;
 
-    font-size:.82rem;
-
-}
-
-.card-footer strong{
-
-    display:block;
-
-    margin-top:.35rem;
-
-    font-size:1rem;
+    font-size: .82rem;
 
 }
 
-.qr-box{
+.preview-card-footer strong {
 
-    width:72px;
+    display: block;
 
-    height:72px;
+    margin-top: .35rem;
 
-    background:#fff;
+    font-size: 1rem;
 
-    border-radius:12px;
+}
 
-    display:flex;
+.preview-qr-box {
 
-    align-items:center;
+    width: 72px;
+    height: 72px;
 
-    justify-content:center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    color:#0F4C81;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    color: #0F4C81;
 
 }
 
@@ -261,45 +241,42 @@
    ACTIONS
 ========================================================== */
 
-.card-actions{
+.preview-card-actions {
 
-    display:flex;
-
-    justify-content:flex-end;
-
-}
-
-.card-actions button{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:.6rem;
-
-    border:none;
-
-    background:#0F4C81;
-
-    color:#fff;
-
-    padding:.9rem 1.5rem;
-
-    border-radius:12px;
-
-    cursor:pointer;
-
-    font-size:.95rem;
-
-    font-weight:600;
-
-    transition:.25s;
+    display: flex;
+    justify-content: flex-end;
 
 }
 
-.card-actions button:hover{
+.preview-card-actions button {
 
-    background:#0b3960;
+    display: flex;
+    align-items: center;
+
+    gap: .6rem;
+
+    border: none;
+
+    padding: .9rem 1.5rem;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    background: #0F4C81;
+
+    color: #ffffff;
+
+    font-size: .95rem;
+    font-weight: 600;
+
+    transition: .25s ease;
+
+}
+
+.preview-card-actions button:hover {
+
+    background: #0b3960;
 
 }
 
@@ -307,29 +284,29 @@
    RESPONSIVE
 ========================================================== */
 
-@media(max-width:768px){
+@media (max-width:768px) {
 
-    .card-member{
+    .preview-card-member {
 
-        flex-direction:column;
+        flex-direction: column;
 
-        text-align:center;
-
-    }
-
-    .card-footer{
-
-        flex-direction:column;
-
-        align-items:flex-start;
-
-        gap:1rem;
+        text-align: center;
 
     }
 
-    .qr-box{
+    .preview-card-footer {
 
-        align-self:flex-end;
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 1rem;
+
+    }
+
+    .preview-qr-box {
+
+        align-self: flex-end;
 
     }
 

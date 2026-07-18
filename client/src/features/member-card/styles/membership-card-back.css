@@ -1,0 +1,348 @@
+/* ==========================================================
+   CARD BACK
+========================================================== */
+
+.card-back {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  overflow: hidden;
+
+  padding: 2rem;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(circle at top left,
+      rgba(255,255,255,.12),
+      transparent 35%),
+    linear-gradient(
+      135deg,
+      #002147 0%,
+      #003366 40%,
+      #0056b3 100%
+    );
+}
+
+/* ==========================================================
+   BACKGROUND
+========================================================== */
+
+.card-back-glow {
+
+  position: absolute;
+
+  width: 320px;
+  height: 320px;
+
+  top: -170px;
+  right: -120px;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.08);
+
+  filter: blur(45px);
+
+}
+
+.card-back-watermark {
+
+  position: absolute;
+
+  bottom: -30px;
+  right: -25px;
+
+  font-size: 6rem;
+
+  font-weight: 800;
+
+  color: rgba(255,255,255,.05);
+
+  letter-spacing: .18em;
+
+  pointer-events: none;
+  user-select: none;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.card-back-header {
+
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1.5rem;
+
+}
+
+.card-back-header h3 {
+
+  margin: 0;
+
+  font-size: 1.15rem;
+
+  letter-spacing: .12em;
+
+}
+
+.card-back-header span {
+
+  display: block;
+
+  margin-top: .25rem;
+
+  font-size: .82rem;
+
+  opacity: .75;
+
+}
+
+/* ==========================================================
+   QR PANEL
+========================================================== */
+
+.qr-panel {
+
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+}
+
+.qr-container {
+
+  background: #ffffff;
+
+  padding: 1rem;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,.25);
+
+}
+
+.scan-text {
+
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+
+  margin-top: .9rem;
+
+  font-size: .85rem;
+
+  opacity: .9;
+
+}
+
+/* ==========================================================
+   MEMBER DETAILS
+========================================================== */
+
+.verification-details {
+
+  position: relative;
+
+  z-index: 2;
+
+  margin-top: 1.5rem;
+
+  padding: 1rem 1.25rem;
+
+  border-radius: 16px;
+
+  background: rgba(255,255,255,.08);
+
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255,255,255,.12);
+
+}
+
+.detail-row {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1rem;
+
+  padding: .55rem 0;
+
+}
+
+.detail-row:not(:last-child) {
+
+  border-bottom: 1px solid rgba(255,255,255,.08);
+
+}
+
+.detail-label {
+
+  font-size: .72rem;
+
+  font-weight: 600;
+
+  letter-spacing: .12em;
+
+  opacity: .7;
+
+}
+
+.detail-value {
+
+  text-align: right;
+
+  font-size: .92rem;
+
+  font-weight: 600;
+
+  word-break: break-word;
+
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.card-back-footer {
+
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 1.5rem;
+
+  margin-top: 1.5rem;
+
+}
+
+.website {
+
+  display: flex;
+  align-items: center;
+
+  gap: .45rem;
+
+  font-size: .9rem;
+
+  font-weight: 500;
+
+}
+
+.verification-note {
+
+  max-width: 220px;
+
+  text-align: right;
+
+  font-size: .75rem;
+
+  line-height: 1.45;
+
+  opacity: .75;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 768px) {
+
+  .card-back {
+
+    padding: 1.35rem;
+
+  }
+
+  .qr-container {
+
+    padding: .8rem;
+
+  }
+
+  .verification-details {
+
+    margin-top: 1rem;
+
+    padding: .85rem 1rem;
+
+  }
+
+  .card-back-footer {
+
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: .8rem;
+
+  }
+
+  .verification-note {
+
+    max-width: 100%;
+
+    text-align: left;
+
+  }
+
+}
+
+@media (max-width: 576px) {
+
+  .card-back-header h3 {
+
+    font-size: 1rem;
+
+  }
+
+  .card-back-header span {
+
+    font-size: .75rem;
+
+  }
+
+  .detail-value {
+
+    font-size: .82rem;
+
+  }
+
+  .website {
+
+    font-size: .8rem;
+
+  }
+
+  .card-back-watermark {
+
+    font-size: 4.5rem;
+
+  }
+
+}

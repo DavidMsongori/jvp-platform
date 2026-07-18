@@ -1,4 +1,8 @@
-import { useRef, useState } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 
 import {
   Camera,
@@ -26,6 +30,8 @@ function ProfileHeader() {
 
     profile,
 
+    setProfile,
+
     fullName,
 
     initials,
@@ -37,8 +43,6 @@ function ProfileHeader() {
     profilePhoto,
 
     joinedDate,
-
-    reloadProfile,
 
   } = useProfile();
 
@@ -52,6 +56,23 @@ function ProfileHeader() {
 
   const [imageFailed, setImageFailed] =
     useState(false);
+
+  const [preview, setPreview] =
+  useState(null);
+
+  useEffect(() => {
+
+  return () => {
+
+    if (preview) {
+
+      URL.revokeObjectURL(preview);
+
+    }
+
+  };
+
+}, [preview]);
 
   /* ==========================================
      MEMBERSHIP STATUS
@@ -113,58 +134,110 @@ function ProfileHeader() {
      PHOTO UPLOAD
   ========================================== */
 
-  const handleUpload = async (
-    event
-  ) => {
+const handleUpload = async (event) => {
 
-    const file =
-      event.target.files?.[0];
+  const file = event.target.files?.[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    try {
+  setError("");
 
-      setUploading(true);
+  /* ===============================
+     VALIDATE TYPE
+  =============================== */
 
-      setError("");
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ];
 
-      /*
-        Pass the File directly.
-        member.service.js creates the FormData.
-      */
+  if (!allowedTypes.includes(file.type)) {
 
-      await uploadProfilePhoto(file);
+    setError(
+      "Only JPG, PNG and WEBP images are allowed."
+    );
 
-      await reloadProfile();
+    event.target.value = "";
 
-      setImageFailed(false);
+    return;
 
-      /*
-        Allow uploading the same image again
-        if the user wants.
-      */
+  }
 
-      event.target.value = "";
+  /* ===============================
+     VALIDATE SIZE
+  =============================== */
 
-    } catch (err) {
+  if (file.size > 2 * 1024 * 1024) {
 
-      console.error(err);
+    setError(
+      "Image must not exceed 2 MB."
+    );
 
-      setError(
+    event.target.value = "";
 
-        err.response?.data?.message ||
+    return;
 
-        "Unable to upload profile photo."
+  }
 
-      );
+  /* ===============================
+     SHOW PREVIEW
+  =============================== */
 
-    } finally {
+  if (preview) {
 
-      setUploading(false);
+  URL.revokeObjectURL(preview);
 
-    }
+}
 
-  };
+const previewUrl = URL.createObjectURL(file);
+
+setPreview(previewUrl);
+
+  try {
+
+    setUploading(true);
+
+    setError("");
+
+    const response = await uploadProfilePhoto(file);
+
+setProfile(response.data);
+
+URL.revokeObjectURL(previewUrl);
+
+setPreview(null);
+
+setImageFailed(false);
+
+  } catch (err) {
+
+    console.error(err);
+
+    URL.revokeObjectURL(previewUrl);
+
+    setPreview(null);
+
+    setImageFailed(false);
+
+    setError(
+
+      err.response?.data?.message ||
+
+      "Unable to upload profile photo."
+
+    );
+
+  } finally {
+
+    setUploading(false);
+
+    event.target.value = "";
+
+  }
+
+};
 
   /* ==========================================
      RENDER
@@ -182,39 +255,60 @@ function ProfileHeader() {
 
         {
 
-          profilePhoto &&
+  preview ? (
 
-          !imageFailed ? (
+    <img
+      src={preview}
+      alt="Preview"
+    />
 
-            <img
+  ) :
 
-              src={profilePhoto}
+  profilePhoto &&
+  !imageFailed ? (
 
-              alt={fullName}
+    <img
+      src={profilePhoto}
+      alt={fullName}
+      onError={() =>
+        setImageFailed(true)
+      }
+    />
 
-              onError={() =>
+  ) : (
 
-                setImageFailed(true)
+    <div className="avatar-placeholder">
 
-              }
+      {initials || "M"}
 
-            />
+    </div>
 
-          ) : (
+  )
 
-            <div className="avatar-placeholder">
+}
 
-              {initials || "M"}
+ {
 
-            </div>
+    uploading && (
 
-          )
+      <div className="upload-overlay">
 
-        }
+        <LoaderCircle
+          size={28}
+          className="spin"
+        />
+
+      </div>
+
+    )
+
+  }
 
         <button
 
           type="button"
+
+          aria-label="Upload profile photo"
 
           className="change-photo-btn"
 

@@ -1,0 +1,326 @@
+/* ==========================================================
+   ACCOUNT SETTINGS
+========================================================== */
+
+.account-settings {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2rem;
+
+}
+
+/* ==========================================================
+   SECTION
+========================================================== */
+
+.account-section {
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 18px;
+
+    padding: 2rem;
+
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+
+}
+
+.account-section h3 {
+
+    margin: 0 0 1.5rem;
+
+    color: var(--text-primary);
+
+    font-size: 1.2rem;
+
+    font-weight: 600;
+
+}
+
+/* ==========================================================
+   PROFILE PHOTO
+========================================================== */
+
+.photo-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 2rem;
+
+}
+
+.photo-preview {
+
+    width: 120px;
+    height: 120px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    border: 4px solid #eef3f8;
+
+    background: #f8fafc;
+
+    flex-shrink: 0;
+
+}
+
+.photo-preview img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+}
+
+.photo-placeholder {
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #0F4C81,
+        #1E88E5
+    );
+
+    color: #ffffff;
+
+    font-size: 2.6rem;
+
+    font-weight: 700;
+
+}
+
+/* ==========================================================
+   FORM
+========================================================== */
+
+.form-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 1.5rem;
+
+}
+
+.form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: .65rem;
+
+}
+
+.form-group label {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: .5rem;
+
+    color: var(--text-secondary);
+
+    font-size: .92rem;
+
+    font-weight: 600;
+
+}
+
+.form-group input {
+
+    width: 100%;
+
+    padding: .95rem 1rem;
+
+    border: 1px solid #dbe3eb;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    color: var(--text-primary);
+
+    font-size: .95rem;
+
+    transition: .25s ease;
+
+}
+
+.form-group input:focus {
+
+    outline: none;
+
+    border-color: var(--primary-color);
+
+    box-shadow: 0 0 0 4px rgba(15, 76, 129, 0.12);
+
+}
+
+.form-group input:disabled {
+
+    background: #f6f8fb;
+
+    color: #6b7280;
+
+    cursor: not-allowed;
+
+}
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.secondary-btn,
+.primary-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: .65rem;
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding: .9rem 1.5rem;
+
+    cursor: pointer;
+
+    font-size: .95rem;
+
+    font-weight: 600;
+
+    transition: .25s ease;
+
+}
+
+.secondary-btn {
+
+    background: #eef5fb;
+
+    color: var(--primary-color);
+
+}
+
+.secondary-btn:hover {
+
+    background: #dfeefb;
+
+}
+
+.primary-btn {
+
+    background: var(--primary-color);
+
+    color: #ffffff;
+
+}
+
+.primary-btn:hover {
+
+    background: #0b3960;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 10px 24px rgba(15, 76, 129, 0.25);
+
+}
+
+/* ==========================================================
+   ACTIONS
+========================================================== */
+
+.account-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 992px) {
+
+    .form-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .account-section {
+
+        padding: 1.5rem;
+
+    }
+
+    .photo-row {
+
+        flex-direction: column;
+
+        align-items: center;
+
+        text-align: center;
+
+    }
+
+    .photo-preview {
+
+        width: 100px;
+        height: 100px;
+
+    }
+
+    .photo-placeholder {
+
+        font-size: 2.2rem;
+
+    }
+
+    .account-actions {
+
+        justify-content: stretch;
+
+    }
+
+    .account-actions .primary-btn {
+
+        width: 100%;
+
+    }
+
+    .secondary-btn {
+
+        width: 100%;
+
+    }
+
+}

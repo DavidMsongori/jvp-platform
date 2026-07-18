@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   FaUsers,
   FaMoneyBillWave,
   FaCalendarAlt,
   FaChartLine,
+  FaUserFriends,
+  FaPlusCircle,
+  FaCog,
+  FaArrowRight,
 } from "react-icons/fa";
 
 import { getDashboard } from "../../services/admin.service";
@@ -13,6 +19,8 @@ import "./Dashboard.css";
 function AdminDashboard() {
 
   const [dashboard, setDashboard] = useState(null);
+
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
 
@@ -149,23 +157,59 @@ function AdminDashboard() {
 
         </div>
 
-        <div className="stat-card">
+       <div className="stat-card">
 
-          <FaUsers className="stat-icon" />
+  <FaUsers className="stat-icon" />
 
-          <div>
+  <div>
 
-            <span>Active Members</span>
+    <span>Activated Members</span>
 
-            <h2>
+    <h2>
 
-              {stats.activeMembers ?? 0}
+      {stats.activatedMembers ?? 0}
 
-            </h2>
+    </h2>
 
-          </div>
+  </div>
 
-        </div>
+</div>
+
+<div className="stat-card">
+
+  <FaUsers className="stat-icon" />
+
+  <div>
+
+    <span>Imported Members</span>
+
+    <h2>
+
+      {stats.importedMembers ?? 0}
+
+    </h2>
+
+  </div>
+
+</div>
+
+<div className="stat-card">
+
+  <FaUsers className="stat-icon" />
+
+  <div>
+
+    <span>New Members</span>
+
+    <h2>
+
+      {stats.newMembers ?? 0}
+
+    </h2>
+
+  </div>
+
+</div>
 
         <div className="stat-card">
 
@@ -231,67 +275,344 @@ function AdminDashboard() {
 
         <div className="dashboard-panel">
 
-          <h3>
+  <div className="panel-header">
 
-            Quick Actions
+    <h3>Quick Actions</h3>
 
-          </h3>
+  </div>
 
-          <p>
+  <div className="quick-actions">
 
-            Coming next...
+    <button
+      className="quick-action"
+      onClick={() => navigate("/admin/members")}
+    >
+      <FaUserFriends />
 
-          </p>
+      <span>Manage Members</span>
 
-        </div>
+      <FaArrowRight />
+    </button>
+
+    <button
+      className="quick-action"
+      onClick={() => navigate("/admin/payments")}
+    >
+      <FaMoneyBillWave />
+
+      <span>Verify Payments</span>
+
+      <FaArrowRight />
+    </button>
+
+    <button
+      className="quick-action"
+      onClick={() => navigate("/admin/events")}
+    >
+      <FaCalendarAlt />
+
+      <span>Manage Events</span>
+
+      <FaArrowRight />
+    </button>
+
+    <button
+      className="quick-action"
+      onClick={() => navigate("/admin/events/new")}
+    >
+      <FaPlusCircle />
+
+      <span>Create Event</span>
+
+      <FaArrowRight />
+    </button>
+
+    <button
+      className="quick-action"
+      onClick={() => navigate("/admin/reports")}
+    >
+      <FaChartLine />
+
+      <span>Reports</span>
+
+      <FaArrowRight />
+    </button>
+
+    <button
+      className="quick-action"
+      onClick={() => navigate("/admin/settings")}
+    >
+      <FaCog />
+
+      <span>System Settings</span>
+
+      <FaArrowRight />
+    </button>
+
+  </div>
+
+</div>
 
         <div className="dashboard-panel">
 
-          <h3>
+  <div className="panel-header">
 
-            Upcoming Events
+    <h3>Upcoming Events</h3>
 
-          </h3>
+  </div>
 
-          <p>
+  {dashboard?.upcomingEvents?.length > 0 ? (
 
-            Coming next...
+    <div className="event-list">
 
-          </p>
+      {dashboard.upcomingEvents.map((event) => (
+
+        <div
+          key={event._id}
+          className="event-item"
+        >
+
+          <div className="event-details">
+
+            <h4>{event.title}</h4>
+
+            <p>
+
+              📅{" "}
+
+              {new Date(event.startDate).toLocaleDateString()}
+
+            </p>
+
+            <p>
+
+              📍 {event.venue}
+
+            </p>
+
+          </div>
+
+          <span className="event-status">
+
+            {event.status}
+
+          </span>
 
         </div>
+
+      ))}
+
+    </div>
+
+  ) : (
+
+    <div className="empty-panel">
+
+      <FaCalendarAlt size={34} />
+
+      <p>No upcoming events.</p>
+
+    </div>
+
+  )}
+
+</div>
 
         <div className="dashboard-panel">
 
-          <h3>
+  <div className="panel-header">
 
-            Recent Members
+    <h3>Recent Members</h3>
 
-          </h3>
+  </div>
 
-          <p>
+  {dashboard?.recentMembers?.length > 0 ? (
 
-            Coming next...
+    <div className="member-list">
 
-          </p>
+      {dashboard.recentMembers.map((member) => (
+
+        <div
+          key={member._id}
+          className="member-item"
+        >
+
+          <div className="member-avatar">
+
+            {member.profilePhoto ? (
+
+              <img
+                src={member.profilePhoto}
+                alt={member.firstName}
+              />
+
+            ) : (
+
+              <div className="avatar-placeholder">
+
+                {member.firstName?.charAt(0)}
+                {member.lastName?.charAt(0)}
+
+              </div>
+
+            )}
+
+          </div>
+
+          <div className="member-details">
+
+            <h4>
+
+              {member.firstName} {member.lastName}
+
+            </h4>
+
+            <p>
+
+              {member.membershipType}
+
+            </p>
+
+            <small>
+
+              Joined{" "}
+
+              {new Date(member.createdAt).toLocaleDateString()}
+
+            </small>
+
+          </div>
+
+          <div className="member-badges">
+
+            <span
+              className={`badge ${
+                member.source === "imported"
+                  ? "badge-imported"
+                  : "badge-new"
+              }`}
+            >
+
+              {member.source}
+
+            </span>
+
+            <span
+              className={`badge ${
+                member.accountActivated
+                  ? "badge-active"
+                  : "badge-pending"
+              }`}
+            >
+
+              {member.accountActivated
+                ? "Activated"
+                : "Pending"}
+
+            </span>
+
+          </div>
 
         </div>
+
+      ))}
+
+    </div>
+
+  ) : (
+
+    <div className="empty-panel">
+
+      <FaUsers size={34} />
+
+      <p>No members found.</p>
+
+    </div>
+
+  )}
+
+</div>
 
         <div className="dashboard-panel">
 
-          <h3>
+  <div className="panel-header">
 
-            Recent Payments
+    <h3>Recent Payments</h3>
 
-          </h3>
+  </div>
 
-          <p>
+  {dashboard?.recentPayments?.length > 0 ? (
 
-            Coming next...
+    <div className="payment-list">
 
-          </p>
+      {dashboard.recentPayments.map((payment) => (
+
+        <div
+          key={payment._id}
+          className="payment-item"
+        >
+
+          <div className="payment-info">
+
+            <h4>
+
+              {payment.member
+                ? `${payment.member.firstName} ${payment.member.lastName}`
+                : "Unknown Member"}
+
+            </h4>
+
+            <p>
+
+              {payment.paymentMethod}
+
+            </p>
+
+            <small>
+
+              {new Date(payment.createdAt).toLocaleDateString()}
+
+            </small>
+
+          </div>
+
+          <div className="payment-right">
+
+            <strong>
+
+              KES {payment.amount.toLocaleString()}
+
+            </strong>
+
+            <span
+              className={`payment-status payment-${payment.status}`}
+            >
+
+              {payment.status}
+
+            </span>
+
+          </div>
 
         </div>
+
+      ))}
+
+    </div>
+
+  ) : (
+
+    <div className="empty-panel">
+
+      <FaMoneyBillWave size={34} />
+
+      <p>No recent payments.</p>
+
+    </div>
+
+  )}
+
+</div>
 
       </div>
 

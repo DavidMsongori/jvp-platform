@@ -1,60 +1,10 @@
 import multer from "multer";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-
-import cloudinary from "../config/cloudinary.js";
 
 /* ==========================================
-   CLOUDINARY STORAGE
+   MEMORY STORAGE
 ========================================== */
 
-const storage = new CloudinaryStorage({
-
-  cloudinary,
-
-  params: async (req, file) => ({
-
-    folder: "jvp-connect/profile-photos",
-
-    allowed_formats: [
-
-      "jpg",
-
-      "jpeg",
-
-      "png",
-
-      "webp",
-
-    ],
-
-    public_id: `member-${req.member.memberNumber || req.member._id}`,
-
-    overwrite: true,
-
-    resource_type: "image",
-
-    transformation: [
-
-      {
-        width: 500,
-        height: 500,
-        crop: "fill",
-        gravity: "face",
-      },
-
-      {
-        quality: "auto",
-      },
-
-      {
-        fetch_format: "auto",
-      },
-
-    ],
-
-  }),
-
-});
+const storage = multer.memoryStorage();
 
 /* ==========================================
    FILE FILTER
@@ -106,7 +56,7 @@ const upload = multer({
 
   limits: {
 
-    fileSize: 2 * 1024 * 1024,
+    fileSize: 2 * 1024 * 1024, // 2MB
 
   },
 

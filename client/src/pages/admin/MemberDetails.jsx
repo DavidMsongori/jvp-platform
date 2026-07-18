@@ -1,98 +1,155 @@
-import { Link } from "react-router-dom";
-import { FaArrowLeft, FaUser } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
+
+import {
+  getMember,
+  activateMember,
+  deactivateMember,
+} from "../../services/admin.service";
+
+import ProfileHeader from "../../components/admin/members/ProfileHeader";
+import PersonalInformation from "../../components/admin/members/PersonalInformation";
+import MembershipInformation from "../../components/admin/members/MembershipInformation";
+
+import "../../components/admin/members/MemberProfile.css";
 
 function MemberDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [member, setMember] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState("");
+
+  /* ==========================================
+     LOAD MEMBER
+  ========================================== */
+
+  const loadMember = async () => {
+    try {
+      setLoading(true);
+
+      const response = await getMember(id);
+
+      setMember(response.data);
+      setError("");
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err.response?.data?.message ||
+          "Failed to load member."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadMember();
+  }, [id]);
+
+  /* ==========================================
+     ACTIVATE / DEACTIVATE
+  ========================================== */
+
+  const handleToggleStatus = async () => {
+    if (!member) return;
+
+    try {
+      setProcessing(true);
+
+      if (member.accountActivated) {
+        await deactivateMember(member._id);
+      } else {
+        await activateMember(member._id);
+      }
+
+      await loadMember();
+    } catch (err) {
+      console.error(err);
+      alert(
+        err.response?.data?.message ||
+          "Unable to update member."
+      );
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  /* ==========================================
+     EDIT
+  ========================================== */
+
+  const handleEdit = () => {
+    navigate(`/admin/members/${id}/edit`);
+  };
+
+  /* ==========================================
+     LOADING
+  ========================================== */
+
+  if (loading) {
+    return (
+      <div className="member-profile-page">
+        <div className="profile-loading">
+          Loading member...
+        </div>
+      </div>
+    );
+  }
+
+  /* ==========================================
+     ERROR
+  ========================================== */
+
+  if (error) {
+    return (
+      <div className="member-profile-page">
+        <Link
+          to="/admin/members"
+          className="back-link"
+        >
+          <FaArrowLeft />
+          Back to Members
+        </Link>
+
+        <div className="profile-error">
+          <h3>Unable to load member</h3>
+
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ==========================================
+     PAGE
+  ========================================== */
+
   return (
-    <div
-      style={{
-        padding: "2rem",
-      }}
-    >
+    <div className="member-profile-page">
       <Link
         to="/admin/members"
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "8px",
-          marginBottom: "2rem",
-          color: "#2563eb",
-          textDecoration: "none",
-          fontWeight: 600,
-        }}
+        className="back-link"
       >
         <FaArrowLeft />
         Back to Members
       </Link>
 
-      <div
-        style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          padding: "4rem 2rem",
-          textAlign: "center",
-          boxShadow: "0 10px 25px rgba(0,0,0,.08)",
-        }}
-      >
-        <div
-          style={{
-            width: "90px",
-            height: "90px",
-            margin: "0 auto 1.5rem",
-            borderRadius: "50%",
-            background: "#eff6ff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "2rem",
-            color: "#2563eb",
-          }}
-        >
-          <FaUser />
-        </div>
+      <ProfileHeader
+        member={member}
+        onEdit={handleEdit}
+        onToggleStatus={handleToggleStatus}
+        processing={processing}
+      />
 
-        <h2
-          style={{
-            marginBottom: "1rem",
-            color: "#1e293b",
-          }}
-        >
-          Member Details
-        </h2>
+      <div className="member-details-grid">
+        <PersonalInformation member={member} />
 
-        <p
-          style={{
-            color: "#64748b",
-            maxWidth: "550px",
-            margin: "0 auto",
-            lineHeight: 1.8,
-          }}
-        >
-          This page is currently being rebuilt using the new
-          JVP Connect Admin architecture.
-          <br />
-          It will include complete member information,
-          profile photo, payment history, membership history,
-          activity logs, documents, edit functionality,
-          activation/deactivation, and role management.
-        </p>
-
-        <div
-          style={{
-            marginTop: "2rem",
-          }}
-        >
-          <span
-            style={{
-              background: "#fef3c7",
-              color: "#92400e",
-              padding: ".7rem 1.2rem",
-              borderRadius: "999px",
-              fontWeight: 600,
-            }}
-          >
-            🚧 Under Development
-          </span>
-        </div>
+        <MembershipInformation member={member} />
       </div>
     </div>
   );

@@ -9,8 +9,7 @@ const memberSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      unique: true,
-      default: null,
+      default: undefined,
     },
 
     accountActivated: {
@@ -22,22 +21,20 @@ const memberSchema = new mongoose.Schema(
        MEMBERSHIP DETAILS
     ========================================== */
 
-source: {
-  type: String,
-  enum: ["new", "imported"],
-  default: "new",
-},
+    source: {
+      type: String,
+      enum: ["new", "imported"],
+      default: "new",
+    },
 
     memberNumber: {
       type: String,
-      unique: true,
-      sparse: true,
       trim: true,
     },
 
     membershipType: {
       type: String,
-      enum: ["ordinary", "leadership"],
+      enum: ["ordinary","member", "leadership"],
       required: true,
     },
 
@@ -52,15 +49,15 @@ source: {
       default: "inactive",
     },
 
-membershipFeePaid: {
-  type: Boolean,
-  default: false,
-},
+    membershipFeePaid: {
+      type: Boolean,
+      default: false,
+    },
 
     membershipExpiry: {
-  type: Date,
-  default: null,
-},
+      type: Date,
+      default: null,
+    },
 
     joinedAt: {
       type: Date,
@@ -89,11 +86,11 @@ membershipFeePaid: {
       trim: true,
     },
 
-    gender: {
-      type: String,
-      enum: ["male", "female"],
-      required: [true, "Gender is required"],
-    },
+   gender: {
+  type: String,
+  enum: ["male", "female"],
+  default: undefined,
+},
 
     dateOfBirth: {
       type: Date,
@@ -103,14 +100,12 @@ membershipFeePaid: {
     nationalId: {
       type: String,
       required: [true, "National ID is required"],
-      unique: true,
       trim: true,
     },
 
     phone: {
       type: String,
       required: [true, "Phone number is required"],
-      unique: true,
       trim: true,
     },
 
@@ -137,10 +132,54 @@ membershipFeePaid: {
       type: String,
       default: "",
     },
+
+    profilePhotoPublicId: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
     versionKey: false,
+  }
+);
+
+/* ==========================================
+   INDEXES
+========================================== */
+
+// A member can only be linked to one user account,
+// but imported members may have no linked user yet.
+memberSchema.index(
+  { user: 1 },
+  {
+    unique: true,
+    sparse: true,
+  }
+);
+
+// Membership number is assigned only after activation.
+memberSchema.index(
+  { memberNumber: 1 },
+  {
+    unique: true,
+    sparse: true,
+  }
+);
+
+// National ID must be unique.
+memberSchema.index(
+  { nationalId: 1 },
+  {
+    unique: true,
+  }
+);
+
+// Phone number must be unique.
+memberSchema.index(
+  { phone: 1 },
+  {
+    unique: true,
   }
 );
 

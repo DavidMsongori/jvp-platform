@@ -1,0 +1,234 @@
+/* ==========================================================
+   PRIVACY SETTINGS
+========================================================== */
+
+.privacy-settings {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2rem;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.privacy-header {
+
+    display: flex;
+    align-items: center;
+
+    gap: 1rem;
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 18px;
+
+    padding: 1.75rem;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,.05);
+
+}
+
+.privacy-header svg {
+
+    color: var(--primary-color);
+
+}
+
+.privacy-header h2 {
+
+    margin: 0 0 .35rem;
+
+    color: var(--text-primary);
+
+}
+
+.privacy-header p {
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+}
+
+/* ==========================================================
+   CARD
+========================================================== */
+
+.privacy-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 18px;
+
+    padding: 2rem;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,.05);
+
+}
+
+.privacy-card h3 {
+
+    display: flex;
+    align-items: center;
+
+    gap: .75rem;
+
+    margin: 0 0 1.5rem;
+
+    color: var(--text-primary);
+
+}
+
+.privacy-description {
+
+    color: var(--text-secondary);
+
+    line-height: 1.7;
+
+    margin-bottom: 1.5rem;
+
+}
+
+/* ==========================================================
+   SECURITY ITEMS
+========================================================== */
+
+.privacy-info {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 1.25rem;
+
+}
+
+.privacy-item {
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 1rem;
+
+    padding: 1rem;
+
+    background: #f8fafc;
+
+    border-radius: 14px;
+
+}
+
+.privacy-item svg {
+
+    color: var(--primary-color);
+
+    margin-top: 2px;
+
+}
+
+.privacy-item strong {
+
+    display: block;
+
+    margin-bottom: .35rem;
+
+    color: var(--text-primary);
+
+}
+
+.privacy-item span {
+
+    color: var(--text-secondary);
+
+    font-size: .92rem;
+
+    line-height: 1.5;
+
+}
+
+/* ==========================================================
+   DANGER ZONE
+========================================================== */
+
+.danger-zone {
+
+    border: 1px solid rgba(220,53,69,.25);
+
+}
+
+.danger-zone h3 {
+
+    color: #dc3545;
+
+}
+
+.danger-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: .65rem;
+
+    border: none;
+
+    padding: .9rem 1.5rem;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    font-size: .95rem;
+
+    font-weight: 600;
+
+    background: #dc3545;
+
+    color: #ffffff;
+
+    transition: .25s ease;
+
+}
+
+.danger-btn:hover {
+
+    background: #bb2d3b;
+
+    transform: translateY(-2px);
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 768px) {
+
+    .privacy-card {
+
+        padding: 1.5rem;
+
+    }
+
+    .privacy-header {
+
+        align-items: flex-start;
+
+    }
+
+    .secondary-btn,
+    .danger-btn {
+
+        width: 100%;
+
+    }
+
+}

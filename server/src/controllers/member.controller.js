@@ -146,11 +146,13 @@ export const uploadProfilePhoto = async (
 
     }
 
+    console.log("REQ.FILE:", req.file);
+    
     const member = await memberService.uploadProfilePhoto(
 
       req.member._id,
 
-      req.file.path
+      req.file
 
     );
 

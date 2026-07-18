@@ -1,33 +1,57 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { FaMoneyCheckAlt } from "react-icons/fa";
+
 import {
-  Search,
-  CreditCard,
-  CheckCircle2,
-  XCircle,
-  Clock3,
-  Loader2,
-  RefreshCw,
-  Download,
-} from "lucide-react";
+  getPayments,
+  verifyPayment,
+} from "../../services/admin.service";
 
-import { getPayments } from "../../services/admin.service";
+import PaymentSummary from "../../components/admin/payments/PaymentSummary";
+import PaymentFilters from "../../components/admin/payments/PaymentFilters";
+import PaymentsTable from "../../components/admin/payments/PaymentsTable";
 
-const Payments = () => {
-  const [payments, setPayments] = useState([]);
+import "../../components/admin/payments/Payments.css";
+
+function Payments() {
+  /* ==========================================
+     STATE
+  ========================================== */
+
   const [loading, setLoading] = useState(true);
 
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("ALL");
+  const [payments, setPayments] = useState([]);
+
+  const [summary, setSummary] = useState({});
+
+  const [pagination, setPagination] = useState({});
+
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 10,
+    search: "",
+    status: "",
+    paymentMethod: "",
+    sortBy: "createdAt",
+    order: "desc",
+  });
+
+  /* ==========================================
+     LOAD PAYMENTS
+  ========================================== */
 
   const loadPayments = async () => {
     try {
       setLoading(true);
 
-      const res = await getPayments();
+      const response = await getPayments(filters);
 
-      setPayments(res.data.data || []);
-    } catch (err) {
-      console.error(err);
+      setSummary(response.data.summary || {});
+
+      setPayments(response.data.payments || []);
+
+      setPagination(response.data.pagination || {});
+    } catch (error) {
+      console.error("Failed to load payments", error);
     } finally {
       setLoading(false);
     }
@@ -35,259 +59,87 @@ const Payments = () => {
 
   useEffect(() => {
     loadPayments();
-  }, []);
+  }, [filters]);
 
-  const filteredPayments = useMemo(() => {
-    return payments.filter((payment) => {
-      const text = search.toLowerCase();
+  /* ==========================================
+     VERIFY PAYMENT
+  ========================================== */
 
-      const matchSearch =
-        payment.memberName?.toLowerCase().includes(text) ||
-        payment.phone?.toLowerCase().includes(text) ||
-        payment.receiptNumber?.toLowerCase().includes(text) ||
-        payment.transactionId?.toLowerCase().includes(text);
-
-      const matchStatus =
-        status === "ALL" || payment.status === status;
-
-      return matchSearch && matchStatus;
-    });
-  }, [payments, search, status]);
-
-  const stats = useMemo(() => {
-    const successful = payments.filter(
-      (p) => p.status === "SUCCESS"
+  const handleVerify = async (payment) => {
+    const confirmed = window.confirm(
+      `Verify payment from ${payment.member?.firstName || "member"}?`
     );
 
-    return {
-      total: payments.length,
-      successful: successful.length,
-      pending: payments.filter((p) => p.status === "PENDING").length,
-      failed: payments.filter((p) => p.status === "FAILED").length,
-      revenue: successful.reduce(
-        (sum, p) => sum + Number(p.amount || 0),
-        0
-      ),
-    };
-  }, [payments]);
+    if (!confirmed) return;
+
+    try {
+      await verifyPayment(payment._id);
+
+      loadPayments();
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+          "Unable to verify payment."
+      );
+    }
+  };
+
+  /* ==========================================
+     EXPORT
+  ========================================== */
+
+  const handleExport = () => {
+    console.log("Export payments");
+  };
+
+  /* ==========================================
+     PAGE
+  ========================================== */
 
   return (
-    <div className="container-fluid">
+    <div className="admin-page">
+      {/* Header */}
 
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="page-header">
         <div>
-          <h2 className="fw-bold mb-1">
-            <CreditCard className="me-2" />
+          <h1 className="page-title">
+            <FaMoneyCheckAlt />
             Payments
-          </h2>
+          </h1>
 
-          <p className="text-muted">
+          <p className="page-subtitle">
             Membership payment management.
           </p>
         </div>
-
-        <div className="d-flex gap-2">
-
-          <button
-            className="btn btn-outline-primary"
-            onClick={loadPayments}
-          >
-            <RefreshCw size={18} className="me-2" />
-            Refresh
-          </button>
-
-          <button className="btn btn-success">
-            <Download size={18} className="me-2" />
-            Export
-          </button>
-
-        </div>
       </div>
 
-      {/* Statistics */}
+      {/* Summary */}
 
-      <div className="row g-3 mb-4">
-
-        <div className="col-lg-3">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <small>Total Payments</small>
-              <h3>{stats.total}</h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-3">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <small>Successful</small>
-              <h3 className="text-success">
-                {stats.successful}
-              </h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-3">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <small>Pending</small>
-              <h3 className="text-warning">
-                {stats.pending}
-              </h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-3">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <small>Total Revenue</small>
-              <h3 className="text-primary">
-                KES {stats.revenue.toLocaleString()}
-              </h3>
-            </div>
-          </div>
-        </div>
-
-      </div>
+      <PaymentSummary summary={summary} />
 
       {/* Filters */}
 
-      <div className="card shadow-sm border-0 mb-4">
-
-        <div className="card-body">
-
-          <div className="row">
-
-            <div className="col-md-8">
-
-              <div className="input-group">
-
-                <span className="input-group-text">
-                  <Search size={18} />
-                </span>
-
-                <input
-                  className="form-control"
-                  placeholder="Search receipt, phone, member..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-
-              </div>
-
-            </div>
-
-            <div className="col-md-4">
-
-              <select
-                className="form-select"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <option value="ALL">All Status</option>
-                <option value="SUCCESS">Successful</option>
-                <option value="PENDING">Pending</option>
-                <option value="FAILED">Failed</option>
-              </select>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
+      <PaymentFilters
+        filters={filters}
+        setFilters={setFilters}
+        onRefresh={loadPayments}
+        onExport={handleExport}
+      />
 
       {/* Table */}
 
-      <div className="card border-0 shadow-sm">
-
-        <div className="table-responsive">
-
-          <table className="table table-hover align-middle mb-0">
-
-            <thead className="table-light">
-
-              <tr>
-                <th>Receipt</th>
-                <th>Member</th>
-                <th>Phone</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-5">
-                    <Loader2 className="spin" />
-                  </td>
-                </tr>
-              ) : filteredPayments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-5">
-                    No payment records found.
-                  </td>
-                </tr>
-              ) : (
-                filteredPayments.map((payment) => (
-                  <tr key={payment._id}>
-
-                    <td>{payment.receiptNumber}</td>
-
-                    <td>{payment.memberName}</td>
-
-                    <td>{payment.phone}</td>
-
-                    <td>KES {Number(payment.amount).toLocaleString()}</td>
-
-                    <td>
-                      {payment.status === "SUCCESS" && (
-                        <span className="badge bg-success">
-                          <CheckCircle2 size={14} className="me-1" />
-                          Success
-                        </span>
-                      )}
-
-                      {payment.status === "FAILED" && (
-                        <span className="badge bg-danger">
-                          <XCircle size={14} className="me-1" />
-                          Failed
-                        </span>
-                      )}
-
-                      {payment.status === "PENDING" && (
-                        <span className="badge bg-warning text-dark">
-                          <Clock3 size={14} className="me-1" />
-                          Pending
-                        </span>
-                      )}
-                    </td>
-
-                    <td>
-                      {new Date(payment.createdAt).toLocaleString()}
-                    </td>
-
-                  </tr>
-                ))
-              )}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
+      <PaymentsTable
+        payments={payments}
+        loading={loading}
+        pagination={pagination}
+        filters={filters}
+        setFilters={setFilters}
+        onVerify={handleVerify}
+      />
     </div>
   );
-};
+}
 
 export default Payments;

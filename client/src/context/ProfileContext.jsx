@@ -21,58 +21,44 @@ const ProfileContext = createContext(null);
    PROVIDER
 ========================================== */
 
-export function ProfileProvider({
-  children,
-}) {
-
+export function ProfileProvider({ children }) {
   /* ======================================
      STATE
   ====================================== */
 
-  const [profile, setProfile] =
-    useState(null);
+  const [profile, setProfile] = useState(null);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [error, setError] =
-    useState("");
+  const [error, setError] = useState("");
 
   /* ======================================
      LOAD PROFILE
   ====================================== */
 
-  const loadProfile = useCallback(async () => {
-
+  const loadProfile = useCallback(async (showLoader = true) => {
     try {
-
-      setLoading(true);
+      if (showLoader) {
+        setLoading(true);
+      }
 
       setError("");
 
-      const response =
-        await getMyProfile();
+      const response = await getMyProfile();
 
       setProfile(response.data);
-
     } catch (err) {
-
       console.error(err);
 
       setError(
-
         err.response?.data?.message ||
-
         "Unable to load profile."
-
       );
-
     } finally {
-
-      setLoading(false);
-
+      if (showLoader) {
+        setLoading(false);
+      }
     }
-
   }, []);
 
   /* ======================================
@@ -80,9 +66,7 @@ export function ProfileProvider({
   ====================================== */
 
   useEffect(() => {
-
     loadProfile();
-
   }, [loadProfile]);
 
   /* ======================================
@@ -90,171 +74,164 @@ export function ProfileProvider({
   ====================================== */
 
   const fullName = profile
-
     ? [
-
         profile.firstName,
-
         profile.middleName,
-
         profile.lastName,
-
       ]
-
         .filter(Boolean)
-
         .join(" ")
-
     : "";
 
   const initials = profile
-
-    ? `${
-
-        profile.firstName?.charAt(0) || ""
-
-      }${
-
-        profile.lastName?.charAt(0) || ""
-
-      }`.toUpperCase()
-
+    ? `${profile.firstName?.charAt(0) || ""}${profile.lastName?.charAt(0) || ""}`.toUpperCase()
     : "";
 
   const memberNumber =
-
     profile?.memberNumber ||
-
     profile?.membershipNumber ||
-
     "";
 
+  const profilePhoto =
+    profile?.profilePhoto || null;
+
+  const membershipStatus =
+    profile?.membershipStatus || "";
+
+  const membershipType =
+    profile?.membershipType || "";
+
+  const membershipFeePaid =
+    profile?.membershipFeePaid || false;
+
+  const membershipExpiry =
+    profile?.membershipExpiry || null;
+
   const joinedDate =
+    profile?.joinedAt || null;
 
-    profile?.joinedAt ||
+  const county =
+    profile?.county || "";
 
-    null;
+  const phone =
+    profile?.phone || "";
+
+  const email =
+    profile?.user?.email || "";
+
+  const role =
+    profile?.user?.role || "member";
+
+  const isActive =
+    profile?.user?.isActive || false;
 
   /* ======================================
      PROFILE COMPLETION
   ====================================== */
 
   const completionFields = [
-
-    profile?.profilePhoto,
-
+    profilePhoto,
     profile?.occupation,
-
-    profile?.phone,
-
+    phone,
     profile?.dateOfBirth,
-
-    profile?.county,
-
+    county,
   ];
 
   const completedFields =
-
     completionFields.filter(Boolean).length;
 
-  const profileCompletion =
-
-    Math.round(
-
-      (completedFields /
-
-        completionFields.length) *
-
+  const profileCompletion = Math.round(
+    (completedFields /
+      completionFields.length) *
       100
-
-    );
+  );
 
   const isProfileComplete =
-
     profileCompletion === 100;
 
   /* ======================================
      CONTEXT VALUE
   ====================================== */
 
-  const value = useMemo(() => ({
+  const value = useMemo(
+    () => ({
+      /* Raw Profile */
 
-    /* Profile */
+      profile,
+      setProfile,
 
-    profile,
+      /* Status */
 
-    setProfile,
+      loading,
+      error,
 
-    /* Status */
+      /* Actions */
 
-    loading,
+      reloadProfile: loadProfile,
 
-    error,
+      /* Identity */
 
-    /* Actions */
+      fullName,
+      initials,
+      memberNumber,
 
-    reloadProfile:
+      /* Contact */
 
+      email,
+      phone,
+
+      /* Membership */
+
+      membershipStatus,
+      membershipType,
+      membershipFeePaid,
+      membershipExpiry,
+      joinedDate,
+
+      /* User */
+
+      role,
+      isActive,
+
+      /* Profile */
+
+      county,
+      profilePhoto,
+
+      /* Completion */
+
+      profileCompletion,
+      isProfileComplete,
+    }),
+    [
+      profile,
+      loading,
+      error,
       loadProfile,
-
-    /* Computed */
-
-    fullName,
-
-    initials,
-
-    profilePhoto:
-
-      profile?.profilePhoto || null,
-
-    membershipStatus:
-
-      profile?.membershipStatus || "",
-
-    memberNumber,
-
-    joinedDate,
-
-    profileCompletion,
-
-    isProfileComplete,
-
-  }), [
-
-    profile,
-
-    loading,
-
-    error,
-
-    loadProfile,
-
-    fullName,
-
-    initials,
-
-    memberNumber,
-
-    joinedDate,
-
-    profileCompletion,
-
-    isProfileComplete,
-
-  ]);
-
-  return (
-
-    <ProfileContext.Provider
-      value={value}
-    >
-
-      {children}
-
-    </ProfileContext.Provider>
-
+      fullName,
+      initials,
+      memberNumber,
+      email,
+      phone,
+      membershipStatus,
+      membershipType,
+      membershipFeePaid,
+      membershipExpiry,
+      joinedDate,
+      role,
+      isActive,
+      county,
+      profilePhoto,
+      profileCompletion,
+      isProfileComplete,
+    ]
   );
 
+  return (
+    <ProfileContext.Provider value={value}>
+      {children}
+    </ProfileContext.Provider>
+  );
 }
 
 /* ==========================================
@@ -262,22 +239,15 @@ export function ProfileProvider({
 ========================================== */
 
 export function useProfile() {
-
-  const context =
-    useContext(ProfileContext);
+  const context = useContext(ProfileContext);
 
   if (!context) {
-
     throw new Error(
-
       "useProfile must be used inside ProfileProvider."
-
     );
-
   }
 
   return context;
-
 }
 
 export default ProfileContext;

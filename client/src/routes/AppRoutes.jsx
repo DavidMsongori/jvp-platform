@@ -54,12 +54,12 @@ import DashboardLayout from "../layouts/DashboardLayout";
 
 import Dashboard from "../pages/dashboard/Dashboard";
 import Profile from "../pages/profile/Profile";
-import MembershipCard from "../pages/dashboard/MembershipCard";
+import MembershipCardPage from "../features/member-card/MembershipCardPage";
 import EventsDashboard from "../pages/dashboard/Events";
 import ProgramsDashboard from "../pages/dashboard/Programs";
 import Certificates from "../pages/dashboard/Certificates";
 import Notifications from "../pages/dashboard/Notifications";
-import Settings from "../pages/dashboard/Settings";
+import Settings from "../pages/dashboard/settings/Settings";
 
 /* ==========================================
    ADMIN LAYOUT
@@ -192,9 +192,9 @@ function AppRoutes() {
           />
 
           <Route
-            path="membership-card"
-            element={<MembershipCard />}
-          />
+  path="membership-card"
+  element={<MembershipCardPage />}
+/>
 
           <Route
             path="events"

@@ -1,0 +1,264 @@
+/* ==========================================================
+   APPLICATION SETTINGS
+========================================================== */
+
+.app-settings {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2rem;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.app-settings-header {
+
+    display: flex;
+    align-items: center;
+
+    gap: 1rem;
+
+    padding: 1.75rem;
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 18px;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,.05);
+
+}
+
+.app-settings-header svg {
+
+    color: var(--primary-color);
+
+}
+
+.app-settings-header h2 {
+
+    margin: 0 0 .35rem;
+
+    color: var(--text-primary);
+
+}
+
+.app-settings-header p {
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+}
+
+/* ==========================================================
+   CARD
+========================================================== */
+
+.app-settings-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 18px;
+
+    padding: 2rem;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,.05);
+
+}
+
+.app-settings-card h3 {
+
+    display: flex;
+    align-items: center;
+
+    gap: .75rem;
+
+    margin: 0 0 1.5rem;
+
+    color: var(--text-primary);
+
+}
+
+/* ==========================================================
+   ROW
+========================================================== */
+
+.setting-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 1rem;
+
+}
+
+.setting-row strong {
+
+    display: block;
+
+    margin-bottom: .35rem;
+
+    color: var(--text-primary);
+
+}
+
+.setting-row span {
+
+    color: var(--text-secondary);
+
+    font-size: .92rem;
+
+}
+
+/* ==========================================================
+   INFO GRID
+========================================================== */
+
+.app-info-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+
+    gap: 1rem;
+
+}
+
+.app-info-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 1rem;
+
+    padding: 1rem;
+
+    background: #f8fafc;
+
+    border-radius: 14px;
+
+}
+
+.app-info-item svg {
+
+    color: var(--primary-color);
+
+}
+
+.app-info-item span {
+
+    display: block;
+
+    margin-bottom: .3rem;
+
+    color: var(--text-secondary);
+
+    font-size: .85rem;
+
+}
+
+.app-info-item strong {
+
+    color: var(--text-primary);
+
+}
+
+/* ==========================================================
+   NOTE
+========================================================== */
+
+.app-note {
+
+    display: flex;
+
+    gap: 1rem;
+
+    align-items: flex-start;
+
+    padding: 1.5rem;
+
+    background: rgba(15,76,129,.08);
+
+    border-left: 4px solid var(--primary-color);
+
+    border-radius: 16px;
+
+}
+
+.app-note svg {
+
+    color: var(--primary-color);
+
+    flex-shrink: 0;
+
+}
+
+.app-note h4 {
+
+    margin: 0 0 .5rem;
+
+    color: var(--text-primary);
+
+}
+
+.app-note p {
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+    line-height: 1.7;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .app-settings-card{
+
+        padding:1.5rem;
+
+    }
+
+    .app-settings-header{
+
+        align-items:flex-start;
+
+    }
+
+    .setting-row{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .setting-row .secondary-btn{
+
+        width:100%;
+
+    }
+
+    .app-info-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}

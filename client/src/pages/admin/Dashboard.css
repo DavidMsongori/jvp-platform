@@ -131,3 +131,494 @@
   }
 
 }
+
+/* ==========================================
+   UPCOMING EVENTS
+========================================== */
+
+.panel-header {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 1rem;
+
+}
+
+.event-list {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 1rem;
+
+}
+
+.event-item {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 1rem;
+
+    border-radius: 12px;
+
+    background: #f8fafc;
+
+    border: 1px solid #edf2f7;
+
+    transition: .25s ease;
+
+}
+
+.event-item:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 18px rgba(0,0,0,.06);
+
+}
+
+.event-details h4 {
+
+    margin: 0 0 .35rem;
+
+    color: #16325B;
+
+    font-size: 1rem;
+
+}
+
+.event-details p {
+
+    margin: .2rem 0;
+
+    color: #64748b;
+
+    font-size: .9rem;
+
+}
+
+.event-status {
+
+    padding: .45rem .85rem;
+
+    border-radius: 30px;
+
+    background: #e8f5e9;
+
+    color: #2e7d32;
+
+    font-size: .8rem;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+}
+
+.empty-panel {
+
+    height: 180px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    color: #94a3b8;
+
+    gap: .75rem;
+
+}
+
+.empty-panel svg {
+
+    color: var(--primary-color);
+
+}
+
+/* ==========================================
+   RECENT MEMBERS
+========================================== */
+
+.member-list{
+
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+
+}
+
+.member-item{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:1rem;
+
+    padding:1rem;
+
+    border:1px solid #edf2f7;
+
+    border-radius:12px;
+
+    background:#f8fafc;
+
+    transition:.25s ease;
+
+}
+
+.member-item:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 18px rgba(0,0,0,.06);
+
+}
+
+.member-avatar{
+
+    flex-shrink:0;
+
+}
+
+.member-avatar img{
+
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+}
+
+.avatar-placeholder{
+
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    background:var(--primary-color);
+
+    color:#fff;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-weight:700;
+
+}
+
+.member-details{
+
+    flex:1;
+
+}
+
+.member-details h4{
+
+    margin:0;
+
+    color:#16325B;
+
+    font-size:1rem;
+
+}
+
+.member-details p{
+
+    margin:.3rem 0;
+
+    color:#64748b;
+
+    text-transform:capitalize;
+
+}
+
+.member-details small{
+
+    color:#94a3b8;
+
+}
+
+.member-badges{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:.5rem;
+
+    align-items:flex-end;
+
+}
+
+.badge{
+
+    padding:.35rem .8rem;
+
+    border-radius:30px;
+
+    font-size:.75rem;
+
+    font-weight:600;
+
+}
+
+.badge-imported{
+
+    background:#FFF8E1;
+
+    color:#B26A00;
+
+}
+
+.badge-new{
+
+    background:#E8F5E9;
+
+    color:#2E7D32;
+
+}
+
+.badge-active{
+
+    background:#E3F2FD;
+
+    color:#1565C0;
+
+}
+
+.badge-pending{
+
+    background:#FCE4EC;
+
+    color:#C2185B;
+
+}
+
+/* ==========================================
+   RECENT PAYMENTS
+========================================== */
+
+.payment-list{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:1rem;
+
+}
+
+.payment-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:1rem;
+
+    padding:1rem;
+
+    border-radius:12px;
+
+    border:1px solid #edf2f7;
+
+    background:#f8fafc;
+
+    transition:.25s ease;
+
+}
+
+.payment-item:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 18px rgba(0,0,0,.06);
+
+}
+
+.payment-info{
+
+    flex:1;
+
+}
+
+.payment-info h4{
+
+    margin:0;
+
+    color:#16325B;
+
+    font-size:1rem;
+
+}
+
+.payment-info p{
+
+    margin:.35rem 0;
+
+    color:#64748b;
+
+    text-transform:capitalize;
+
+}
+
+.payment-info small{
+
+    color:#94a3b8;
+
+}
+
+.payment-right{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:.45rem;
+
+}
+
+.payment-right strong{
+
+    color:#16325B;
+
+    font-size:1rem;
+
+}
+
+.payment-status{
+
+    padding:.35rem .8rem;
+
+    border-radius:30px;
+
+    font-size:.75rem;
+
+    font-weight:600;
+
+    text-transform:capitalize;
+
+}
+
+.payment-completed{
+
+    background:#E8F5E9;
+
+    color:#2E7D32;
+
+}
+
+.payment-pending{
+
+    background:#FFF8E1;
+
+    color:#B26A00;
+
+}
+
+.payment-failed{
+
+    background:#FCE4EC;
+
+    color:#C62828;
+
+}
+
+
+/* ==========================================
+   QUICK ACTIONS
+========================================== */
+
+.quick-actions{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:.8rem;
+
+}
+
+.quick-action{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:1rem;
+
+    width:100%;
+
+    padding:1rem 1.1rem;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#f8fafc;
+
+    cursor:pointer;
+
+    transition:.25s ease;
+
+    font-size:.95rem;
+
+    color:#16325B;
+
+}
+
+.quick-action span{
+
+    flex:1;
+
+    text-align:left;
+
+    font-weight:600;
+
+}
+
+.quick-action svg:first-child{
+
+    color:var(--primary-color);
+
+    font-size:1.1rem;
+
+}
+
+.quick-action svg:last-child{
+
+    color:#94a3b8;
+
+}
+
+.quick-action:hover{
+
+    background:var(--primary-color);
+
+    color:#fff;
+
+    transform:translateX(4px);
+
+}
+
+.quick-action:hover svg{
+
+    color:#fff;
+
+}

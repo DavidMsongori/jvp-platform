@@ -20,31 +20,44 @@ export const getDashboard = async () => {
 
   const [
 
-    totalMembers,
+  totalMembers,
 
-    activeMembers,
+  activatedMembers,
 
-    pendingMembers,
+  importedMembers,
 
-    expiredMembers,
+  newMembers,
 
-  ] = await Promise.all([
+  expiredMembers,
 
-    Member.countDocuments(),
+] = await Promise.all([
 
-    Member.countDocuments({
-      membershipStatus: "active",
-    }),
+  // Everyone
+  Member.countDocuments(),
 
-    Member.countDocuments({
-      membershipStatus: "pending_payment",
-    }),
+  // Members who have actually activated their accounts
+  Member.countDocuments({
+    accountActivated: true,
+  }),
 
-    Member.countDocuments({
-      membershipStatus: "expired",
-    }),
+  // Imported members still waiting to activate
+  Member.countDocuments({
+    source: "imported",
+    accountActivated: false,
+  }),
 
-  ]);
+  // Members who registered through JVP Connect
+  Member.countDocuments({
+    source: "new",
+    accountActivated: true,
+  }),
+
+  // Expired memberships
+  Member.countDocuments({
+    membershipStatus: "expired",
+  }),
+
+]);
 
   /* ----------------------------------------
      PAYMENT STATISTICS
@@ -177,21 +190,23 @@ export const getDashboard = async () => {
 
     statistics: {
 
-      totalMembers,
+  totalMembers,
 
-      activeMembers,
+  activatedMembers,
 
-      pendingMembers,
+  importedMembers,
 
-      expiredMembers,
+  newMembers,
 
-      totalPayments,
+  expiredMembers,
 
-      totalRevenue,
+  totalPayments,
 
-      totalEvents,
+  totalRevenue,
 
-    },
+  totalEvents,
+
+},
 
     recentMembers,
 
@@ -412,33 +427,27 @@ export const getMembers = async (query = {}) => {
 
   const summary = {
 
-    totalMembers:
-      await Member.countDocuments(),
+  totalMembers: await Member.countDocuments(),
 
-    activeMembers:
-      await Member.countDocuments({
+  activatedMembers: await Member.countDocuments({
+    accountActivated: true,
+  }),
 
-        membershipStatus: "active",
+  importedMembers: await Member.countDocuments({
+    source: "imported",
+    accountActivated: false,
+  }),
 
-      }),
+  newMembers: await Member.countDocuments({
+    source: "new",
+    accountActivated: true,
+  }),
 
-    pendingMembers:
-      await Member.countDocuments({
+  expiredMembers: await Member.countDocuments({
+    membershipStatus: "expired",
+  }),
 
-        membershipStatus:
-          "pending_payment",
-
-      }),
-
-    expiredMembers:
-      await Member.countDocuments({
-
-        membershipStatus:
-          "expired",
-
-      }),
-
-  };
+};
 
   /* ----------------------------------------
      RETURN
