@@ -1,107 +1,233 @@
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-import MemberSearch from "../../../../components/common/MemberSearch";
+import {
+  X,
+  Search,
+  UserRound,
+} from "lucide-react";
+
+import "./LeaderFormModal.css";
+
+import memberService from "../../../../services/member.service";
+
+/* ============================================================
+   CONSTANTS
+============================================================ */
 
 const CATEGORIES = [
   {
-    value: "patron",
     label: "Patron",
+    value: "patron",
   },
   {
+    label: "Regional Executive",
     value: "regional_executive",
-    label: "Regional Executive Committee",
   },
   {
-    value: "youth_assembly",
     label: "Youth Assembly",
+    value: "youth_assembly",
   },
   {
-    value: "county_leadership",
     label: "County Leadership",
+    value: "county_leadership",
   },
 ];
 
-const REGIONAL_POSITIONS = [
+const DEPARTMENTS = [
+  {
+    label: "Executive",
+    value: "executive",
+  },
+  {
+    label: "Administration",
+    value: "administration",
+  },
+  {
+    label: "Finance",
+    value: "finance",
+  },
+  {
+    label: "Programs",
+    value: "programs",
+  },
+  {
+    label: "Communications",
+    value: "communications",
+  },
+  {
+    label: "Youth Affairs",
+    value: "youth_affairs",
+  },
+  {
+    label: "Gender and Inclusion",
+    value: "gender_and_inclusion",
+  },
+  {
+    label: "Other",
+    value: "other",
+  },
+];
+
+const SCOPES = [
+  {
+    label: "Regional",
+    value: "regional",
+  },
+  {
+    label: "County",
+    value: "county",
+  },
+  {
+    label: "Constituency",
+    value: "constituency",
+  },
+  {
+    label: "Ward",
+    value: "ward",
+  },
+  {
+    label: "Organization",
+    value: "organization",
+  },
+];
+
+const APPOINTMENT_TYPES = [
+  {
+    label: "Elected",
+    value: "elected",
+  },
+  {
+    label: "Appointed",
+    value: "appointed",
+  },
+  {
+    label: "Nominated",
+    value: "nominated",
+  },
+  {
+    label: "Honorary",
+    value: "honorary",
+  },
+];
+
+const POSITIONS = [
+  "Patron",
+
   "President",
   "Deputy President",
   "Secretary General",
   "Deputy Secretary General",
-  "National Treasurer",
-  "Deputy National Treasurer",
-  "Organizing Secretary",
-  "Deputy Organizing Secretary",
-  "Women's Representative",
-  "Deputy Women's Representative",
-  "Youth Representative",
-  "Deputy Youth Representative",
-  "Publicity Secretary",
-  "Deputy Publicity Secretary",
-  "Projects Coordinator",
+  "Treasurer",
+  "Deputy Treasurer",
+
+  "Regional Youth Governor",
+  "Regional Youth Senator",
+  "Regional Youth MP",
+
+  "County Youth Governor",
+  "County Youth Senator",
+  "County Youth MP",
+
+  "Constituency Youth MP",
+
+  "Ward Youth MCA",
+
+  "Director",
+  "Coordinator",
+  "Committee Chairperson",
+  "Committee Member",
 ];
 
-const ASSEMBLY_POSITIONS = [
-  "Speaker",
-  "Deputy Speaker",
-  "Clerk",
-  "Deputy Clerk",
-  "Youth MP",
-];
+/* ============================================================
+   DEFAULT FORM
+============================================================ */
 
-const COUNTY_POSITIONS = [
-  "Governor",
-  "Deputy Governor",
-  "Youth MCA",
-];
-
-const COUNTIES = [
-  "Mombasa",
-  "Kwale",
-  "Kilifi",
-  "Tana River",
-  "Lamu",
-  "Taita Taveta",
-];
-
-const INITIAL_FORM = {
+const DEFAULT_FORM = {
   member: "",
 
-  category: "regional_executive",
-
+  category: "",
   position: "",
 
-  county: "",
+  department: "",
+  scope: "",
+  appointmentType: "",
 
-  displayOrder: 1,
+  county: "",
+  constituency: "",
+  ward: "",
+
+  displayOrder: 999,
+  featured: false,
 
   termStart: "",
-
   termEnd: "",
 
+  verified: true,
+
+  remarks: "",
+
   patron: {
-    name: "",
+    fullName: "",
+    title: "",
     organization: "",
-    biography: "",
     photo: "",
+    bio: "",
   },
 };
 
+/* ============================================================
+   HELPERS
+============================================================ */
+
+const formatDateForInput = (date) => {
+  if (!date) return "";
+
+  return new Date(date)
+    .toISOString()
+    .split("T")[0];
+};
+
+const getMemberName = (member) => {
+  if (!member) return "";
+
+  return [
+    member.firstName,
+    member.middleName,
+    member.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+};
+
+/* ============================================================
+   COMPONENT
+============================================================ */
+
 export default function LeaderFormModal({
   open,
-  onClose,
-  onSave,
   leader = null,
   loading = false,
+  onClose,
+  onSave,
 }) {
-  const [form, setForm] = useState(INITIAL_FORM);
+  const [form, setForm] = useState(DEFAULT_FORM);
 
-  const [selectedMember, setSelectedMember] =
-    useState(null);
+  const [members, setMembers] = useState([]);
 
-  const [errors, setErrors] = useState({});
+  const [memberSearch, setMemberSearch] =
+    useState("");
+
+  const [membersLoading, setMembersLoading] =
+    useState(false);
+
+  const [error, setError] = useState("");
 
   /* ==========================================================
-     LOAD FORM
+     EDIT MODE
   ========================================================== */
 
   useEffect(() => {
@@ -109,54 +235,187 @@ export default function LeaderFormModal({
 
     if (leader) {
       setForm({
-        ...INITIAL_FORM,
-        ...leader,
+        member:
+          leader.member?._id ||
+          leader.member ||
+          "",
+
+        category: leader.category || "",
+        position: leader.position || "",
+
+        department: leader.department || "",
+        scope: leader.scope || "",
+        appointmentType:
+          leader.appointmentType || "",
+
+        county: leader.county || "",
+        constituency:
+          leader.constituency || "",
+        ward: leader.ward || "",
+
+        displayOrder:
+          leader.displayOrder ?? 999,
+
+        featured:
+          leader.featured ?? false,
+
+        termStart:
+          formatDateForInput(
+            leader.termStart
+          ),
+
+        termEnd:
+          formatDateForInput(
+            leader.termEnd
+          ),
+
+        verified:
+          leader.verified ?? true,
+
+        remarks:
+          leader.remarks || "",
+
+        patron: {
+          fullName:
+            leader.patron?.fullName || "",
+
+          title:
+            leader.patron?.title || "",
+
+          organization:
+            leader.patron?.organization ||
+            "",
+
+          photo:
+            leader.patron?.photo || "",
+
+          bio:
+            leader.patron?.bio || "",
+        },
       });
 
-      setSelectedMember(
-        leader.member || null
+      setMemberSearch(
+        leader.member
+          ? getMemberName(leader.member)
+          : ""
       );
     } else {
-      setForm(INITIAL_FORM);
+      setForm({
+        ...DEFAULT_FORM,
+        termStart: formatDateForInput(
+          new Date()
+        ),
+      });
 
-      setSelectedMember(null);
-
-      setErrors({});
+      setMemberSearch("");
     }
-  }, [leader, open]);
+
+    setError("");
+  }, [open, leader]);
 
   /* ==========================================================
-     UPDATE FIELD
+     LOAD MEMBERS
   ========================================================== */
 
-  const update = (field, value) => {
+ useEffect(() => {
+  if (!open) return;
+
+  if (form.category === "patron") {
+    setMembers([]);
+    return;
+  }
+
+  if (!memberSearch.trim()) {
+    setMembers([]);
+    return;
+  }
+
+  const loadMembers = async () => {
+    try {
+      setMembersLoading(true);
+
+      const response =
+        await memberService.searchMembers(
+          memberSearch
+        );
+
+      /*
+       * memberService.searchMembers()
+       * already returns response.data
+       */
+      const results =
+        response?.data ||
+        response?.members ||
+        response ||
+        [];
+
+      setMembers(
+        Array.isArray(results)
+          ? results
+          : []
+      );
+
+    } catch (err) {
+      console.error(
+        "Member search failed:",
+        err
+      );
+
+      setMembers([]);
+
+    } finally {
+      setMembersLoading(false);
+    }
+  };
+
+  const timer = setTimeout(
+    loadMembers,
+    350
+  );
+
+  return () =>
+    clearTimeout(timer);
+
+}, [
+  open,
+  memberSearch,
+  form.category,
+]);
+
+  /* ==========================================================
+     SELECTED MEMBER
+  ========================================================== */
+
+  const selectedMember = useMemo(() => {
+    return members.find(
+      (member) =>
+        member._id === form.member
+    );
+  }, [members, form.member]);
+
+  /* ==========================================================
+     FIELD UPDATE
+  ========================================================== */
+
+  const updateField = (field, value) => {
     setForm((prev) => ({
       ...prev,
       [field]: value,
     }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [field]: "",
-    }));
   };
 
-  /* ==========================================================
-     UPDATE PATRON
-  ========================================================== */
-
-  const updatePatron = (field, value) => {
+  const updatePatronField = (
+    field,
+    value
+  ) => {
     setForm((prev) => ({
       ...prev,
+
       patron: {
         ...prev.patron,
+
         [field]: value,
       },
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      patronName: "",
     }));
   };
 
@@ -164,7 +423,9 @@ export default function LeaderFormModal({
      CATEGORY CHANGE
   ========================================================== */
 
-  const changeCategory = (category) => {
+  const handleCategoryChange = (
+    category
+  ) => {
     setForm((prev) => ({
       ...prev,
 
@@ -175,157 +436,240 @@ export default function LeaderFormModal({
           ? ""
           : prev.member,
 
-      position: "",
+      appointmentType:
+        category === "patron"
+          ? "honorary"
+          : prev.appointmentType,
 
-      county:
-        category === "county_leadership"
-          ? prev.county
-          : "",
+      scope:
+        category === "patron"
+          ? "organization"
+          : prev.scope,
     }));
-
-    setErrors({});
 
     if (category === "patron") {
-      setSelectedMember(null);
+      setMemberSearch("");
     }
   };
 
   /* ==========================================================
-     MEMBER SELECT
+     SELECT MEMBER
   ========================================================== */
 
-  const handleMemberSelect = (
+  const handleSelectMember = (
     member
   ) => {
-    setSelectedMember(member);
-
-    update(
-      "member",
-      member?._id || ""
-    );
-
-    setErrors((prev) => ({
+    setForm((prev) => ({
       ...prev,
-      member: "",
+
+      member: member._id,
+
+      county:
+        member.county || "",
+
+      constituency:
+        member.constituency || "",
+
+      ward:
+        member.ward || "",
     }));
+
+    setMemberSearch(
+      getMemberName(member)
+    );
   };
 
   /* ==========================================================
-     AVAILABLE POSITIONS
-  ========================================================== */
-
-  const positions = (() => {
-    switch (form.category) {
-      case "regional_executive":
-        return REGIONAL_POSITIONS;
-
-      case "youth_assembly":
-        return ASSEMBLY_POSITIONS;
-
-      case "county_leadership":
-        return COUNTY_POSITIONS;
-
-      default:
-        return [];
-    }
-  })();
-
-  /* ==========================================================
-     VALIDATE
+     VALIDATION
   ========================================================== */
 
   const validate = () => {
-    const validationErrors = {};
+    if (!form.category) {
+      return "Please select a leadership category.";
+    }
 
-    if (
-      form.category !== "patron"
-    ) {
-      if (!form.member) {
-        validationErrors.member =
-          "Please select a member.";
-      }
+    if (!form.position) {
+      return "Please select a leadership position.";
+    }
 
-      if (!form.position) {
-        validationErrors.position =
-          "Please select a position.";
-      }
+    if (!form.department) {
+      return "Please select a department.";
+    }
 
-      if (
-        form.category ===
-          "county_leadership" &&
-        !form.county
-      ) {
-        validationErrors.county =
-          "Please select a county.";
-      }
-    } else {
-      if (
-        !form.patron.name.trim()
-      ) {
-        validationErrors.patronName =
-          "Patron name is required.";
-      }
+    if (!form.scope) {
+      return "Please select a leadership scope.";
+    }
+
+    if (!form.appointmentType) {
+      return "Please select an appointment type.";
     }
 
     if (
-      !form.displayOrder ||
-      form.displayOrder < 1
+      form.category !== "patron" &&
+      !form.member
     ) {
-      validationErrors.displayOrder =
-        "Display order must be at least 1.";
+      return "Please select a member.";
     }
 
-    if (
-      form.termStart &&
-      form.termEnd &&
-      new Date(form.termEnd) <
-        new Date(form.termStart)
-    ) {
-      validationErrors.termEnd =
-        "Term End cannot be before Term Start.";
+    if (form.category === "patron") {
+      if (!form.patron.fullName.trim()) {
+        return "Patron full name is required.";
+      }
     }
 
-    setErrors(validationErrors);
+    if (!form.termStart) {
+      return "Term start date is required.";
+    }
 
-    return (
-      Object.keys(
-        validationErrors
-      ).length === 0
-    );
+    return null;
   };
 
   /* ==========================================================
      SUBMIT
   ========================================================== */
 
-  const submit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-    if (!validate()) {
+    const validationError =
+      validate();
+
+    if (validationError) {
+      setError(validationError);
+
       return;
     }
 
-    onSave(form);
+    setError("");
+
+    const payload = {
+      category: form.category,
+
+      position: form.position,
+
+      department: form.department,
+
+      scope: form.scope,
+
+      appointmentType:
+        form.appointmentType,
+
+      displayOrder: Number(
+        form.displayOrder
+      ),
+
+      featured: form.featured,
+
+      termStart: form.termStart,
+
+      termEnd:
+        form.termEnd || null,
+
+      verified: form.verified,
+
+      remarks: form.remarks,
+
+      ...(form.category === "patron"
+        ? {
+            member: null,
+
+            patron: {
+              fullName:
+                form.patron.fullName,
+
+              title:
+                form.patron.title,
+
+              organization:
+                form.patron.organization,
+
+              photo:
+                form.patron.photo,
+
+              bio:
+                form.patron.bio,
+            },
+          }
+        : {
+            member: form.member,
+
+            /*
+             * These values are intentionally sent
+             * from the selected member's current
+             * geographical information.
+             */
+            county:
+              selectedMember?.county ||
+              form.county ||
+              null,
+
+            constituency:
+              selectedMember?.constituency ||
+              form.constituency ||
+              null,
+
+            ward:
+              selectedMember?.ward ||
+              form.ward ||
+              null,
+          }),
+    };
+
+    await onSave(payload);
+  };
+
+  /* ==========================================================
+     CLOSE
+  ========================================================== */
+
+  const handleClose = () => {
+    if (loading) return;
+
+    setForm(DEFAULT_FORM);
+
+    setMemberSearch("");
+
+    setError("");
+
+    onClose();
   };
 
   if (!open) return null;
-    return (
-    <div className="modal-overlay">
 
-      <div className="modal leadership-modal">
+  const isPatron =
+    form.category === "patron";
+
+  /* ==========================================================
+     RENDER
+  ========================================================== */
+
+  return (
+    <div className="modal-overlay">
+      <div className="leader-form-modal">
+
+        {/* ==================================================
+            HEADER
+        ================================================== */}
 
         <div className="modal-header">
 
-          <h2>
-            {leader
-              ? "Edit Leadership Assignment"
-              : "Assign Leader"}
-          </h2>
+          <div>
+            <h2>
+              {leader
+                ? "Edit Leadership Assignment"
+                : "Assign New Leader"}
+            </h2>
+
+            <p>
+              Assign an existing member to a
+              leadership position.
+            </p>
+          </div>
 
           <button
             type="button"
-            className="icon-btn"
-            onClick={onClose}
+            className="modal-close"
+            onClick={handleClose}
             disabled={loading}
           >
             <X size={20} />
@@ -333,336 +677,703 @@ export default function LeaderFormModal({
 
         </div>
 
-        <form onSubmit={submit} noValidate>
+        {/* ==================================================
+            ERROR
+        ================================================== */}
 
-          <div className="form-grid">
+        {error && (
+          <div className="form-error">
+            {error}
+          </div>
+        )}
 
-            {/* ==========================================
-                CATEGORY
-            ========================================== */}
+        <form
+          onSubmit={handleSubmit}
+          className="leader-form"
+        >
 
-            <div className="form-group">
+          {/* =================================================
+              CATEGORY
+          ================================================= */}
 
-              <label>Category</label>
+          <section className="form-section">
 
-              <select
-                value={form.category}
-                disabled={loading}
-                onChange={(e) =>
-                  changeCategory(e.target.value)
-                }
-              >
-                {CATEGORIES.map((category) => (
-                  <option
-                    key={category.value}
-                    value={category.value}
-                  >
-                    {category.label}
-                  </option>
-                ))}
-              </select>
+            <h3>Leadership Classification</h3>
 
-            </div>
+            <div className="form-grid">
 
-            {/* ==========================================
-                MEMBER SEARCH
-            ========================================== */}
+              <div className="form-field">
 
-            {form.category !== "patron" && (
+                <label>
+                  Leadership Category *
+                </label>
 
-              <div className="form-group full">
-
-                <MemberSearch
-                  value={selectedMember}
+                <select
+                  value={form.category}
+                  onChange={(e) =>
+                    handleCategoryChange(
+                      e.target.value
+                    )
+                  }
                   disabled={loading}
-                  onChange={handleMemberSelect}
-                />
+                >
+                  <option value="">
+                    Select category
+                  </option>
 
-                {errors.member && (
-                  <small className="form-error">
-                    {errors.member}
-                  </small>
-                )}
+                  {CATEGORIES.map(
+                    (category) => (
+                      <option
+                        key={
+                          category.value
+                        }
+                        value={
+                          category.value
+                        }
+                      >
+                        {category.label}
+                      </option>
+                    )
+                  )}
+                </select>
 
               </div>
 
-            )}
+              <div className="form-field">
 
-            {/* ==========================================
-                PATRON
-            ========================================== */}
+                <label>
+                  Position *
+                </label>
 
-            {form.category === "patron" && (
+                <select
+                  value={form.position}
+                  onChange={(e) =>
+                    updateField(
+                      "position",
+                      e.target.value
+                    )
+                  }
+                  disabled={loading}
+                >
+                  <option value="">
+                    Select position
+                  </option>
 
-              <>
+                  {POSITIONS.map(
+                    (position) => (
+                      <option
+                        key={position}
+                        value={position}
+                      >
+                        {position}
+                      </option>
+                    )
+                  )}
+                </select>
 
-                <div className="form-group">
+              </div>
 
-                  <label>Patron Name</label>
+              <div className="form-field">
+
+                <label>
+                  Department *
+                </label>
+
+                <select
+                  value={form.department}
+                  onChange={(e) =>
+                    updateField(
+                      "department",
+                      e.target.value
+                    )
+                  }
+                  disabled={loading}
+                >
+                  <option value="">
+                    Select department
+                  </option>
+
+                  {DEPARTMENTS.map(
+                    (department) => (
+                      <option
+                        key={
+                          department.value
+                        }
+                        value={
+                          department.value
+                        }
+                      >
+                        {department.label}
+                      </option>
+                    )
+                  )}
+                </select>
+
+              </div>
+
+              <div className="form-field">
+
+                <label>
+                  Leadership Scope *
+                </label>
+
+                <select
+                  value={form.scope}
+                  onChange={(e) =>
+                    updateField(
+                      "scope",
+                      e.target.value
+                    )
+                  }
+                  disabled={loading}
+                >
+                  <option value="">
+                    Select scope
+                  </option>
+
+                  {SCOPES.map(
+                    (scope) => (
+                      <option
+                        key={scope.value}
+                        value={scope.value}
+                      >
+                        {scope.label}
+                      </option>
+                    )
+                  )}
+                </select>
+
+              </div>
+
+              <div className="form-field">
+
+                <label>
+                  Appointment Type *
+                </label>
+
+                <select
+                  value={
+                    form.appointmentType
+                  }
+                  onChange={(e) =>
+                    updateField(
+                      "appointmentType",
+                      e.target.value
+                    )
+                  }
+                  disabled={loading}
+                >
+                  <option value="">
+                    Select appointment type
+                  </option>
+
+                  {APPOINTMENT_TYPES.map(
+                    (type) => (
+                      <option
+                        key={type.value}
+                        value={type.value}
+                      >
+                        {type.label}
+                      </option>
+                    )
+                  )}
+                </select>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          {/* =================================================
+              MEMBER SELECTION
+          ================================================= */}
+
+          {!isPatron && (
+            <section className="form-section">
+
+              <h3>Member Assignment</h3>
+
+              <div className="form-field">
+
+                <label>
+                  Search and Select Member *
+                </label>
+
+                <div className="member-search">
+
+                  <Search size={18} />
 
                   <input
                     type="text"
-                    value={form.patron.name}
-                    disabled={loading}
-                    onChange={(e) =>
-                      updatePatron(
-                        "name",
-                        e.target.value
-                      )
+                    placeholder="Search by name, phone, ID or member number..."
+                    value={
+                      memberSearch
                     }
-                  />
+                    onChange={(e) => {
+                      setMemberSearch(
+                        e.target.value
+                      );
 
-                  {errors.patronName && (
-                    <small className="form-error">
-                      {errors.patronName}
-                    </small>
-                  )}
+                      if (
+                        form.member
+                      ) {
+                        updateField(
+                          "member",
+                          ""
+                        );
+                      }
+                    }}
+                    disabled={loading}
+                  />
 
                 </div>
 
-                <div className="form-group">
+                {membersLoading && (
+                  <div className="member-search-status">
+                    Searching members...
+                  </div>
+                )}
 
-                  <label>Organization</label>
+                {!membersLoading &&
+                  memberSearch &&
+                  !form.member &&
+                  members.length > 0 && (
+
+                    <div className="member-results">
+
+                      {members.map(
+                        (member) => (
+
+                          <button
+                            type="button"
+                            key={
+                              member._id
+                            }
+                            className="member-result"
+                            onClick={() =>
+                              handleSelectMember(
+                                member
+                              )
+                            }
+                          >
+
+                            <div className="member-avatar">
+
+                              {member.profilePhoto ? (
+
+                                <img
+                                  src={
+                                    member.profilePhoto
+                                  }
+                                  alt=""
+                                />
+
+                              ) : (
+
+                                <UserRound
+                                  size={20}
+                                />
+
+                              )}
+
+                            </div>
+
+                            <div>
+
+                              <strong>
+                                {getMemberName(
+                                  member
+                                )}
+                              </strong>
+
+                              <small>
+                                {member.memberNumber ||
+                                  "No membership number"}
+                                {" · "}
+                                {member.county}
+                              </small>
+
+                            </div>
+
+                          </button>
+
+                        )
+                      )}
+
+                    </div>
+
+                  )}
+
+                {!membersLoading &&
+                  memberSearch &&
+                  !form.member &&
+                  members.length === 0 && (
+
+                    <div className="member-search-status">
+                      No active members found.
+                    </div>
+
+                  )}
+
+              </div>
+
+              {selectedMember && (
+
+                <div className="selected-member">
+
+                  <div className="selected-member-avatar">
+
+                    {selectedMember.profilePhoto ? (
+
+                      <img
+                        src={
+                          selectedMember.profilePhoto
+                        }
+                        alt=""
+                      />
+
+                    ) : (
+
+                      <UserRound
+                        size={24}
+                      />
+
+                    )}
+
+                  </div>
+
+                  <div>
+
+                    <strong>
+                      {getMemberName(
+                        selectedMember
+                      )}
+                    </strong>
+
+                    <span>
+                      {selectedMember.memberNumber}
+                    </span>
+
+                    <small>
+                      {selectedMember.county}
+                      {" · "}
+                      {
+                        selectedMember.constituency ||
+                        "No constituency"
+                      }
+                      {" · "}
+                      {
+                        selectedMember.ward ||
+                        "No ward"
+                      }
+                    </small>
+
+                  </div>
+
+                </div>
+
+              )}
+
+            </section>
+          )}
+
+          {/* =================================================
+              PATRON
+          ================================================= */}
+
+          {isPatron && (
+
+            <section className="form-section">
+
+              <h3>Patron Information</h3>
+
+              <div className="form-grid">
+
+                <div className="form-field">
+
+                  <label>
+                    Full Name *
+                  </label>
+
+                  <input
+                    type="text"
+                    value={
+                      form.patron.fullName
+                    }
+                    onChange={(e) =>
+                      updatePatronField(
+                        "fullName",
+                        e.target.value
+                      )
+                    }
+                    disabled={loading}
+                  />
+
+                </div>
+
+                <div className="form-field">
+
+                  <label>
+                    Title
+                  </label>
+
+                  <input
+                    type="text"
+                    value={
+                      form.patron.title
+                    }
+                    onChange={(e) =>
+                      updatePatronField(
+                        "title",
+                        e.target.value
+                      )
+                    }
+                    disabled={loading}
+                  />
+
+                </div>
+
+                <div className="form-field">
+
+                  <label>
+                    Organization
+                  </label>
 
                   <input
                     type="text"
                     value={
                       form.patron.organization
                     }
-                    disabled={loading}
                     onChange={(e) =>
-                      updatePatron(
+                      updatePatronField(
                         "organization",
                         e.target.value
                       )
                     }
-                  />
-
-                </div>
-
-                <div className="form-group full">
-
-                  <label>Biography</label>
-
-                  <textarea
-                    rows={4}
-                    value={
-                      form.patron.biography
-                    }
                     disabled={loading}
-                    onChange={(e) =>
-                      updatePatron(
-                        "biography",
-                        e.target.value
-                      )
-                    }
                   />
 
                 </div>
 
-                <div className="form-group full">
+                <div className="form-field">
 
-                  <label>Photo URL</label>
+                  <label>
+                    Photo URL
+                  </label>
 
                   <input
-                    type="text"
+                    type="url"
                     value={
                       form.patron.photo
                     }
-                    disabled={loading}
                     onChange={(e) =>
-                      updatePatron(
+                      updatePatronField(
                         "photo",
                         e.target.value
                       )
                     }
+                    disabled={loading}
                   />
 
                 </div>
 
-              </>
+              </div>
 
-            )}
+              <div className="form-field">
 
-            {/* ==========================================
-                POSITION
-            ========================================== */}
+                <label>
+                  Biography
+                </label>
 
-            {form.category !== "patron" && (
-
-              <div className="form-group">
-
-                <label>Position</label>
-
-                <select
-                  value={form.position}
-                  disabled={loading}
+                <textarea
+                  rows="4"
+                  value={
+                    form.patron.bio
+                  }
                   onChange={(e) =>
-                    update(
-                      "position",
+                    updatePatronField(
+                      "bio",
                       e.target.value
                     )
                   }
-                >
-                  <option value="">
-                    Select Position
-                  </option>
-
-                  {positions.map((position) => (
-                    <option
-                      key={position}
-                      value={position}
-                    >
-                      {position}
-                    </option>
-                  ))}
-
-                </select>
-
-                {errors.position && (
-                  <small className="form-error">
-                    {errors.position}
-                  </small>
-                )}
+                  disabled={loading}
+                />
 
               </div>
 
-            )}
+            </section>
 
-            {/* ==========================================
-                COUNTY
-            ========================================== */}
+          )}
 
-            {form.category ===
-              "county_leadership" && (
+          {/* =================================================
+              TERM
+          ================================================= */}
 
-              <div className="form-group">
+          <section className="form-section">
 
-                <label>County</label>
+            <h3>Leadership Term</h3>
 
-                <select
-                  value={form.county}
-                  disabled={loading}
+            <div className="form-grid">
+
+              <div className="form-field">
+
+                <label>
+                  Term Start *
+                </label>
+
+                <input
+                  type="date"
+                  value={
+                    form.termStart
+                  }
                   onChange={(e) =>
-                    update(
-                      "county",
+                    updateField(
+                      "termStart",
                       e.target.value
                     )
                   }
-                >
-                  <option value="">
-                    Select County
-                  </option>
-
-                  {COUNTIES.map((county) => (
-                    <option
-                      key={county}
-                      value={county}
-                    >
-                      {county}
-                    </option>
-                  ))}
-
-                </select>
-
-                {errors.county && (
-                  <small className="form-error">
-                    {errors.county}
-                  </small>
-                )}
+                  disabled={loading}
+                />
 
               </div>
 
-            )}
+              <div className="form-field">
 
-            {/* ==========================================
-                DISPLAY ORDER
-            ========================================== */}
+                <label>
+                  Term End
+                </label>
 
-            <div className="form-group">
+                <input
+                  type="date"
+                  value={
+                    form.termEnd
+                  }
+                  onChange={(e) =>
+                    updateField(
+                      "termEnd",
+                      e.target.value
+                    )
+                  }
+                  disabled={loading}
+                />
 
-              <label>Display Order</label>
+              </div>
 
-              <input
-                type="number"
-                min="1"
-                value={form.displayOrder}
-                disabled={loading}
-                onChange={(e) =>
-                  update(
-                    "displayOrder",
-                    Number(e.target.value)
-                  )
-                }
-              />
+              <div className="form-field">
 
-              {errors.displayOrder && (
-                <small className="form-error">
-                  {errors.displayOrder}
-                </small>
-              )}
+                <label>
+                  Display Order
+                </label>
+
+                <input
+                  type="number"
+                  min="1"
+                  value={
+                    form.displayOrder
+                  }
+                  onChange={(e) =>
+                    updateField(
+                      "displayOrder",
+                      e.target.value
+                    )
+                  }
+                  disabled={loading}
+                />
+
+              </div>
 
             </div>
 
-            {/* ==========================================
-                TERM START
-            ========================================== */}
+            <div className="form-checkboxes">
 
-            <div className="form-group">
+              <label>
 
-              <label>Term Start</label>
+                <input
+                  type="checkbox"
+                  checked={
+                    form.featured
+                  }
+                  onChange={(e) =>
+                    updateField(
+                      "featured",
+                      e.target.checked
+                    )
+                  }
+                  disabled={loading}
+                />
 
-              <input
-                type="date"
-                value={form.termStart}
-                disabled={loading}
+                Featured Leader
+
+              </label>
+
+              <label>
+
+                <input
+                  type="checkbox"
+                  checked={
+                    form.verified
+                  }
+                  onChange={(e) =>
+                    updateField(
+                      "verified",
+                      e.target.checked
+                    )
+                  }
+                  disabled={loading}
+                />
+
+                Verified
+
+              </label>
+
+            </div>
+
+          </section>
+
+          {/* =================================================
+              REMARKS
+          ================================================= */}
+
+          <section className="form-section">
+
+            <div className="form-field">
+
+              <label>
+                Remarks
+              </label>
+
+              <textarea
+                rows="3"
+                maxLength="500"
+                value={
+                  form.remarks
+                }
                 onChange={(e) =>
-                  update(
-                    "termStart",
+                  updateField(
+                    "remarks",
                     e.target.value
                   )
                 }
-              />
-
-            </div>
-
-            {/* ==========================================
-                TERM END
-            ========================================== */}
-
-            <div className="form-group">
-
-              <label>Term End</label>
-
-              <input
-                type="date"
-                value={form.termEnd}
                 disabled={loading}
-                onChange={(e) =>
-                  update(
-                    "termEnd",
-                    e.target.value
-                  )
-                }
+                placeholder="Optional administrative remarks..."
               />
-
-              {errors.termEnd && (
-                <small className="form-error">
-                  {errors.termEnd}
-                </small>
-              )}
 
             </div>
 
-          </div>
+          </section>
+
+          {/* =================================================
+              ACTIONS
+          ================================================= */}
 
           <div className="modal-actions">
 
             <button
               type="button"
               className="btn-secondary"
+              onClick={handleClose}
               disabled={loading}
-              onClick={onClose}
             >
               Cancel
             </button>
@@ -673,9 +1384,7 @@ export default function LeaderFormModal({
               disabled={loading}
             >
               {loading
-                ? leader
-                  ? "Updating..."
-                  : "Assigning..."
+                ? "Saving..."
                 : leader
                 ? "Update Leader"
                 : "Assign Leader"}
@@ -686,7 +1395,6 @@ export default function LeaderFormModal({
         </form>
 
       </div>
-
     </div>
   );
 }

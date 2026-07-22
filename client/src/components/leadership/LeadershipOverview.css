@@ -1,0 +1,203 @@
+/* =====================================================
+   CARD
+===================================================== */
+
+.leadership-overview {
+
+  background: #ffffff;
+
+  border-radius: 22px;
+
+  padding: 28px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 24px;
+
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.leadership-overview-header h3 {
+
+  margin: 0;
+
+  font-size: 1.3rem;
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+}
+
+.leadership-overview-header p {
+
+  margin-top: 8px;
+
+  color: #64748b;
+
+  line-height: 1.6;
+
+}
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.leadership-overview-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 18px;
+
+}
+
+.overview-card {
+
+  padding: 22px;
+
+  border-radius: 18px;
+
+  border: 1px solid #e2e8f0;
+
+  background: #f8fafc;
+
+  transition: .25s;
+
+}
+
+.overview-card:hover {
+
+  transform: translateY(-3px);
+
+  box-shadow: 0 8px 24px rgba(15,23,42,.08);
+
+}
+
+.overview-icon {
+
+  width: 52px;
+
+  height: 52px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #0f766e,
+    #155e75
+  );
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+}
+
+.overview-card span {
+
+  display: block;
+
+  font-size: .82rem;
+
+  color: #64748b;
+
+  margin-bottom: 8px;
+
+}
+
+.overview-card strong {
+
+  color: #0f172a;
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+  line-height: 1.5;
+
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.leadership-overview-footer {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #eef2f7;
+
+}
+
+.leadership-overview-footer span {
+
+  display: block;
+
+  color: #64748b;
+
+  font-size: .82rem;
+
+  margin-bottom: 4px;
+
+}
+
+.leadership-overview-footer strong {
+
+  color: #0f172a;
+
+  font-size: .95rem;
+
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+
+  .leadership-overview {
+
+    padding: 22px;
+
+  }
+
+  .leadership-overview-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .leadership-overview-footer {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 18px;
+
+  }
+
+}

@@ -1,0 +1,194 @@
+/* =====================================================
+   LEADERSHIP WORKSPACE
+===================================================== */
+
+.leadership-workspace {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 24px;
+
+  margin-bottom: 32px;
+
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.leadership-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 24px;
+
+  padding: 28px;
+
+  border-radius: 24px;
+
+  background: linear-gradient(
+    135deg,
+    #0f766e,
+    #155e75
+  );
+
+  color: #fff;
+
+  box-shadow:
+    0 12px 32px rgba(15,118,110,.20);
+
+}
+
+.leadership-header h2 {
+
+  margin: 10px 0;
+
+  font-size: 2rem;
+
+  font-weight: 700;
+
+}
+
+.leadership-header p {
+
+  max-width: 620px;
+
+  line-height: 1.7;
+
+  opacity: .92;
+
+}
+
+/* =====================================================
+   TAG
+===================================================== */
+
+.leadership-tag {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.18);
+
+  font-size: .85rem;
+
+  font-weight: 600;
+
+}
+
+/* =====================================================
+   REGION
+===================================================== */
+
+.leadership-region {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 150px;
+
+  min-height: 90px;
+
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background: rgba(255,255,255,.12);
+
+  backdrop-filter: blur(8px);
+
+}
+
+.leadership-region span {
+
+  font-size: 1.1rem;
+
+  font-weight: 700;
+
+  text-align: center;
+
+}
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.leadership-grid {
+
+  display: grid;
+
+  gap: 24px;
+
+}
+
+.leadership-grid-two {
+
+  grid-template-columns: repeat(2, minmax(0,1fr));
+
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 992px) {
+
+  .leadership-header {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+  }
+
+  .leadership-region {
+
+    width: 100%;
+
+  }
+
+  .leadership-grid-two {
+
+    grid-template-columns: 1fr;
+
+  }
+
+}
+
+@media (max-width: 576px) {
+
+  .leadership-header {
+
+    padding: 22px;
+
+  }
+
+  .leadership-header h2 {
+
+    font-size: 1.6rem;
+
+  }
+
+  .leadership-header p {
+
+    font-size: .95rem;
+
+  }
+
+}

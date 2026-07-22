@@ -1,0 +1,207 @@
+/* ==========================================
+   PAGE
+========================================== */
+
+.leadership-overview {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 30px;
+}
+
+/* ==========================================
+   HERO
+========================================== */
+
+.leadership-hero {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 35px;
+
+    border-radius: 20px;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color: white;
+}
+
+.leadership-hero h1 {
+
+    margin: 0;
+
+    font-size: 2rem;
+}
+
+.leadership-hero p {
+
+    margin-top: 12px;
+
+    opacity: .95;
+
+    line-height: 1.7;
+}
+
+.leadership-completion {
+
+    text-align: center;
+
+    min-width: 170px;
+
+    background: rgba(255,255,255,.15);
+
+    padding: 25px;
+
+    border-radius: 18px;
+
+    backdrop-filter: blur(8px);
+}
+
+.leadership-completion span {
+
+    font-size: .9rem;
+
+    opacity: .9;
+}
+
+.leadership-completion h2 {
+
+    margin-top: 10px;
+
+    font-size: 2.5rem;
+}
+
+/* ==========================================
+   SUMMARY
+========================================== */
+
+.leadership-summary {
+
+    display: grid;
+
+    grid-template-columns: repeat(4,1fr);
+
+    gap: 20px;
+}
+
+.summary-card {
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    border: 1px solid #e2e8f0;
+
+    transition: .25s;
+}
+
+.summary-card:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow: 0 15px 35px rgba(15,23,42,.08);
+}
+
+.summary-card h4 {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: .95rem;
+}
+
+.summary-card h2 {
+
+    margin-top: 12px;
+
+    color: #0f172a;
+
+    font-size: 2rem;
+}
+
+/* ==========================================
+   CONTENT GRID
+========================================== */
+
+.leadership-overview-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2,1fr);
+
+    gap: 25px;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width:1200px){
+
+    .leadership-summary{
+
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media (max-width:992px){
+
+    .leadership-overview-grid{
+
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media (max-width:768px){
+
+    .leadership-hero{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:25px;
+    }
+
+    .leadership-summary{
+
+        grid-template-columns:1fr;
+    }
+
+    .leadership-completion{
+
+        width:100%;
+    }
+
+    .leadership-hero h1{
+
+        font-size:1.6rem;
+    }
+
+}
+
+@media (max-width:480px){
+
+    .leadership-hero{
+
+        padding:25px;
+    }
+
+    .summary-card{
+
+        padding:20px;
+    }
+
+}

@@ -22,29 +22,27 @@ import {
   useProfile,
 } from "../../context/ProfileContext";
 
+import {
+  useDashboard,
+} from "../../context/DashboardContext";
+
 import "./ProfileHeader.css";
 
 function ProfileHeader() {
+  const {
+    profile,
+    setProfile,
+    fullName,
+    initials,
+    memberNumber,
+    membershipStatus,
+    profilePhoto,
+    joinedDate,
+  } = useProfile();
 
   const {
-
-    profile,
-
-    setProfile,
-
-    fullName,
-
-    initials,
-
-    memberNumber,
-
-    membershipStatus,
-
-    profilePhoto,
-
-    joinedDate,
-
-  } = useProfile();
+    reloadDashboard,
+  } = useDashboard();
 
   const inputRef = useRef(null);
 
@@ -58,21 +56,15 @@ function ProfileHeader() {
     useState(false);
 
   const [preview, setPreview] =
-  useState(null);
+    useState(null);
 
   useEffect(() => {
-
-  return () => {
-
-    if (preview) {
-
-      URL.revokeObjectURL(preview);
-
-    }
-
-  };
-
-}, [preview]);
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
 
   /* ==========================================
      MEMBERSHIP STATUS
@@ -83,47 +75,29 @@ function ProfileHeader() {
   ).toLowerCase();
 
   const statusMap = {
-
     active: {
-
       label: "Active Member",
-
       className: "active",
-
       icon: <CheckCircle2 size={16} />,
-
     },
 
     pending_payment: {
-
       label: "Pending Payment",
-
       className: "pending",
-
       icon: <Clock3 size={16} />,
-
     },
 
     expired: {
-
       label: "Expired",
-
       className: "expired",
-
       icon: <XCircle size={16} />,
-
     },
 
     inactive: {
-
       label: "Inactive",
-
       className: "inactive",
-
       icon: <XCircle size={16} />,
-
     },
-
   };
 
   const badge =
@@ -134,117 +108,122 @@ function ProfileHeader() {
      PHOTO UPLOAD
   ========================================== */
 
-const handleUpload = async (event) => {
+  const handleUpload = async (
+    event
+  ) => {
+    const file =
+      event.target.files?.[0];
 
-  const file = event.target.files?.[0];
-
-  if (!file) return;
-
-  setError("");
-
-  /* ===============================
-     VALIDATE TYPE
-  =============================== */
-
-  const allowedTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-  ];
-
-  if (!allowedTypes.includes(file.type)) {
-
-    setError(
-      "Only JPG, PNG and WEBP images are allowed."
-    );
-
-    event.target.value = "";
-
-    return;
-
-  }
-
-  /* ===============================
-     VALIDATE SIZE
-  =============================== */
-
-  if (file.size > 2 * 1024 * 1024) {
-
-    setError(
-      "Image must not exceed 2 MB."
-    );
-
-    event.target.value = "";
-
-    return;
-
-  }
-
-  /* ===============================
-     SHOW PREVIEW
-  =============================== */
-
-  if (preview) {
-
-  URL.revokeObjectURL(preview);
-
-}
-
-const previewUrl = URL.createObjectURL(file);
-
-setPreview(previewUrl);
-
-  try {
-
-    setUploading(true);
+    if (!file) return;
 
     setError("");
 
-    const response = await uploadProfilePhoto(file);
+    /* ===============================
+       VALIDATE TYPE
+    =============================== */
 
-setProfile(response.data);
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
 
-URL.revokeObjectURL(previewUrl);
+    if (
+      !allowedTypes.includes(file.type)
+    ) {
+      setError(
+        "Only JPG, PNG and WEBP images are allowed."
+      );
 
-setPreview(null);
+      event.target.value = "";
 
-setImageFailed(false);
+      return;
+    }
 
-  } catch (err) {
+    /* ===============================
+       VALIDATE SIZE
+    =============================== */
 
-    console.error(err);
+    if (
+      file.size >
+      2 * 1024 * 1024
+    ) {
+      setError(
+        "Image must not exceed 2 MB."
+      );
 
-    URL.revokeObjectURL(previewUrl);
+      event.target.value = "";
 
-    setPreview(null);
+      return;
+    }
 
-    setImageFailed(false);
+    /* ===============================
+       CREATE PREVIEW
+    =============================== */
 
-    setError(
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
 
-      err.response?.data?.message ||
+    const previewUrl =
+      URL.createObjectURL(file);
 
-      "Unable to upload profile photo."
+    setPreview(previewUrl);
 
-    );
+    try {
+      setUploading(true);
 
-  } finally {
+      setError("");
 
-    setUploading(false);
+      const response =
+        await uploadProfilePhoto(
+          file
+        );
 
-    event.target.value = "";
+      /* Update Profile Context */
 
-  }
+      setProfile(response.data);
 
-};
+      /* Refresh Dashboard Context */
+
+      await reloadDashboard();
+
+      URL.revokeObjectURL(
+        previewUrl
+      );
+
+      setPreview(null);
+
+      setImageFailed(false);
+    } catch (err) {
+      console.error(err);
+
+      URL.revokeObjectURL(
+        previewUrl
+      );
+
+      setPreview(null);
+
+      setImageFailed(false);
+
+      setError(
+        err.response?.data
+          ?.message ||
+          "Unable to upload profile photo."
+      );
+    } finally {
+      setUploading(false);
+
+      event.target.value = "";
+    }
+  };
 
   /* ==========================================
      RENDER
   ========================================== */
 
   return (
-
     <section className="profile-header">
 
       {/* ======================================
@@ -253,151 +232,87 @@ setImageFailed(false);
 
       <div className="profile-avatar">
 
-        {
+        {preview ? (
+          <img
+            src={preview}
+            alt="Preview"
+          />
+        ) : profilePhoto &&
+          !imageFailed ? (
+          <img
+            src={profilePhoto}
+            alt={fullName}
+            onError={() =>
+              setImageFailed(true)
+            }
+          />
+        ) : (
+          <div className="avatar-placeholder">
+            {initials || "M"}
+          </div>
+        )}
 
-  preview ? (
-
-    <img
-      src={preview}
-      alt="Preview"
-    />
-
-  ) :
-
-  profilePhoto &&
-  !imageFailed ? (
-
-    <img
-      src={profilePhoto}
-      alt={fullName}
-      onError={() =>
-        setImageFailed(true)
-      }
-    />
-
-  ) : (
-
-    <div className="avatar-placeholder">
-
-      {initials || "M"}
-
-    </div>
-
-  )
-
-}
-
- {
-
-    uploading && (
-
-      <div className="upload-overlay">
-
-        <LoaderCircle
-          size={28}
-          className="spin"
-        />
-
-      </div>
-
-    )
-
-  }
+        {uploading && (
+          <div className="upload-overlay">
+            <LoaderCircle
+              size={28}
+              className="spin"
+            />
+          </div>
+        )}
 
         <button
-
           type="button"
-
-          aria-label="Upload profile photo"
-
           className="change-photo-btn"
-
-          onClick={() =>
-
-            inputRef.current?.click()
-
-          }
-
-          disabled={uploading}
-
+          aria-label="Upload profile photo"
           title="Upload Profile Photo"
-
-        >
-
-          {
-
-            uploading ? (
-
-              <LoaderCircle
-
-                size={18}
-
-                className="spin"
-
-              />
-
-            ) : (
-
-              <Camera size={18} />
-
-            )
-
+          onClick={() =>
+            inputRef.current?.click()
           }
-
+          disabled={uploading}
+        >
+          {uploading ? (
+            <LoaderCircle
+              size={18}
+              className="spin"
+            />
+          ) : (
+            <Camera size={18} />
+          )}
         </button>
 
         <input
-
           ref={inputRef}
-
           type="file"
-
-          accept="image/jpeg,image/jpg,image/png,image/webp"
-
           hidden
-
+          accept="image/jpeg,image/jpg,image/png,image/webp"
           onChange={handleUpload}
-
         />
 
       </div>
 
       {/* ======================================
-          MEMBER DETAILS
+          PROFILE DETAILS
       ====================================== */}
 
       <div className="profile-details">
 
         <h1>
-
           {fullName || "Member"}
-
         </h1>
 
         <p className="member-number">
-
-          {
-
-            memberNumber ||
-
-            "Membership Number Pending"
-
-          }
-
+          {memberNumber ||
+            "Membership Number Pending"}
         </p>
 
         <div
-
           className={`status-badge ${badge.className}`}
-
         >
-
           {badge.icon}
 
           <span>
-
             {badge.label}
-
           </span>
 
         </div>
@@ -408,13 +323,8 @@ setImageFailed(false);
 
             <MapPin size={16} />
 
-            {
-
-              profile?.county ||
-
-              "County Not Set"
-
-            }
+            {profile?.county ||
+              "County Not Set"}
 
           </span>
 
@@ -422,56 +332,32 @@ setImageFailed(false);
 
             <CalendarDays size={16} />
 
-            {
-
-              joinedDate
-
-                ? `Joined ${new Date(
-
-                    joinedDate
-
-                  ).toLocaleDateString(
-
-                    "en-KE",
-
-                    {
-
-                      month: "long",
-
-                      year: "numeric",
-
-                    }
-
-                  )}`
-
-                : "Join Date Pending"
-
-            }
+            {joinedDate
+              ? `Joined ${new Date(
+                  joinedDate
+                ).toLocaleDateString(
+                  "en-KE",
+                  {
+                    month: "long",
+                    year: "numeric",
+                  }
+                )}`
+              : "Join Date Pending"}
 
           </span>
 
         </div>
 
-        {
-
-          error && (
-
-            <div className="upload-error">
-
-              {error}
-
-            </div>
-
-          )
-
-        }
+        {error && (
+          <div className="upload-error">
+            {error}
+          </div>
+        )}
 
       </div>
 
     </section>
-
   );
-
 }
 
 export default ProfileHeader;

@@ -1,4 +1,4 @@
-import SummitNavbar from "../../components/summit/navbar/SummitNavbar";
+import Navbar from "../../components/layout/Navbar";
 import Hero from "../../components/summit/hero/Hero";
 import About from "../../components/summit/about/About";
 import WhyAttend from "../../components/summit/WhyAttend/WhyAttend";
@@ -13,7 +13,7 @@ import Footer from "../../components/summit/footer/Footer";
 export default function SummitPage() {
   return (
     <main className="bg-white overflow-x-hidden">
-      <SummitNavbar />
+      <Navbar />
       <Hero />
       <About />
       <WhyAttend />

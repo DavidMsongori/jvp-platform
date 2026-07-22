@@ -1,92 +1,104 @@
 import api from "./api";
 
 /* ==========================================================
-   GET ALL LEADERS
+   LEADERSHIP DIRECTORY
 ========================================================== */
 
-export const getLeaders = async (filters = {}) => {
-  const params = new URLSearchParams();
+const getPublicLeaders = async () => {
+  const response = await api.get("/leaders/public");
+  return response.data;
+};
 
-  Object.entries(filters).forEach(([key, value]) => {
-    if (
-      value !== undefined &&
-      value !== null &&
-      value !== "" &&
-      value !== "all"
-    ) {
-      params.append(key, value);
-    }
+const getLeader = async (leaderId) => {
+  const response = await api.get(`/leaders/${leaderId}`);
+  return response.data;
+};
+
+
+/* ==========================================================
+   LEADERSHIP DASHBOARD
+========================================================== */
+
+const getLeadershipDashboard = async (params = {}) => {
+  const response = await api.get("/leaders/dashboard", {
+    params,
   });
 
-  const query = params.toString();
-
-  const response = await api.get(
-    `/leaders${query ? `?${query}` : ""}`
-  );
-
   return response.data;
 };
 
 /* ==========================================================
-   GET SINGLE LEADER
+   ADMIN
 ========================================================== */
 
-export const getLeader = async (id) => {
-  const response = await api.get(`/leaders/${id}`);
+const getLeaders = async (params = {}) => {
+  const response = await api.get("/leaders/admin/all", {
+    params,
+  });
 
   return response.data;
 };
 
-/* ==========================================================
-   CREATE LEADER
-========================================================== */
-
-export const createLeader = async (leaderData) => {
-  const response = await api.post(
-    "/leaders",
-    leaderData
-  );
-
+const getStatistics = async () => {
+  const response = await api.get("/leaders/statistics");
   return response.data;
 };
 
-/* ==========================================================
-   UPDATE LEADER
-========================================================== */
+const createLeader = async (data) => {
+  const response = await api.post("/leaders", data);
+  return response.data;
+};
 
-export const updateLeader = async (
-  id,
-  leaderData
-) => {
+const updateLeader = async (leaderId, data) => {
   const response = await api.put(
-    `/leaders/${id}`,
-    leaderData
+    `/leaders/${leaderId}`,
+    data
   );
 
   return response.data;
 };
 
-/* ==========================================================
-   DELETE LEADER
-========================================================== */
+const activateLeader = async (leaderId) => {
+  const response = await api.patch(
+    `/leaders/${leaderId}/activate`
+  );
 
-export const deleteLeader = async (id) => {
+  return response.data;
+};
+
+const deactivateLeader = async (leaderId) => {
+  const response = await api.patch(
+    `/leaders/${leaderId}/deactivate`
+  );
+
+  return response.data;
+};
+
+const deleteLeader = async (leaderId) => {
   const response = await api.delete(
-    `/leaders/${id}`
+    `/leaders/${leaderId}`
   );
 
   return response.data;
 };
-
-/* ==========================================================
-   EXPORT
-========================================================== */
 
 const leaderService = {
-  getLeaders,
+  /* Public */
+  getPublicLeaders,
   getLeader,
+
+  /* Leadership Dashboard */
+  getLeadershipDashboard,
+
+  /* Admin */
+  getLeaders,
+  getStatistics,
+
   createLeader,
   updateLeader,
+
+  activateLeader,
+  deactivateLeader,
   deleteLeader,
 };
 

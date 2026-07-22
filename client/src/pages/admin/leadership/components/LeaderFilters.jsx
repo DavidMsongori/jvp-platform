@@ -1,19 +1,121 @@
-import { Search, Filter, RotateCcw } from "lucide-react";
+import {
+  Search,
+  Filter,
+  RotateCcw,
+  MapPin,
+  Layers,
+  BriefcaseBusiness,
+} from "lucide-react";
+
+import "./LeaderFilters.css";
+
+/* ==========================================================
+   OPTIONS
+========================================================== */
 
 const CATEGORIES = [
-  { label: "All Categories", value: "all" },
-  { label: "Patron", value: "patron" },
+  {
+    label: "All Leadership Levels",
+    value: "all",
+  },
+
+  {
+    label: "Patron",
+    value: "patron",
+  },
+
   {
     label: "Regional Executive",
     value: "regional_executive",
   },
+
   {
     label: "Youth Assembly",
     value: "youth_assembly",
   },
+
   {
     label: "County Leadership",
     value: "county_leadership",
+  },
+];
+
+const DEPARTMENTS = [
+  {
+    label: "All Departments",
+    value: "",
+  },
+
+  {
+    label: "Executive",
+    value: "executive",
+  },
+
+  {
+    label: "Legislative",
+    value: "legislative",
+  },
+
+  {
+    label: "Administration",
+    value: "administration",
+  },
+
+  {
+    label: "Finance",
+    value: "finance",
+  },
+
+  {
+    label: "Programs",
+    value: "programs",
+  },
+
+  {
+    label: "Communications",
+    value: "communications",
+  },
+
+  {
+    label: "Youth Affairs",
+    value: "youth_affairs",
+  },
+
+  {
+    label: "Other",
+    value: "other",
+  },
+];
+
+const SCOPES = [
+  {
+    label: "All Scopes",
+    value: "",
+  },
+
+  {
+    label: "Regional",
+    value: "regional",
+  },
+
+  {
+    label: "County",
+    value: "county",
+  },
+
+  {
+    label: "Constituency",
+    value: "constituency",
+  },
+
+  {
+    label: "Ward",
+    value: "ward",
+  },
+
+  {
+    label: "National",
+    value: "national",
   },
 ];
 
@@ -26,14 +128,22 @@ const COUNTIES = [
   "Taita Taveta",
 ];
 
+/* ==========================================================
+   COMPONENT
+========================================================== */
+
 export default function LeaderFilters({
-  search,
-  category,
-  county,
-  active,
+  search = "",
+  category = "all",
+  department = "",
+  scope = "",
+  county = "",
+  active = "all",
 
   onSearchChange,
   onCategoryChange,
+  onDepartmentChange,
+  onScopeChange,
   onCountyChange,
   onStatusChange,
   onReset,
@@ -41,7 +151,9 @@ export default function LeaderFilters({
   return (
     <div className="leader-filters">
 
-      {/* Search */}
+      {/* =====================================================
+          SEARCH
+      ===================================================== */}
 
       <div className="filter-search">
 
@@ -51,73 +163,156 @@ export default function LeaderFilters({
           type="text"
           placeholder="Search leaders..."
           value={search}
-          onChange={(e) =>
-            onSearchChange(e.target.value)
+          onChange={(event) =>
+            onSearchChange(
+              event.target.value
+            )
           }
         />
 
       </div>
 
-      {/* Category */}
+      {/* =====================================================
+          CATEGORY
+      ===================================================== */}
 
       <div className="filter-group">
 
-        <Filter size={16} />
+        <Layers size={16} />
 
         <select
           value={category}
-          onChange={(e) =>
-            onCategoryChange(e.target.value)
+          onChange={(event) =>
+            onCategoryChange(
+              event.target.value
+            )
           }
         >
           {CATEGORIES.map((item) => (
+
             <option
               key={item.value}
               value={item.value}
             >
               {item.label}
             </option>
+
           ))}
         </select>
 
       </div>
 
-      {/* County */}
+      {/* =====================================================
+          DEPARTMENT
+      ===================================================== */}
 
       <div className="filter-group">
 
+        <BriefcaseBusiness size={16} />
+
         <select
-          value={county}
-          onChange={(e) =>
-            onCountyChange(e.target.value)
+          value={department}
+          onChange={(event) =>
+            onDepartmentChange(
+              event.target.value
+            )
           }
         >
+          {DEPARTMENTS.map((item) => (
+
+            <option
+              key={item.value}
+              value={item.value}
+            >
+              {item.label}
+            </option>
+
+          ))}
+        </select>
+
+      </div>
+
+      {/* =====================================================
+          SCOPE
+      ===================================================== */}
+
+      <div className="filter-group">
+
+        <Filter size={16} />
+
+        <select
+          value={scope}
+          onChange={(event) =>
+            onScopeChange(
+              event.target.value
+            )
+          }
+        >
+          {SCOPES.map((item) => (
+
+            <option
+              key={item.value}
+              value={item.value}
+            >
+              {item.label}
+            </option>
+
+          ))}
+        </select>
+
+      </div>
+
+      {/* =====================================================
+          COUNTY
+      ===================================================== */}
+
+      <div className="filter-group">
+
+        <MapPin size={16} />
+
+        <select
+          value={county}
+          onChange={(event) =>
+            onCountyChange(
+              event.target.value
+            )
+          }
+        >
+
           <option value="">
             All Counties
           </option>
 
-          {COUNTIES.map((county) => (
+          {COUNTIES.map((countyName) => (
+
             <option
-              key={county}
-              value={county}
+              key={countyName}
+              value={countyName}
             >
-              {county}
+              {countyName}
             </option>
+
           ))}
+
         </select>
 
       </div>
 
-      {/* Status */}
+      {/* =====================================================
+          STATUS
+      ===================================================== */}
 
       <div className="filter-group">
 
         <select
           value={active}
-          onChange={(e) =>
-            onStatusChange(e.target.value)
+          onChange={(event) =>
+            onStatusChange(
+              event.target.value
+            )
           }
         >
+
           <option value="all">
             All Status
           </option>
@@ -134,9 +329,12 @@ export default function LeaderFilters({
 
       </div>
 
-      {/* Reset */}
+      {/* =====================================================
+          RESET
+      ===================================================== */}
 
       <button
+        type="button"
         className="btn-secondary"
         onClick={onReset}
       >

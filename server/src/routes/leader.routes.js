@@ -3,9 +3,14 @@ import express from "express";
 import {
   createLeader,
   getLeaders,
+  getPublicLeaders,
   getLeader,
+  getLeadershipMembers,
   updateLeader,
+  activateLeader,
+  deactivateLeader,
   deleteLeader,
+  getLeaderStatistics,
 } from "../controllers/leader.controller.js";
 
 import auth from "../middleware/auth.js";
@@ -17,13 +22,37 @@ const router = express.Router();
    PUBLIC ROUTES
 =========================================================== */
 
-router.get("/", getLeaders);
+router.get("/", getPublicLeaders);
 
-router.get("/:id", getLeader);
+router.get("/public", getPublicLeaders);
+
+/* ===========================================================
+   LEADERSHIP DASHBOARD
+=========================================================== */
+
+router.get(
+  "/dashboard",
+  auth,
+  getLeadershipMembers
+);
 
 /* ===========================================================
    ADMIN ROUTES
 =========================================================== */
+
+router.get(
+  "/admin/all",
+  auth,
+  authorize("admin", "super_admin"),
+  getLeaders
+);
+
+router.get(
+  "/statistics",
+  auth,
+  authorize("admin", "super_admin"),
+  getLeaderStatistics
+);
 
 router.post(
   "/",
@@ -39,11 +68,31 @@ router.put(
   updateLeader
 );
 
+router.patch(
+  "/:id/activate",
+  auth,
+  authorize("admin", "super_admin"),
+  activateLeader
+);
+
+router.patch(
+  "/:id/deactivate",
+  auth,
+  authorize("admin", "super_admin"),
+  deactivateLeader
+);
+
 router.delete(
   "/:id",
   auth,
   authorize("admin", "super_admin"),
   deleteLeader
 );
+
+/* ===========================================================
+   PARAMETERIZED ROUTES (KEEP LAST)
+=========================================================== */
+
+router.get("/:id", getLeader);
 
 export default router;

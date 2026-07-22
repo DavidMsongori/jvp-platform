@@ -63,6 +63,24 @@ import ProgramsDashboard from "../pages/dashboard/Programs";
 import Certificates from "../pages/dashboard/Certificates";
 import Notifications from "../pages/dashboard/Notifications";
 import Settings from "../pages/dashboard/settings/Settings";
+import LeadershipCard from "../pages/leadership/LeadershipCard";
+
+/* ==========================================
+   LEADERSHIP WORKSPACE
+========================================== */
+
+import LeadershipLayout from "../pages/leadership/LeadershipLayout";
+import LeadershipOverview from "../pages/leadership/LeadershipOverview";
+
+import LeadershipMembers from "../pages/leadership/LeadershipMembers";
+import LeadershipMeetings from "../pages/leadership/LeadershipMeetings";
+import LeadershipAnnouncements from "../pages/leadership/LeadershipAnnouncements";
+import LeadershipReports from "../pages/leadership/LeadershipReports";
+import LeadershipDocuments from "../pages/leadership/LeadershipDocuments";
+import LeadershipCommittees from "../pages/leadership/LeadershipCommittees";
+import LeadershipAnalytics from "../pages/leadership/LeadershipAnalytics";
+import LeadershipSettings from "../pages/leadership/LeadershipSettings";
+
 
 /* ==========================================
    ADMIN LAYOUT
@@ -182,63 +200,127 @@ function AppRoutes() {
           }
         />
 
-        {/* =====================================
-            MEMBER DASHBOARD
-        ====================================== */}
+       /* =====================================
+   MEMBER DASHBOARD
+===================================== */
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route
-            index
-            element={<Dashboard />}
-          />
+<Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <DashboardLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route
+    index
+    element={<Dashboard />}
+  />
 
-          <Route
-            path="profile"
-            element={<Profile />}
-          />
+  <Route
+    path="profile"
+    element={<Profile />}
+  />
 
-          <Route
-            path="membership-card"
-            element={<MembershipCardPage />}
-          />
+  <Route
+    path="membership-card"
+    element={<MembershipCardPage />}
+  />
 
-          <Route
-            path="events"
-            element={<EventsDashboard />}
-          />
+  <Route
+    path="events"
+    element={<EventsDashboard />}
+  />
 
-          <Route
-  path="events/:id"
-  element={<EventDetails />}
-/>
+  <Route
+    path="events/:id"
+    element={<EventDetails />}
+  />
 
-          <Route
-            path="programs"
-            element={<ProgramsDashboard />}
-          />
+  <Route
+    path="programs"
+    element={<ProgramsDashboard />}
+  />
 
-          <Route
-            path="certificates"
-            element={<Certificates />}
-          />
+  <Route
+    path="certificates"
+    element={<Certificates />}
+  />
 
-          <Route
-            path="notifications"
-            element={<Notifications />}
-          />
+  <Route
+    path="notifications"
+    element={<Notifications />}
+  />
 
-          <Route
-            path="settings"
-            element={<Settings />}
-          />
-        </Route>
+  <Route
+    path="settings"
+    element={<Settings />}
+  />
+</Route>
+
+/* =====================================
+   LEADERSHIP WORKSPACE
+===================================== */
+
+<Route
+  path="/workspace/leadership"
+  element={
+    <ProtectedRoute>
+      <LeadershipLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route
+    index
+    element={<LeadershipOverview />}
+  />
+
+   <Route
+        path="card"
+        element={<LeadershipCard />}
+    />
+
+  <Route
+    path="members"
+    element={<LeadershipMembers />}
+  />
+
+  <Route
+    path="meetings"
+    element={<LeadershipMeetings />}
+  />
+
+  <Route
+    path="announcements"
+    element={<LeadershipAnnouncements />}
+  />
+
+  <Route
+    path="reports"
+    element={<LeadershipReports />}
+  />
+
+  <Route
+    path="documents"
+    element={<LeadershipDocuments />}
+  />
+
+  <Route
+    path="committees"
+    element={<LeadershipCommittees />}
+  />
+
+  <Route
+    path="analytics"
+    element={<LeadershipAnalytics />}
+  />
+
+  <Route
+    path="settings"
+    element={<LeadershipSettings />}
+  />
+</Route>
+
 
         {/* =====================================
             ADMIN DASHBOARD

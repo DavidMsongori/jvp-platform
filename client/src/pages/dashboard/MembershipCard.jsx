@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { useProfile } from "../../context/ProfileContext";
+import { useDashboard } from "../../context/DashboardContext";
 
 import MembershipCardFront from "../../components/membership/MembershipCardFront";
 import MembershipCardBack from "../../components/membership/MembershipCardBack";
@@ -13,23 +14,19 @@ import "../../components/membership/MembershipCard.css";
 ===================================================== */
 
 function MembershipCard() {
-
   const {
-
     profile,
-
     loading,
-
     error,
-
   } = useProfile();
 
+  const {
+    leadership,
+  } = useDashboard();
+
   const [
-
     flipped,
-
     setFlipped,
-
   ] = useState(false);
 
   /* ==========================================
@@ -37,9 +34,7 @@ function MembershipCard() {
   ========================================== */
 
   if (loading) {
-
     return (
-
       <div className="membership-page">
 
         <div className="membership-loading">
@@ -47,17 +42,13 @@ function MembershipCard() {
           <div className="profile-spinner" />
 
           <h3>
-
             Loading Membership Card...
-
           </h3>
 
         </div>
 
       </div>
-
     );
-
   }
 
   /* ==========================================
@@ -65,53 +56,41 @@ function MembershipCard() {
   ========================================== */
 
   if (error) {
-
     return (
-
       <div className="membership-page">
 
         <div className="membership-error">
 
           <h2>
-
             Unable to load membership card
-
           </h2>
 
-          <p>
-
-            {error}
-
-          </p>
+          <p>{error}</p>
 
         </div>
 
       </div>
-
     );
-
   }
 
+  /* ==========================================
+     NO PROFILE
+  ========================================== */
+
   if (!profile) {
-
     return (
-
       <div className="membership-page">
 
         <div className="membership-error">
 
           <h2>
-
             Membership information unavailable.
-
           </h2>
 
         </div>
 
       </div>
-
     );
-
   }
 
   /* ==========================================
@@ -119,23 +98,32 @@ function MembershipCard() {
   ========================================== */
 
   return (
-
     <div className="membership-page">
+
+      {leadership?.hasLeadershipCard && (
+        <div className="membership-info-banner">
+
+          <strong>
+            Leadership Card Available
+          </strong>
+
+          <p>
+            Your leadership credentials are active.
+            A digital leadership card will be available
+            alongside your membership card.
+          </p>
+
+        </div>
+      )}
 
       <div className="membership-card-stage">
 
         <div
-
           className={
-
             flipped
-
               ? "membership-card-flip flipped"
-
               : "membership-card-flip"
-
           }
-
         >
 
           {/* FRONT */}
@@ -143,9 +131,8 @@ function MembershipCard() {
           <div className="membership-face membership-front">
 
             <MembershipCardFront
-
               card={profile}
-
+              leadership={leadership}
             />
 
           </div>
@@ -155,9 +142,8 @@ function MembershipCard() {
           <div className="membership-face membership-back">
 
             <MembershipCardBack
-
               card={profile}
-
+              leadership={leadership}
             />
 
           </div>
@@ -173,31 +159,15 @@ function MembershipCard() {
       <div className="membership-flip-controls">
 
         <button
-
           className="flip-card-btn"
-
+          type="button"
           onClick={() =>
-
-            setFlipped(
-
-              !flipped
-
-            )
-
+            setFlipped(!flipped)
           }
-
         >
-
-          {
-
-            flipped
-
-              ? "Show Front"
-
-              : "Show Back"
-
-          }
-
+          {flipped
+            ? "Show Front"
+            : "Show Back"}
         </button>
 
       </div>
@@ -207,15 +177,12 @@ function MembershipCard() {
       ====================================== */}
 
       <MembershipCardActions
-
         card={profile}
-
+        leadership={leadership}
       />
 
     </div>
-
   );
-
 }
 
 export default MembershipCard;

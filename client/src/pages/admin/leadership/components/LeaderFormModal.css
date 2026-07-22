@@ -1,0 +1,629 @@
+/* =========================================================
+   LEADER FORM MODAL
+========================================================= */
+
+.leader-form-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 2rem;
+
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(6px);
+
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.leader-form-modal {
+  width: min(100%, 900px);
+  max-height: calc(100vh - 4rem);
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--color-surface, #ffffff);
+  border-radius: 18px;
+
+  box-shadow:
+    0 25px 60px rgba(15, 23, 42, 0.25),
+    0 8px 24px rgba(15, 23, 42, 0.12);
+
+  overflow: hidden;
+
+  animation: leaderModalEnter 0.2s ease-out;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.leader-form-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  padding: 1.5rem 1.75rem;
+
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.leader-form-modal-header h2 {
+  margin: 0;
+
+  color: var(--color-heading, #172033);
+
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.leader-form-modal-header p {
+  margin: 0.4rem 0 0;
+
+  color: var(--color-text-muted, #64748b);
+
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.leader-form-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: var(--color-text-muted, #64748b);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.leader-form-modal-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.leader-form-modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   FORM BODY
+========================================================= */
+
+.leader-form-modal-body {
+  padding: 1.75rem;
+
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   FORM SECTIONS
+========================================================= */
+
+.leader-form-section {
+  margin-bottom: 2rem;
+}
+
+.leader-form-section:last-child {
+  margin-bottom: 0;
+}
+
+.leader-form-section-title {
+  margin: 0 0 1rem;
+
+  color: var(--color-heading, #172033);
+
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.leader-form-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 1.25rem 1.5rem;
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.leader-form-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.45rem;
+}
+
+.leader-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.leader-form-group label {
+  color: var(--color-heading, #334155);
+
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.leader-form-group label span {
+  color: #dc2626;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.leader-form-group input,
+.leader-form-group select,
+.leader-form-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  min-height: 44px;
+
+  padding: 0.7rem 0.85rem;
+
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: var(--color-heading, #172033);
+
+  font-family: inherit;
+  font-size: 0.9rem;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.leader-form-group textarea {
+  min-height: 100px;
+
+  resize: vertical;
+}
+
+.leader-form-group input:focus,
+.leader-form-group select:focus,
+.leader-form-group textarea:focus {
+  border-color: var(--color-primary, #2563eb);
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.leader-form-group input:disabled,
+.leader-form-group select:disabled,
+.leader-form-group textarea:disabled {
+  background: #f8fafc;
+
+  color: #94a3b8;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   MEMBER SEARCH
+========================================================= */
+
+.member-search-wrapper {
+  position: relative;
+}
+
+.member-search-wrapper input {
+  padding-left: 2.6rem;
+}
+
+.member-search-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 0.85rem;
+
+  transform: translateY(-50%);
+
+  color: #94a3b8;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   MEMBER SEARCH RESULTS
+========================================================= */
+
+.member-search-results {
+  position: absolute;
+
+  z-index: 20;
+
+  top: calc(100% + 0.4rem);
+  left: 0;
+  right: 0;
+
+  max-height: 260px;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.15);
+}
+
+.member-search-result {
+  display: flex;
+  align-items: center;
+
+  gap: 0.75rem;
+
+  width: 100%;
+
+  padding: 0.75rem 0.85rem;
+
+  border: 0;
+
+  background: transparent;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: background 0.15s ease;
+}
+
+.member-search-result:hover {
+  background: #f8fafc;
+}
+
+.member-search-result img {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+}
+
+.member-search-result-info {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.member-search-result-info strong {
+  color: #172033;
+
+  font-size: 0.88rem;
+}
+
+.member-search-result-info span {
+  color: #64748b;
+
+  font-size: 0.78rem;
+}
+
+
+/* =========================================================
+   SELECTED MEMBER
+========================================================= */
+
+.selected-member {
+  display: flex;
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  padding: 0.85rem 1rem;
+
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+
+  background: #eff6ff;
+}
+
+.selected-member-info {
+  display: flex;
+  align-items: center;
+
+  gap: 0.75rem;
+}
+
+.selected-member-info img {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+}
+
+.selected-member-info strong {
+  display: block;
+
+  color: #172033;
+
+  font-size: 0.9rem;
+}
+
+.selected-member-info span {
+  display: block;
+
+  margin-top: 0.15rem;
+
+  color: #64748b;
+
+  font-size: 0.78rem;
+}
+
+.selected-member-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #64748b;
+
+  cursor: pointer;
+}
+
+.selected-member-remove:hover {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+
+/* =========================================================
+   CHECKBOXES
+========================================================= */
+
+.leader-form-checkboxes {
+  display: flex;
+  align-items: center;
+
+  gap: 1.5rem;
+
+  flex-wrap: wrap;
+}
+
+.leader-form-checkbox {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 0.5rem;
+
+  color: #334155;
+
+  font-size: 0.88rem;
+
+  cursor: pointer;
+}
+
+.leader-form-checkbox input {
+  width: 16px;
+  height: 16px;
+
+  accent-color: var(--color-primary, #2563eb);
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   FORM FOOTER
+========================================================= */
+
+.leader-form-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 0.75rem;
+
+  padding: 1.25rem 1.75rem;
+
+  border-top: 1px solid var(--color-border, #e5e7eb);
+
+  background: #f8fafc;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.leader-form-modal-footer button {
+  min-height: 42px;
+
+  padding: 0.7rem 1.25rem;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.leader-form-modal-footer button:active {
+  transform: translateY(1px);
+}
+
+.leader-form-cancel {
+  border: 1px solid #cbd5e1;
+
+  background: #ffffff;
+
+  color: #334155;
+}
+
+.leader-form-cancel:hover {
+  background: #f1f5f9;
+}
+
+.leader-form-submit {
+  border: 1px solid var(--color-primary, #2563eb);
+
+  background: var(--color-primary, #2563eb);
+
+  color: #ffffff;
+}
+
+.leader-form-submit:hover {
+  background: #1d4ed8;
+}
+
+.leader-form-submit:disabled,
+.leader-form-cancel:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   VALIDATION
+========================================================= */
+
+.leader-form-error {
+  margin-top: 0.35rem;
+
+  color: #dc2626;
+
+  font-size: 0.78rem;
+}
+
+.leader-form-group.has-error input,
+.leader-form-group.has-error select,
+.leader-form-group.has-error textarea {
+  border-color: #dc2626;
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes leaderModalEnter {
+  from {
+    opacity: 0;
+
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+  .leader-form-modal-overlay {
+    align-items: flex-start;
+
+    padding: 1rem;
+  }
+
+  .leader-form-modal {
+    max-height: calc(100vh - 2rem);
+
+    border-radius: 14px;
+  }
+
+  .leader-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .leader-form-group.full-width {
+    grid-column: auto;
+  }
+
+  .leader-form-modal-header,
+  .leader-form-modal-body,
+  .leader-form-modal-footer {
+    padding: 1.25rem;
+  }
+
+  .leader-form-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .leader-form-modal-footer button {
+    width: 100%;
+  }
+}

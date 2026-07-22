@@ -224,10 +224,17 @@ function Navbar() {
           </Link>
 
           <button
+  type="button"
   className="menu-btn"
-  onClick={() => setMobileMenu(!mobileMenu)}
+  onClick={() => setMobileMenu((prev) => !prev)}
+  aria-label={
+    mobileMenu
+      ? "Close navigation menu"
+      : "Open navigation menu"
+  }
+  aria-expanded={mobileMenu}
 >
-  MENU
+  {mobileMenu ? <FaTimes /> : <FaBars />}
 </button>
         </div>
       </div>

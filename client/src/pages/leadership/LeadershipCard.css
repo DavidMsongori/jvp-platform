@@ -1,0 +1,460 @@
+/* ==========================================================
+   PAGE
+========================================================== */
+
+.leadership-card-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.leadership-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.leadership-card-header h1 {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+
+    margin: 0;
+
+    font-size: 2rem;
+    font-weight: 700;
+
+    color: #1f2937;
+}
+
+.leadership-card-header p {
+    margin-top: .5rem;
+    color: #6b7280;
+}
+
+.refresh-card-button {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+
+    padding: .85rem 1.4rem;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #0d6efd;
+    color: white;
+
+    font-size: .95rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .25s;
+}
+
+.refresh-card-button:hover:not(:disabled) {
+    background: #0b5ed7;
+}
+
+.refresh-card-button:disabled {
+    opacity: .7;
+    cursor: not-allowed;
+}
+
+/* ==========================================================
+   DIGITAL CARD
+========================================================== */
+
+.digital-leadership-card {
+    background: linear-gradient(135deg, #0d6efd, #084298);
+
+    color: white;
+
+    border-radius: 24px;
+
+    padding: 2rem;
+
+    box-shadow:
+        0 20px 40px rgba(0,0,0,.12);
+
+    overflow: hidden;
+
+    position: relative;
+}
+
+.digital-leadership-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 260px;
+    height: 260px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.08);
+
+    right: -80px;
+    top: -80px;
+
+}
+
+.digital-leadership-card::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.05);
+
+    left: -50px;
+    bottom: -50px;
+
+}
+
+/* ==========================================================
+   TOP
+========================================================== */
+
+.card-top {
+
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    margin-bottom: 2rem;
+
+}
+
+.card-top img {
+
+    width: 110px;
+    height: 110px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 5px solid rgba(255,255,255,.35);
+
+}
+
+.card-top h2 {
+
+    margin: 0;
+
+    font-size: 1.7rem;
+    font-weight: 700;
+
+}
+
+.card-top h3 {
+
+    margin: .35rem 0;
+
+    font-weight: 600;
+
+}
+
+.card-top p {
+
+    margin: 0;
+
+    opacity: .9;
+
+    text-transform: capitalize;
+
+}
+
+/* ==========================================================
+   BODY
+========================================================== */
+
+.card-body {
+
+    position: relative;
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px,1fr));
+
+    gap: 1.2rem;
+
+}
+
+.card-item {
+
+    background: rgba(255,255,255,.08);
+
+    padding: 1rem;
+
+    border-radius: 14px;
+
+}
+
+.card-item span {
+
+    display: block;
+
+    margin-bottom: .45rem;
+
+    font-size: .85rem;
+
+    opacity: .8;
+
+}
+
+.card-item strong {
+
+    font-size: 1rem;
+    font-weight: 700;
+
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.card-footer {
+
+    position: relative;
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(220px,1fr));
+
+    gap: 1rem;
+
+    margin-top: 2rem;
+
+}
+
+.card-footer > div {
+
+    background: rgba(255,255,255,.08);
+
+    border-radius: 14px;
+
+    padding: 1rem;
+
+}
+
+.card-footer svg {
+
+    font-size: 1.1rem;
+
+    margin-bottom: .75rem;
+
+}
+
+.card-footer span {
+
+    display: block;
+
+    font-size: .85rem;
+
+    opacity: .8;
+
+    margin-bottom: .35rem;
+
+}
+
+.card-footer strong {
+
+    font-size: 1rem;
+
+}
+
+.card-status {
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+.card-status.active {
+
+    color: #b9ffcb;
+
+}
+
+/* ==========================================================
+   VERIFICATION
+========================================================== */
+
+.leadership-card-info {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 2rem;
+
+    box-shadow:
+        0 8px 24px rgba(0,0,0,.05);
+
+}
+
+.leadership-card-info h2 {
+
+    margin-top: 0;
+
+    color: #1f2937;
+
+}
+
+.leadership-card-info p {
+
+    color: #6b7280;
+
+    line-height: 1.7;
+
+}
+
+.leadership-card-info code {
+
+    display: inline-block;
+
+    margin: 1rem 0;
+
+    padding: .8rem 1.2rem;
+
+    border-radius: 10px;
+
+    background: #f3f4f6;
+
+    color: #0d6efd;
+
+    font-size: 1rem;
+    font-weight: 700;
+
+}
+
+.verification-link {
+
+    display: inline-flex;
+
+    align-items: center;
+    gap: .6rem;
+
+    margin-top: 1rem;
+
+    color: #0d6efd;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+}
+
+.verification-link:hover {
+
+    text-decoration: underline;
+
+}
+
+/* ==========================================================
+   LOADING
+========================================================== */
+
+.leadership-card-loading,
+.leadership-card-error {
+
+    background: white;
+
+    padding: 4rem;
+
+    border-radius: 18px;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 24px rgba(0,0,0,.05);
+
+    font-size: 1.1rem;
+
+}
+
+.leadership-card-error {
+
+    color: #dc3545;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 992px) {
+
+    .leadership-card-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .card-top {
+
+        flex-direction: column;
+
+        text-align: center;
+
+    }
+
+    .card-body,
+    .card-footer {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .card-top img {
+
+        width: 100px;
+        height: 100px;
+
+    }
+
+}
+
+@media (max-width: 576px) {
+
+    .digital-leadership-card {
+
+        padding: 1.5rem;
+
+    }
+
+    .leadership-card-header h1 {
+
+        font-size: 1.6rem;
+
+    }
+
+}

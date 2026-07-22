@@ -1,0 +1,207 @@
+/* =====================================================
+   CARD
+===================================================== */
+
+.leadership-statistics {
+
+  background: #ffffff;
+
+  border-radius: 22px;
+
+  padding: 28px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 24px;
+
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.leadership-statistics-header h3 {
+
+  margin: 0;
+
+  font-size: 1.3rem;
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+}
+
+.leadership-statistics-header p {
+
+  margin-top: 8px;
+
+  color: #64748b;
+
+  line-height: 1.6;
+
+}
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.leadership-statistics-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 18px;
+
+}
+
+.leadership-stat-card {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 20px;
+
+  border-radius: 18px;
+
+  border: 1px solid #e5e7eb;
+
+  transition: all 0.25s ease;
+
+}
+
+.leadership-stat-card:hover {
+
+  transform: translateY(-3px);
+
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+
+}
+
+.stat-icon {
+
+  width: 56px;
+
+  height: 56px;
+
+  border-radius: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #ffffff;
+
+  flex-shrink: 0;
+
+}
+
+.green .stat-icon {
+
+  background: #16a34a;
+
+}
+
+.blue .stat-icon {
+
+  background: #2563eb;
+
+}
+
+.orange .stat-icon {
+
+  background: #ea580c;
+
+}
+
+.purple .stat-icon {
+
+  background: #7c3aed;
+
+}
+
+.stat-content {
+
+  display: flex;
+
+  flex-direction: column;
+
+}
+
+.stat-content span {
+
+  color: #64748b;
+
+  font-size: 0.85rem;
+
+  margin-bottom: 6px;
+
+}
+
+.stat-content strong {
+
+  font-size: 1.6rem;
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.leadership-statistics-footer {
+
+  padding-top: 18px;
+
+  border-top: 1px solid #eef2f7;
+
+}
+
+.leadership-statistics-footer small {
+
+  color: #64748b;
+
+  line-height: 1.6;
+
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+
+  .leadership-statistics {
+
+    padding: 22px;
+
+  }
+
+  .leadership-statistics-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .stat-content strong {
+
+    font-size: 1.4rem;
+
+  }
+
+}

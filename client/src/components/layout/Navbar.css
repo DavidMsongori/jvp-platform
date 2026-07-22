@@ -1,44 +1,59 @@
 /* ==========================================================
    JVP CONNECT NAVBAR
-   PART 1 - DESKTOP
+   COMPLETE RESPONSIVE STYLESHEET
 ========================================================== */
 
+
 /* ==========================================================
-   ROOT
+   ROOT NAVBAR
 ========================================================== */
 
 .navbar {
+
   position: fixed;
+
   top: 0;
   left: 0;
+
   width: 100%;
 
   z-index: 1000;
+
+  background: transparent;
 
   transition:
     background .35s ease,
     box-shadow .35s ease,
     backdrop-filter .35s ease;
+
 }
 
+
+/* ==========================================================
+   SCROLLED NAVBAR
+========================================================== */
+
 .navbar.scrolled {
-  background: rgba(255,255,255,.97);
+
+  background: rgba(255, 255, 255, .97);
 
   backdrop-filter: blur(16px);
 
   box-shadow:
-    0 10px 35px rgba(15,23,42,.08);
+    0 10px 35px rgba(15, 23, 42, .10);
+
 }
 
+
 /* ==========================================================
-   CONTAINER
+   NAVBAR CONTAINER
 ========================================================== */
 
 .navbar-container {
 
   width: min(1400px, 94%);
 
-  height: 86px;
+  min-height: 86px;
 
   margin: 0 auto;
 
@@ -52,6 +67,7 @@
 
 }
 
+
 /* ==========================================================
    LOGO
 ========================================================== */
@@ -64,11 +80,14 @@
 
   gap: 14px;
 
+  min-width: 0;
+
+  flex-shrink: 1;
+
   text-decoration: none;
 
-  flex-shrink: 0;
-
 }
+
 
 .logo img {
 
@@ -76,9 +95,19 @@
 
   height: 58px;
 
+  flex-shrink: 0;
+
   object-fit: contain;
 
 }
+
+
+.logo > div {
+
+  min-width: 0;
+
+}
+
 
 .logo h2 {
 
@@ -92,22 +121,28 @@
 
   line-height: 1.1;
 
+  white-space: nowrap;
+
 }
+
 
 .logo span {
 
   display: block;
 
-  margin-top: 3px;
+  margin-top: 4px;
 
   color: #64748b;
 
   font-size: .78rem;
 
+  white-space: nowrap;
+
 }
 
+
 /* ==========================================================
-   NAVIGATION
+   DESKTOP NAVIGATION
 ========================================================== */
 
 .nav-links {
@@ -122,11 +157,14 @@
 
 }
 
+
+/* MAIN NAV LINKS */
+
 .nav-links > a {
 
   position: relative;
 
-  text-decoration: none;
+  padding: 8px 0;
 
   color: #1e293b;
 
@@ -134,9 +172,14 @@
 
   font-weight: 600;
 
-  transition: color .3s;
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  transition: color .3s ease;
 
 }
+
 
 .nav-links > a:hover {
 
@@ -144,7 +187,8 @@
 
 }
 
-/* Animated underline */
+
+/* UNDERLINE */
 
 .nav-links > a::after {
 
@@ -154,7 +198,7 @@
 
   left: 0;
 
-  bottom: -8px;
+  bottom: 0;
 
   width: 0;
 
@@ -166,11 +210,13 @@
 
 }
 
+
 .nav-links > a:hover::after {
 
   width: 100%;
 
 }
+
 
 /* ==========================================================
    DROPDOWN
@@ -180,7 +226,10 @@
 
   position: relative;
 
+  flex-shrink: 0;
+
 }
+
 
 .dropdown-toggle {
 
@@ -190,21 +239,28 @@
 
   gap: 8px;
 
-  background: none;
+  padding: 8px 0;
 
   border: none;
 
-  cursor: pointer;
+  background: transparent;
 
   color: #1e293b;
+
+  font-family: inherit;
 
   font-size: .96rem;
 
   font-weight: 600;
 
-  transition: color .3s;
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition: color .3s ease;
 
 }
+
 
 .dropdown-toggle:hover {
 
@@ -212,21 +268,24 @@
 
 }
 
+
 .dropdown-icon {
 
   font-size: .72rem;
 
-  transition: transform .3s;
+  transition: transform .3s ease;
 
 }
 
-.dropdown:hover .dropdown-icon,
 
-.dropdown.show .dropdown-icon {
+.dropdown-icon.rotate {
 
   transform: rotate(180deg);
 
 }
+
+
+/* DESKTOP DROPDOWN */
 
 .dropdown-menu {
 
@@ -236,43 +295,53 @@
 
   left: 50%;
 
-  transform: translateX(-50%);
-
   width: 220px;
 
-  background: white;
+  transform:
+    translateX(-50%)
+    translateY(-8px);
+
+  background: #ffffff;
+
+  border: 1px solid #edf2f7;
 
   border-radius: 18px;
 
   overflow: hidden;
 
-  border: 1px solid #edf2f7;
-
-  box-shadow:
-    0 20px 45px rgba(15,23,42,.12);
-
   opacity: 0;
 
   visibility: hidden;
 
+  pointer-events: none;
+
+  box-shadow:
+    0 20px 45px rgba(15, 23, 42, .14);
+
   transition:
-    opacity .25s,
-    transform .25s,
-    visibility .25s;
+    opacity .25s ease,
+    visibility .25s ease,
+    transform .25s ease;
 
 }
 
-.dropdown:hover .dropdown-menu,
 
-.dropdown.show .dropdown-menu {
+/* DESKTOP DROPDOWN OPEN */
+
+.dropdown-menu.show {
 
   opacity: 1;
 
   visibility: visible;
 
-  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
 
 }
+
 
 .dropdown-menu a {
 
@@ -280,28 +349,35 @@
 
   padding: 14px 20px;
 
-  text-decoration: none;
-
   color: #334155;
+
+  font-size: .95rem;
 
   font-weight: 500;
 
-  transition: .25s;
+  text-decoration: none;
+
+  transition:
+    background .25s ease,
+    color .25s ease,
+    padding-left .25s ease;
 
 }
 
+
 .dropdown-menu a:hover {
+
+  padding-left: 28px;
 
   background: #f8fafc;
 
   color: #004b8d;
 
-  padding-left: 28px;
-
 }
 
+
 /* ==========================================================
-   ACTIONS
+   NAVBAR ACTIONS
 ========================================================== */
 
 .navbar-actions {
@@ -316,8 +392,9 @@
 
 }
 
+
 /* ==========================================================
-   LOGIN BUTTON
+   DESKTOP LOGIN BUTTON
 ========================================================== */
 
 .login-btn {
@@ -328,32 +405,38 @@
 
   justify-content: center;
 
-  text-decoration: none;
-
   padding: 11px 22px;
 
-  border-radius: 999px;
-
   border: 2px solid #004b8d;
+
+  border-radius: 999px;
 
   color: #004b8d;
 
   font-weight: 700;
 
-  transition: .3s;
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  transition:
+    background .3s ease,
+    color .3s ease;
 
 }
+
 
 .login-btn:hover {
 
   background: #004b8d;
 
-  color: white;
+  color: #ffffff;
 
 }
 
+
 /* ==========================================================
-   JOIN BUTTON
+   DESKTOP JOIN BUTTON
 ========================================================== */
 
 .join-btn {
@@ -366,50 +449,103 @@
 
   gap: 10px;
 
-  text-decoration: none;
-
   padding: 12px 24px;
 
   border-radius: 999px;
 
-  background: linear-gradient(
-    135deg,
-    #004b8d,
-    #0076c9
-  );
+  background:
+    linear-gradient(
+      135deg,
+      #004b8d,
+      #0076c9
+    );
 
-  color: white;
+  color: #ffffff;
 
   font-weight: 700;
 
+  text-decoration: none;
+
+  white-space: nowrap;
+
   box-shadow:
-    0 12px 28px rgba(0,75,141,.28);
+    0 12px 28px rgba(0, 75, 141, .28);
 
   transition:
-    transform .3s,
-    box-shadow .3s;
+    transform .3s ease,
+    box-shadow .3s ease;
 
 }
+
 
 .join-btn:hover {
 
   transform: translateY(-2px);
 
   box-shadow:
-    0 18px 36px rgba(0,75,141,.35);
+    0 18px 36px rgba(0, 75, 141, .35);
 
 }
 
+
 /* ==========================================================
-   MOBILE ELEMENTS
-   (Hidden in Part 1)
+   HAMBURGER BUTTON
 ========================================================== */
 
 .menu-btn {
 
   display: none;
 
+  align-items: center;
+
+  justify-content: center;
+
+  width: 44px;
+
+  height: 44px;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: #004b8d;
+
+  font-size: 1.7rem;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+  z-index: 1200;
+
+  transition:
+    background .25s ease,
+    color .25s ease,
+    transform .25s ease;
+
 }
+
+
+.menu-btn:hover {
+
+  background: rgba(0, 75, 141, .08);
+
+  color: #0076c9;
+
+  transform: scale(1.05);
+
+}
+
+
+/* ==========================================================
+   MOBILE ACTIONS
+========================================================== */
 
 .mobile-actions {
 
@@ -418,107 +554,144 @@
 }
 
 
-
-/* ==========================================================
-   PART 2 - RESPONSIVE
-========================================================== */
-
 /* ==========================================================
    LARGE TABLETS
 ========================================================== */
 
 @media (max-width: 1200px) {
 
+
   .navbar-container {
 
     width: 96%;
 
-    gap: 1rem;
+    gap: 1.25rem;
 
   }
+
 
   .nav-links {
 
-    gap: 1.35rem;
+    gap: 1.25rem;
 
   }
+
 
   .login-btn {
 
-    padding: 10px 18px;
+    padding: 10px 17px;
 
   }
 
+
   .join-btn {
 
-    padding: 11px 20px;
+    padding: 11px 19px;
 
   }
 
 }
 
+
 /* ==========================================================
-   MOBILE & TABLETS
+   TABLETS AND PHONES
 ========================================================== */
 
 @media (max-width: 992px) {
 
-  /* Container */
+
+  /* ----------------------------------------
+     NAVBAR
+  ---------------------------------------- */
 
   .navbar-container {
 
-    height: 78px;
-
     width: 94%;
+
+    min-height: 78px;
+
+    gap: 12px;
 
   }
 
-  /* Hide desktop buttons */
+
+  /* ----------------------------------------
+     LOGO
+  ---------------------------------------- */
+
+  .logo {
+
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    gap: 10px;
+
+  }
+
+
+  .logo img {
+
+    width: 50px;
+
+    height: 50px;
+
+  }
+
+
+  .logo h2 {
+
+    font-size: 1.15rem;
+
+  }
+
+
+  .logo span {
+
+    font-size: .7rem;
+
+  }
+
+
+  /* ----------------------------------------
+     HIDE DESKTOP BUTTONS
+  ---------------------------------------- */
 
   .login-btn,
+
   .join-btn {
 
     display: none;
 
   }
 
-  /* Hamburger */
+
+  /* ----------------------------------------
+     KEEP HAMBURGER VISIBLE
+  ---------------------------------------- */
 
   .menu-btn {
 
     display: flex;
 
-    align-items: center;
+    width: 46px;
 
-    justify-content: center;
+    height: 46px;
 
-    width: 44px;
+    min-width: 46px;
 
-    height: 44px;
+    min-height: 46px;
 
-    border: none;
+    flex: 0 0 46px;
 
-    background: transparent;
-
-    color: #004b8d;
-
-    font-size: 1.6rem;
-
-    cursor: pointer;
-
-    transition: .3s;
-
-    z-index: 1200;
+    font-size: 1.65rem;
 
   }
 
-  .menu-btn:hover {
 
-    transform: scale(1.08);
-
-  }
-
-  /* Navigation */
+  /* ----------------------------------------
+     MOBILE NAVIGATION
+  ---------------------------------------- */
 
   .nav-links {
 
@@ -526,13 +699,13 @@
 
     top: 78px;
 
-    left: -100%;
+    left: 0;
 
     width: 100%;
 
     height: calc(100vh - 78px);
 
-    background: #ffffff;
+    padding: 1.5rem;
 
     display: flex;
 
@@ -546,30 +719,51 @@
 
     overflow-y: auto;
 
-    padding: 1.5rem;
-
-    transition: left .35s ease;
+    background: #ffffff;
 
     box-shadow:
-      0 10px 40px rgba(15,23,42,.08);
+      0 15px 40px rgba(15, 23, 42, .12);
+
+    transform: translateX(100%);
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+      transform .35s ease,
+      visibility .35s ease;
 
   }
+
 
   .nav-links.active {
 
-    left: 0;
+    transform: translateX(0);
+
+    visibility: visible;
+
+    pointer-events: auto;
 
   }
+
+
+  /* ----------------------------------------
+     MOBILE MAIN LINKS
+  ---------------------------------------- */
 
   .nav-links > a {
 
     width: 100%;
 
-    padding: 18px 4px;
+    padding: 17px 4px;
 
     border-bottom: 1px solid #edf2f7;
 
+    color: #1e293b;
+
   }
+
 
   .nav-links > a::after {
 
@@ -577,7 +771,10 @@
 
   }
 
-  /* Dropdown */
+
+  /* ----------------------------------------
+     MOBILE DROPDOWN
+  ---------------------------------------- */
 
   .dropdown {
 
@@ -585,19 +782,19 @@
 
   }
 
+
   .dropdown-toggle {
 
     width: 100%;
 
-    display: flex;
-
     justify-content: space-between;
 
-    padding: 18px 4px;
+    padding: 17px 4px;
 
     border-bottom: 1px solid #edf2f7;
 
   }
+
 
   .dropdown-menu {
 
@@ -605,11 +802,17 @@
 
     width: 100%;
 
+    margin: 0;
+
+    padding: 0;
+
     transform: none;
 
     opacity: 1;
 
     visibility: visible;
+
+    pointer-events: auto;
 
     display: none;
 
@@ -617,19 +820,21 @@
 
     border-radius: 10px;
 
-    box-shadow: none;
-
     background: #f8fafc;
 
-    margin: 0;
+    box-shadow: none;
 
   }
 
-  .dropdown.open .dropdown-menu {
+
+  .dropdown-menu.show {
 
     display: block;
 
+    transform: none;
+
   }
+
 
   .dropdown-menu a {
 
@@ -639,13 +844,17 @@
 
   }
 
+
   .dropdown-menu a:last-child {
 
     border-bottom: none;
 
   }
 
-  /* Mobile Buttons */
+
+  /* ----------------------------------------
+     MOBILE ACTION BUTTONS
+  ---------------------------------------- */
 
   .mobile-actions {
 
@@ -655,26 +864,26 @@
 
     gap: 14px;
 
-    margin-top: 32px;
+    margin-top: 30px;
 
-    padding-top: 28px;
+    padding-top: 26px;
 
     border-top: 1px solid #e5e7eb;
 
   }
 
+
   .mobile-login-btn,
+
   .mobile-join-btn {
 
     display: flex;
 
-    justify-content: center;
-
     align-items: center;
 
-    gap: 10px;
+    justify-content: center;
 
-    text-decoration: none;
+    gap: 10px;
 
     width: 100%;
 
@@ -684,50 +893,40 @@
 
     font-weight: 700;
 
-    transition: .3s;
+    text-decoration: none;
 
   }
+
 
   .mobile-login-btn {
 
-    color: #004b8d;
-
     border: 2px solid #004b8d;
 
-    background: white;
+    background: #ffffff;
+
+    color: #004b8d;
 
   }
 
-  .mobile-login-btn:hover {
-
-    background: #004b8d;
-
-    color: white;
-
-  }
 
   .mobile-join-btn {
 
-    background: linear-gradient(
-      135deg,
-      #004b8d,
-      #0076c9
-    );
+    background:
+      linear-gradient(
+        135deg,
+        #004b8d,
+        #0076c9
+      );
 
-    color: white;
+    color: #ffffff;
 
     box-shadow:
-      0 12px 28px rgba(0,75,141,.25);
-
-  }
-
-  .mobile-join-btn:hover {
-
-    transform: translateY(-2px);
+      0 12px 28px rgba(0, 75, 141, .25);
 
   }
 
 }
+
 
 /* ==========================================================
    PHONES
@@ -735,39 +934,38 @@
 
 @media (max-width: 768px) {
 
+
   .navbar-container {
 
-    width: 95%;
+    width: 94%;
 
   }
 
-  .logo {
-
-    gap: 10px;
-
-  }
 
   .logo img {
 
-    width: 48px;
+    width: 46px;
 
-    height: 48px;
+    height: 46px;
 
   }
+
 
   .logo h2 {
 
-    font-size: 1.1rem;
+    font-size: 1.08rem;
 
   }
 
+
   .logo span {
 
-    font-size: .72rem;
+    font-size: .68rem;
 
   }
 
 }
+
 
 /* ==========================================================
    SMALL PHONES
@@ -775,29 +973,33 @@
 
 @media (max-width: 576px) {
 
+
   .navbar-container {
 
     width: 94%;
 
-    height: 72px;
+    min-height: 72px;
+
+    gap: 8px;
 
   }
 
-  .nav-links {
 
-    top: 72px;
+  .logo {
 
-    height: calc(100vh - 72px);
+    gap: 8px;
 
   }
+
 
   .logo img {
 
-    width: 42px;
+    width: 40px;
 
-    height: 42px;
+    height: 40px;
 
   }
+
 
   .logo h2 {
 
@@ -805,11 +1007,91 @@
 
   }
 
+
   .logo span {
 
     display: none;
 
   }
+
+
+  .navbar-actions {
+
+    margin-left: auto;
+
+  }
+
+
+  .menu-btn {
+
+    display: flex;
+
+    width: 42px;
+
+    height: 42px;
+
+    min-width: 42px;
+
+    min-height: 42px;
+
+    flex: 0 0 42px;
+
+    font-size: 1.5rem;
+
+  }
+
+
+  .nav-links {
+
+    top: 72px;
+
+    height: calc(100vh - 72px);
+
+    padding: 1.25rem;
+
+  }
+
+}
+
+
+/* ==========================================================
+   EXTRA SMALL PHONES
+========================================================== */
+
+@media (max-width: 380px) {
+
+
+  .navbar-container {
+
+    width: 96%;
+
+    gap: 5px;
+
+  }
+
+
+  .logo {
+
+    gap: 6px;
+
+  }
+
+
+  .logo img {
+
+    width: 36px;
+
+    height: 36px;
+
+  }
+
+
+  .logo h2 {
+
+    font-size: .92rem;
+
+  }
+
 
   .menu-btn {
 
@@ -817,7 +1099,13 @@
 
     height: 40px;
 
-    font-size: 1.45rem;
+    min-width: 40px;
+
+    min-height: 40px;
+
+    flex-basis: 40px;
+
+    font-size: 1.4rem;
 
   }
 

@@ -1,0 +1,235 @@
+/* =====================================================
+   CARD
+===================================================== */
+
+.leadership-position-card {
+
+  background: #ffffff;
+
+  border-radius: 22px;
+
+  padding: 28px;
+
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+
+  border: 1px solid #e5e7eb;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 24px;
+
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.leadership-position-header {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+}
+
+.leadership-position-icon {
+
+  width: 60px;
+
+  height: 60px;
+
+  border-radius: 18px;
+
+  background: linear-gradient(
+    135deg,
+    #0f766e,
+    #155e75
+  );
+
+  color: #ffffff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+.leadership-position-header h3 {
+
+  margin: 0;
+
+  font-size: 1.3rem;
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+}
+
+.leadership-position-header p {
+
+  margin-top: 6px;
+
+  color: #64748b;
+
+  line-height: 1.6;
+
+}
+
+/* =====================================================
+   BODY
+===================================================== */
+
+.leadership-position-body {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+
+}
+
+.leadership-item {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 14px;
+
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid #eef2f7;
+
+}
+
+.leadership-item:last-child {
+
+  border-bottom: none;
+
+  padding-bottom: 0;
+
+}
+
+.leadership-item svg {
+
+  color: #0f766e;
+
+  margin-top: 3px;
+
+  flex-shrink: 0;
+
+}
+
+.leadership-item span {
+
+  display: block;
+
+  font-size: .82rem;
+
+  color: #64748b;
+
+  margin-bottom: 4px;
+
+}
+
+.leadership-item strong {
+
+  color: #0f172a;
+
+  font-size: .97rem;
+
+  font-weight: 600;
+
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.leadership-position-footer {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #eef2f7;
+
+}
+
+.leadership-status {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  color: #475569;
+
+  font-weight: 500;
+
+}
+
+.status-dot {
+
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: #22c55e;
+
+  display: inline-block;
+
+}
+
+.leadership-position-footer strong {
+
+  color: #16a34a;
+
+  font-size: .95rem;
+
+  font-weight: 700;
+
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+
+  .leadership-position-card {
+
+    padding: 22px;
+
+  }
+
+  .leadership-position-header {
+
+    align-items: flex-start;
+
+  }
+
+  .leadership-position-icon {
+
+    width: 54px;
+
+    height: 54px;
+
+  }
+
+}

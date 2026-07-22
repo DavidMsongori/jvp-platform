@@ -31,7 +31,8 @@ export default function LeadershipPage() {
 
   const [showForm, setShowForm] = useState(false);
 
-  const [editingLeader, setEditingLeader] = useState(null);
+  const [editingLeader, setEditingLeader] =
+    useState(null);
 
   const [showDeleteDialog, setShowDeleteDialog] =
     useState(false);
@@ -39,9 +40,11 @@ export default function LeadershipPage() {
   const [selectedLeader, setSelectedLeader] =
     useState(null);
 
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] =
+    useState(false);
 
-  const [deleting, setDeleting] = useState(false);
+  const [deleting, setDeleting] =
+    useState(false);
 
   /* ==========================================================
      CREATE / UPDATE
@@ -61,7 +64,6 @@ export default function LeadershipPage() {
       }
 
       setShowForm(false);
-
       setEditingLeader(null);
     } catch (err) {
       console.error(err);
@@ -80,10 +82,11 @@ export default function LeadershipPage() {
     try {
       setDeleting(true);
 
-      await deleteLeader(selectedLeader._id);
+      await deleteLeader(
+        selectedLeader._id
+      );
 
       setShowDeleteDialog(false);
-
       setSelectedLeader(null);
     } catch (err) {
       console.error(err);
@@ -98,7 +101,6 @@ export default function LeadershipPage() {
 
   const handleEdit = (leader) => {
     setEditingLeader(leader);
-
     setShowForm(true);
   };
 
@@ -108,93 +110,137 @@ export default function LeadershipPage() {
 
   const handleCreate = () => {
     setEditingLeader(null);
-
     setShowForm(true);
   };
+
+  /* ==========================================================
+     RENDER
+  ========================================================== */
 
   return (
     <div className="leadership-page">
 
-      {/* ==========================================
+      {/* =====================================================
           HEADER
-      ========================================== */}
+      ===================================================== */}
 
       <div className="leadership-header">
 
         <div>
 
-          <h1>Leadership Management</h1>
+          <h1>
+            Leadership Management
+          </h1>
 
           <p>
-            Manage Patron, Regional Executive,
-            Youth Assembly and County Leadership.
+            Manage patrons, regional executives,
+            Youth Assembly leaders, and county
+            leadership assignments.
           </p>
 
         </div>
 
         <button
+          type="button"
           className="btn-primary"
           onClick={handleCreate}
         >
           <Plus size={18} />
 
           Assign Leader
-
         </button>
 
       </div>
 
-      {/* ==========================================
+      {/* =====================================================
           FILTERS
-      ========================================== */}
+      ===================================================== */}
 
       <LeaderFilters
-        search={filters.search || ""}
-        category={filters.category || "all"}
-        county={filters.county || ""}
-        active={filters.active || "all"}
+        search={
+          filters.search || ""
+        }
+
+        category={
+          filters.category || "all"
+        }
+
+        department={
+          filters.department || ""
+        }
+
+        scope={
+          filters.scope || ""
+        }
+
+        county={
+          filters.county || ""
+        }
+
+        active={
+          filters.active || "all"
+        }
+
         onSearchChange={(value) =>
           updateFilters({
             search: value,
           })
         }
+
         onCategoryChange={(value) =>
           updateFilters({
             category:
-              value === "all" ? "" : value,
+              value === "all"
+                ? ""
+                : value,
           })
         }
+
+        onDepartmentChange={(value) =>
+          updateFilters({
+            department: value,
+          })
+        }
+
+        onScopeChange={(value) =>
+          updateFilters({
+            scope: value,
+          })
+        }
+
         onCountyChange={(value) =>
           updateFilters({
             county: value,
           })
         }
+
         onStatusChange={(value) =>
           updateFilters({
             active:
-              value === "all" ? "" : value,
+              value === "all"
+                ? ""
+                : value,
           })
         }
+
         onReset={resetFilters}
       />
 
-      {/* ==========================================
+      {/* =====================================================
           ERROR
-      ========================================== */}
+      ===================================================== */}
 
       {error && (
 
         <div className="error-banner">
-
           {error}
-
         </div>
 
       )}
 
-      {/* ==========================================
+      {/* =====================================================
           TABLE
-      ========================================== */}
+      ===================================================== */}
 
       <LeaderTable
         leaders={leaders}
@@ -202,14 +248,13 @@ export default function LeadershipPage() {
         onEdit={handleEdit}
         onDelete={(leader) => {
           setSelectedLeader(leader);
-
           setShowDeleteDialog(true);
         }}
       />
 
-      {/* ==========================================
+      {/* =====================================================
           CREATE / EDIT MODAL
-      ========================================== */}
+      ===================================================== */}
 
       <LeaderFormModal
         open={showForm}
@@ -217,15 +262,14 @@ export default function LeadershipPage() {
         loading={saving}
         onClose={() => {
           setShowForm(false);
-
           setEditingLeader(null);
         }}
         onSave={handleSave}
       />
 
-      {/* ==========================================
+      {/* =====================================================
           DELETE DIALOG
-      ========================================== */}
+      ===================================================== */}
 
       <DeleteLeaderDialog
         open={showDeleteDialog}
@@ -233,7 +277,6 @@ export default function LeadershipPage() {
         loading={deleting}
         onCancel={() => {
           setShowDeleteDialog(false);
-
           setSelectedLeader(null);
         }}
         onConfirm={handleDelete}

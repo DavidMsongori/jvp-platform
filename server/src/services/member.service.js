@@ -5,6 +5,8 @@ import ActivityLog from "../models/ActivityLog.js";
 import AppError from "../utils/AppError.js";
 import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
+import Leader from "../models/leader.model.js";
+import { calculateProfileCompletion } from "../utils/profileCompletion.js";
 
 /* ==========================================================
    GET MY PROFILE
@@ -66,19 +68,23 @@ export const updateMyProfile = async (
 
   const {
 
-    firstName,
+  firstName,
 
-    middleName,
+  middleName,
 
-    lastName,
+  lastName,
 
-    phone,
+  phone,
 
-    county,
+  county,
+  constituency,
+  ward,
 
-    occupation,
+  occupation,
 
-  } = data;
+  disability,
+
+} = data;
 
   /* ==========================================
      CHECK PHONE NUMBER
@@ -142,19 +148,45 @@ export const updateMyProfile = async (
 
   }
 
-  if (county !== undefined) {
+ if (county !== undefined) {
 
-    member.county = county;
+  member.county = county;
 
-  }
+}
 
-  if (occupation !== undefined) {
+if (constituency !== undefined) {
 
-    member.occupation = occupation;
+  member.constituency = constituency;
 
-  }
+}
 
-  await member.save();
+if (ward !== undefined) {
+
+  member.ward = ward;
+
+}
+
+if (occupation !== undefined) {
+
+  member.occupation = occupation;
+
+}
+
+if (disability !== undefined) {
+
+  member.disability = disability;
+
+}
+
+  /* ==========================================
+   PROFILE COMPLETION
+========================================== */
+
+member.profileCompletion =
+  calculateProfileCompletion(member);
+
+await member.save();
+
 
   /* ==========================================
      ACTIVITY LOG
@@ -192,64 +224,71 @@ export const updateMyProfile = async (
    MEMBER DASHBOARD
 ========================================================== */
 
-export const getDashboard = async (
+export const getDashboard = async (memberId) => {
 
-  memberId
+  /* ==========================================
+     MEMBER
+  ========================================== */
 
-) => {
-
-  const member = await Member.findById(
-
-    memberId
-
-  ).populate(
-
-    "user",
-
-    "email role isActive"
-
-  );
-
-  if (!member) {
-
-    throw new AppError(
-
-      "Member profile not found.",
-
-      404
-
+  const member = await Member.findById(memberId)
+    .populate(
+      "user",
+      "email role isActive"
     );
 
+  if (!member) {
+    throw new AppError(
+      "Member profile not found.",
+      404
+    );
   }
+
+  /* ==========================================
+     LEADERSHIP
+  ========================================== */
+
+  const leader = await Leader.findOne({
+    member: member._id,
+    isActive: true,
+  });
+
+  const leadership = {
+    isLeader: !!leader,
+
+    hasLeadershipCard: !!leader,
+
+    category: leader?.category ?? null,
+
+    position: leader?.position ?? null,
+
+    county: leader?.county ?? null,
+
+    constituency: leader?.constituency ?? null,
+
+    ward: leader?.ward ?? null,
+
+    termStart: leader?.termStart ?? null,
+
+    termEnd: leader?.termEnd ?? null,
+  };
 
   /* ==========================================
      PAYMENTS
   ========================================== */
 
   const totalPayments =
-
     await Payment.countDocuments({
-
       member: member._id,
-
       status: "successful",
-
     });
 
   const recentPayments =
-
     await Payment.find({
-
       member: member._id,
-
     })
-
       .sort({
-
         createdAt: -1,
-
       })
-
       .limit(5);
 
   /* ==========================================
@@ -257,80 +296,160 @@ export const getDashboard = async (
   ========================================== */
 
   const totalRegistrations =
-
     await Registration.countDocuments({
-
       member: member._id,
-
     });
 
   const upcomingEvents =
-
     await Registration.find({
-
       member: member._id,
-
     })
-
       .populate({
-
         path: "event",
-
         select:
-
           "title venue startDate endDate status",
-
       })
-
       .sort({
-
         createdAt: -1,
-
       })
-
       .limit(5);
+
+  /* ==========================================
+     MEMBER
+  ========================================== */
+
+  const memberData = {
+
+    id: member._id,
+
+    memberNumber: member.memberNumber,
+
+    firstName: member.firstName,
+
+    middleName: member.middleName,
+
+    lastName: member.lastName,
+
+    county: member.county,
+
+    constituency: member.constituency,
+
+    ward: member.ward,
+
+    membershipType: member.membershipType,
+
+    membershipStatus: member.membershipStatus,
+
+    profilePhoto: member.profilePhoto,
+
+    joinedAt: member.joinedAt,
+
+    email: member.user?.email,
+
+    role: member.user?.role,
+
+  };
+
+  /* ==========================================
+     SUMMARY
+  ========================================== */
+
+  const summary = {
+
+    totalPayments,
+
+    totalRegistrations,
+
+    unreadNotifications: 0,
+
+    activePrograms: 0,
+
+  };
+
+  /* ==========================================
+     STATISTICS
+  ========================================== */
+
+  const statistics = {
+
+    totalPayments,
+
+    totalRegistrations,
+
+   profileCompletion:
+    member.profileCompletion ?? 0,
+
+    loginCount:
+      member.loginCount ?? 0,
+
+    lastLogin:
+      member.lastLogin ?? null,
+
+    volunteerHours: 0,
+
+    /* Future leadership stats */
+
+    membersServed: 0,
+
+    eventsCoordinated: 0,
+
+    reportsSubmitted: 0,
+
+    performanceScore: 0,
+
+  };
+
+  /* ==========================================
+     PROFILE COMPLETION
+  ========================================== */
+
+  const completion = {
+
+    profile:
+    member.profileCompletion ?? 0,
+
+    membership:
+      member.membershipStatus === "active"
+        ? 100
+        : 50,
+
+  };
+
+  /* ==========================================
+     PLACEHOLDERS
+  ========================================== */
+
+  const notifications = [];
+
+  const news = [];
+
+  const recentActivity = [];
+
+  /* ==========================================
+     RESPONSE
+  ========================================== */
 
   return {
 
-    profile: {
+    member: memberData,
 
-  id: member._id,
+    leadership,
 
-  memberNumber: member.memberNumber,
+    summary,
 
-  firstName: member.firstName,
+    statistics,
 
-  middleName: member.middleName,
+    completion,
 
-  lastName: member.lastName,
+    events: upcomingEvents,
 
-  county: member.county,
+    notifications,
 
-  membershipType: member.membershipType,
+    news,
 
-  membershipStatus: member.membershipStatus,
-
-  profilePhoto: member.profilePhoto,
-
-  joinedAt: member.joinedAt,
-
-  email: member.user.email,
-
-  role: member.user.role,
-
-},
-
-    statistics: {
-
-      totalPayments,
-
-      totalRegistrations,
-
-    },
+    recentActivity,
 
     recentPayments,
-
-    upcomingEvents,
 
   };
 
@@ -345,20 +464,41 @@ export const uploadProfilePhoto = async (
   file
 ) => {
 
+  /* ==========================================
+     FIND MEMBER
+  ========================================== */
+
   const member = await Member.findById(memberId);
 
   if (!member) {
+
     throw new AppError(
       "Member profile not found.",
       404
     );
+
   }
 
-  if (!file || !file.buffer) {
+  /* ==========================================
+     VALIDATE FILE
+  ========================================== */
+
+  if (!file) {
+
     throw new AppError(
-      "Please upload a profile photo.",
+      "Please select a profile photo.",
       400
     );
+
+  }
+
+  if (!file.buffer) {
+
+    throw new AppError(
+      "Uploaded file could not be processed.",
+      400
+    );
+
   }
 
   /* ==========================================
@@ -366,99 +506,153 @@ export const uploadProfilePhoto = async (
   ========================================== */
 
   if (member.profilePhotoPublicId) {
+
     try {
+
       await cloudinary.uploader.destroy(
         member.profilePhotoPublicId
       );
+
     } catch (error) {
+
       console.error(
         "Failed to delete previous profile photo:",
         error.message
       );
+
     }
-  }
-
-  /* ==========================================
-     UPLOAD NEW PHOTO
-  ========================================== */
-
-  const result = await new Promise((resolve, reject) => {
-
-    const uploadStream = cloudinary.uploader.upload_stream(
-
-      {
-        folder: "jvp-connect/profile",
-
-        public_id:
-  member.memberNumber
-    ? `member-${member.memberNumber.replace(/\//g, "-")}`
-    : `member-${member._id}`,
-
-        overwrite: true,
-
-        invalidate: true,
-
-  transformation: [
-    {
-      width: 500,
-      height: 500,
-      crop: "fill",
-      gravity: "face",
-      quality: "auto",
-      fetch_format: "auto",
-    },
-  ],
-        resource_type: "image",
-      },
-
-      (error, result) => {
-
-  if (error) {
-
-    console.log("========== CLOUDINARY ERROR ==========");
-    console.dir(error, { depth: null });
-    console.log("======================================");
-
-    return reject(error);
 
   }
 
-  resolve(result);
-
-}
-
-    );
-
-    streamifier
-      .createReadStream(file.buffer)
-      .pipe(uploadStream);
-
-  });
-
   /* ==========================================
-     SAVE MEMBER
+     UPLOAD TO CLOUDINARY
   ========================================== */
 
-  member.profilePhoto = result.secure_url;
-  member.profilePhotoPublicId = result.public_id;
+  const result = await new Promise(
+
+    (resolve, reject) => {
+
+      const uploadStream =
+        cloudinary.uploader.upload_stream(
+
+          {
+
+            folder:
+              "jvp-connect/profile",
+
+            public_id:
+
+              member.memberNumber
+
+                ? `member-${member.memberNumber
+                    .replace(/\//g, "-")}`
+
+                : `member-${member._id}`,
+
+            overwrite: true,
+
+            invalidate: true,
+
+            transformation: [
+
+              {
+
+                width: 500,
+
+                height: 500,
+
+                crop: "fill",
+
+                gravity: "face",
+
+                quality: "auto",
+
+                fetch_format: "auto",
+
+              },
+
+            ],
+
+            resource_type: "image",
+
+          },
+
+          (error, result) => {
+
+            if (error) {
+
+              console.error(
+                "Cloudinary upload failed:",
+                error
+              );
+
+              return reject(error);
+
+            }
+
+            resolve(result);
+
+          }
+
+        );
+
+      streamifier
+
+        .createReadStream(file.buffer)
+
+        .pipe(uploadStream);
+
+    }
+
+  );
+
+  /* ==========================================
+     UPDATE MEMBER PHOTO
+  ========================================== */
+
+  member.profilePhoto =
+    result.secure_url;
+
+  member.profilePhotoPublicId =
+    result.public_id;
+
+  /* ==========================================
+     UPDATE PROFILE COMPLETION
+  ========================================== */
+
+  member.profileCompletion =
+    calculateProfileCompletion(member);
 
   await member.save();
 
   /* ==========================================
-     ACTIVITY LOG
+     LOG ACTIVITY
   ========================================== */
 
   await ActivityLog.create({
 
     user: member.user,
 
-    action: "Updated profile photo",
+    action:
+      ACTIVITY.MEMBER.PROFILE_PHOTO_UPDATED,
 
-    module: "members",
+    module:
+      ACTIVITY_MODULES.MEMBERS,
 
-    description: "Profile photo uploaded.",
+    targetType:
+      TARGET_TYPES.MEMBER,
 
-    targetId: member._id,
+    targetId:
+      member._id,
+
+    title:
+      "Profile Photo Updated",
+
+    description:
+      "Member successfully uploaded a new profile photo.",
+
+    status:
+      "success",
 
   });
 
@@ -467,10 +661,15 @@ export const uploadProfilePhoto = async (
   ========================================== */
 
   return await Member.findById(
+
     member._id
+
   ).populate(
+
     "user",
+
     "email role isActive createdAt"
+
   );
 
 };

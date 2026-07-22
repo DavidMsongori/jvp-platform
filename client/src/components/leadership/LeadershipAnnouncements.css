@@ -1,0 +1,265 @@
+/* =====================================================
+   CARD
+===================================================== */
+
+.leadership-announcements {
+
+  background: #ffffff;
+
+  border-radius: 22px;
+
+  padding: 28px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 10px 30px rgba(15,23,42,.06);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 24px;
+
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.leadership-announcements-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 20px;
+
+}
+
+.leadership-announcements-header h3 {
+
+  margin: 0;
+
+  font-size: 1.3rem;
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+}
+
+.leadership-announcements-header p {
+
+  margin-top: 8px;
+
+  color: #64748b;
+
+  line-height: 1.6;
+
+}
+
+.announcement-link {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: #0f766e;
+
+  font-weight: 600;
+
+  text-decoration: none;
+
+}
+
+.announcement-link:hover {
+
+  text-decoration: underline;
+
+}
+
+/* =====================================================
+   LIST
+===================================================== */
+
+.announcement-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+
+}
+
+.announcement-item {
+
+  display: flex;
+
+  gap: 18px;
+
+  padding: 18px;
+
+  border-radius: 18px;
+
+  border: 1px solid #e5e7eb;
+
+  transition: all .25s ease;
+
+}
+
+.announcement-item:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 20px rgba(15,23,42,.06);
+
+}
+
+.announcement-icon {
+
+  width: 50px;
+
+  height: 50px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #0f766e,
+    #155e75
+  );
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+}
+
+.announcement-content {
+
+  flex: 1;
+
+}
+
+.announcement-content h4 {
+
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+}
+
+.announcement-content p {
+
+  margin: 10px 0;
+
+  color: #64748b;
+
+  line-height: 1.6;
+
+}
+
+.announcement-meta {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  color: #94a3b8;
+
+  font-size: .82rem;
+
+}
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.announcement-empty {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 16px;
+
+  padding: 50px 20px;
+
+  text-align: center;
+
+  color: #64748b;
+
+}
+
+.announcement-empty svg {
+
+  color: #0f766e;
+
+}
+
+.announcement-empty h4 {
+
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 1.15rem;
+
+}
+
+.announcement-empty p {
+
+  margin: 0;
+
+  max-width: 320px;
+
+  line-height: 1.6;
+
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+
+  .leadership-announcements {
+
+    padding: 22px;
+
+  }
+
+  .leadership-announcements-header {
+
+    flex-direction: column;
+
+  }
+
+  .announcement-item {
+
+    flex-direction: column;
+
+  }
+
+}

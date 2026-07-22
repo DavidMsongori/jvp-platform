@@ -1,15 +1,13 @@
 const Member = require("../models/Member");
+const Leader = require("../models/Leader");
 
 class DashboardService {
-
   /* =====================================================
      MEMBER DASHBOARD
   ===================================================== */
 
   async getDashboard(memberId) {
-
     const member = await Member.findById(memberId)
-
       .select("-password -otp -otpExpires");
 
     if (!member) {
@@ -17,12 +15,51 @@ class DashboardService {
     }
 
     /* =====================================================
+       LEADERSHIP
+    ===================================================== */
+
+    const leader = await Leader.findOne({
+      member: member._id,
+      isActive: true,
+    }).lean();
+
+    const leadership = {
+      isLeader: !!leader,
+
+      hasLeadershipCard: !!leader,
+
+      category: leader?.category || null,
+
+      position: leader?.position || null,
+
+      county: leader?.county || null,
+
+      constituency: leader?.constituency || null,
+
+      ward: leader?.ward || null,
+
+      office: leader?.office || null,
+
+      appointmentDate:
+        leader?.appointmentDate || null,
+
+      leadershipNumber:
+        leader?.leadershipNumber || null,
+    };
+
+    const leader = await Leader.findOne({
+  member: member._id,
+  isActive: true,
+}).lean();
+
+console.log("MEMBER ID:", member._id);
+console.log("LEADER RECORD:", leader);
+
+    /* =====================================================
        PLACEHOLDER DATA
-       (Future Services)
     ===================================================== */
 
     const events = [
-
       {
         id: 1,
         title: "Coastal Youth Summit 2026",
@@ -32,7 +69,6 @@ class DashboardService {
         status: "Open",
         statusClass: "open",
       },
-
       {
         id: 2,
         title: "Beach Cleanup Exercise",
@@ -42,7 +78,6 @@ class DashboardService {
         status: "Register",
         statusClass: "register",
       },
-
       {
         id: 3,
         title: "Leadership Bootcamp",
@@ -52,11 +87,9 @@ class DashboardService {
         status: "Coming Soon",
         statusClass: "coming-soon",
       },
-
     ];
 
     const notifications = [
-
       {
         id: 1,
         title: "Membership Activated",
@@ -64,15 +97,14 @@ class DashboardService {
         date: "Today",
         type: "success",
       },
-
       {
         id: 2,
         title: "Complete Your Profile",
-        message: "Complete your profile to unlock more opportunities.",
+        message:
+          "Complete your profile to unlock more opportunities.",
         date: "Today",
         type: "info",
       },
-
       {
         id: 3,
         title: "Coastal Youth Summit",
@@ -80,38 +112,36 @@ class DashboardService {
         date: "2 days ago",
         type: "announcement",
       },
-
     ];
 
     const news = [
-
       {
         id: 1,
         category: "Events",
-        title: "Registration for Coastal Youth Summit 2026 Now Open",
+        title:
+          "Registration for Coastal Youth Summit 2026 Now Open",
         excerpt:
           "Members from all six counties are invited to register.",
         date: "Today",
       },
-
       {
         id: 2,
         category: "Partnership",
-        title: "JVP Signs New Youth Empowerment Partnership",
+        title:
+          "JVP Signs New Youth Empowerment Partnership",
         excerpt:
           "The partnership will strengthen youth empowerment programmes across the Coast Region.",
         date: "Yesterday",
       },
-
       {
         id: 3,
         category: "Leadership",
-        title: "Applications for Volunteer Leaders Now Open",
+        title:
+          "Applications for Volunteer Leaders Now Open",
         excerpt:
           "Volunteer leadership opportunities are available in all six counties.",
         date: "3 days ago",
       },
-
     ];
 
     /* =====================================================
@@ -119,19 +149,12 @@ class DashboardService {
     ===================================================== */
 
     const summary = {
-
       registeredEvents: 2,
-
       activePrograms: 3,
-
       certificates: 0,
-
-      unreadNotifications:
-        notifications.length,
-
+      unreadNotifications: notifications.length,
       profileCompletion:
         member.profileCompleted || 0,
-
     };
 
     /* =====================================================
@@ -139,7 +162,6 @@ class DashboardService {
     ===================================================== */
 
     const statistics = {
-
       profileCompletion:
         member.profileCompleted || 0,
 
@@ -159,7 +181,6 @@ class DashboardService {
         summary.certificates,
 
       volunteerHours: 0,
-
     };
 
     /* =====================================================
@@ -167,15 +188,14 @@ class DashboardService {
     ===================================================== */
 
     const completion = {
-
       profile:
         member.profileCompleted || 0,
 
       membership:
-        member.activationStatus === "Activated"
+        member.activationStatus ===
+        "Activated"
           ? 100
           : 50,
-
     };
 
     /* =====================================================
@@ -183,19 +203,17 @@ class DashboardService {
     ===================================================== */
 
     const recentActivity = [
-
       {
         id: 1,
-        activity: "Logged into JVP Connect",
+        activity:
+          "Logged into JVP Connect",
         when: "Today",
       },
-
       {
         id: 2,
         activity: "Updated profile",
         when: "Yesterday",
       },
-
     ];
 
     /* =====================================================
@@ -203,20 +221,15 @@ class DashboardService {
     ===================================================== */
 
     return {
-
       success: true,
 
-      message: "Dashboard loaded successfully.",
+      message:
+        "Dashboard loaded successfully.",
 
       dashboard: {
-
-        /*
-          Return the complete member document.
-          This keeps Dashboard, Profile and
-          Membership Card using the same model.
-        */
-
         member,
+
+        leadership,
 
         summary,
 
@@ -231,13 +244,9 @@ class DashboardService {
         news,
 
         recentActivity,
-
       },
-
     };
-
   }
-
 }
 
 module.exports = new DashboardService();

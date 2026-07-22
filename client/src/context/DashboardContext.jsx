@@ -4,233 +4,183 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
 } from "react";
 
-import {
-  getDashboard,
-} from "../services/member.service";
+import { getDashboard } from "../services/member.service";
 
-/* ==========================================
+/* ==========================================================
    CONTEXT
-========================================== */
+========================================================== */
 
 const DashboardContext = createContext(null);
 
-/* ==========================================
+/* ==========================================================
    PROVIDER
-========================================== */
+========================================================== */
 
-export function DashboardProvider({
-  children,
-}) {
-
-  /* ======================================
+export function DashboardProvider({ children }) {
+  /* ==========================================
      STATE
-  ====================================== */
+  ========================================== */
 
-  const [dashboard, setDashboard] =
-    useState(null);
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState("");
-
-  /* ======================================
+  /* ==========================================
      LOAD DASHBOARD
-  ====================================== */
+  ========================================== */
 
   const loadDashboard = useCallback(async () => {
-
     try {
-
       setLoading(true);
-
       setError("");
 
-      const response =
-        await getDashboard();
+      const response = await getDashboard();
 
       setDashboard(response.data);
-
     } catch (err) {
-
       console.error(err);
 
       setError(
-
         err.response?.data?.message ||
-
-        "Unable to load dashboard."
-
+          "Unable to load dashboard."
       );
-
     } finally {
-
       setLoading(false);
-
     }
-
   }, []);
 
-  /* ======================================
+  /* ==========================================
      INITIAL LOAD
-  ====================================== */
+  ========================================== */
 
   useEffect(() => {
-
     loadDashboard();
-
   }, [loadDashboard]);
 
-  /* ======================================
+  /* ==========================================
      DERIVED DATA
-  ====================================== */
+  ========================================== */
 
-  const profile =
-    dashboard?.profile || null;
+  const member = dashboard?.member ?? null;
 
-  const statistics =
-    dashboard?.statistics || {};
+  const leadership = dashboard?.leadership ?? null;
 
-  const recentPayments =
-    dashboard?.recentPayments || [];
+  const summary = dashboard?.summary ?? {};
 
-  const upcomingEvents =
-    dashboard?.upcomingEvents || [];
+  const statistics = dashboard?.statistics ?? {};
 
-  const recentActivity =
-    dashboard?.recentActivity || [];
+  const completion = dashboard?.completion ?? {};
 
-  const notifications =
-    dashboard?.notifications || [];
+  const events = dashboard?.events ?? [];
 
-  const news =
-    dashboard?.news || [];
+  const notifications = dashboard?.notifications ?? [];
 
-  /* ======================================
-     DASHBOARD SUMMARY
-  ====================================== */
+  const news = dashboard?.news ?? [];
 
-  const summary = {
+  const recentActivity = dashboard?.recentActivity ?? [];
 
-    unreadNotifications:
+  /* ==========================================
+     LEADERSHIP HELPERS
+  ========================================== */
 
-      notifications.filter(
+  const isLeader = leadership?.isLeader ?? false;
 
-        (notification) => !notification.read
+  const leaderId = leadership?.leaderId ?? null;
 
-      ).length,
+  const position = leadership?.position ?? null;
 
-    pendingPayments:
+  const category = leadership?.category ?? null;
 
-      recentPayments.filter(
+  const leadershipStatus = leadership?.status ?? null;
 
-        (payment) =>
-
-          payment.status === "pending"
-
-      ).length,
-
-    upcomingEvents:
-
-      upcomingEvents.length,
-
-    totalNews:
-
-      news.length,
-
-    profileCompletion:
-
-      dashboard?.summary?.profileCompletion ||
-
-      0,
-
-  };
-
-  /* ======================================
+  /* ==========================================
      CONTEXT VALUE
-  ====================================== */
+  ========================================== */
 
-  const value = {
+  const value = useMemo(
+    () => ({
+      dashboard,
 
-    /* Raw Dashboard */
+      member,
 
-    dashboard,
+      leadership,
 
-    /* Profile */
+      isLeader,
 
-    profile,
+      leaderId,
 
-    /* Statistics */
+      position,
 
-    statistics,
+      category,
 
-    /* Dashboard Collections */
+      leadershipStatus,
 
-    recentPayments,
+      summary,
 
-    upcomingEvents,
+      statistics,
 
-    recentActivity,
+      completion,
 
-    notifications,
+      events,
 
-    news,
+      notifications,
 
-    /* Dashboard Summary */
+      news,
 
-    summary,
+      recentActivity,
 
-    /* Status */
+      loading,
 
-    loading,
+      error,
 
-    error,
-
-    /* Actions */
-
-    reloadDashboard:
+      reloadDashboard: loadDashboard,
+    }),
+    [
+      dashboard,
+      member,
+      leadership,
+      isLeader,
+      leaderId,
+      position,
+      category,
+      leadershipStatus,
+      summary,
+      statistics,
+      completion,
+      events,
+      notifications,
+      news,
+      recentActivity,
+      loading,
+      error,
       loadDashboard,
-
-  };
-
-  return (
-
-    <DashboardContext.Provider
-      value={value}
-    >
-
-      {children}
-
-    </DashboardContext.Provider>
-
+    ]
   );
 
+  return (
+    <DashboardContext.Provider value={value}>
+      {children}
+    </DashboardContext.Provider>
+  );
 }
 
-/* ==========================================
+/* ==========================================================
    HOOK
-========================================== */
+========================================================== */
 
 export function useDashboard() {
-
-  const context =
-    useContext(DashboardContext);
+  const context = useContext(DashboardContext);
 
   if (!context) {
-
     throw new Error(
-
       "useDashboard must be used inside DashboardProvider."
-
     );
-
   }
 
   return context;
-
 }
 
 export default DashboardContext;

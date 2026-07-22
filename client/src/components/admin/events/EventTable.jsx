@@ -33,7 +33,7 @@ const EventTable = ({
     );
   }
 
-  if (!events.length) {
+  if (!events?.length) {
     return (
       <div className="table-state">
         No events have been created yet.
@@ -47,167 +47,275 @@ const EventTable = ({
       <table className="event-table">
 
         <thead>
-
           <tr>
-
             <th>Event</th>
-
             <th>Category</th>
-
             <th>Status</th>
-
             <th>Date</th>
-
             <th>Venue</th>
-
             <th>Registered</th>
-
             <th>Featured</th>
-
             <th>Actions</th>
-
           </tr>
-
         </thead>
 
         <tbody>
 
-          {events.map((event) => (
+          {events.map((event) => {
 
-            <tr key={event._id}>
+            const registered =
+              event.registeredParticipants || 0;
 
-              <td>
+            const capacity =
+              event.maxParticipants || 0;
 
-                <div className="event-title-cell">
+            const percentage =
+              capacity > 0
+                ? Math.min(
+                    Math.round(
+                      (registered / capacity) * 100
+                    ),
+                    100
+                  )
+                : 0;
 
-                  <img
-                    src={
-                      event.coverImage?.secureUrl ||
-                      event.coverImage?.url ||
-                      "/images/event-placeholder.jpg"
-                    }
-                    alt={event.title}
-                  />
+            return (
 
-                  <div>
+              <tr key={event._id}>
 
-                    <strong>
-                      {event.title}
-                    </strong>
+                {/* EVENT */}
+
+                <td className="event-main-cell">
+
+                  <div className="event-title-cell">
+
+                    <img
+                      src={
+                        event.coverImage?.secureUrl ||
+                        event.coverImage?.url ||
+                        "/images/event-placeholder.jpg"
+                      }
+                      alt={event.title}
+                    />
+
+                    <div className="event-title-content">
+
+                      <strong
+                        title={event.title}
+                      >
+                        {event.title}
+                      </strong>
+
+                      <span>
+                        {event.eventType || "Event"}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                {/* CATEGORY */}
+
+                <td>
+
+                  <span className="category-badge">
+
+                    {event.category || "General"}
+
+                  </span>
+
+                </td>
+
+                {/* STATUS */}
+
+                <td>
+
+                  <span
+                    className={`status-badge ${event.status}`}
+                  >
+
+                    {event.status}
+
+                  </span>
+
+                </td>
+
+                {/* DATE */}
+
+                <td>
+
+                  <div className="date-cell">
+
+                    <Calendar size={15} />
 
                     <span>
-                      {event.eventType}
+
+                      {new Date(
+                        event.startDate
+                      ).toLocaleDateString(
+                        "en-KE",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}
+
                     </span>
 
                   </div>
 
-                </div>
+                </td>
 
-              </td>
+                {/* VENUE */}
 
-              <td>
-                {event.category}
-              </td>
+                <td>
 
-              <td>
+                  <div className="venue-cell">
 
-                <span
-                  className={`status-badge ${event.status}`}
-                >
-                  {event.status}
-                </span>
+                    <strong>
 
-              </td>
+                      {event.venue?.name ||
+                        "TBA"}
 
-              <td>
+                    </strong>
 
-                <div className="date-cell">
+                    {event.venue?.city && (
 
-                  <Calendar size={15} />
+                      <span>
 
-                  {new Date(
-                    event.startDate
-                  ).toLocaleDateString(
-                    "en-KE"
+                        {event.venue.city}
+
+                      </span>
+
+                    )}
+
+                  </div>
+
+                </td>
+
+                {/* REGISTRATIONS */}
+
+                <td>
+
+                  <div className="registration-cell">
+
+                    <div className="registration-count">
+
+                      <Users size={15} />
+
+                      <strong>
+
+                        {registered}
+
+                      </strong>
+
+                      {capacity > 0 && (
+
+                        <span>
+
+                          / {capacity}
+
+                        </span>
+
+                      )}
+
+                    </div>
+
+                    {capacity > 0 && (
+
+                      <div className="registration-progress">
+
+                        <div
+                          className="registration-progress-bar"
+                          style={{
+                            width: `${percentage}%`,
+                          }}
+                        />
+
+                      </div>
+
+                    )}
+
+                  </div>
+
+                </td>
+
+                {/* FEATURED */}
+
+                <td>
+
+                  {event.isFeatured ? (
+
+                    <Star
+                      size={18}
+                      fill="currentColor"
+                      className="featured-icon"
+                    />
+
+                  ) : (
+
+                    <span className="not-featured">
+                      —
+                    </span>
+
                   )}
 
-                </div>
+                </td>
 
-              </td>
+                {/* ACTIONS */}
 
-              <td>
-                {event.venue?.name ||
-                  "TBA"}
-              </td>
+                <td>
 
-              <td>
+                  <div className="table-actions">
 
-                <div className="registration-cell">
+                    <button
+                      className="view-btn"
+                      onClick={() =>
+                        onView(event)
+                      }
+                      title="View event"
+                    >
 
-                  <Users size={15} />
+                      <Eye size={17} />
 
-                  {event.registeredParticipants ||
-                    0}
+                    </button>
 
-                </div>
+                    <button
+                      className="edit-btn"
+                      onClick={() =>
+                        onEdit(event)
+                      }
+                      title="Edit event"
+                    >
 
-              </td>
+                      <Pencil size={17} />
 
-              <td>
+                    </button>
 
-                {event.isFeatured ? (
-                  <Star
-                    size={18}
-                    fill="gold"
-                    color="gold"
-                  />
-                ) : (
-                  "-"
-                )}
+                    <button
+                      className="delete-btn"
+                      onClick={() =>
+                        onDelete(event)
+                      }
+                      title="Delete event"
+                    >
 
-              </td>
+                      <Trash2 size={17} />
 
-              <td>
+                    </button>
 
-                <div className="table-actions">
+                  </div>
 
-                  <button
-                    className="view-btn"
-                    onClick={() =>
-                      onView(event)
-                    }
-                    title="View"
-                  >
-                    <Eye size={18} />
-                  </button>
+                </td>
 
-                  <button
-                    className="edit-btn"
-                    onClick={() =>
-                      onEdit(event)
-                    }
-                    title="Edit"
-                  >
-                    <Pencil size={18} />
-                  </button>
+              </tr>
 
-                  <button
-                    className="delete-btn"
-                    onClick={() =>
-                      onDelete(event)
-                    }
-                    title="Delete"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+            );
 
-                </div>
-
-              </td>
-
-            </tr>
-
-          ))}
+          })}
 
         </tbody>
 

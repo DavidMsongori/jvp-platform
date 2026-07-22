@@ -1,21 +1,4 @@
-import Leader from "../models/leader.model.js";
-
-/* ===========================================================
-   MEMBER POPULATE
-=========================================================== */
-
-const MEMBER_POPULATE = `
-  memberNumber
-  firstName
-  middleName
-  lastName
-  profilePhoto
-  county
-  constituency
-  ward
-  gender
-  membershipStatus
-`;
+import leaderService from "../services/leader.service.js";
 
 /* ===========================================================
    CREATE LEADER
@@ -23,37 +6,15 @@ const MEMBER_POPULATE = `
 
 export const createLeader = async (req, res, next) => {
   try {
-    const data = {
-      ...req.body,
-      createdBy: req.user?._id,
-      updatedBy: req.user?._id,
-    };
-
-    // Prevent duplicate active assignment
-    if (data.member) {
-      const exists = await Leader.findOne({
-        member: data.member,
-        isActive: true,
-      });
-
-      if (exists) {
-        return res.status(409).json({
-          success: false,
-          message:
-            "This member already has an active leadership assignment.",
-        });
-      }
-    }
-
-    const leader = await Leader.create(data);
-
-    const result = await Leader.findById(leader._id)
-      .populate("member", MEMBER_POPULATE);
+    const leader = await leaderService.createLeader(
+      req.body,
+      req.user?._id
+    );
 
     return res.status(201).json({
       success: true,
       message: "Leader assigned successfully.",
-      data: result,
+      data: leader,
     });
   } catch (error) {
     next(error);
@@ -66,36 +27,27 @@ export const createLeader = async (req, res, next) => {
 
 export const getLeaders = async (req, res, next) => {
   try {
-    const {
-      category,
-      county,
-      active = true,
-    } = req.query;
+    const leaders = await leaderService.getLeaders(req.query);
 
-    const filter = {};
+    return res.status(200).json({
+      success: true,
+      count: leaders.length,
+      data: leaders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    if (category) {
-      filter.category = category;
-    }
+/* ===========================================================
+   GET PUBLIC LEADERS
+=========================================================== */
 
-    if (county) {
-      filter.county = county;
-    }
+export const getPublicLeaders = async (req, res, next) => {
+  try {
+    const leaders = await leaderService.getPublicLeaders();
 
-    if (active !== undefined) {
-      filter.isActive = active === "true";
-    }
-
-    const leaders = await Leader.find(filter)
-      .populate("member", MEMBER_POPULATE)
-      .sort({
-        category: 1,
-        county: 1,
-        displayOrder: 1,
-        position: 1,
-      });
-
-    return res.json({
+    return res.status(200).json({
       success: true,
       count: leaders.length,
       data: leaders,
@@ -111,19 +63,39 @@ export const getLeaders = async (req, res, next) => {
 
 export const getLeader = async (req, res, next) => {
   try {
-    const leader = await Leader.findById(req.params.id)
-      .populate("member", MEMBER_POPULATE);
+    const leader = await leaderService.getLeaderById(
+      req.params.id
+    );
 
-    if (!leader) {
-      return res.status(404).json({
-        success: false,
-        message: "Leader not found.",
-      });
-    }
-
-    return res.json({
+    return res.status(200).json({
       success: true,
       data: leader,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ===========================================================
+   GET LEADERSHIP MEMBERS DASHBOARD
+=========================================================== */
+
+export const getLeadershipMembers = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const dashboard =
+      await leaderService.getLeadershipMembers(
+        req.user._id,
+        req.query
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Leadership dashboard retrieved successfully.",
+      data: dashboard,
     });
   } catch (error) {
     next(error);
@@ -136,28 +108,58 @@ export const getLeader = async (req, res, next) => {
 
 export const updateLeader = async (req, res, next) => {
   try {
-    const leader = await Leader.findById(req.params.id);
+    const leader = await leaderService.updateLeader(
+      req.params.id,
+      req.body,
+      req.user?._id
+    );
 
-    if (!leader) {
-      return res.status(404).json({
-        success: false,
-        message: "Leader not found.",
-      });
-    }
-
-    Object.assign(leader, req.body);
-
-    leader.updatedBy = req.user?._id;
-
-    await leader.save();
-
-    const result = await Leader.findById(leader._id)
-      .populate("member", MEMBER_POPULATE);
-
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: "Leader updated successfully.",
-      data: result,
+      data: leader,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ===========================================================
+   ACTIVATE LEADER
+=========================================================== */
+
+export const activateLeader = async (req, res, next) => {
+  try {
+    const leader = await leaderService.activateLeader(
+      req.params.id,
+      req.user?._id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Leader activated successfully.",
+      data: leader,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ===========================================================
+   DEACTIVATE LEADER
+=========================================================== */
+
+export const deactivateLeader = async (req, res, next) => {
+  try {
+    const leader = await leaderService.deactivateLeader(
+      req.params.id,
+      req.user?._id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Leader deactivated successfully.",
+      data: leader,
     });
   } catch (error) {
     next(error);
@@ -170,20 +172,33 @@ export const updateLeader = async (req, res, next) => {
 
 export const deleteLeader = async (req, res, next) => {
   try {
-    const leader = await Leader.findById(req.params.id);
+    await leaderService.deleteLeader(req.params.id);
 
-    if (!leader) {
-      return res.status(404).json({
-        success: false,
-        message: "Leader not found.",
-      });
-    }
-
-    await leader.deleteOne();
-
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: "Leader removed successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ===========================================================
+   LEADER STATISTICS
+=========================================================== */
+
+export const getLeaderStatistics = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const statistics =
+      await leaderService.getStatistics();
+
+    return res.status(200).json({
+      success: true,
+      data: statistics,
     });
   } catch (error) {
     next(error);

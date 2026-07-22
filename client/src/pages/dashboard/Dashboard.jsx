@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import WelcomeBanner from "../../components/dashboard/WelcomeBanner";
 import DashboardStats from "../../components/dashboard/DashboardStats";
 import MemberCardPreview from "../../components/dashboard/MemberCardPreview";
@@ -10,159 +8,154 @@ import RecentActivity from "../../components/dashboard/RecentActivity";
 import Notifications from "../../components/dashboard/Notifications";
 import News from "../../components/dashboard/News";
 
-import { getDashboard } from "../../services/member.service";
+/* ==========================================
+   LEADERSHIP
+========================================== */
+
+import LeadershipSnapshot from "../../components/leadership/LeadershipSnapshot";
+
+import { useDashboard } from "../../context/DashboardContext";
 
 import "./Dashboard.css";
 
 function Dashboard() {
-  const [dashboard, setDashboard] = useState(null);
+  /* ==========================================
+     DASHBOARD CONTEXT
+  ========================================== */
 
-  const [loading, setLoading] = useState(true);
+  const {
+    member,
+    leadership,
+    summary,
+    statistics,
+    events,
+    notifications,
+    news,
+    recentActivity,
+    loading,
+    error,
+  } = useDashboard();
 
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
-    try {
-      setLoading(true);
-
-      const response = await getDashboard();
-
-      setDashboard(response.data);
-
-    } catch (err) {
-
-      console.error(err);
-
-      setError(
-
-        err.response?.data?.message ||
-
-        "Unable to load dashboard."
-
-      );
-
-    } finally {
-
-      setLoading(false);
-
-    }
-  };
+  /* ==========================================
+     LOADING
+  ========================================== */
+console.log("Leadership in Dashboard:", leadership);
 
   if (loading) {
-
     return (
-
       <div className="member-dashboard">
 
         <div className="dashboard-loading">
 
-          <p>Loading dashboard...</p>
+          <p>
+            Loading dashboard...
+          </p>
 
         </div>
 
       </div>
-
     );
-
   }
 
+  /* ==========================================
+     ERROR
+  ========================================== */
+
   if (error) {
-
     return (
-
       <div className="member-dashboard">
 
         <div className="dashboard-empty">
 
-          <h3>Unable to Load Dashboard</h3>
+          <h3>
+            Unable to Load Dashboard
+          </h3>
 
-          <p>{error}</p>
+          <p>
+            {error}
+          </p>
 
         </div>
 
       </div>
-
     );
-
   }
 
-  const profile = dashboard?.profile || {};
+  /* ==========================================
+     PLACEHOLDERS
+     (Replace with services later)
+  ========================================== */
 
-  const statistics = dashboard?.statistics || {};
+  const recentPayments = [];
 
-  const upcomingEvents =
-    dashboard?.upcomingEvents || [];
-
-  const recentPayments =
-    dashboard?.recentPayments || [];
-
-  // Backend endpoints to be added later
-  const recentActivity =
-    dashboard?.recentActivity || [];
-
-  const notifications =
-    dashboard?.notifications || [];
-
-  const news =
-    dashboard?.news || [];
+  /* ==========================================
+     PAGE
+  ========================================== */
 
   return (
-
     <div className="member-dashboard">
 
-      {/* ==========================================
+      {/* ======================================
           WELCOME
-      ========================================== */}
+      ====================================== */}
 
       <WelcomeBanner
-        profile={profile}
+        member={member}
+        leadership={leadership}
       />
 
-      {/* ==========================================
-          STATS
-      ========================================== */}
+      {/* ======================================
+          LEADERSHIP WORKSPACE
+      ====================================== */}
+
+      {leadership?.isLeader && (
+    <LeadershipSnapshot />
+)}
+
+      {/* ======================================
+          DASHBOARD STATISTICS
+      ====================================== */}
 
       <DashboardStats
-        profile={profile}
         statistics={statistics}
+        summary={summary}
       />
 
-      {/* ==========================================
-          CARD + QUICK ACTIONS
-      ========================================== */}
+      {/* ======================================
+          MEMBERSHIP CARD + QUICK ACTIONS
+      ====================================== */}
 
       <div className="dashboard-grid">
 
         <div className="dashboard-grid-half">
 
           <MemberCardPreview
-            profile={profile}
+            member={member}
+            leadership={leadership}
           />
 
         </div>
 
         <div className="dashboard-grid-half">
 
-          <QuickActions />
+          <QuickActions
+            leadership={leadership}
+          />
 
         </div>
 
       </div>
 
-      {/* ==========================================
+      {/* ======================================
           EVENTS + PAYMENTS
-      ========================================== */}
+      ====================================== */}
 
       <div className="dashboard-grid">
 
         <div className="dashboard-grid-half">
 
           <UpcomingEvents
-            events={upcomingEvents}
+            events={events}
           />
 
         </div>
@@ -177,9 +170,9 @@ function Dashboard() {
 
       </div>
 
-      {/* ==========================================
-          ACTIVITY + NOTIFICATIONS
-      ========================================== */}
+      {/* ======================================
+          RECENT ACTIVITY + NOTIFICATIONS
+      ====================================== */}
 
       <div className="dashboard-grid">
 
@@ -201,16 +194,15 @@ function Dashboard() {
 
       </div>
 
-      {/* ==========================================
+      {/* ======================================
           NEWS
-      ========================================== */}
+      ====================================== */}
 
       <News
         news={news}
       />
 
     </div>
-
   );
 }
 

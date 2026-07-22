@@ -1,0 +1,251 @@
+/* =====================================================
+   HEADER
+===================================================== */
+
+.leadership-header {
+    height: 80px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 900;
+
+    box-shadow: 0 1px 8px rgba(15, 23, 42, 0.05);
+}
+
+/* =====================================================
+   LEFT
+===================================================== */
+
+.leadership-header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.leadership-header-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.leadership-header-title h1 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.leadership-header-title p {
+    margin: 6px 0 0;
+
+    color: #64748b;
+
+    font-size: 0.95rem;
+}
+
+/* =====================================================
+   SIDEBAR TOGGLE
+===================================================== */
+
+.sidebar-toggle-button {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    cursor: pointer;
+
+    font-size: 1.1rem;
+
+    color: #334155;
+
+    transition: all 0.25s ease;
+}
+
+.sidebar-toggle-button:hover {
+    background: #eff6ff;
+    color: #2563eb;
+
+    transform: translateY(-1px);
+}
+
+.sidebar-toggle-button:active {
+    transform: scale(0.96);
+}
+
+/* =====================================================
+   RIGHT
+===================================================== */
+
+.leadership-header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* =====================================================
+   NOTIFICATIONS
+===================================================== */
+
+.leadership-notification-button {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f8fafc;
+
+    cursor: pointer;
+
+    font-size: 1.1rem;
+
+    color: #334155;
+
+    transition: all 0.25s ease;
+}
+
+.leadership-notification-button:hover {
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    transform: translateY(-1px);
+}
+
+.notification-badge {
+    position: absolute;
+
+    top: 2px;
+    right: 2px;
+
+    min-width: 20px;
+    height: 20px;
+
+    padding: 0 5px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 999px;
+
+    background: #ef4444;
+
+    color: #ffffff;
+
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+/* =====================================================
+   USER
+===================================================== */
+
+.leadership-user {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.leadership-user img {
+    width: 48px;
+    height: 48px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 2px solid #e2e8f0;
+}
+
+.leadership-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.leadership-user strong {
+    color: #0f172a;
+
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.leadership-user small {
+    margin-top: 3px;
+
+    color: #64748b;
+
+    font-size: 0.8rem;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 992px) {
+
+    .leadership-header {
+        padding: 0 20px;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .leadership-header {
+        height: auto;
+
+        padding: 16px 20px;
+
+        flex-direction: column;
+        align-items: flex-start;
+
+        gap: 18px;
+    }
+
+    .leadership-header-left {
+        width: 100%;
+    }
+
+    .leadership-header-right {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+    .leadership-header-title h1 {
+        font-size: 1.3rem;
+    }
+
+    .leadership-header-title p {
+        font-size: 0.85rem;
+    }
+
+}

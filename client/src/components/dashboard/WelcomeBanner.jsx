@@ -4,18 +4,36 @@ import {
   FiMapPin,
   FiCreditCard,
   FiArrowRight,
+  FiShield,
 } from "react-icons/fi";
 
 import "./WelcomeBanner.css";
 
-function WelcomeBanner({ member }) {
+function WelcomeBanner({
+  member,
+  leadership,
+}) {
   if (!member) return null;
 
   const firstName =
     member.firstName || "Member";
 
+  const membershipNumber =
+    member.memberNumber ||
+    member.membershipNumber ||
+    "Pending Membership Number";
+
+  const profileCompletion =
+    member.profileCompleted ??
+    member.profileCompletion ??
+    0;
+
   return (
     <section className="welcome-banner">
+
+      {/* ======================================
+          LEFT
+      ======================================= */}
 
       <div className="welcome-banner-left">
 
@@ -43,8 +61,7 @@ function WelcomeBanner({ member }) {
             <FiCreditCard />
 
             <span>
-              {member.membershipNumber ||
-                "Pending Membership Number"}
+              {membershipNumber}
             </span>
 
           </div>
@@ -53,7 +70,9 @@ function WelcomeBanner({ member }) {
 
             <FiMapPin />
 
-            <span>{member.county}</span>
+            <span>
+              {member.county || "Not Set"}
+            </span>
 
           </div>
 
@@ -62,14 +81,31 @@ function WelcomeBanner({ member }) {
             <FiCheckCircle />
 
             <span>
-              {member.membershipStatus}
+              {member.membershipStatus ||
+                "Inactive"}
             </span>
 
           </div>
 
+          {leadership?.isLeader && (
+            <div className="meta-item leadership">
+
+              <FiShield />
+
+              <span>
+                {leadership.position}
+              </span>
+
+            </div>
+          )}
+
         </div>
 
       </div>
+
+      {/* ======================================
+          RIGHT
+      ======================================= */}
 
       <div className="welcome-banner-right">
 
@@ -82,7 +118,7 @@ function WelcomeBanner({ member }) {
           <div className="progress-circle">
 
             <span>
-              {member.profileCompletion || 72}%
+              {profileCompletion}%
             </span>
 
           </div>
@@ -99,7 +135,6 @@ function WelcomeBanner({ member }) {
             Complete Profile
 
             <FiArrowRight />
-
           </Link>
 
         </div>

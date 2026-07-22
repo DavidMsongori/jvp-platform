@@ -17,6 +17,8 @@ import AppError from "../utils/AppError.js";
 import * as otpService from "./otp.service.js";
 import * as emailService from "./email.service.js";
 
+import { calculateProfileCompletion } from "../utils/profileCompletion.js";
+
 import {
   generateToken,
   verifyToken,
@@ -153,18 +155,24 @@ export const register = async (data) => {
   try {
 
     const {
-      firstName,
-      middleName,
-      lastName,
-      gender,
-      dateOfBirth,
-      nationalId,
-      phone,
-      occupation,
-      county,
-      membershipType,
-      email,
-    } = data;
+  firstName,
+  middleName,
+  lastName,
+  gender,
+  dateOfBirth,
+  nationalId,
+  phone,
+  occupation,
+
+  county,
+  constituency,
+  ward,
+
+  disability,
+
+  membershipType,
+  email,
+} = data;
 
     const normalizedEmail =
       email.toLowerCase().trim();
@@ -278,15 +286,28 @@ export const register = async (data) => {
 
           phone,
 
-          occupation,
+         occupation,
 
-          county,
+county,
+constituency,
+ward,
+
+disability,
         },
       ],
 
       { session }
 
     );
+
+    /* ----------------------------------------
+   PROFILE COMPLETION
+---------------------------------------- */
+
+member.profileCompletion =
+  calculateProfileCompletion(member);
+
+await member.save({ session });
 
     /* ----------------------------------------
        GENERATE OTP
@@ -596,145 +617,225 @@ export const activateExistingMember = async (data) => {
 ========================================================== */
 
 export const verifyOTP = async (data) => {
+
   const session = await startTransaction();
 
   try {
+
     const {
       email,
       code,
       purpose = OTP_PURPOSE.ACCOUNT_ACTIVATION,
     } = data;
 
-    console.log("Incoming request body:", data);
-console.log("Email:", email);
-console.log("Code:", code);
+    /* ----------------------------------------
+       VALIDATE INPUT
+    ---------------------------------------- */
 
-    const normalizedEmail = email.toLowerCase().trim();
+    if (!email) {
 
-    console.log("========== VERIFY OTP ==========");
-    console.log("Email:", normalizedEmail);
-    console.log("Purpose:", purpose);
+      throw new AppError(
+        "Email address is required.",
+        400
+      );
+
+    }
+
+    if (!code) {
+
+      throw new AppError(
+        "Verification code is required.",
+        400
+      );
+
+    }
+
+    /* ----------------------------------------
+       NORMALIZE EMAIL
+    ---------------------------------------- */
+
+    const normalizedEmail =
+      email.toLowerCase().trim();
 
     /* ----------------------------------------
        FIND USER
     ---------------------------------------- */
 
     const user = await User.findOne({
+
       email: normalizedEmail,
+
     }).session(session);
 
     if (!user) {
+
       throw new AppError(
         "Account not found.",
         404
       );
-    }
 
-    console.log("✅ User found");
+    }
 
     /* ----------------------------------------
        VERIFY OTP
     ---------------------------------------- */
 
-    console.log("OTP entered by user:", code);
     await otpService.verifyOTP({
+
       user,
+
       purpose,
+
       code,
+
     });
 
-    console.log("✅ OTP verified");
+    /* ----------------------------------------
+       FIND MEMBER
+    ---------------------------------------- */
+
+    const member = await Member.findOne({
+
+      user: user._id,
+
+    }).session(session);
+
+    if (!member) {
+
+      throw new AppError(
+
+        "Member profile not found.",
+
+        404
+
+      );
+
+    }
 
     /* ----------------------------------------
        ACCOUNT ACTIVATION
     ---------------------------------------- */
 
-    if (purpose === OTP_PURPOSE.ACCOUNT_ACTIVATION) {
+    if (
+
+      purpose ===
+      OTP_PURPOSE.ACCOUNT_ACTIVATION
+
+    ) {
 
       user.emailVerified = true;
 
-      await user.save({ session });
+      await user.save({
 
-      console.log("✅ User email verified");
+        session,
 
-      const member = await Member.findOne({
-        user: user._id,
-      }).session(session);
-
-      if (!member) {
-        throw new AppError(
-          "Member profile not found.",
-          404
-        );
-      }
-
-      console.log("✅ Member found");
+      });
 
       member.accountActivated = true;
 
-      await member.save({ session });
+      await member.save({
 
-      console.log("✅ Member activated");
+        session,
 
-      await emailService.sendWelcomeEmail({
-        email: user.email,
-        firstName: member.firstName,
       });
 
-      console.log("✅ Welcome email sent");
     }
 
     /* ----------------------------------------
        LOG ACTIVITY
     ---------------------------------------- */
 
-   await logActivity({
-  user: user._id,
+    await logActivity({
 
-  action: ACTIVITY.AUTH.OTP_VERIFIED,
+      user: user._id,
 
-  module: ACTIVITY_MODULES.AUTH,
+      action:
+        ACTIVITY.AUTH.OTP_VERIFIED,
 
-  targetType: TARGET_TYPES.MEMBER,
+      module:
+        ACTIVITY_MODULES.AUTH,
 
-  targetId: member._id,
+      targetType:
+        TARGET_TYPES.MEMBER,
 
-  title: "OTP Verified",
+      targetId:
+        member._id,
 
-  description:
-    "Member successfully verified their OTP.",
+      title:
+        "OTP Verified",
 
-  status: "success",
+      description:
+        "Member successfully verified their OTP.",
 
-  session,
-});
+      status:
+        "success",
 
-    console.log("✅ Activity logged");
+      session,
+
+    });
 
     /* ----------------------------------------
-       COMMIT
+       COMMIT TRANSACTION
     ---------------------------------------- */
 
     await session.commitTransaction();
 
-    console.log("✅ Transaction committed");
-    console.log("========== OTP SUCCESS ==========");
+    /* ----------------------------------------
+       SEND WELCOME EMAIL
+       Only after successful commit
+    ---------------------------------------- */
+
+    if (
+
+      purpose ===
+      OTP_PURPOSE.ACCOUNT_ACTIVATION
+
+    ) {
+
+      await emailService.sendWelcomeEmail({
+
+        email:
+          user.email,
+
+        firstName:
+          member.firstName,
+
+      });
+
+    }
+
+    /* ----------------------------------------
+       RESPONSE
+    ---------------------------------------- */
 
     return {
+
       success: true,
+
       verified: true,
+
       nextStep:
-        purpose === OTP_PURPOSE.ACCOUNT_ACTIVATION
+
+        purpose ===
+        OTP_PURPOSE.ACCOUNT_ACTIVATION
+
           ? "create-password"
+
           : "reset-password",
+
     };
 
   } catch (error) {
 
-    console.error("❌ VERIFY OTP ERROR");
-    console.error(error);
+    if (
 
-    await session.abortTransaction();
+      session.inTransaction()
+
+    ) {
+
+      await session.abortTransaction();
+
+    }
 
     throw error;
 
@@ -743,6 +844,7 @@ console.log("Code:", code);
     await session.endSession();
 
   }
+
 };
 
 /* ==========================================================
