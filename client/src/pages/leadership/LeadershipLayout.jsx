@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 
 import { useDashboard } from "../../context/DashboardContext";
 
@@ -9,6 +17,8 @@ import LeadershipHeader from "../../components/leadership/header/LeadershipHeade
 import "./LeadershipLayout.css";
 
 function LeadershipLayout() {
+  const location = useLocation();
+
   const {
     loading,
     isLeader,
@@ -18,7 +28,58 @@ function LeadershipLayout() {
     category,
   } = useDashboard();
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [
+    collapsed,
+    setCollapsed,
+  ] = useState(false);
+
+  const [
+    mobileOpen,
+    setMobileOpen,
+  ] = useState(false);
+
+  /* ==========================================
+     CLOSE MOBILE SIDEBAR AFTER NAVIGATION
+  ========================================== */
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  /* ==========================================
+     PREVENT BODY SCROLL WHEN SIDEBAR IS OPEN
+  ========================================== */
+
+  useEffect(() => {
+    if (!mobileOpen) {
+      document.body.style.overflow = "";
+
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  /* ==========================================
+     SIDEBAR TOGGLE
+
+     Mobile: open/close drawer
+     Desktop: collapse/expand sidebar
+  ========================================== */
+
+  const handleSidebarToggle = () => {
+    if (window.innerWidth <= 768) {
+      setMobileOpen((current) => !current);
+
+      return;
+    }
+
+    setCollapsed((current) => !current);
+  };
 
   /* ==========================================
      LOADING
@@ -37,7 +98,12 @@ function LeadershipLayout() {
   ========================================== */
 
   if (!isLeader) {
-    return <Navigate to="/dashboard" replace />;
+    return (
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+    );
   }
 
   /* ==========================================
@@ -47,22 +113,52 @@ function LeadershipLayout() {
   return (
     <div
       className={`leadership-layout ${
-        collapsed ? "collapsed" : ""
+        collapsed
+          ? "collapsed"
+          : ""
       }`}
     >
+      {/* ======================================
+          MOBILE OVERLAY
+      ====================================== */}
+
+      {mobileOpen && (
+        <button
+          type="button"
+          className="leadership-sidebar-overlay"
+          onClick={() =>
+            setMobileOpen(false)
+          }
+          aria-label="Close leadership navigation"
+        />
+      )}
+
+      {/* ======================================
+          SIDEBAR
+      ====================================== */}
+
       <LeadershipSidebar
         collapsed={collapsed}
-        setCollapsed={setCollapsed}
+        mobileOpen={mobileOpen}
+        onClose={() =>
+          setMobileOpen(false)
+        }
         leadership={leadership}
         leaderId={leaderId}
         position={position}
         category={category}
       />
 
+      {/* ======================================
+          MAIN
+      ====================================== */}
+
       <div className="leadership-main">
         <LeadershipHeader
           collapsed={collapsed}
-          setCollapsed={setCollapsed}
+          setCollapsed={
+            handleSidebarToggle
+          }
           leadership={leadership}
           leaderId={leaderId}
           position={position}

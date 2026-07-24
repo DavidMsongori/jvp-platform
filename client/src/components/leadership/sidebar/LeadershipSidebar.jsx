@@ -1,4 +1,7 @@
-import { NavLink } from "react-router-dom";
+import {
+  NavLink,
+} from "react-router-dom";
+
 import {
   FaHome,
   FaIdCard,
@@ -10,13 +13,15 @@ import {
   FaSitemap,
   FaChartBar,
   FaCog,
+  FaTimes,
 } from "react-icons/fa";
 
 import "./LeadershipSidebar.css";
 
 function LeadershipSidebar({
   collapsed = false,
-  leadership,
+  mobileOpen = false,
+  onClose,
   position,
   category,
 }) {
@@ -76,53 +81,83 @@ function LeadershipSidebar({
 
   return (
     <aside
-      className={
+      className={[
+        "leadership-sidebar",
         collapsed
-          ? "leadership-sidebar collapsed"
-          : "leadership-sidebar"
-      }
+          ? "collapsed"
+          : "",
+        mobileOpen
+          ? "mobile-open"
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-label="Leadership workspace navigation"
     >
-      {/* ==========================================
+      {/* ======================================
+          MOBILE CLOSE BUTTON
+      ====================================== */}
+
+      <button
+        type="button"
+        className="leadership-mobile-close"
+        onClick={onClose}
+        aria-label="Close leadership navigation"
+      >
+        <FaTimes />
+      </button>
+
+      {/* ======================================
           BRAND
-      ========================================== */}
+      ====================================== */}
 
       <div className="leadership-sidebar-brand">
         {!collapsed ? (
           <>
             <h2>Leadership</h2>
-            <span>Workspace</span>
+
+            <span>
+              Workspace
+            </span>
           </>
         ) : (
           <h2>LW</h2>
         )}
       </div>
 
-      {/* ==========================================
+      {/* ======================================
           PROFILE
-      ========================================== */}
+      ====================================== */}
 
       <div className="leadership-profile">
         <div className="leadership-avatar">
-          {position?.charAt(0)?.toUpperCase() || "L"}
+          {position
+            ?.charAt(0)
+            ?.toUpperCase() || "L"}
         </div>
 
         {!collapsed && (
           <div className="leadership-profile-info">
-            <h4>{position || "Leader"}</h4>
+            <h4>
+              {position || "Leader"}
+            </h4>
 
             <p>
               {category
                 ?.replace(/_/g, " ")
-                ?.replace(/\b\w/g, (c) => c.toUpperCase()) ||
-                "Leadership"}
+                ?.replace(
+                  /\b\w/g,
+                  (character) =>
+                    character.toUpperCase()
+                ) || "Leadership"}
             </p>
           </div>
         )}
       </div>
 
-      {/* ==========================================
+      {/* ======================================
           NAVIGATION
-      ========================================== */}
+      ====================================== */}
 
       <nav className="leadership-nav">
         {menuItems.map((item) => (
@@ -130,7 +165,10 @@ function LeadershipSidebar({
             key={item.path}
             to={item.path}
             end={item.end}
-            className={({ isActive }) =>
+            onClick={onClose}
+            className={({
+              isActive,
+            }) =>
               isActive
                 ? "leadership-nav-link active"
                 : "leadership-nav-link"
@@ -141,7 +179,9 @@ function LeadershipSidebar({
             </span>
 
             {!collapsed && (
-              <span>{item.name}</span>
+              <span>
+                {item.name}
+              </span>
             )}
           </NavLink>
         ))}
