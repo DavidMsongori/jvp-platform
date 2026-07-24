@@ -5,12 +5,16 @@ import api from "./api";
 ========================================================== */
 
 const getPublicLeaders = async () => {
+  console.log("PUBLIC LEADERS ENDPOINT CALLED");
+
   const response = await api.get("/leaders/public");
+
   return response.data;
 };
 
 const getLeader = async (leaderId) => {
   const response = await api.get(`/leaders/${leaderId}`);
+
   return response.data;
 };
 

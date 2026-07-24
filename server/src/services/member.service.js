@@ -757,22 +757,19 @@ export const searchMembers = async (query = "") => {
   })
 
     .select({
+  memberNumber: 1,
 
-      memberNumber: 1,
+  firstName: 1,
+  middleName: 1,
+  lastName: 1,
 
-      firstName: 1,
+  county: 1,
+  constituency: 1,
+  ward: 1,
 
-      middleName: 1,
-
-      lastName: 1,
-
-      county: 1,
-
-      profilePhoto: 1,
-
-      membershipStatus: 1,
-
-    })
+  profilePhoto: 1,
+  membershipStatus: 1,
+})
 
     .sort({
 

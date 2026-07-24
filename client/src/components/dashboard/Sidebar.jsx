@@ -8,21 +8,29 @@ import {
   Settings,
   LogOut,
   Shield,
+  X,
 } from "lucide-react";
 
-import { NavLink } from "react-router-dom";
+import {
+  NavLink,
+} from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { useDashboard } from "../../context/DashboardContext";
 
 import "./Sidebar.css";
 
-const Sidebar = () => {
+const Sidebar = ({
+  open = false,
+  onClose,
+}) => {
   /* ==========================================
      CONTEXT
   ========================================== */
 
-  const { logout } = useAuth();
+  const {
+    logout,
+  } = useAuth();
 
   const {
     leadership,
@@ -78,26 +86,72 @@ const Sidebar = () => {
     menu.splice(3, 0, {
       name: "Leadership",
       icon: Shield,
-      path: "/workspace/leadership"
+      path: "/workspace/leadership",
     });
   }
+
+  /* ==========================================
+     LOGOUT
+  ========================================== */
+
+  const handleLogout = async () => {
+    onClose?.();
+
+    await logout();
+  };
 
   /* ==========================================
      COMPONENT
   ========================================== */
 
   return (
-    <aside className="member-sidebar">
+    <aside
+      className={`member-sidebar ${
+        open ? "mobile-open" : ""
+      }`}
+      aria-label="Member dashboard navigation"
+    >
+
+      {/* ======================================
+          MOBILE CLOSE BUTTON
+      ====================================== */}
+
+      <button
+        type="button"
+        className="sidebar-mobile-close"
+        onClick={onClose}
+        aria-label="Close dashboard navigation"
+      >
+        <X size={24} />
+      </button>
+
+      {/* ======================================
+          LOGO
+      ====================================== */}
+
       <div className="sidebar-logo">
+
         <img
           src="/logo.png"
           alt="JVP Connect"
         />
 
-        <h3>JVP Connect</h3>
+        <div>
+          <h3>JVP Connect</h3>
+
+          <span>
+            Member Dashboard
+          </span>
+        </div>
+
       </div>
 
+      {/* ======================================
+          MENU
+      ====================================== */}
+
       <nav>
+
         {menu.map((item) => {
           const Icon = item.icon;
 
@@ -105,8 +159,14 @@ const Sidebar = () => {
             <NavLink
               key={item.path}
               to={item.path}
-              end={item.path === "/dashboard"}
-              className={({ isActive }) =>
+              end={
+                item.path ===
+                "/dashboard"
+              }
+              onClick={onClose}
+              className={({
+                isActive,
+              }) =>
                 isActive
                   ? "sidebar-link active"
                   : "sidebar-link"
@@ -114,20 +174,31 @@ const Sidebar = () => {
             >
               <Icon size={20} />
 
-              <span>{item.name}</span>
+              <span>
+                {item.name}
+              </span>
             </NavLink>
           );
         })}
+
       </nav>
 
+      {/* ======================================
+          LOGOUT
+      ====================================== */}
+
       <button
+        type="button"
         className="logout-btn"
-        onClick={logout}
+        onClick={handleLogout}
       >
         <LogOut size={18} />
 
-        <span>Logout</span>
+        <span>
+          Logout
+        </span>
       </button>
+
     </aside>
   );
 };

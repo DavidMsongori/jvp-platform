@@ -10,6 +10,7 @@ import PatronSection from "./components/PatronSection";
 import ExecutiveSection from "./components/ExecutiveSection";
 import AssemblySection from "./components/AssemblySection";
 import CountyLeadershipSection from "./components/CountyLeadershipSection";
+import CouncilGovernors from "./components/CouncilGovernors";
 
 import leaderService from "../../services/leader.service";
 
@@ -19,33 +20,59 @@ export default function Leadership() {
   const [error, setError] = useState("");
 
   /* ==========================================================
-     LOAD LEADERS
+     LOAD PUBLIC LEADERSHIP
   ========================================================== */
 
   useEffect(() => {
-    const loadLeadership = async () => {
+    let isMounted = true;
+
+    const loadPublicLeadership = async () => {
       try {
         setLoading(true);
+        setError("");
+
+        /*
+         * PUBLIC ENDPOINT ONLY
+         *
+         * GET /api/leaders/public
+         *
+         * NEVER use getLeaders() here.
+         */
 
         const response =
-          await leaderService.getLeaders({
-            active: true,
-          });
+          await leaderService.getPublicLeaders();
 
-        setLeaders(response.data || []);
+        if (!isMounted) return;
+
+        setLeaders(
+          Array.isArray(response?.data)
+            ? response.data
+            : []
+        );
       } catch (err) {
-        console.error(err);
+        console.error(
+          "Failed to load public leadership:",
+          err
+        );
+
+        if (!isMounted) return;
 
         setError(
           err.response?.data?.message ||
             "Unable to load leadership."
         );
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    loadLeadership();
+    loadPublicLeadership();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   /* ==========================================================
@@ -76,6 +103,22 @@ export default function Leadership() {
         ),
     [leaders]
   );
+
+  const councilOfGovernors = useMemo(
+  () =>
+    leaders
+      .filter(
+        (leader) =>
+          leader.category ===
+          "council_of_governors"
+      )
+      .sort(
+        (a, b) =>
+          (a.displayOrder || 0) -
+          (b.displayOrder || 0)
+      ),
+  [leaders]
+);
 
   const assembly = useMemo(
     () =>
@@ -112,6 +155,14 @@ export default function Leadership() {
 
         grouped[county].push(leader);
       });
+
+    Object.keys(grouped).forEach((county) => {
+      grouped[county].sort(
+        (a, b) =>
+          (a.displayOrder || 0) -
+          (b.displayOrder || 0)
+      );
+    });
 
     return grouped;
   }, [leaders]);
@@ -150,14 +201,16 @@ export default function Leadership() {
               leaders={executive}
             />
 
+            <CouncilGovernors
+  leaders={councilOfGovernors}
+/>
+
             <AssemblySection
               leaders={assembly}
             />
 
             <CountyLeadershipSection
-              counties={
-                countyLeadership
-              }
+              counties={countyLeadership}
             />
           </>
         )}

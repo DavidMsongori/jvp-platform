@@ -513,12 +513,20 @@ export const getAllEvents = async (query = {}) => {
     sort = "-startDate",
   } = query;
 
+  /* ===========================================================
+     BASE FILTER
+     Soft-deleted events are never returned.
+  =========================================================== */
+
   const filter = {
+    isDeleted: {
+      $ne: true,
+    },
   };
 
-  /* --------------------------
+  /* ===========================================================
      SEARCH
-  -------------------------- */
+  =========================================================== */
 
   if (search) {
     filter.$or = [
@@ -543,9 +551,9 @@ export const getAllEvents = async (query = {}) => {
     ];
   }
 
-  /* --------------------------
+  /* ===========================================================
      FILTERS
-  -------------------------- */
+  =========================================================== */
 
   if (category) {
     filter.category = category;
@@ -556,45 +564,56 @@ export const getAllEvents = async (query = {}) => {
   }
 
   if (
-  featured !== undefined &&
-  featured !== null &&
-  featured !== ""
-) {
-  filter.featured = featured === "true";
-}
+    featured !== undefined &&
+    featured !== null &&
+    featured !== ""
+  ) {
+    filter.isFeatured =
+      featured === "true";
+  }
 
-  if (published !== undefined) {
+  if (
+    published !== undefined &&
+    published !== null &&
+    published !== ""
+  ) {
     filter.isPublished =
       published === "true";
   }
 
   if (county) {
-    filter["venue.county"] =
-      county;
+    filter["venue.county"] = county;
   }
 
+  /* ===========================================================
+     PAGINATION
+  =========================================================== */
+
   const currentPage = Math.max(
-    Number(page),
+    Number(page) || 1,
     1
   );
 
   const pageSize = Math.max(
-    Number(limit),
+    Number(limit) || 10,
     1
   );
 
   const skip =
     (currentPage - 1) * pageSize;
 
-  console.log("FILTER:", filter);
+  /* ===========================================================
+     DEBUGGING
+  =========================================================== */
 
-const totalEvents = await Event.countDocuments({});
-console.log("TOTAL EVENTS:", totalEvents);
+  console.log(
+    "EVENT FILTER:",
+    filter
+  );
 
-const publishedEvents = await Event.countDocuments({
-    isPublished: true,
-});
-console.log("PUBLISHED EVENTS:", publishedEvents);  
+  /* ===========================================================
+     FETCH EVENTS + TOTAL
+  =========================================================== */
 
   const [events, total] =
     await Promise.all([
@@ -609,6 +628,10 @@ console.log("PUBLISHED EVENTS:", publishedEvents);
 
       Event.countDocuments(filter),
     ]);
+
+  /* ===========================================================
+     RESPONSE
+  =========================================================== */
 
   return {
     events,
