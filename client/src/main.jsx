@@ -17,6 +17,21 @@ import { EventProvider } from "./context/EventContext";
 import { LeaderProvider } from "./context/LeaderContext";
 import { LeadershipDashboardProvider } from "./context/LeadershipDashboardContext";
 
+/* ==========================================
+   GLOBAL PROFILE IMAGE FALLBACK
+========================================== */
+
+import {
+  installProfileImageFallback,
+} from "./utils/installProfileImageFallback";
+
+
+/* ==========================================
+   INSTALL GLOBAL IMAGE FALLBACK
+========================================== */
+
+installProfileImageFallback();
+
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(

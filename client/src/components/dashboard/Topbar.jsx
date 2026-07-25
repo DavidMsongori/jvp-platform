@@ -177,19 +177,21 @@ const Topbar = () => {
             }
           >
             <img
-              src={
-                profilePhoto ||
-                "/images/default-avatar.png"
-              }
-              alt={
-                fullName ||
-                "Member"
-              }
-              onError={(event) => {
-                event.target.src =
-                  "/images/default-avatar.png";
-              }}
-            />
+  src={
+    profilePhoto ||
+    "/images/default-avatar.png"
+  }
+  alt={
+    fullName ||
+    "Member"
+  }
+  onError={(event) => {
+    event.currentTarget.onerror = null;
+
+    event.currentTarget.src =
+      "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23eef2f7'/%3E%3Ccircle cx='80' cy='61' r='28' fill='%2394a3b8'/%3E%3Cpath d='M34 139c4-28 22-43 46-43s42 15 46 43' fill='%2394a3b8'/%3E%3C/svg%3E";
+  }}
+/>
 
             <span>
               {fullName || "Member"}
