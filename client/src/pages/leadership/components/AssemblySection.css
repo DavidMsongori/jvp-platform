@@ -3,7 +3,7 @@
 ========================================================== */
 
 .assembly-section {
-  padding: 90px 0;
+  padding: 72px 0;
 
   background: #f8fafc;
 }
@@ -15,7 +15,9 @@
 .assembly-header {
   max-width: 760px;
 
-  margin: 0 auto 60px;
+  margin: 0 auto 44px;
+
+  padding: 0 16px;
 
   text-align: center;
 }
@@ -23,7 +25,7 @@
 .assembly-header .section-tag {
   display: inline-block;
 
-  padding: 8px 18px;
+  padding: 7px 16px;
 
   border-radius: 999px;
 
@@ -31,29 +33,35 @@
 
   color: #004b8d;
 
-  font-size: .82rem;
-
+  font-size: 0.78rem;
   font-weight: 700;
 
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
 
   text-transform: uppercase;
 }
 
 .assembly-header h2 {
-  margin: 18px 0 16px;
-
-  font-size: 2.6rem;
+  margin: 16px 0 14px;
 
   color: #0f172a;
+
+  font-size: clamp(
+    2rem,
+    4vw,
+    2.6rem
+  );
+
+  line-height: 1.15;
 }
 
 .assembly-header p {
+  margin: 0;
+
   color: #64748b;
 
-  font-size: 1.05rem;
-
-  line-height: 1.9;
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
 /* ==========================================================
@@ -61,94 +69,242 @@
 ========================================================== */
 
 .assembly-grid {
+  width: 100%;
+
   display: grid;
 
   grid-template-columns:
     repeat(
-      auto-fit,
-      minmax(270px, 1fr)
+      5,
+      minmax(0, 1fr)
     );
 
-  gap: 32px;
+  gap: 18px;
 
   align-items: stretch;
 }
 
 /* ==========================================================
-   LARGE DESKTOP
+   CARD SIZE
+========================================================== */
+
+.assembly-grid > * {
+  width: 100%;
+  min-width: 0;
+
+  overflow: hidden;
+}
+
+/* ==========================================================
+   CARD IMAGE
+========================================================== */
+
+.assembly-grid img {
+  width: 100%;
+  height: 210px;
+
+  display: block;
+
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* ==========================================================
+   CARD CONTENT
+========================================================== */
+
+.assembly-grid h3,
+.assembly-grid h4 {
+  margin-top: 12px;
+
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.assembly-grid p {
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+/* Reduce card internal spacing */
+
+.assembly-grid .leader-card-content,
+.assembly-grid .leader-card-body {
+  padding: 16px;
+}
+
+/* Smaller category badge */
+
+.assembly-grid .leader-card-badge,
+.assembly-grid .leader-category,
+.assembly-grid .leader-card-tag {
+  padding: 6px 12px;
+
+  font-size: 0.7rem;
+}
+
+/* ==========================================================
+   LARGE DESKTOP — 6 CARDS
 ========================================================== */
 
 @media (min-width: 1400px) {
 
   .assembly-grid {
-
     grid-template-columns:
-      repeat(4, 1fr);
+      repeat(
+        6,
+        minmax(0, 1fr)
+      );
 
+    gap: 16px;
+  }
+
+  .assembly-grid img {
+    height: 195px;
+  }
+
+  .assembly-grid h3,
+  .assembly-grid h4 {
+    font-size: 0.95rem;
   }
 
 }
 
 /* ==========================================================
-   TABLET
+   SMALL DESKTOP — 4 CARDS
 ========================================================== */
 
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
+
+  .assembly-grid {
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      );
+
+    gap: 18px;
+  }
+
+  .assembly-grid img {
+    height: 220px;
+  }
+
+}
+
+/* ==========================================================
+   TABLET — 3 CARDS
+========================================================== */
+
+@media (max-width: 900px) {
 
   .assembly-section {
-
-    padding: 70px 0;
-
+    padding: 64px 0;
   }
 
   .assembly-grid {
-
     grid-template-columns:
       repeat(
-        auto-fit,
-        minmax(240px, 1fr)
+        3,
+        minmax(0, 1fr)
       );
 
-    gap: 24px;
+    gap: 16px;
+  }
 
+  .assembly-grid img {
+    height: 210px;
   }
 
 }
 
 /* ==========================================================
-   MOBILE
+   MOBILE — 2 CARDS
 ========================================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
 
   .assembly-section {
-
-    padding: 60px 0;
-
+    padding: 52px 0;
   }
 
   .assembly-header {
+    margin-bottom: 32px;
 
-    margin-bottom: 40px;
-
+    padding: 0 12px;
   }
 
   .assembly-header h2 {
-
-    font-size: 2rem;
-
+    font-size: 1.8rem;
   }
 
   .assembly-header p {
-
-    font-size: 1rem;
-
+    font-size: 0.92rem;
+    line-height: 1.65;
   }
 
   .assembly-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
 
-    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 
+  .assembly-grid img {
+    height: 175px;
+  }
+
+  .assembly-grid .leader-card-content,
+  .assembly-grid .leader-card-body {
+    padding: 12px;
+  }
+
+  .assembly-grid h3,
+  .assembly-grid h4 {
+    margin-top: 9px;
+
+    font-size: 0.88rem;
+  }
+
+  .assembly-grid p {
+    font-size: 0.76rem;
+  }
+
+  .assembly-grid .leader-card-badge,
+  .assembly-grid .leader-category,
+  .assembly-grid .leader-card-tag {
+    padding: 5px 9px;
+
+    font-size: 0.62rem;
+  }
+
+}
+
+/* ==========================================================
+   VERY SMALL PHONES
+========================================================== */
+
+@media (max-width: 380px) {
+
+  .assembly-grid {
+    gap: 9px;
+  }
+
+  .assembly-grid img {
+    height: 155px;
+  }
+
+  .assembly-grid .leader-card-content,
+  .assembly-grid .leader-card-body {
+    padding: 10px;
+  }
+
+  .assembly-grid h3,
+  .assembly-grid h4 {
+    font-size: 0.8rem;
   }
 
 }

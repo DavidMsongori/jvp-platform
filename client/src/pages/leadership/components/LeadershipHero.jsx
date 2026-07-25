@@ -35,7 +35,7 @@ export default function LeadershipHero() {
 
             <div>
 
-              <strong>40+</strong>
+              <strong>200+</strong>
 
               <span>Leaders</span>
 
