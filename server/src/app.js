@@ -16,6 +16,7 @@ import healthRoutes from "./routes/health.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 import leaderRoutes from "./routes/leader.routes.js";
 import leadershipCardRoutes from "./routes/leadershipCard.routes.js";
+import meetingRoutes from "./routes/meeting.routes.js";
 
 const app = express();
 
@@ -128,6 +129,11 @@ app.use("/api/events", eventRoutes);
 app.use("/api/leaders", leaderRoutes);
 
 app.use("/api/leadership-card", leadershipCardRoutes);
+
+app.use(
+  "/api/meetings",
+  meetingRoutes
+);
 
 /* ==========================================================
    404

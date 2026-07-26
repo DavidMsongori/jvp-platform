@@ -1,0 +1,1077 @@
+/* ==========================================================
+   LEADERSHIP MEETING PAGE
+========================================================== */
+
+.leadership-meeting-page {
+  --meeting-primary: #0b5d3b;
+  --meeting-primary-dark: #073d29;
+  --meeting-primary-soft: #eaf5ef;
+  --meeting-secondary: #dd9b23;
+  --meeting-danger: #b42318;
+  --meeting-warning: #9a6700;
+  --meeting-success: #147a4a;
+  --meeting-text: #18251f;
+  --meeting-muted: #68746e;
+  --meeting-border: #dce4df;
+  --meeting-surface: #ffffff;
+  --meeting-background: #f4f7f5;
+  --meeting-shadow:
+    0 18px 50px rgba(14, 48, 33, 0.1);
+
+  min-height: 100vh;
+  padding: 28px;
+  color: var(--meeting-text);
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(221, 155, 35, 0.09),
+      transparent 30%
+    ),
+    var(--meeting-background);
+}
+
+.leadership-meeting-page *,
+.leadership-meeting-page *::before,
+.leadership-meeting-page *::after {
+  box-sizing: border-box;
+}
+
+.leadership-meeting-page button,
+.leadership-meeting-page input,
+.leadership-meeting-page select,
+.leadership-meeting-page textarea {
+  font: inherit;
+}
+
+/* ==========================================================
+   HERO
+========================================================== */
+
+.leadership-meeting-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  max-width: 1500px;
+  margin: 0 auto 24px;
+  padding: 34px;
+  overflow: hidden;
+  border-radius: 22px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      120deg,
+      rgba(7, 61, 41, 0.98),
+      rgba(11, 93, 59, 0.94)
+    );
+  box-shadow: var(--meeting-shadow);
+}
+
+.leadership-meeting-hero__content {
+  max-width: 760px;
+}
+
+.leadership-meeting-eyebrow {
+  margin: 0 0 8px;
+  color: #f5ca70;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.leadership-meeting-hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.05;
+}
+
+.leadership-meeting-hero p:not(
+    .leadership-meeting-eyebrow
+  ) {
+  max-width: 680px;
+  margin: 14px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.leadership-meeting-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ==========================================================
+   ALERTS
+========================================================== */
+
+.leadership-meeting-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1500px;
+  margin: 0 auto 18px;
+  padding: 14px 17px;
+  border: 1px solid;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.leadership-meeting-alert button {
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.leadership-meeting-alert--error {
+  border-color: #f1b7b1;
+  color: #8d1d14;
+  background: #fff1ef;
+}
+
+.leadership-meeting-alert--success {
+  border-color: #a9d9bd;
+  color: #11663e;
+  background: #edf9f2;
+}
+
+/* ==========================================================
+   STATISTICS
+========================================================== */
+
+.leadership-meeting-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 1500px;
+  margin: 0 auto 24px;
+}
+
+.leadership-meeting-stat-card {
+  position: relative;
+  min-height: 142px;
+  padding: 22px;
+  overflow: hidden;
+  border: 1px solid var(--meeting-border);
+  border-radius: 17px;
+  background: var(--meeting-surface);
+  box-shadow:
+    0 7px 24px rgba(19, 53, 37, 0.055);
+}
+
+.leadership-meeting-stat-card::after {
+  position: absolute;
+  right: -25px;
+  bottom: -35px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--meeting-primary-soft);
+  content: "";
+}
+
+.leadership-meeting-stat-card span,
+.leadership-meeting-stat-card small {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.leadership-meeting-stat-card span {
+  color: var(--meeting-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+}
+
+.leadership-meeting-stat-card strong {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin: 10px 0 4px;
+  color: var(--meeting-primary-dark);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.leadership-meeting-stat-card small {
+  color: var(--meeting-muted);
+}
+
+.leadership-meeting-stat-card--live {
+  border-color: rgba(180, 35, 24, 0.25);
+}
+
+.leadership-meeting-stat-card--live::before {
+  position: absolute;
+  top: 21px;
+  right: 21px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--meeting-danger);
+  box-shadow:
+    0 0 0 7px rgba(180, 35, 24, 0.1);
+  content: "";
+}
+
+/* ==========================================================
+   MAIN PANEL
+========================================================== */
+
+.leadership-meeting-panel {
+  max-width: 1500px;
+  margin: 0 auto;
+  border: 1px solid var(--meeting-border);
+  border-radius: 20px;
+  background: var(--meeting-surface);
+  box-shadow:
+    0 8px 30px rgba(18, 47, 34, 0.06);
+}
+
+.leadership-meeting-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px 26px 18px;
+}
+
+.leadership-meeting-panel__header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.leadership-meeting-panel__header p {
+  margin: 7px 0 0;
+  color: var(--meeting-muted);
+  line-height: 1.55;
+}
+
+.leadership-meeting-result-count {
+  flex: 0 0 auto;
+  padding: 8px 13px;
+  border-radius: 999px;
+  color: var(--meeting-primary);
+  background: var(--meeting-primary-soft);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+/* ==========================================================
+   FILTERS
+========================================================== */
+
+.leadership-meeting-filters {
+  display: grid;
+  grid-template-columns:
+    minmax(230px, 2fr)
+    repeat(4, minmax(130px, 1fr))
+    auto;
+  gap: 10px;
+  padding: 0 26px 22px;
+}
+
+.leadership-meeting-filters input,
+.leadership-meeting-filters select,
+.leadership-meeting-form input,
+.leadership-meeting-form select,
+.leadership-meeting-form textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid var(--meeting-border);
+  border-radius: 10px;
+  outline: none;
+  color: var(--meeting-text);
+  background: #ffffff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.leadership-meeting-filters input:focus,
+.leadership-meeting-filters select:focus,
+.leadership-meeting-form input:focus,
+.leadership-meeting-form select:focus,
+.leadership-meeting-form textarea:focus {
+  border-color: var(--meeting-primary);
+  box-shadow:
+    0 0 0 3px rgba(11, 93, 59, 0.12);
+}
+
+.leadership-meeting-search {
+  position: relative;
+}
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.leadership-meeting-button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 15px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-weight: 750;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease,
+    opacity 0.16s ease;
+}
+
+.leadership-meeting-button:hover:not(
+    :disabled
+  ) {
+  transform: translateY(-1px);
+}
+
+.leadership-meeting-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.leadership-meeting-button--primary {
+  color: #ffffff;
+  background: var(--meeting-primary);
+  box-shadow:
+    0 5px 15px rgba(11, 93, 59, 0.2);
+}
+
+.leadership-meeting-button--primary:hover:not(
+    :disabled
+  ) {
+  background: var(--meeting-primary-dark);
+}
+
+.leadership-meeting-button--secondary {
+  border-color: var(--meeting-border);
+  color: var(--meeting-text);
+  background: #ffffff;
+}
+
+.leadership-meeting-button--success {
+  color: #ffffff;
+  background: var(--meeting-success);
+}
+
+.leadership-meeting-button--danger {
+  color: #ffffff;
+  background: var(--meeting-danger);
+}
+
+.leadership-meeting-button--warning {
+  border-color: #ecd398;
+  color: #7b5100;
+  background: #fff8e5;
+}
+
+.leadership-meeting-button--danger-outline {
+  border-color: #e5b4b0;
+  color: var(--meeting-danger);
+  background: #ffffff;
+}
+
+.leadership-meeting-button--light {
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.leadership-meeting-button--hero {
+  color: var(--meeting-primary-dark);
+  background: #f4c75d;
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.leadership-meeting-table-wrapper {
+  overflow-x: auto;
+  border-top: 1px solid var(--meeting-border);
+}
+
+.leadership-meeting-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+}
+
+.leadership-meeting-table th,
+.leadership-meeting-table td {
+  padding: 17px 20px;
+  border-bottom: 1px solid #edf1ee;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.leadership-meeting-table th {
+  color: var(--meeting-muted);
+  background: #f9fbfa;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.leadership-meeting-table tbody tr {
+  transition: background 0.17s ease;
+}
+
+.leadership-meeting-table tbody tr:hover {
+  background: #fbfdfc;
+}
+
+.leadership-meeting-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.leadership-meeting-title-button {
+  padding: 0;
+  border: 0;
+  color: var(--meeting-primary-dark);
+  background: transparent;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.leadership-meeting-title-button:hover {
+  color: var(--meeting-primary);
+  text-decoration: underline;
+}
+
+.leadership-meeting-number,
+.leadership-meeting-type,
+.leadership-meeting-table-subtext {
+  display: block;
+  margin-top: 4px;
+  color: var(--meeting-muted);
+  font-size: 0.79rem;
+}
+
+.leadership-meeting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.leadership-meeting-actions--compact {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+.leadership-meeting-actions--compact
+  .leadership-meeting-button {
+  min-height: 34px;
+  padding: 7px 11px;
+  font-size: 0.78rem;
+}
+
+/* ==========================================================
+   STATUS BADGES
+========================================================== */
+
+.leadership-meeting-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.leadership-meeting-status::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.leadership-meeting-status--draft {
+  color: #626c67;
+  background: #eef1ef;
+}
+
+.leadership-meeting-status--scheduled {
+  color: #145aa3;
+  background: #eaf3ff;
+}
+
+.leadership-meeting-status--postponed {
+  color: #9a6700;
+  background: #fff5d8;
+}
+
+.leadership-meeting-status--live {
+  color: #b42318;
+  background: #ffebe8;
+}
+
+.leadership-meeting-status--completed {
+  color: #147a4a;
+  background: #e9f7ef;
+}
+
+.leadership-meeting-status--cancelled {
+  color: #7d2939;
+  background: #f8e9ed;
+}
+
+/* ==========================================================
+   MOBILE LIST
+========================================================== */
+
+.leadership-meeting-mobile-list {
+  display: none;
+}
+
+.leadership-meeting-mobile-card {
+  padding: 19px;
+  border-bottom: 1px solid var(--meeting-border);
+}
+
+.leadership-meeting-mobile-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--meeting-muted);
+  font-size: 0.76rem;
+}
+
+.leadership-meeting-mobile-card h3 {
+  margin: 15px 0 8px;
+  color: var(--meeting-primary-dark);
+}
+
+.leadership-meeting-mobile-card > p {
+  margin: 0;
+  color: var(--meeting-muted);
+}
+
+.leadership-meeting-mobile-card dl {
+  display: grid;
+  grid-template-columns:
+    repeat(2, 1fr);
+  gap: 12px;
+  margin: 17px 0;
+}
+
+.leadership-meeting-mobile-card dl div {
+  padding: 10px;
+  border-radius: 9px;
+  background: #f5f8f6;
+}
+
+.leadership-meeting-mobile-card dt {
+  color: var(--meeting-muted);
+  font-size: 0.72rem;
+}
+
+.leadership-meeting-mobile-card dd {
+  margin: 4px 0 0;
+  font-weight: 750;
+}
+
+/* ==========================================================
+   PAGINATION
+========================================================== */
+
+.leadership-meeting-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 18px 24px;
+  border-top: 1px solid var(--meeting-border);
+}
+
+.leadership-meeting-pagination span {
+  color: var(--meeting-muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+/* ==========================================================
+   LOADING AND EMPTY STATES
+========================================================== */
+
+.leadership-meeting-loading,
+.leadership-meeting-empty {
+  display: flex;
+  min-height: 320px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 35px;
+  text-align: center;
+}
+
+.leadership-meeting-loading p,
+.leadership-meeting-empty p {
+  color: var(--meeting-muted);
+}
+
+.leadership-meeting-empty h3 {
+  margin: 14px 0 5px;
+}
+
+.leadership-meeting-empty__icon {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  border-radius: 18px;
+  color: #ffffff;
+  background: var(--meeting-primary);
+  font-weight: 900;
+}
+
+.leadership-meeting-spinner {
+  width: 37px;
+  height: 37px;
+  border: 4px solid #dce9e1;
+  border-top-color: var(--meeting-primary);
+  border-radius: 50%;
+  animation:
+    leadership-meeting-spin 0.8s linear
+    infinite;
+}
+
+@keyframes leadership-meeting-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   MODALS
+========================================================== */
+
+.leadership-meeting-modal-backdrop {
+  position: fixed;
+  z-index: 1500;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 25px;
+  background: rgba(9, 25, 17, 0.68);
+  backdrop-filter: blur(5px);
+}
+
+.leadership-meeting-modal {
+  display: flex;
+  width: min(980px, 100%);
+  max-height: calc(100vh - 50px);
+  overflow: hidden;
+  flex-direction: column;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.25);
+}
+
+.leadership-meeting-modal--details {
+  width: min(1050px, 100%);
+}
+
+.leadership-meeting-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 23px 27px;
+  border-bottom: 1px solid var(--meeting-border);
+}
+
+.leadership-meeting-modal__header h2 {
+  margin: 0;
+  color: var(--meeting-primary-dark);
+  font-size: 1.45rem;
+}
+
+.leadership-meeting-modal__header p {
+  margin: 6px 0 0;
+  color: var(--meeting-muted);
+}
+
+.leadership-meeting-modal__close {
+  display: grid;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--meeting-border);
+  border-radius: 10px;
+  color: var(--meeting-muted);
+  background: #ffffff;
+  font-size: 1.45rem;
+  cursor: pointer;
+}
+
+.leadership-meeting-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 11px;
+  padding: 18px 27px;
+  border-top: 1px solid var(--meeting-border);
+  background: #fafcfb;
+}
+
+.leadership-meeting-modal__footer--details {
+  justify-content: space-between;
+}
+
+.leadership-meeting-modal__footer--details > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* ==========================================================
+   FORM
+========================================================== */
+
+.leadership-meeting-form {
+  overflow-y: auto;
+}
+
+.leadership-meeting-form__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 17px;
+  padding: 25px 27px;
+}
+
+.leadership-meeting-form label {
+  display: block;
+}
+
+.leadership-meeting-form label > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #38483f;
+  font-size: 0.83rem;
+  font-weight: 750;
+}
+
+.leadership-meeting-form textarea {
+  min-height: 105px;
+  resize: vertical;
+}
+
+.leadership-meeting-form__full {
+  grid-column: 1 / -1;
+}
+
+.leadership-meeting-form__section-title {
+  margin-top: 5px;
+  padding: 14px 0 2px;
+  border-top: 1px solid var(--meeting-border);
+  color: var(--meeting-primary-dark);
+  font-size: 0.94rem;
+  font-weight: 850;
+}
+
+.leadership-meeting-checkbox {
+  display: flex !important;
+  min-height: 45px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--meeting-border);
+  border-radius: 10px;
+}
+
+.leadership-meeting-checkbox input {
+  width: 17px;
+  min-height: auto;
+  height: 17px;
+  margin: 0;
+}
+
+.leadership-meeting-checkbox span {
+  margin: 0 !important;
+}
+
+/* ==========================================================
+   DETAILS
+========================================================== */
+
+.leadership-meeting-details {
+  padding: 25px 27px;
+  overflow-y: auto;
+}
+
+.leadership-meeting-details__badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+
+.leadership-meeting-room-code {
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--meeting-primary);
+  background: var(--meeting-primary-soft);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.leadership-meeting-details__summary {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.leadership-meeting-details__summary article,
+.leadership-meeting-record-grid article {
+  padding: 15px;
+  border: 1px solid var(--meeting-border);
+  border-radius: 12px;
+  background: #fbfdfc;
+}
+
+.leadership-meeting-details__summary span,
+.leadership-meeting-record-grid span {
+  display: block;
+  color: var(--meeting-muted);
+  font-size: 0.76rem;
+}
+
+.leadership-meeting-details__summary strong,
+.leadership-meeting-record-grid strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--meeting-primary-dark);
+  font-size: 0.91rem;
+  word-break: break-word;
+}
+
+.leadership-meeting-details__section {
+  padding: 21px 0;
+  border-top: 1px solid var(--meeting-border);
+}
+
+.leadership-meeting-details__section h3 {
+  margin: 0 0 13px;
+  color: var(--meeting-primary-dark);
+  font-size: 1rem;
+}
+
+.leadership-meeting-details__section p {
+  margin: 0;
+  color: var(--meeting-muted);
+  line-height: 1.7;
+}
+
+.leadership-meeting-record-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.leadership-meeting-record-grid strong {
+  font-size: 1.1rem;
+  text-transform: capitalize;
+}
+
+/* ==========================================================
+   ACCESSIBILITY
+========================================================== */
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(
+    0,
+    0,
+    0,
+    0
+  ) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 1200px) {
+  .leadership-meeting-filters {
+    grid-template-columns:
+      repeat(3, 1fr);
+  }
+
+  .leadership-meeting-search {
+    grid-column: span 2;
+  }
+
+  .leadership-meeting-details__summary,
+  .leadership-meeting-record-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .leadership-meeting-page {
+    padding: 18px;
+  }
+
+  .leadership-meeting-hero {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 27px;
+  }
+
+  .leadership-meeting-hero__actions {
+    justify-content: flex-start;
+  }
+
+  .leadership-meeting-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .leadership-meeting-table-wrapper {
+    display: none;
+  }
+
+  .leadership-meeting-mobile-list {
+    display: block;
+    border-top: 1px solid var(--meeting-border);
+  }
+}
+
+@media (max-width: 680px) {
+  .leadership-meeting-page {
+    padding: 12px;
+  }
+
+  .leadership-meeting-hero {
+    padding: 23px 19px;
+    border-radius: 16px;
+  }
+
+  .leadership-meeting-hero__actions,
+  .leadership-meeting-hero__actions
+    .leadership-meeting-button {
+    width: 100%;
+  }
+
+  .leadership-meeting-stats {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .leadership-meeting-stat-card {
+    min-height: 125px;
+  }
+
+  .leadership-meeting-panel {
+    border-radius: 15px;
+  }
+
+  .leadership-meeting-panel__header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 20px 17px;
+  }
+
+  .leadership-meeting-filters {
+    grid-template-columns: 1fr;
+    padding: 0 17px 19px;
+  }
+
+  .leadership-meeting-search {
+    grid-column: auto;
+  }
+
+  .leadership-meeting-pagination {
+    justify-content: space-between;
+    padding: 15px;
+  }
+
+  .leadership-meeting-modal-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .leadership-meeting-modal {
+    width: 100%;
+    max-height: 94vh;
+    border-radius: 18px 18px 0 0;
+  }
+
+  .leadership-meeting-modal__header,
+  .leadership-meeting-modal__footer,
+  .leadership-meeting-details {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .leadership-meeting-form__grid {
+    grid-template-columns: 1fr;
+    padding: 21px 18px;
+  }
+
+  .leadership-meeting-form__full {
+    grid-column: auto;
+  }
+
+  .leadership-meeting-details__summary,
+  .leadership-meeting-record-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .leadership-meeting-modal__footer,
+  .leadership-meeting-modal__footer--details {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .leadership-meeting-modal__footer--details > div,
+  .leadership-meeting-modal__footer
+    .leadership-meeting-actions {
+    width: 100%;
+  }
+
+  .leadership-meeting-modal__footer
+    .leadership-meeting-button {
+    flex: 1;
+  }
+}
