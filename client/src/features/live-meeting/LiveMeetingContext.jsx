@@ -1155,18 +1155,28 @@ const liveMeetingReducer = (
       };
 
     case "CHAT_MESSAGE_RECEIVED": {
-      const message =
-        action.payload;
+     const message = action.payload;
 
-      if (!message?.id) {
-        return state;
-      }
+const messageId =
+    message?.messageId ||
+    message?._id ||
+    message?.id ||
+    message?.clientId;
 
-      const alreadyExists =
-        state.chatMessages.some(
-          (item) =>
-            item.id === message.id
-        );
+if (!messageId) {
+    return state;
+}
+
+const alreadyExists =
+    state.chatMessages.some(item => {
+        const existingId =
+            item?.messageId ||
+            item?._id ||
+            item?.id ||
+            item?.clientId;
+
+        return existingId === messageId;
+    });
 
       if (alreadyExists) {
         return state;
