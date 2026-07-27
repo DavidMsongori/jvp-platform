@@ -253,6 +253,7 @@ const MeetingLiveRoom = ({
   canManage = false,
   enterRoom = false,
   onMeetingRefresh,
+   onLiveRoomExit,
 }) => {
   const resolvedCurrentUserId =
     currentUserId ||
@@ -316,7 +317,7 @@ const MeetingLiveRoom = ({
     setSettings(initialSettings);
   }, [initialSettings]);
 
- useEffect(() => {
+useEffect(() => {
   const participant =
     getCurrentParticipant(
       meeting,
@@ -326,15 +327,22 @@ const MeetingLiveRoom = ({
   const participantJoined =
     Boolean(
       participant?.isInRoom ||
-        participant?.joined ||
-        participant?.attendanceStatus ===
-          "present"
+        participant?.joined
     );
 
-  setIsJoined(
+  /*
+   * Only open the room when either the page requested entry
+   * or the backend confirms that the participant joined.
+   *
+   * Do not automatically set isJoined to false here.
+   * Leaving is handled explicitly by handleLiveRoomExit.
+   */
+  if (
     enterRoom ||
     participantJoined
-  );
+  ) {
+    setIsJoined(true);
+  }
 }, [
   meeting,
   resolvedCurrentUserId,
@@ -480,6 +488,7 @@ const handleLiveRoomExit =
     setIsJoined(false);
     setMicrophoneEnabled(false);
     setCameraEnabled(false);
+    onLiveRoomExit?.();
 
     try {
       if (onMeetingRefresh) {

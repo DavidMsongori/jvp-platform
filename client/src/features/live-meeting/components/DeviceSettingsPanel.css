@@ -1,0 +1,622 @@
+/* ==========================================================
+   DEVICE SETTINGS PANEL
+========================================================== */
+
+.device-settings-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 85;
+  display: flex;
+  width: min(410px, 100%);
+  min-width: 0;
+  flex-direction: column;
+  border-left: 1px solid
+    rgba(148, 163, 184, 0.18);
+  background:
+    rgba(15, 23, 42, 0.98);
+  color: #f8fafc;
+  box-shadow:
+    -18px 0 48px
+    rgba(2, 6, 23, 0.38);
+  backdrop-filter: blur(20px);
+  animation:
+    device-settings-panel-enter
+    180ms ease-out;
+}
+
+@keyframes device-settings-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.device-settings-panel__header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px;
+  border-bottom: 1px solid
+    rgba(148, 163, 184, 0.14);
+}
+
+.device-settings-panel__header
+  > div {
+  min-width: 0;
+}
+
+.device-settings-panel__title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.device-settings-panel__title-row
+  > svg {
+  width: 20px;
+  height: 20px;
+  color: #5eead4;
+}
+
+.device-settings-panel__title-row
+  h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.device-settings-panel__header
+  p {
+  margin: 7px 0 0;
+  color:
+    rgba(226, 232, 240, 0.62);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.device-settings-panel__close-button {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid
+    rgba(148, 163, 184, 0.15);
+  border-radius: 9px;
+  background:
+    rgba(30, 41, 59, 0.8);
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.device-settings-panel__close-button:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+.device-settings-panel__close-button
+  svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.device-settings-panel__content {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 16px;
+  scrollbar-width: thin;
+}
+
+.device-settings-panel__content::-webkit-scrollbar {
+  width: 7px;
+}
+
+.device-settings-panel__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.device-settings-panel__content::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background:
+    rgba(148, 163, 184, 0.24);
+}
+
+/* ==========================================================
+   ERROR
+========================================================== */
+
+.device-settings-panel__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px;
+  border: 1px solid
+    rgba(248, 113, 113, 0.22);
+  border-radius: 10px;
+  background:
+    rgba(127, 29, 29, 0.42);
+  color: #fecaca;
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.device-settings-panel__error
+  > svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.device-settings-panel__error
+  span {
+  min-width: 0;
+  flex: 1;
+}
+
+.device-settings-panel__error
+  button {
+  display: inline-flex;
+  border: 0;
+  background: transparent;
+  color: #fecaca;
+  cursor: pointer;
+}
+
+/* ==========================================================
+   SECTIONS
+========================================================== */
+
+.device-settings-panel__section {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid
+    rgba(148, 163, 184, 0.12);
+  border-radius: 13px;
+  background:
+    rgba(30, 41, 59, 0.55);
+}
+
+.device-settings-panel__section-heading {
+  margin-bottom: 12px;
+}
+
+.device-settings-panel__section-heading
+  > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.device-settings-panel__section-heading
+  > div
+  > svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #5eead4;
+}
+
+.device-settings-panel__section-heading
+  h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.device-settings-panel__section-heading
+  span {
+  display: block;
+  margin-top: 3px;
+  color: #94a3b8;
+  font-size: 0.65rem;
+  line-height: 1.45;
+}
+
+/* ==========================================================
+   VIDEO PREVIEW
+========================================================== */
+
+.device-settings-panel__preview {
+  position: relative;
+  overflow: hidden;
+  min-height: 190px;
+  border: 1px solid
+    rgba(148, 163, 184, 0.14);
+  border-radius: 11px;
+  background: #020617;
+}
+
+.device-settings-panel__preview
+  video {
+  display: block;
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.device-settings-panel__preview-empty {
+  display: flex;
+  min-height: 190px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.device-settings-panel__preview-empty
+  > svg {
+  width: 31px;
+  height: 31px;
+  margin-bottom: 10px;
+  color: #64748b;
+}
+
+.device-settings-panel__preview-empty
+  strong {
+  color: #e2e8f0;
+  font-size: 0.78rem;
+}
+
+.device-settings-panel__preview-empty
+  span {
+  max-width: 220px;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 0.65rem;
+  line-height: 1.45;
+}
+
+/* ==========================================================
+   FIELDS
+========================================================== */
+
+.device-settings-panel__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.device-settings-panel__field {
+  display: block;
+}
+
+.device-settings-panel__field-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+  color: #cbd5e1;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.device-settings-panel__field-label
+  svg {
+  width: 15px;
+  height: 15px;
+  color: #94a3b8;
+}
+
+.device-settings-panel__select-wrap {
+  position: relative;
+  display: block;
+}
+
+.device-settings-panel__select-wrap
+  select {
+  width: 100%;
+  min-height: 42px;
+  appearance: none;
+  padding:
+    0
+    38px
+    0
+    11px;
+  border: 1px solid
+    rgba(148, 163, 184, 0.16);
+  border-radius: 9px;
+  outline: none;
+  background: #1e293b;
+  color: #f8fafc;
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.device-settings-panel__select-wrap
+  select:focus {
+  border-color:
+    rgba(45, 212, 191, 0.65);
+  box-shadow:
+    0 0 0 3px
+    rgba(45, 212, 191, 0.09);
+}
+
+.device-settings-panel__select-wrap
+  select:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.device-settings-panel__select-wrap
+  > svg {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 15px;
+  height: 15px;
+  color: #94a3b8;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* ==========================================================
+   MICROPHONE TEST
+========================================================== */
+
+.device-settings-panel__microphone-test {
+  padding: 10px;
+  border: 1px solid
+    rgba(148, 163, 184, 0.12);
+  border-radius: 9px;
+  background:
+    rgba(15, 23, 42, 0.5);
+}
+
+.device-settings-panel__microphone-test
+  > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.device-settings-panel__microphone-test
+  span {
+  color: #cbd5e1;
+  font-size: 0.67rem;
+  font-weight: 700;
+}
+
+.device-settings-panel__microphone-test
+  small {
+  color: #64748b;
+  font-size: 0.58rem;
+  text-align: right;
+}
+
+.device-settings-panel__audio-meter {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      12,
+      minmax(0, 1fr)
+    );
+  gap: 3px;
+}
+
+.device-settings-panel__audio-meter
+  span {
+  height: 8px;
+  border-radius: 999px;
+  background:
+    rgba(71, 85, 105, 0.75);
+  transition:
+    background-color
+    100ms ease;
+}
+
+.device-settings-panel__audio-meter
+  .device-settings-panel__audio-bar--active {
+  background: #2dd4bf;
+}
+
+/* ==========================================================
+   SUPPORT NOTE
+========================================================== */
+
+.device-settings-panel__support-note {
+  margin: -3px 0 0;
+  color: #64748b;
+  font-size: 0.61rem;
+  line-height: 1.5;
+}
+
+/* ==========================================================
+   REFRESH BUTTON
+========================================================== */
+
+.device-settings-panel__refresh-button {
+  display: inline-flex;
+  width: 100%;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid
+    rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  background:
+    rgba(30, 41, 59, 0.75);
+  color: #cbd5e1;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.device-settings-panel__refresh-button:hover:not(
+    :disabled
+  ) {
+  background: #334155;
+  color: #ffffff;
+}
+
+.device-settings-panel__refresh-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.device-settings-panel__refresh-button
+  svg {
+  width: 16px;
+  height: 16px;
+}
+
+.device-settings-panel__spin {
+  animation:
+    device-settings-spin
+    800ms linear infinite;
+}
+
+@keyframes device-settings-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.device-settings-panel__footer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 14px 16px;
+  border-top: 1px solid
+    rgba(148, 163, 184, 0.14);
+  background:
+    rgba(15, 23, 42, 0.98);
+}
+
+.device-settings-panel__cancel-button,
+.device-settings-panel__apply-button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.device-settings-panel__cancel-button {
+  border: 1px solid
+    rgba(148, 163, 184, 0.16);
+  background:
+    rgba(30, 41, 59, 0.75);
+  color: #cbd5e1;
+}
+
+.device-settings-panel__cancel-button:hover:not(
+    :disabled
+  ) {
+  background: #334155;
+}
+
+.device-settings-panel__apply-button {
+  border: 1px solid
+    rgba(94, 234, 212, 0.2);
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.device-settings-panel__apply-button:hover:not(
+    :disabled
+  ) {
+  background: #0d9488;
+}
+
+.device-settings-panel__cancel-button:disabled,
+.device-settings-panel__apply-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.device-settings-panel__apply-button
+  svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 720px) {
+  .device-settings-panel {
+    position: fixed;
+    width: min(100%, 430px);
+  }
+}
+
+@media (max-width: 480px) {
+  .device-settings-panel {
+    width: 100%;
+  }
+
+  .device-settings-panel__header {
+    padding: 16px;
+  }
+
+  .device-settings-panel__content {
+    padding: 12px;
+  }
+
+  .device-settings-panel__preview,
+  .device-settings-panel__preview
+    video,
+  .device-settings-panel__preview-empty {
+    min-height: 165px;
+    height: 165px;
+  }
+
+  .device-settings-panel__footer {
+    padding:
+      12px
+      12px
+      calc(
+        12px +
+        env(safe-area-inset-bottom)
+      );
+  }
+
+  .device-settings-panel__cancel-button,
+  .device-settings-panel__apply-button {
+    flex: 1;
+  }
+}

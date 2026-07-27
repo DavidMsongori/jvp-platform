@@ -1422,10 +1422,14 @@ const renderRoomControls = () => {
         localStorage.getItem("accessToken") ||
         ""
       }
-      canManage={true}
-      enterRoom={enterLiveRoom}
-      onMeetingRefresh={loadMeeting}
-    />
+       canManage={true}
+  enterRoom={enterLiveRoom}
+  onMeetingRefresh={loadMeeting}
+  onLiveRoomExit={() => {
+    setEnterLiveRoom(false);
+    setActiveTab("overview");
+  }}
+/>
   );
 };
 
@@ -1668,9 +1672,10 @@ const renderRoomControls = () => {
                   <button
   type="button"
   className="leadership-details-button leadership-details-button--light"
-  onClick={() => {
-    setActiveTab("live-room");
-  }}
+ onClick={() => {
+  setEnterLiveRoom(true);
+  setActiveTab("live-room");
+}}
 >
   Join Room
 </button>

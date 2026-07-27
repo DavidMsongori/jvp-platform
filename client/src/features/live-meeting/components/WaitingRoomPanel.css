@@ -1,0 +1,648 @@
+/* ==========================================================
+   WAITING ROOM PANEL
+========================================================== */
+
+.waiting-room-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 82;
+  display: flex;
+  width: min(410px, 100%);
+  min-width: 0;
+  flex-direction: column;
+  border-left: 1px solid
+    rgba(148, 163, 184, 0.18);
+  background:
+    rgba(15, 23, 42, 0.98);
+  color: #f8fafc;
+  box-shadow:
+    -18px 0 48px
+    rgba(2, 6, 23, 0.38);
+  backdrop-filter: blur(20px);
+  animation:
+    waiting-room-panel-enter
+    180ms ease-out;
+}
+
+@keyframes waiting-room-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.waiting-room-panel__header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px;
+  border-bottom: 1px solid
+    rgba(148, 163, 184, 0.14);
+}
+
+.waiting-room-panel__header
+  > div {
+  min-width: 0;
+}
+
+.waiting-room-panel__title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.waiting-room-panel__title-row
+  > svg {
+  width: 20px;
+  height: 20px;
+  color: #fbbf24;
+}
+
+.waiting-room-panel__title-row
+  h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.waiting-room-panel__count {
+  display: inline-flex;
+  min-width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border-radius: 999px;
+  background:
+    rgba(120, 53, 15, 0.65);
+  color: #fde68a;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.waiting-room-panel__header
+  p {
+  margin: 7px 0 0;
+  color:
+    rgba(226, 232, 240, 0.62);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.waiting-room-panel__close-button {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid
+    rgba(148, 163, 184, 0.15);
+  border-radius: 9px;
+  background:
+    rgba(30, 41, 59, 0.8);
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.waiting-room-panel__close-button:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+/* ==========================================================
+   SEARCH
+========================================================== */
+
+.waiting-room-panel__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 14px 16px 10px;
+}
+
+.waiting-room-panel__search
+  > svg {
+  position: absolute;
+  left: 12px;
+  z-index: 1;
+  width: 17px;
+  height: 17px;
+  color: #64748b;
+}
+
+.waiting-room-panel__search
+  input {
+  width: 100%;
+  min-height: 42px;
+  padding:
+    0
+    40px
+    0
+    39px;
+  border: 1px solid
+    rgba(148, 163, 184, 0.16);
+  border-radius: 10px;
+  outline: none;
+  background:
+    rgba(30, 41, 59, 0.76);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.waiting-room-panel__search
+  input::placeholder {
+  color: #64748b;
+}
+
+.waiting-room-panel__search
+  input:focus {
+  border-color:
+    rgba(245, 158, 11, 0.62);
+  box-shadow:
+    0 0 0 3px
+    rgba(245, 158, 11, 0.09);
+}
+
+.waiting-room-panel__search
+  button {
+  position: absolute;
+  right: 8px;
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+/* ==========================================================
+   MANAGEMENT
+========================================================== */
+
+.waiting-room-panel__management {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid
+    rgba(148, 163, 184, 0.12);
+}
+
+.waiting-room-panel__select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.waiting-room-panel__select-all
+  > span {
+  display: inline-flex;
+  width: 17px;
+  height: 17px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid
+    rgba(148, 163, 184, 0.4);
+  border-radius: 5px;
+}
+
+.waiting-room-panel__select-all--active
+  > span {
+  border-color: #0d9488;
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.waiting-room-panel__admit-all-button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 11px;
+  border: 1px solid
+    rgba(94, 234, 212, 0.2);
+  border-radius: 8px;
+  background: #0f766e;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.waiting-room-panel__admit-all-button:hover:not(
+    :disabled
+  ) {
+  background: #0d9488;
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.waiting-room-panel__content {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 12px;
+  scrollbar-width: thin;
+}
+
+.waiting-room-panel__content::-webkit-scrollbar {
+  width: 7px;
+}
+
+.waiting-room-panel__content::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background:
+    rgba(148, 163, 184, 0.24);
+}
+
+.waiting-room-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ==========================================================
+   PARTICIPANT
+========================================================== */
+
+.waiting-room-panel__participant {
+  display: grid;
+  grid-template-columns:
+    auto
+    auto
+    minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px;
+  border: 1px solid
+    rgba(245, 158, 11, 0.18);
+  border-radius: 12px;
+  background:
+    rgba(120, 53, 15, 0.12);
+}
+
+.waiting-room-panel__select {
+  display: inline-flex;
+  width: 19px;
+  height: 19px;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  padding: 0;
+  border: 1px solid
+    rgba(148, 163, 184, 0.4);
+  border-radius: 5px;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.waiting-room-panel__select--active {
+  border-color: #0d9488;
+  background: #0f766e;
+}
+
+.waiting-room-panel__avatar-wrap {
+  position: relative;
+  width: 42px;
+  height: 42px;
+}
+
+.waiting-room-panel__avatar,
+.waiting-room-panel__initials {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.waiting-room-panel__avatar {
+  object-fit: cover;
+}
+
+.waiting-room-panel__initials {
+  background:
+    linear-gradient(
+      145deg,
+      #92400e,
+      #78350f
+    );
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.waiting-room-panel__waiting-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #1e293b;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.waiting-room-panel__participant-info {
+  min-width: 0;
+  align-self: center;
+}
+
+.waiting-room-panel__participant-info
+  strong {
+  display: block;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.waiting-room-panel__participant-info
+  span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 0.62rem;
+}
+
+.waiting-room-panel__participant-info
+  svg {
+  width: 13px;
+  height: 13px;
+}
+
+.waiting-room-panel__participant-actions {
+  display: flex;
+  grid-column: 2 / -1;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.waiting-room-panel__admit-button,
+.waiting-room-panel__reject-button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.waiting-room-panel__admit-button {
+  padding: 0 10px;
+  border: 1px solid
+    rgba(94, 234, 212, 0.2);
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.waiting-room-panel__admit-button:hover:not(
+    :disabled
+  ) {
+  background: #0d9488;
+}
+
+.waiting-room-panel__reject-button {
+  width: 34px;
+  border: 1px solid
+    rgba(248, 113, 113, 0.2);
+  background:
+    rgba(127, 29, 29, 0.48);
+  color: #fecaca;
+}
+
+.waiting-room-panel__reject-button:hover:not(
+    :disabled
+  ) {
+  background:
+    rgba(153, 27, 27, 0.75);
+}
+
+/* ==========================================================
+   EMPTY
+========================================================== */
+
+.waiting-room-panel__empty {
+  display: flex;
+  min-height: 300px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+}
+
+.waiting-room-panel__empty-icon {
+  display: inline-flex;
+  width: 58px;
+  height: 58px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  border: 1px solid
+    rgba(245, 158, 11, 0.18);
+  border-radius: 50%;
+  background:
+    rgba(120, 53, 15, 0.18);
+  color: #fbbf24;
+}
+
+.waiting-room-panel__empty-icon
+  svg {
+  width: 25px;
+  height: 25px;
+}
+
+.waiting-room-panel__empty
+  strong {
+  color: #e2e8f0;
+  font-size: 0.86rem;
+}
+
+.waiting-room-panel__empty
+  span {
+  max-width: 245px;
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.waiting-room-panel__footer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border-top: 1px solid
+    rgba(148, 163, 184, 0.14);
+  background:
+    rgba(15, 23, 42, 0.98);
+}
+
+.waiting-room-panel__footer
+  > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.waiting-room-panel__footer
+  strong {
+  color: #e2e8f0;
+  font-size: 0.7rem;
+}
+
+.waiting-room-panel__footer
+  > div:first-child
+  button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  font: inherit;
+  font-size: 0.62rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.waiting-room-panel__bulk-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.waiting-room-panel__bulk-actions
+  button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 11px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.67rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.waiting-room-panel__bulk-reject {
+  border: 1px solid
+    rgba(248, 113, 113, 0.2);
+  background:
+    rgba(127, 29, 29, 0.48);
+  color: #fecaca;
+}
+
+.waiting-room-panel__bulk-admit {
+  border: 1px solid
+    rgba(94, 234, 212, 0.2);
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.waiting-room-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 720px) {
+  .waiting-room-panel {
+    position: fixed;
+    width: min(100%, 430px);
+  }
+}
+
+@media (max-width: 480px) {
+  .waiting-room-panel {
+    width: 100%;
+  }
+
+  .waiting-room-panel__header {
+    padding: 16px;
+  }
+
+  .waiting-room-panel__management {
+    padding:
+      0
+      12px
+      12px;
+  }
+
+  .waiting-room-panel__participant {
+    grid-template-columns:
+      auto
+      auto
+      minmax(0, 1fr);
+  }
+
+  .waiting-room-panel__footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding:
+      12px
+      12px
+      calc(
+        12px +
+        env(safe-area-inset-bottom)
+      );
+  }
+
+  .waiting-room-panel__bulk-actions {
+    width: 100%;
+  }
+
+  .waiting-room-panel__bulk-actions
+    button {
+    flex: 1;
+  }
+}

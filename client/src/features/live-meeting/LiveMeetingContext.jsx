@@ -666,7 +666,7 @@ const liveMeetingReducer = (
             {}),
           status: "completed",
         },
-        roomStatus: "completed",
+        roomStatus: "ended",
         ending: false,
         isJoined: false,
         isWaiting: false,
@@ -1440,422 +1440,533 @@ const LiveMeetingProvider = ({
     }, []);
 
   /* ========================================================
-     SOCKET CONNECTION
-  ======================================================== */
+   SOCKET CONNECTION
+======================================================== */
 
-  useEffect(() => {
-    mountedRef.current = true;
+useEffect(() => {
+  mountedRef.current = true;
 
-    if (!meetingId) {
-      dispatch({
-        type: "ERROR",
-        payload:
-          "Meeting ID is required.",
-      });
-
-      return undefined;
-    }
-
+  if (!meetingId) {
     dispatch({
-      type: "SOCKET_CONNECTING",
+      type: "ERROR",
+      payload:
+        "Meeting ID is required.",
     });
 
-    let activeSocket;
+    return undefined;
+  }
 
-    try {
-      activeSocket =
-        connectSocket(
-          authToken || undefined
-        );
-    } catch (error) {
+  dispatch({
+    type: "SOCKET_CONNECTING",
+  });
+
+  /*
+   * Register listeners before connecting.
+   * This prevents fast localhost connections from
+   * emitting events before React starts listening.
+   */
+
+  const cleanupFunctions = [];
+
+  cleanupFunctions.push(
+    onSocketConnected(() => {
+      if (!mountedRef.current) {
+        return;
+      }
+
+      const activeSocket =
+        getSocket();
+
       dispatch({
-        type: "SOCKET_ERROR",
+        type: "SOCKET_CONNECTED",
 
         payload: {
-          message:
-            error.message ||
-            "Unable to connect to the meeting socket.",
+          socketId:
+            activeSocket?.id ||
+            "",
         },
       });
+    })
+  );
 
-      return undefined;
-    }
-
-    const cleanupFunctions = [];
-
-    cleanupFunctions.push(
-      onSocketConnected(() => {
+  cleanupFunctions.push(
+    onSocketAuthenticated(
+      (payload) => {
         if (!mountedRef.current) {
           return;
         }
 
         dispatch({
-          type: "SOCKET_CONNECTED",
+          type:
+            "SOCKET_AUTHENTICATED",
+
+          payload:
+            payload?.data ||
+            payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onSocketDisconnected(
+      (reason) => {
+        if (!mountedRef.current) {
+          return;
+        }
+
+        dispatch({
+          type:
+            "SOCKET_DISCONNECTED",
 
           payload: {
-            socketId:
-              getSocket().id,
+            reason,
           },
         });
-      })
-    );
+      }
+    )
+  );
 
-    cleanupFunctions.push(
-      onSocketAuthenticated(
-        (payload) => {
-          if (!mountedRef.current) {
-            return;
-          }
-
-          dispatch({
-            type:
-              "SOCKET_AUTHENTICATED",
-
-            payload:
-              payload?.data ||
-              payload,
-          });
+  cleanupFunctions.push(
+    onSocketConnectError(
+      (error) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onSocketDisconnected(
-        (reason) => {
-          if (!mountedRef.current) {
-            return;
-          }
+        dispatch({
+          type: "SOCKET_ERROR",
 
-          dispatch({
-            type:
-              "SOCKET_DISCONNECTED",
+          payload: {
+            message:
+              error?.message ||
+              "Socket connection failed.",
+          },
+        });
+      }
+    )
+  );
 
-            payload: {
-              reason,
-            },
-          });
+  cleanupFunctions.push(
+    onMeetingError(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onSocketConnectError(
-        (error) => {
-          if (!mountedRef.current) {
-            return;
-          }
+        dispatch({
+          type: "ERROR",
+          payload,
+        });
+      }
+    )
+  );
 
-          dispatch({
-            type: "SOCKET_ERROR",
-
-            payload: {
-              message:
-                error?.message ||
-                "Socket connection failed.",
-            },
-          });
+  cleanupFunctions.push(
+    onMeetingStarted(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingError(
-        (payload) => {
-          dispatch({
-            type: "ERROR",
-            payload,
-          });
+        dispatch({
+          type:
+            "MEETING_STARTED",
+
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onMeetingEnded(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingStarted(
-        (payload) => {
-          dispatch({
-            type:
-              "MEETING_STARTED",
+        joinedMeetingRef.current =
+          false;
 
-            payload,
-          });
+        closeAllPeerConnections();
+        stopScreenStream();
+        stopLocalStream();
+
+        dispatch({
+          type: "MEETING_ENDED",
+
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onMeetingAdmitted(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingEnded(
-        (payload) => {
-          joinedMeetingRef.current =
-            false;
+        dispatch({
+          type: "ADMITTED",
+          payload,
+        });
+      }
+    )
+  );
 
-          closeAllPeerConnections();
-          stopScreenStream();
-          stopLocalStream();
-
-          dispatch({
-            type: "MEETING_ENDED",
-
-            payload,
-          });
+  cleanupFunctions.push(
+    onMeetingRemoved(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingAdmitted(
-        (payload) => {
-          dispatch({
-            type: "ADMITTED",
-            payload,
-          });
+        joinedMeetingRef.current =
+          false;
+
+        closeAllPeerConnections();
+        stopScreenStream();
+        stopLocalStream();
+
+        dispatch({
+          type: "REMOVED",
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onParticipantJoined(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingRemoved(
-        (payload) => {
-          joinedMeetingRef.current =
-            false;
+        dispatch({
+          type:
+            "PARTICIPANT_JOINED",
 
-          closeAllPeerConnections();
-          stopScreenStream();
-          stopLocalStream();
+          payload,
+        });
+      }
+    )
+  );
 
-          dispatch({
-            type: "REMOVED",
-            payload,
-          });
+  cleanupFunctions.push(
+    onParticipantLeft(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onParticipantJoined(
-        (payload) => {
-          dispatch({
-            type:
-              "PARTICIPANT_JOINED",
+        const socketId =
+          payload?.participant
+            ?.socketId;
 
-            payload,
-          });
+        if (socketId) {
+          removePeerConnection(
+            socketId
+          );
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onParticipantLeft(
-        (payload) => {
-          const socketId =
-            payload?.participant
-              ?.socketId;
+        dispatch({
+          type:
+            "PARTICIPANT_LEFT",
 
-          if (socketId) {
-            removePeerConnection(
-              socketId
-            );
-          }
+          payload,
+        });
+      }
+    )
+  );
 
-          dispatch({
-            type:
-              "PARTICIPANT_LEFT",
-
-            payload,
-          });
+  cleanupFunctions.push(
+    onParticipantDisconnected(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onParticipantDisconnected(
-        (payload) => {
-          if (payload?.socketId) {
-            removePeerConnection(
-              payload.socketId
-            );
-          }
-
-          dispatch({
-            type:
-              "PARTICIPANT_LEFT",
-
-            payload,
-          });
+        if (payload?.socketId) {
+          removePeerConnection(
+            payload.socketId
+          );
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onParticipantWaiting(
-        (payload) => {
-          dispatch({
-            type:
-              "PARTICIPANT_WAITING",
+        dispatch({
+          type:
+            "PARTICIPANT_LEFT",
 
-            payload,
-          });
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onParticipantWaiting(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onParticipantAdmitted(
-        (payload) => {
-          dispatch({
-            type:
-              "PARTICIPANT_ADMITTED",
+        dispatch({
+          type:
+            "PARTICIPANT_WAITING",
 
-            payload,
-          });
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onParticipantAdmitted(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onParticipantRemoved(
-        (payload) => {
-          dispatch({
-            type:
-              "PARTICIPANT_REMOVED",
+        dispatch({
+          type:
+            "PARTICIPANT_ADMITTED",
 
-            payload,
-          });
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onParticipantRemoved(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onParticipantMediaUpdated(
-        (payload) => {
-          dispatch({
-            type: "MEDIA_UPDATED",
-            payload,
-          });
+        dispatch({
+          type:
+            "PARTICIPANT_REMOVED",
+
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onParticipantMediaUpdated(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingHandUpdated(
-        (payload) => {
-          dispatch({
-            type: "HAND_UPDATED",
-            payload,
-          });
+        dispatch({
+          type: "MEDIA_UPDATED",
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onMeetingHandUpdated(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingPresence(
-        (payload) => {
-          dispatch({
-            type:
-              "PRESENCE_UPDATED",
+        dispatch({
+          type: "HAND_UPDATED",
+          payload,
+        });
+      }
+    )
+  );
 
-            payload,
-          });
+  cleanupFunctions.push(
+    onMeetingPresence(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingChatMessage(
-        (message) => {
-          dispatch({
-            type:
-              "CHAT_MESSAGE_RECEIVED",
+        dispatch({
+          type:
+            "PRESENCE_UPDATED",
 
-            payload: message,
-          });
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onMeetingChatMessage(
+      (message) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onMeetingTyping(
-        (payload) => {
-          dispatch({
-            type: "TYPING_UPDATED",
-            payload,
-          });
+        dispatch({
+          type:
+            "CHAT_MESSAGE_RECEIVED",
+
+          payload: message,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onMeetingTyping(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onRoomSettingsUpdated(
-        (payload) => {
-          dispatch({
-            type:
-              "ROOM_SETTINGS_UPDATED",
+        dispatch({
+          type: "TYPING_UPDATED",
+          payload,
+        });
+      }
+    )
+  );
 
-            payload,
-          });
+  cleanupFunctions.push(
+    onRoomSettingsUpdated(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    cleanupFunctions.push(
-      onScreenShareStatus(
-        (payload) => {
-          dispatch({
-            type:
-              "SCREEN_SHARE_UPDATED",
+        dispatch({
+          type:
+            "ROOM_SETTINGS_UPDATED",
 
-            payload,
-          });
+          payload,
+        });
+      }
+    )
+  );
+
+  cleanupFunctions.push(
+    onScreenShareStatus(
+      (payload) => {
+        if (!mountedRef.current) {
+          return;
         }
-      )
-    );
 
-    /*
-     * WebRTC events are received here and then
-     * exposed through state-independent listener
-     * registration helpers below. The actual peer
-     * negotiation will be built in useWebRTC.js.
-     */
+        dispatch({
+          type:
+            "SCREEN_SHARE_UPDATED",
 
-    return () => {
-      mountedRef.current = false;
+          payload,
+        });
+      }
+    )
+  );
 
-      cleanupFunctions.forEach(
-        (cleanup) => {
-          if (
-            typeof cleanup ===
-            "function"
-          ) {
-            cleanup();
-          }
-        }
+  /*
+   * Connect only after all listeners are registered.
+   */
+
+  let activeSocket;
+
+  try {
+    activeSocket =
+      connectSocket(
+        authToken || undefined
       );
 
-      if (
-        typingTimeoutRef.current
-      ) {
-        window.clearTimeout(
-          typingTimeoutRef.current
-        );
+    /*
+     * If the global socket was already connected before this
+     * provider mounted, the "connect" event will not fire again.
+     */
+
+    if (activeSocket.connected) {
+      dispatch({
+        type: "SOCKET_CONNECTED",
+
+        payload: {
+          socketId:
+            activeSocket.id ||
+            "",
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "SOCKET_ERROR",
+
+      payload: {
+        message:
+          error?.message ||
+          "Unable to connect to the meeting socket.",
+      },
+    });
+
+    cleanupFunctions.forEach(
+      (cleanup) => {
+        if (
+          typeof cleanup ===
+          "function"
+        ) {
+          cleanup();
+        }
       }
+    );
 
-      closeAllPeerConnections();
-      stopScreenStream();
-      stopLocalStream();
+    return undefined;
+  }
 
-      /*
-       * We do not disconnect the global socket here
-       * automatically because another feature may
-       * still need the authenticated connection.
-       */
-    };
-  }, [
-    authToken,
-    meetingId,
-    closeAllPeerConnections,
-    removePeerConnection,
-    stopLocalStream,
-    stopScreenStream,
-  ]);
+  /*
+   * WebRTC events are received here and exposed through
+   * separate subscription helpers.
+   */
+
+  return () => {
+    mountedRef.current = false;
+
+    cleanupFunctions.forEach(
+      (cleanup) => {
+        if (
+          typeof cleanup ===
+          "function"
+        ) {
+          cleanup();
+        }
+      }
+    );
+
+    if (
+      typingTimeoutRef.current
+    ) {
+      window.clearTimeout(
+        typingTimeoutRef.current
+      );
+    }
+
+    closeAllPeerConnections();
+    stopScreenStream();
+    stopLocalStream();
+
+    /*
+     * Do not automatically disconnect the global socket because
+     * another part of the application may still be using it.
+     */
+  };
+}, [
+  authToken,
+  meetingId,
+  closeAllPeerConnections,
+  removePeerConnection,
+  stopLocalStream,
+  stopScreenStream,
+]);
 
   /* ========================================================
      JOIN AND LEAVE
@@ -2136,6 +2247,92 @@ const LiveMeetingProvider = ({
       [meetingId]
     );
 
+    const resolveParticipantUserId =
+  useCallback(
+    (participantOrUserId) => {
+      if (
+        typeof participantOrUserId ===
+        "string"
+      ) {
+        return participantOrUserId;
+      }
+
+      return String(
+        participantOrUserId
+          ?.userId ||
+          participantOrUserId
+            ?.participantUserId ||
+          participantOrUserId
+            ?.participantId ||
+          participantOrUserId
+            ?.user?._id ||
+          participantOrUserId
+            ?.user?.id ||
+          participantOrUserId
+            ?._id ||
+          participantOrUserId
+            ?.id ||
+          ""
+      );
+    },
+    []
+  );
+
+const admitWaitingParticipant =
+  useCallback(
+    async (
+      participantOrUserId
+    ) => {
+      const participantUserId =
+        resolveParticipantUserId(
+          participantOrUserId
+        );
+
+      if (!participantUserId) {
+        throw new Error(
+          "Participant user ID is required."
+        );
+      }
+
+      return admitParticipant(
+        participantUserId
+      );
+    },
+    [
+      admitParticipant,
+      resolveParticipantUserId,
+    ]
+  );
+
+const rejectWaitingParticipant =
+  useCallback(
+    async (
+      participantOrUserId,
+      reason =
+        "Waiting-room request rejected."
+    ) => {
+      const participantUserId =
+        resolveParticipantUserId(
+          participantOrUserId
+        );
+
+      if (!participantUserId) {
+        throw new Error(
+          "Participant user ID is required."
+        );
+      }
+
+      return removeParticipant(
+        participantUserId,
+        reason
+      );
+    },
+    [
+      removeParticipant,
+      resolveParticipantUserId,
+    ]
+  );
+
   /* ========================================================
      MEDIA STATE
   ======================================================== */
@@ -2241,6 +2438,17 @@ const LiveMeetingProvider = ({
       },
       [meetingId]
     );
+
+    const toggleRaisedHand =
+  useCallback(async () => {
+    return setHandRaised(
+      !state.localMedia
+        ?.handRaised
+    );
+  }, [
+    setHandRaised,
+    state.localMedia?.handRaised,
+  ]);
 
   const setScreenSharing =
     useCallback(
@@ -2358,6 +2566,194 @@ const LiveMeetingProvider = ({
       },
       [meetingId]
     );
+
+    /* ========================================================
+   RESOLVED ROOM SETTINGS
+======================================================== */
+
+const meetingLocked =
+  Boolean(
+    state.roomSettings
+      ?.meetingLocked ??
+      state.roomSettings
+        ?.locked ??
+      false
+  );
+
+const waitingRoomEnabled =
+  Boolean(
+    state.roomSettings
+      ?.waitingRoomEnabled ??
+      state.roomSettings
+        ?.waitingRoom ??
+      true
+  );
+
+const participantUnmuteAllowed =
+  Boolean(
+    state.roomSettings
+      ?.participantUnmuteAllowed ??
+      true
+  );
+
+const participantVideoAllowed =
+  Boolean(
+    state.roomSettings
+      ?.participantVideoAllowed ??
+      true
+  );
+
+const participantScreenShareAllowed =
+  Boolean(
+    state.roomSettings
+      ?.participantScreenShareAllowed ??
+      true
+  );
+
+const participantChatAllowed =
+  Boolean(
+    state.roomSettings
+      ?.participantChatAllowed ??
+      true
+  );
+
+/* ========================================================
+   ROOM SETTING ACTIONS
+======================================================== */
+
+const setMeetingLocked =
+  useCallback(
+    async (enabled) => {
+      return updateRoomSettings({
+        ...state.roomSettings,
+
+        meetingLocked:
+          Boolean(enabled),
+      });
+    },
+    [
+      updateRoomSettings,
+      state.roomSettings,
+    ]
+  );
+
+const toggleMeetingLock =
+  useCallback(
+    async (nextValue) => {
+      const enabled =
+        typeof nextValue ===
+        "boolean"
+          ? nextValue
+          : !meetingLocked;
+
+      return setMeetingLocked(
+        enabled
+      );
+    },
+    [
+      setMeetingLocked,
+      meetingLocked,
+    ]
+  );
+
+const setWaitingRoomEnabled =
+  useCallback(
+    async (enabled) => {
+      return updateRoomSettings({
+        ...state.roomSettings,
+
+        waitingRoomEnabled:
+          Boolean(enabled),
+      });
+    },
+    [
+      updateRoomSettings,
+      state.roomSettings,
+    ]
+  );
+
+const toggleWaitingRoom =
+  useCallback(
+    async (nextValue) => {
+      const enabled =
+        typeof nextValue ===
+        "boolean"
+          ? nextValue
+          : !waitingRoomEnabled;
+
+      return setWaitingRoomEnabled(
+        enabled
+      );
+    },
+    [
+      setWaitingRoomEnabled,
+      waitingRoomEnabled,
+    ]
+  );
+
+const setParticipantUnmuteAllowed =
+  useCallback(
+    async (enabled) => {
+      return updateRoomSettings({
+        ...state.roomSettings,
+
+        participantUnmuteAllowed:
+          Boolean(enabled),
+      });
+    },
+    [
+      updateRoomSettings,
+      state.roomSettings,
+    ]
+  );
+
+const setParticipantVideoAllowed =
+  useCallback(
+    async (enabled) => {
+      return updateRoomSettings({
+        ...state.roomSettings,
+
+        participantVideoAllowed:
+          Boolean(enabled),
+      });
+    },
+    [
+      updateRoomSettings,
+      state.roomSettings,
+    ]
+  );
+
+const setParticipantScreenShareAllowed =
+  useCallback(
+    async (enabled) => {
+      return updateRoomSettings({
+        ...state.roomSettings,
+
+        participantScreenShareAllowed:
+          Boolean(enabled),
+      });
+    },
+    [
+      updateRoomSettings,
+      state.roomSettings,
+    ]
+  );
+
+const setParticipantChatAllowed =
+  useCallback(
+    async (enabled) => {
+      return updateRoomSettings({
+        ...state.roomSettings,
+
+        participantChatAllowed:
+          Boolean(enabled),
+      });
+    },
+    [
+      updateRoomSettings,
+      state.roomSettings,
+    ]
+  );
 
   /* ========================================================
      WEBRTC EVENT SUBSCRIPTIONS
@@ -2542,147 +2938,291 @@ const LiveMeetingProvider = ({
   const canEndMeeting =
     isHost;
 
-  /* ========================================================
-     CONTEXT VALUE
-  ======================================================== */
+ /* ========================================================
+   CONTEXT VALUE
+======================================================== */
 
-  const contextValue =
-    useMemo(
-      () => ({
-        ...state,
+const contextValue =
+  useMemo(
+    () => ({
+      ...state,
 
-        currentUser,
-        currentUserId,
-        currentParticipant,
+      /* ==================================================
+         COMPATIBILITY ALIASES
+      ================================================== */
+
+      joined:
+        state.isJoined,
+
+      waiting:
+        state.isWaiting,
+
+      admitted:
+        state.isAdmitted,
+
+      raisedHand:
+        state.localMedia
+          ?.handRaised ||
+        false,
+
+      meetingRole:
         currentMeetingRole,
 
-        participants,
-        connectedParticipants,
-        waitingParticipants,
-        raisedHands,
-        typingUsers,
-
-        isHost,
-        isCoHost,
-        isModerator,
-
+      isManager:
         canManageRoom,
-        canAdmitParticipants,
-        canEndMeeting,
 
-        socket: getSocket(),
+      /* ==================================================
+         CURRENT USER
+      ================================================== */
 
-        localStreamRef,
-        screenStreamRef,
-        peerConnectionsRef,
-        remoteStreamsRef,
-        pendingIceCandidatesRef,
+      currentUser,
+      currentUserId,
+      currentParticipant,
+      currentMeetingRole,
 
-        joinRoom,
+      /* ==================================================
+         PARTICIPANTS
+      ================================================== */
+
+      participants,
+      connectedParticipants,
+      waitingParticipants,
+      raisedHands,
+      typingUsers,
+
+      /* ==================================================
+         PERMISSIONS
+      ================================================== */
+
+      isHost,
+      isCoHost,
+      isModerator,
+
+      canManageRoom,
+      canAdmitParticipants,
+      canEndMeeting,
+
+      /* ==================================================
+         SOCKET
+      ================================================== */
+
+      socket:
+        getSocket(),
+
+      /* ==================================================
+         REFERENCES
+      ================================================== */
+
+      localStreamRef,
+      screenStreamRef,
+      peerConnectionsRef,
+      remoteStreamsRef,
+      pendingIceCandidatesRef,
+
+      /* ==================================================
+         JOIN AND LEAVE
+      ================================================== */
+
+      joinRoom,
+      leaveRoom,
+
+      leaveMeeting:
         leaveRoom,
-        refreshPresence,
 
-        startRoomMeeting,
+      refreshPresence,
+
+      /* ==================================================
+         MEETING CONTROL
+      ================================================== */
+
+      startRoomMeeting,
+      endRoomMeeting,
+
+      endMeeting:
         endRoomMeeting,
 
-        admitParticipant,
-        removeParticipant,
-
-        updateLocalMedia,
-        setMicrophoneEnabled,
-        setCameraEnabled,
-        setHandRaised,
-        setScreenSharing,
-
-        sendChatMessage,
-        sendTypingStatus,
-
-        updateRoomSettings,
-
-        setLocalStream,
-        stopLocalStream,
-
-        setScreenStream,
-        stopScreenStream,
-
-        setRemoteStream,
-        getRemoteStream,
-
-        getPeerConnection,
-        setPeerConnection,
-        removePeerConnection,
-        closeAllPeerConnections,
-
-        subscribeToWebRTC,
-
-        clearError,
-        clearNotice,
-
-        disconnectSocket,
-      }),
-      [
-        state,
-
-        currentUser,
-        currentUserId,
-        currentParticipant,
-        currentMeetingRole,
-
-        participants,
-        connectedParticipants,
-        waitingParticipants,
-        raisedHands,
-        typingUsers,
-
-        isHost,
-        isCoHost,
-        isModerator,
-
-        canManageRoom,
-        canAdmitParticipants,
-        canEndMeeting,
-
-        joinRoom,
-        leaveRoom,
-        refreshPresence,
-
-        startRoomMeeting,
+      endMeetingForAll:
         endRoomMeeting,
 
-        admitParticipant,
-        removeParticipant,
+      /* ==================================================
+         WAITING ROOM
+      ================================================== */
 
-        updateLocalMedia,
-        setMicrophoneEnabled,
-        setCameraEnabled,
+      admitParticipant,
+      removeParticipant,
+
+      admitWaitingParticipant,
+
+      rejectParticipant:
+        rejectWaitingParticipant,
+
+      rejectWaitingParticipant,
+
+      /* ==================================================
+         LOCAL MEDIA
+      ================================================== */
+
+      updateLocalMedia,
+      setMicrophoneEnabled,
+      setCameraEnabled,
+      setHandRaised,
+
+      setRaisedHand:
         setHandRaised,
-        setScreenSharing,
 
-        sendChatMessage,
-        sendTypingStatus,
+      toggleRaisedHand,
+      setScreenSharing,
 
-        updateRoomSettings,
+      /* ==================================================
+         CHAT
+      ================================================== */
 
-        setLocalStream,
-        stopLocalStream,
+      sendChatMessage,
+      sendTypingStatus,
 
-        setScreenStream,
-        stopScreenStream,
+      /* ==================================================
+         HOST ROOM SETTINGS
+      ================================================== */
 
-        setRemoteStream,
-        getRemoteStream,
+      updateRoomSettings,
 
-        getPeerConnection,
-        setPeerConnection,
-        removePeerConnection,
-        closeAllPeerConnections,
+      meetingLocked,
+      waitingRoomEnabled,
 
-        subscribeToWebRTC,
+      participantUnmuteAllowed,
+      participantVideoAllowed,
+      participantScreenShareAllowed,
+      participantChatAllowed,
 
-        clearError,
-        clearNotice,
-      ]
-    );
+      setMeetingLocked,
+      toggleMeetingLock,
+
+      setWaitingRoomEnabled,
+      toggleWaitingRoom,
+
+      setParticipantUnmuteAllowed,
+      setParticipantVideoAllowed,
+      setParticipantScreenShareAllowed,
+      setParticipantChatAllowed,
+
+      /* ==================================================
+         MEDIA STREAM HELPERS
+      ================================================== */
+
+      setLocalStream,
+      stopLocalStream,
+
+      setScreenStream,
+      stopScreenStream,
+
+      setRemoteStream,
+      getRemoteStream,
+
+      /* ==================================================
+         PEER CONNECTION HELPERS
+      ================================================== */
+
+      getPeerConnection,
+      setPeerConnection,
+      removePeerConnection,
+      closeAllPeerConnections,
+
+      subscribeToWebRTC,
+
+      /* ==================================================
+         ERROR HELPERS
+      ================================================== */
+
+      clearError,
+      clearNotice,
+
+      disconnectSocket,
+    }),
+    [
+      state,
+
+      currentUser,
+      currentUserId,
+      currentParticipant,
+      currentMeetingRole,
+
+      participants,
+      connectedParticipants,
+      waitingParticipants,
+      raisedHands,
+      typingUsers,
+
+      isHost,
+      isCoHost,
+      isModerator,
+
+      canManageRoom,
+      canAdmitParticipants,
+      canEndMeeting,
+
+      joinRoom,
+      leaveRoom,
+      refreshPresence,
+
+      startRoomMeeting,
+      endRoomMeeting,
+
+      admitParticipant,
+      removeParticipant,
+      admitWaitingParticipant,
+      rejectWaitingParticipant,
+
+      updateLocalMedia,
+      setMicrophoneEnabled,
+      setCameraEnabled,
+      setHandRaised,
+      toggleRaisedHand,
+      setScreenSharing,
+
+      sendChatMessage,
+      sendTypingStatus,
+
+      updateRoomSettings,
+
+      meetingLocked,
+      waitingRoomEnabled,
+
+      participantUnmuteAllowed,
+      participantVideoAllowed,
+      participantScreenShareAllowed,
+      participantChatAllowed,
+
+      setMeetingLocked,
+      toggleMeetingLock,
+
+      setWaitingRoomEnabled,
+      toggleWaitingRoom,
+
+      setParticipantUnmuteAllowed,
+      setParticipantVideoAllowed,
+      setParticipantScreenShareAllowed,
+      setParticipantChatAllowed,
+
+      setLocalStream,
+      stopLocalStream,
+
+      setScreenStream,
+      stopScreenStream,
+
+      setRemoteStream,
+      getRemoteStream,
+
+      getPeerConnection,
+      setPeerConnection,
+      removePeerConnection,
+      closeAllPeerConnections,
+
+      subscribeToWebRTC,
+
+      clearError,
+      clearNotice,
+    ]
+  );
 
   return (
     <LiveMeetingContext.Provider
