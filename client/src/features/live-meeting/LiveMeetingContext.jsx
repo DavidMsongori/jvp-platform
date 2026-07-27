@@ -847,16 +847,75 @@ const liveMeetingReducer = (
                 String(item.userId) ===
                 userId
             );
+          presence.forEach(
+  (presenceEntry) => {
+    const userId =
+      String(
+        presenceEntry?.userId ||
+        ""
+      );
+
+    if (
+      !userId ||
+      participants[userId]
+    ) {
+      return;
+    }
+
+    participants[userId] =
+      normalizeParticipant(
+        {
+          userId,
+
+          socketId:
+            presenceEntry
+              ?.socketId ||
+            "",
+
+          socketIds:
+            presenceEntry
+              ?.socketIds ||
+            [],
+
+          connected: true,
+
+          connectionCount:
+            presenceEntry
+              ?.connectionCount ||
+            1,
+        },
+
+        state.meeting
+      );
+  }
+);
 
           participants[userId] = {
-            ...participants[userId],
-            connected: Boolean(
-              presenceEntry
-            ),
-            connectionCount:
-              presenceEntry
-                ?.connectionCount || 0,
-          };
+  ...participants[userId],
+
+  connected:
+    Boolean(presenceEntry),
+
+  connectionCount:
+    presenceEntry
+      ?.connectionCount || 0,
+
+  socketId:
+    presenceEntry
+      ?.socketId ||
+    participants[userId]
+      ?.socketId ||
+    "",
+
+  socketIds:
+    Array.isArray(
+      presenceEntry?.socketIds
+    )
+      ? presenceEntry.socketIds
+      : participants[userId]
+          ?.socketIds ||
+        [],
+};
         }
       );
 

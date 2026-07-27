@@ -420,11 +420,24 @@ const getConnectedParticipants = (
     ([
       userId,
       socketIds,
-    ]) => ({
-      userId,
-      connectionCount:
-        socketIds.size,
-    })
+    ]) => {
+      const resolvedSocketIds =
+        Array.from(socketIds);
+
+      return {
+        userId,
+
+        socketId:
+          resolvedSocketIds[0] ||
+          "",
+
+        socketIds:
+          resolvedSocketIds,
+
+        connectionCount:
+          resolvedSocketIds.length,
+      };
+    }
   );
 };
 

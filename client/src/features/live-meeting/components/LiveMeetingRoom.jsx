@@ -404,7 +404,14 @@ const participants =
     currentUserEmail,
   ]);
 
- 
+ const activeParticipants = useMemo(() => {
+  return participants.filter((participant) => {
+    return (
+      participant?.connected === true &&
+      Number(participant?.connectionCount || 0) > 0
+    );
+  });
+}, [participants]);
 
   const {
   socketStatus = "disconnected",
@@ -2279,7 +2286,7 @@ const handleSelectSpeaker =
   const videoGridProps =
     useMemo(
       () => ({
-        participants,
+       participants: activeParticipants,
 
         remoteStreams:
           currentRemoteStreams,
@@ -2322,7 +2329,7 @@ const handleSelectSpeaker =
           false,
       }),
       [
-        participants,
+        activeParticipants,
         currentRemoteStreams,
         localStream,
         screenShare

@@ -2299,6 +2299,77 @@ const useWebRTC = ({
     connectToPeer,
   ]);
 
+/* ========================================================
+   REMOVE DISCONNECTED PEERS
+======================================================== */
+
+useEffect(() => {
+  if (
+    !isJoined ||
+    !isAdmitted
+  ) {
+    return;
+  }
+
+  const activeSocketIds =
+    new Set(
+      connectedParticipants.flatMap(
+        (participant) => [
+          ...(participant
+            ?.socketIds ||
+            []),
+
+          participant?.socketId,
+        ]
+          .filter(Boolean)
+          .map(normalizeSocketId)
+      )
+    );
+
+  const localSocketId =
+    normalizeSocketId(
+      socketId ||
+      socket?.id
+    );
+
+  Array.from(
+    peerConnectionsRef.current
+      .keys()
+  ).forEach(
+    (targetSocketId) => {
+      const normalizedTargetSocketId =
+        normalizeSocketId(
+          targetSocketId
+        );
+
+      if (
+        normalizedTargetSocketId ===
+        localSocketId
+      ) {
+        return;
+      }
+
+      if (
+        !activeSocketIds.has(
+          normalizedTargetSocketId
+        )
+      ) {
+        disconnectPeer(
+          normalizedTargetSocketId
+        );
+      }
+    }
+  );
+}, [
+  isJoined,
+  isAdmitted,
+  connectedParticipants,
+  socketId,
+  socket,
+  peerConnectionsRef,
+  disconnectPeer,
+]);
+
   /* ========================================================
      LOCAL TRACK SYNCHRONIZATION
   ======================================================== */
