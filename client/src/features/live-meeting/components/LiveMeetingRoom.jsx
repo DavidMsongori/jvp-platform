@@ -261,6 +261,8 @@ const LiveMeetingRoom = ({
     liveMeeting.user ||
     null;
 
+
+
   const resolvedCurrentUserId =
     String(
       currentUser?._id ||
@@ -427,6 +429,10 @@ const participants =
 
   roomStatus,
 
+  chatMessages = [],
+sendChatMessage,
+sendTypingStatus,
+
   joinRoom,
   leaveMeeting,
 
@@ -537,10 +543,6 @@ const [
   setChatPanelOpen,
 ] = useState(false);
 
-const [
-  chatMessages,
-  setChatMessages,
-] = useState([]);
 
 const [
   chatSending,
@@ -1230,119 +1232,24 @@ const handleToggleHostControlsPanel =
   }, []);
 
 
-  const handleSendChatMessage =
-  useCallback(
-    async (messageText) => {
-      const text =
-        String(
-          messageText || ""
-        ).trim();
+  const handleSendChatMessage = useCallback(
+  async (messageText) => {
+    const text = String(messageText || "").trim();
 
-      if (!text) {
-        return;
-      }
+    if (!text) return;
 
-      setChatSending(true);
+    setChatSending(true);
 
-      try {
-        const temporaryMessage = {
-          clientId:
-            `local-${Date.now()}-${Math.random()
-              .toString(36)
-              .slice(2)}`,
-
-          senderId:
-            resolvedCurrentUserId,
-
-          senderName:
-            currentUser?.fullName ||
-            currentUser?.name ||
-            [
-              currentUser?.firstName,
-              currentUser?.middleName,
-              currentUser?.lastName,
-            ]
-              .filter(Boolean)
-              .join(" ") ||
-            currentUser?.email ||
-            "You",
-
-          senderPhoto:
-            currentUser?.profilePhoto ||
-            currentUser?.avatar ||
-            "",
-
-          text,
-
-          createdAt:
-            new Date().toISOString(),
-
-          status: "sent",
-        };
-
-        setChatMessages(
-          (currentMessages) => [
-            ...currentMessages,
-            temporaryMessage,
-          ]
-        );
-
-        /*
-         * Later, replace the local update above
-         * with the socket/context chat method.
-         *
-         * Example:
-         *
-         * await liveMeeting.sendChatMessage({
-         *   message: text,
-         * });
-         */
-      } finally {
-        setChatSending(false);
-      }
-    },
-    [
-      currentUser,
-      resolvedCurrentUserId,
-    ]
-  );
-
-  const handleDeleteChatMessage =
-  useCallback((message) => {
-    const messageId =
-      String(
-        message?.messageId ||
-        message?._id ||
-        message?.id ||
-        message?.clientId ||
-        ""
-      );
-
-    if (!messageId) {
-      return;
+    try {
+      await sendChatMessage(text);
+    } finally {
+      setChatSending(false);
     }
+  },
+  [sendChatMessage]
+);
 
-    setChatMessages(
-      (currentMessages) =>
-        currentMessages.filter(
-          (currentMessage) => {
-            const currentMessageId =
-              String(
-                currentMessage?.messageId ||
-                currentMessage?._id ||
-                currentMessage?.id ||
-                currentMessage?.clientId ||
-                ""
-              );
 
-            return (
-              currentMessageId !==
-              messageId
-            );
-          }
-        )
-    );
-  }, []);
 
   const resolveWaitingParticipantId =
   useCallback((participant) => {
@@ -2733,31 +2640,22 @@ const handleSelectSpeaker =
 
 {chatPanelOpen && (
   <MeetingChatPanel
-    messages={
-      chatMessages
+    isOpen={chatPanelOpen}
+    messages={chatMessages}
+    currentUser={currentUser}
+    canSend={
+      isConnected &&
+      participantChatAllowed
     }
-    currentUser={
-      currentUser
-    }
-    isOpen={
-      chatPanelOpen
-    }
-   canSend={true}
-
-    canDeleteMessages={
-      canManageParticipants
-    }
-    sending={
-      chatSending
-    }
+    sending={chatSending}
     onClose={() =>
       setChatPanelOpen(false)
     }
     onSendMessage={
       handleSendChatMessage
     }
-    onDeleteMessage={
-      handleDeleteChatMessage
+    onTypingChange={
+      sendTypingStatus
     }
   />
 )}
