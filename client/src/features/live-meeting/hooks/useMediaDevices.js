@@ -248,6 +248,9 @@ const useMediaDevices = ({
   const refreshingRef =
     useRef(false);
 
+  const initialRefreshDoneRef =
+  useRef(false);  
+
   const [
     devices,
     setDevices,
@@ -741,17 +744,13 @@ const useMediaDevices = ({
         }
       },
       [
-        mediaDevicesSupported,
-        devices,
-        requestLabels,
-        requestDevicePermission,
-        selectedAudioInputId,
-        selectedVideoInputId,
-        selectedAudioOutputId,
-        rememberSelection,
-        onDevicesChanged,
-        handleError,
-      ]
+  mediaDevicesSupported,
+  requestLabels,
+  requestDevicePermission,
+  rememberSelection,
+  onDevicesChanged,
+  handleError,
+]
     );
 
   /* ========================================================
@@ -1095,6 +1094,22 @@ const useMediaDevices = ({
             )
           );
 
+          await Promise.all(
+  validElements.map(
+    async (element) => {
+      element.volume = 1;
+
+      if (element.paused) {
+        try {
+          await element.play();
+        } catch {
+          // Browser may block autoplay.
+        }
+      }
+    }
+  )
+);
+
           setSelectedAudioOutputId(
             nextDeviceId
           );
@@ -1230,30 +1245,30 @@ const useMediaDevices = ({
      INITIAL REFRESH
   ======================================================== */
 
-  useEffect(() => {
-    mountedRef.current =
+ useEffect(() => {
+  mountedRef.current = true;
+
+  if (
+    autoRefresh &&
+    mediaDevicesSupported &&
+    !initialRefreshDoneRef.current
+  ) {
+    initialRefreshDoneRef.current =
       true;
 
-    if (
-      autoRefresh &&
-      mediaDevicesSupported
-    ) {
-      refreshDevices().catch(
-        () => {
-          // Error is already stored by refreshDevices.
-        }
-      );
-    }
+    refreshDevices().catch(() => {
+      // Error is already stored by refreshDevices.
+    });
+  }
 
-    return () => {
-      mountedRef.current =
-        false;
-    };
-  }, [
-    autoRefresh,
-    mediaDevicesSupported,
-    refreshDevices,
-  ]);
+  return () => {
+    mountedRef.current = false;
+  };
+}, [
+  autoRefresh,
+  mediaDevicesSupported,
+  refreshDevices,
+]);
 
   /* ========================================================
      DEVICE CHANGE LISTENER
