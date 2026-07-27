@@ -46,67 +46,119 @@ async function startServer() {
     const httpServer =
       http.createServer(app);
 
-    /* ======================================
-       SOCKET.IO SERVER
-    ====================================== */
+   /* ======================================
+   SOCKET.IO SERVER
+====================================== */
 
-    const io = new Server(
-      httpServer,
-      {
-        cors: {
-          origin(origin, callback) {
-            if (!origin) {
-              return callback(
-                null,
-                true
-              );
-            }
+const socketAllowedOrigins = [
+  ...allowedOrigins,
 
-            if (
-              allowedOrigins.includes(
-                origin
-              )
-            ) {
-              return callback(
-                null,
-                true
-              );
-            }
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
 
-            return callback(
-              new Error(
-                `Socket origin ${origin} is not allowed.`
-              )
-            );
-          },
+  "https://jvp-platform.vercel.app",
+  "https://jvp.co.ke",
+  "https://www.jvp.co.ke",
+];
 
-          methods: [
-            "GET",
-            "POST",
-            "PUT",
-            "PATCH",
-            "DELETE",
-            "OPTIONS",
-          ],
+const io = new Server(
+  httpServer,
+  {
+    cors: {
+      origin(origin, callback) {
+        /*
+         * Allow requests without an Origin header.
+         * This supports tools, server-to-server requests,
+         * and some mobile clients.
+         */
+        if (!origin) {
+          return callback(
+            null,
+            true
+          );
+        }
 
-          credentials: true,
-        },
+        if (
+          socketAllowedOrigins.includes(
+            origin
+          )
+        ) {
+          return callback(
+            null,
+            true
+          );
+        }
 
-        transports: [
-          "websocket",
-          "polling",
-        ],
+        /*
+         * Allow Vercel preview deployments for this project.
+         *
+         * Examples:
+         * https://jvp-platform-git-main-username.vercel.app
+         * https://jvp-platform-abc123.vercel.app
+         */
+        const isAllowedVercelPreview =
+          /^https:\/\/jvp-platform(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(
+            origin
+          );
 
-        pingTimeout: 60000,
-        pingInterval: 25000,
-        maxHttpBufferSize: 1e6,
-        allowEIO3: false,
-      }
-    );
+        if (isAllowedVercelPreview) {
+          return callback(
+            null,
+            true
+          );
+        }
 
-    app.set("io", io);
+        console.warn(
+          `Blocked Socket.IO origin: ${origin}`
+        );
 
-    registerMeetingSocket(io);
+        return callback(
+          new Error(
+            `Socket origin ${origin} is not allowed.`
+          )
+        );
+      },
+
+      methods: [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS",
+      ],
+
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+      ],
+
+      credentials: true,
+    },
+
+    transports: [
+      "websocket",
+      "polling",
+    ],
+
+    pingTimeout: 60000,
+    pingInterval: 25000,
+
+    maxHttpBufferSize: 1e6,
+
+    allowEIO3: false,
+
+    /*
+     * Keep the standard Socket.IO path unless the
+     * client explicitly uses a different one.
+     */
+    path: "/socket.io",
+  }
+);
+
+app.set("io", io);
+
+registerMeetingSocket(io);
 
     /* ======================================
        START SERVER
