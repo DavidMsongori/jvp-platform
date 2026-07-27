@@ -1094,22 +1094,6 @@ const useMediaDevices = ({
             )
           );
 
-          await Promise.all(
-  validElements.map(
-    async (element) => {
-      element.volume = 1;
-
-      if (element.paused) {
-        try {
-          await element.play();
-        } catch {
-          // Browser may block autoplay.
-        }
-      }
-    }
-  )
-);
-
           setSelectedAudioOutputId(
             nextDeviceId
           );
