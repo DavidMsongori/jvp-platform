@@ -18,14 +18,6 @@ const DEFAULT_AUDIO_CONSTRAINTS = {
   echoCancellation: true,
   noiseSuppression: true,
   autoGainControl: true,
-
-  channelCount: 2,
-
-  sampleRate: 48000,
-
-  sampleSize: 16,
-
-  latency: 0,
 };
 
 const DEFAULT_VIDEO_CONSTRAINTS = {
@@ -768,58 +760,6 @@ const useLocalMedia = ({
 
                 let finalStream =
                   newStream;
-
-/* ========================================================
-   BOOST MICROPHONE GAIN
-======================================================== */
-
-const microphoneTrack =
-  newStream.getAudioTracks()[0];
-
-if (microphoneTrack) {
-  try {
-    const audioContext =
-      new AudioContext();
-
-    const source =
-      audioContext.createMediaStreamSource(
-        new MediaStream([
-          microphoneTrack,
-        ])
-      );
-
-    const gainNode =
-      audioContext.createGain();
-
-    gainNode.gain.value = 2.0;
-
-    const destination =
-      audioContext.createMediaStreamDestination();
-
-    source.connect(gainNode);
-    gainNode.connect(destination);
-
-    const boostedTrack =
-      destination.stream.getAudioTracks()[0];
-
-    if (boostedTrack) {
-      newStream.removeTrack(
-        microphoneTrack
-      );
-
-      microphoneTrack.stop();
-
-      newStream.addTrack(
-        boostedTrack
-      );
-    }
-  } catch (error) {
-    console.warn(
-      "Unable to boost microphone",
-      error
-    );
-  }
-}
 
                 if (
                   preserveExistingTracks &&
