@@ -80,6 +80,7 @@ import LeadershipDocuments from "../pages/leadership/LeadershipDocuments";
 import LeadershipCommittees from "../pages/leadership/LeadershipCommittees";
 import LeadershipAnalytics from "../pages/leadership/LeadershipAnalytics";
 import LeadershipSettings from "../pages/leadership/LeadershipSettings";
+import LeadershipMeetingDetails from "../pages/LeadershipMeetingDetails";
 
 
 /* ==========================================
@@ -288,6 +289,11 @@ function AppRoutes() {
   <Route
     path="meetings"
     element={<LeadershipMeetings />}
+  />
+
+  <Route
+    path="meetings/:meetingId"
+    element={<LeadershipMeetingDetails />}
   />
 
   <Route

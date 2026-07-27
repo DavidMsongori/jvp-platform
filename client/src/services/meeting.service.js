@@ -188,20 +188,19 @@ export const removeMeetingAgendaItem =
    PARTICIPANTS
 ========================================================== */
 
-export const inviteMeetingParticipants =
-  async (
-    meetingId,
-    participants
-  ) => {
-    const response = await api.post(
-      `/meetings/${meetingId}/participants`,
-      {
-        participants,
-      }
-    );
+export const inviteMeetingParticipants = async (
+  meetingId,
+  participants
+) => {
+  const response = await api.post(
+    `/meetings/${meetingId}/participants`,
+    {
+      participants,
+    }
+  );
 
-    return response.data;
-  };
+  return response.data;
+};
 
 export const removeMeetingParticipant =
   async (

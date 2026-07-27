@@ -5,6 +5,8 @@ import {
   useState,
 } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import {
   cancelMeeting,
   createMeeting,
@@ -254,6 +256,7 @@ const toISOStringFromLocalInput = (
 ========================================================== */
 
 const LeadershipMeeting = () => {
+    const navigate = useNavigate();
   const [
     meetings,
     setMeetings,
@@ -786,38 +789,6 @@ const LeadershipMeeting = () => {
      MEETING DETAILS
   ======================================================== */
 
-  const openMeetingDetails =
-    async (meetingId) => {
-      try {
-        setActionLoading(true);
-        setError("");
-
-        const response =
-          await getMeetingById(
-            meetingId
-          );
-
-        setSelectedMeeting(
-          getSingleMeeting(
-            response
-          )
-        );
-
-        setDetailsModalOpen(
-          true
-        );
-      } catch (requestError) {
-        setError(
-          getApiErrorMessage(
-            requestError,
-            "Unable to retrieve meeting details."
-          )
-        );
-      } finally {
-        setActionLoading(false);
-      }
-    };
-
   const refreshSelectedMeeting =
     async () => {
       if (
@@ -1002,6 +973,12 @@ const LeadershipMeeting = () => {
       </span>
     );
   };
+
+  const openMeetingDetails = (meetingId) => {
+  navigate(
+    `/workspace/leadership/meetings/${meetingId}`
+  );
+};
 
   const renderMeetingActions = (
     meeting,

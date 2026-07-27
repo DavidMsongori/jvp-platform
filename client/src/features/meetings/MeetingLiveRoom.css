@@ -1,0 +1,642 @@
+.meeting-live-room {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.meeting-live-room__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.meeting-live-room__eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meeting-live-room__header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #101828;
+  font-size: 24px;
+}
+
+.meeting-live-room__header p {
+  max-width: 650px;
+  margin: 7px 0 0;
+  color: #667085;
+  line-height: 1.6;
+}
+
+.meeting-live-room__header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.meeting-live-room__status {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #f2f4f7;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.meeting-live-room__status > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #98a2b3;
+}
+
+.meeting-live-room__status--live {
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.meeting-live-room__status--live > span {
+  background: #12b76a;
+}
+
+.meeting-live-room__status--scheduled {
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+.meeting-live-room__status--scheduled > span {
+  background: #2e90fa;
+}
+
+.meeting-live-room__status--completed {
+  background: #f2f4f7;
+  color: #475467;
+}
+
+.meeting-live-room__status--cancelled {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.meeting-live-room__status--cancelled
+  > span {
+  background: #f04438;
+}
+
+.meeting-live-room__settings-button,
+.meeting-live-room__save-settings,
+.meeting-live-room__response-button,
+.meeting-live-room__external-button,
+.meeting-live-room__join-button,
+.meeting-live-room__leave-button {
+  display: inline-flex;
+  min-height: 41px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 15px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.meeting-live-room__settings-button,
+.meeting-live-room__external-button {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+}
+
+.meeting-live-room__save-settings,
+.meeting-live-room__join-button {
+  border: 1px solid #101828;
+  background: #101828;
+  color: #ffffff;
+}
+
+.meeting-live-room__leave-button {
+  border: 1px solid #d92d20;
+  background: #d92d20;
+  color: #ffffff;
+}
+
+.meeting-live-room button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.meeting-live-room__alert {
+  padding: 13px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.meeting-live-room__alert--error {
+  border: 1px solid #fecdca;
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.meeting-live-room__alert--success {
+  border: 1px solid #abefc6;
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.meeting-live-room__summary {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.meeting-live-room__summary article {
+  display: flex;
+  min-height: 104px;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #eaecf0;
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+.meeting-live-room__summary article > span {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #f2f4f7;
+  color: #475467;
+  font-size: 19px;
+}
+
+.meeting-live-room__summary small {
+  display: block;
+  margin-bottom: 5px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.meeting-live-room__summary strong {
+  color: #101828;
+  font-size: 19px;
+}
+
+.meeting-live-room__settings-panel {
+  padding: 23px;
+  border: 1px solid #d0d5dd;
+  border-radius: 17px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px
+    rgba(16, 24, 40, 0.06);
+}
+
+.meeting-live-room__settings-header {
+  margin-bottom: 20px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.meeting-live-room__settings-header h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 18px;
+}
+
+.meeting-live-room__settings-header p {
+  margin: 6px 0 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.meeting-live-room__settings-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.meeting-live-room__settings-grid label {
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 15px;
+  border: 1px solid #eaecf0;
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.meeting-live-room__settings-grid label div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meeting-live-room__settings-grid strong {
+  color: #344054;
+  font-size: 13px;
+}
+
+.meeting-live-room__settings-grid span {
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.meeting-live-room__settings-grid input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.meeting-live-room__settings-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #eaecf0;
+}
+
+.meeting-live-room__settings-footer
+  > button:first-child {
+  min-height: 41px;
+  padding: 0 15px;
+  border: 1px solid #d0d5dd;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #344054;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.meeting-live-room__invitation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 19px;
+  border: 1px solid #eaecf0;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.meeting-live-room__invitation h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 15px;
+}
+
+.meeting-live-room__invitation p {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.meeting-live-room__invitation > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meeting-live-room__response-button {
+  min-height: 37px;
+  padding: 0 13px;
+}
+
+.meeting-live-room__response-button--accepted {
+  border: 1px solid #abefc6;
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.meeting-live-room__response-button--tentative {
+  border: 1px solid #b2ddff;
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+.meeting-live-room__response-button--declined {
+  border: 1px solid #fecdca;
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.meeting-live-room__room {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    310px;
+  min-height: 520px;
+  overflow: hidden;
+  border: 1px solid #344054;
+  border-radius: 18px;
+  background: #101828;
+}
+
+.meeting-live-room__stage {
+  position: relative;
+  display: flex;
+  min-height: 520px;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  background:
+    radial-gradient(
+      circle at top,
+      #344054,
+      #101828 58%
+    );
+}
+
+.meeting-live-room__stage-empty {
+  max-width: 450px;
+  text-align: center;
+}
+
+.meeting-live-room__stage-icon {
+  display: inline-flex;
+  width: 70px;
+  height: 70px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 30px;
+}
+
+.meeting-live-room__stage h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 23px;
+}
+
+.meeting-live-room__stage p {
+  margin: 9px 0 0;
+  color: #d0d5dd;
+  line-height: 1.65;
+}
+
+.meeting-live-room__joined-state {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.meeting-live-room__video-placeholder {
+  display: flex;
+  min-height: 440px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 1px solid #475467;
+  border-radius: 15px;
+  background: #1d2939;
+  color: #d0d5dd;
+}
+
+.meeting-live-room__video-placeholder svg {
+  width: 42px;
+  height: 42px;
+}
+
+.meeting-live-room__joined-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(2, 122, 72, 0.9);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.meeting-live-room__joined-badge span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #75e0a7;
+}
+
+.meeting-live-room__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+  border-left: 1px solid #344054;
+  background: #1d2939;
+}
+
+.meeting-live-room__sidebar h3 {
+  margin: 0 0 13px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.meeting-live-room__room-info {
+  padding-bottom: 18px;
+  border-bottom: 1px solid #344054;
+}
+
+.meeting-live-room__room-info > p {
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+.meeting-live-room__room-code {
+  padding: 12px;
+  border-radius: 10px;
+  background: #344054;
+}
+
+.meeting-live-room__room-code > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #98a2b3;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.meeting-live-room__room-code > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.meeting-live-room__room-code strong {
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+}
+
+.meeting-live-room__room-code button {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: #475467;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.meeting-live-room__external-button {
+  width: 100%;
+  margin-top: 10px;
+  border-color: #475467;
+  background: #344054;
+  color: #ffffff;
+}
+
+.meeting-live-room__device-controls {
+  flex: 1;
+}
+
+.meeting-live-room__device-controls
+  > div {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.meeting-live-room__device-controls button {
+  display: flex;
+  min-height: 45px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 13px;
+  border: 1px solid #475467;
+  border-radius: 9px;
+  background: #344054;
+  color: #d0d5dd;
+  cursor: pointer;
+  text-align: left;
+}
+
+.meeting-live-room__device-controls
+  button.is-active {
+  border-color: #75e0a7;
+  background: #05603a;
+  color: #ffffff;
+}
+
+.meeting-live-room__device-controls
+  button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.meeting-live-room__join-button,
+.meeting-live-room__leave-button {
+  width: 100%;
+  margin-top: auto;
+}
+
+@media (max-width: 950px) {
+  .meeting-live-room__room {
+    grid-template-columns: 1fr;
+  }
+
+  .meeting-live-room__sidebar {
+    border-top: 1px solid #344054;
+    border-left: 0;
+  }
+
+  .meeting-live-room__stage {
+    min-height: 430px;
+  }
+}
+
+@media (max-width: 760px) {
+  .meeting-live-room__header,
+  .meeting-live-room__invitation {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .meeting-live-room__header-actions {
+    justify-content: flex-start;
+  }
+
+  .meeting-live-room__summary,
+  .meeting-live-room__settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .meeting-live-room__invitation
+    > div:last-child {
+    width: 100%;
+  }
+
+  .meeting-live-room__response-button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .meeting-live-room__header-actions,
+  .meeting-live-room__settings-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .meeting-live-room__settings-button,
+  .meeting-live-room__save-settings,
+  .meeting-live-room__settings-footer
+    > button:first-child {
+    width: 100%;
+  }
+
+  .meeting-live-room__response-button {
+    width: 100%;
+    flex: none;
+  }
+
+  .meeting-live-room__stage {
+    min-height: 360px;
+    padding: 20px;
+  }
+
+  .meeting-live-room__video-placeholder {
+    min-height: 310px;
+  }
+}

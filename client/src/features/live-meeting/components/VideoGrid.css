@@ -1,0 +1,458 @@
+/* ==========================================================
+   VIDEO GRID ROOT
+========================================================== */
+
+.video-grid {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.video-grid__count {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  backdrop-filter: blur(10px);
+}
+
+/* ==========================================================
+   STANDARD GRID
+========================================================== */
+
+.video-grid__tiles {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  gap: 14px;
+  align-content: center;
+  justify-content: center;
+}
+
+.video-grid__tile {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.video-grid__tile > * {
+  height: 100%;
+}
+
+/* ==========================================================
+   GRID SIZE: 1 PARTICIPANT
+========================================================== */
+
+.video-grid--size-1
+  .video-grid__tiles {
+  grid-template-columns:
+    minmax(280px, 920px);
+}
+
+.video-grid--size-1
+  .video-grid__tile {
+  max-height: 720px;
+}
+
+/* ==========================================================
+   GRID SIZE: 2 PARTICIPANTS
+========================================================== */
+
+.video-grid--size-2
+  .video-grid__tiles {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(260px, 1fr)
+    );
+}
+
+/* ==========================================================
+   GRID SIZE: 3–4 PARTICIPANTS
+========================================================== */
+
+.video-grid--size-4
+  .video-grid__tiles {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(250px, 1fr)
+    );
+}
+
+/* ==========================================================
+   GRID SIZE: 5–6 PARTICIPANTS
+========================================================== */
+
+.video-grid--size-6
+  .video-grid__tiles {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(220px, 1fr)
+    );
+}
+
+/* ==========================================================
+   GRID SIZE: 7–9 PARTICIPANTS
+========================================================== */
+
+.video-grid--size-9
+  .video-grid__tiles {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(200px, 1fr)
+    );
+}
+
+/* ==========================================================
+   GRID SIZE: 10–12 PARTICIPANTS
+========================================================== */
+
+.video-grid--size-12
+  .video-grid__tiles {
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(180px, 1fr)
+    );
+}
+
+/* ==========================================================
+   GRID SIZE: MANY PARTICIPANTS
+========================================================== */
+
+.video-grid--size-many
+  .video-grid__tiles {
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(190px, 1fr)
+    );
+  align-content: start;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.video-grid--size-many
+  .video-grid__tile {
+  align-self: start;
+}
+
+/* ==========================================================
+   SPOTLIGHT LAYOUT
+========================================================== */
+
+.video-grid__spotlight {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(190px, 250px);
+  gap: 14px;
+}
+
+.video-grid__featured {
+  min-width: 0;
+  min-height: 0;
+}
+
+.video-grid__featured
+  > * {
+  height: 100%;
+}
+
+.video-grid__featured
+  .participant-video {
+  height: 100%;
+}
+
+.video-grid__featured
+  .participant-video__media {
+  height: 100%;
+  min-height: 420px;
+  aspect-ratio: auto;
+}
+
+.video-grid__filmstrip {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: 12px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+}
+
+.video-grid__filmstrip-tile {
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.video-grid__filmstrip
+  .local-video-preview,
+.video-grid__filmstrip
+  .participant-video {
+  max-width: none;
+}
+
+.video-grid__filmstrip
+  .local-video-preview__media,
+.video-grid__filmstrip
+  .participant-video__media {
+  min-height: 125px;
+}
+
+/* ==========================================================
+   SCROLLBARS
+========================================================== */
+
+.video-grid__filmstrip::-webkit-scrollbar,
+.video-grid--size-many
+  .video-grid__tiles::-webkit-scrollbar {
+  width: 7px;
+}
+
+.video-grid__filmstrip::-webkit-scrollbar-track,
+.video-grid--size-many
+  .video-grid__tiles::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.video-grid__filmstrip::-webkit-scrollbar-thumb,
+.video-grid--size-many
+  .video-grid__tiles::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.3);
+}
+
+.video-grid__filmstrip::-webkit-scrollbar-thumb:hover,
+.video-grid--size-many
+  .video-grid__tiles::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* ==========================================================
+   EMPTY STATE
+========================================================== */
+
+.video-grid--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  border: 1px dashed rgba(148, 163, 184, 0.28);
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(15, 23, 42, 0.98),
+      rgba(30, 41, 59, 0.95)
+    );
+}
+
+.video-grid__empty-state {
+  display: flex;
+  max-width: 360px;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  text-align: center;
+}
+
+.video-grid__empty-icon {
+  display: inline-flex;
+  width: 64px;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.72);
+  color: #5eead4;
+  font-size: 1.6rem;
+}
+
+.video-grid__empty-state h3 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.video-grid__empty-state p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================
+   COMPACT MODE
+========================================================== */
+
+.video-grid--compact
+  .video-grid__tiles {
+  gap: 10px;
+}
+
+.video-grid--compact
+  .video-grid__spotlight {
+  gap: 10px;
+}
+
+.video-grid--compact
+  .video-grid__filmstrip {
+  gap: 9px;
+}
+
+/* ==========================================================
+   LAPTOPS AND SMALL DESKTOPS
+========================================================== */
+
+@media (max-width: 1200px) {
+  .video-grid--size-12
+    .video-grid__tiles {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(190px, 1fr)
+      );
+  }
+
+  .video-grid__spotlight {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(170px, 220px);
+  }
+}
+
+/* ==========================================================
+   TABLETS
+========================================================== */
+
+@media (max-width: 900px) {
+  .video-grid--size-6
+    .video-grid__tiles,
+  .video-grid--size-9
+    .video-grid__tiles,
+  .video-grid--size-12
+    .video-grid__tiles,
+  .video-grid--size-many
+    .video-grid__tiles {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(210px, 1fr)
+      );
+  }
+
+  .video-grid__spotlight {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-grid__featured {
+    flex: 1 1 auto;
+  }
+
+  .video-grid__featured
+    .participant-video__media {
+    min-height: 350px;
+  }
+
+  .video-grid__filmstrip {
+    flex: 0 0 auto;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-right: 0;
+    padding-bottom: 4px;
+  }
+
+  .video-grid__filmstrip-tile {
+    width: 220px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 640px) {
+  .video-grid__tiles {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    overflow-y: auto;
+  }
+
+  .video-grid__tile {
+    flex: 0 0 auto;
+  }
+
+  .video-grid__count {
+    top: 8px;
+    left: 8px;
+    padding: 6px 9px;
+    font-size: 0.7rem;
+  }
+
+  .video-grid__spotlight {
+    gap: 10px;
+  }
+
+  .video-grid__featured {
+    flex: 0 0 auto;
+  }
+
+  .video-grid__featured
+    .participant-video__media {
+    height: auto;
+    min-height: 240px;
+    aspect-ratio: 16 / 9;
+  }
+
+  .video-grid__filmstrip {
+    gap: 9px;
+  }
+
+  .video-grid__filmstrip-tile {
+    width: 180px;
+  }
+
+  .video-grid__filmstrip
+    .local-video-preview__media,
+  .video-grid__filmstrip
+    .participant-video__media {
+    min-height: 105px;
+  }
+
+  .video-grid--empty {
+    min-height: 260px;
+    border-radius: 14px;
+  }
+
+  .video-grid__empty-state {
+    padding: 24px;
+  }
+}

@@ -1,0 +1,502 @@
+/* ==========================================================
+   MEETING TOOLBAR
+========================================================== */
+
+.meeting-toolbar {
+  position: relative;
+  z-index: 50;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns:
+    minmax(180px, 1fr)
+    auto
+    minmax(180px, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 14px 24px;
+  border-top: 1px solid
+    rgba(148, 163, 184, 0.16);
+  background:
+    rgba(2, 6, 23, 0.97);
+  backdrop-filter: blur(20px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.meeting-toolbar--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(100%);
+}
+
+/* ==========================================================
+   SECTIONS
+========================================================== */
+
+.meeting-toolbar__section {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.meeting-toolbar__section--left {
+  justify-content: flex-start;
+}
+
+.meeting-toolbar__section--centre {
+  justify-content: center;
+}
+
+.meeting-toolbar__section--right {
+  justify-content: flex-end;
+}
+
+/* ==========================================================
+   TOOLBAR BUTTON
+========================================================== */
+
+.meeting-toolbar__button {
+  position: relative;
+  display: inline-flex;
+  min-width: 88px;
+  min-height: 64px;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border: 1px solid
+    rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  background:
+    rgba(30, 41, 59, 0.92);
+  color: #f8fafc;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.meeting-toolbar__button:hover:not(
+    :disabled
+  ) {
+  border-color:
+    rgba(94, 234, 212, 0.34);
+  background: #334155;
+  transform: translateY(-2px);
+}
+
+.meeting-toolbar__button:focus-visible,
+.meeting-toolbar__device-arrow:focus-visible,
+.meeting-toolbar__leave-button:focus-visible {
+  outline: 3px solid
+    rgba(45, 212, 191, 0.32);
+  outline-offset: 2px;
+}
+
+.meeting-toolbar__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+}
+
+/* ==========================================================
+   MEDIA OFF AND ACTIVE STATES
+========================================================== */
+
+.meeting-toolbar__button--media-off {
+  border-color:
+    rgba(248, 113, 113, 0.24);
+  background:
+    rgba(127, 29, 29, 0.72);
+  color: #fecaca;
+}
+
+.meeting-toolbar__button--media-off:hover:not(
+    :disabled
+  ) {
+  border-color:
+    rgba(248, 113, 113, 0.42);
+  background:
+    rgba(153, 27, 27, 0.9);
+}
+
+.meeting-toolbar__button--active {
+  border-color:
+    rgba(45, 212, 191, 0.4);
+  background:
+    rgba(15, 118, 110, 0.92);
+  color: #ffffff;
+}
+
+.meeting-toolbar__button--active:hover:not(
+    :disabled
+  ) {
+  background:
+    rgba(13, 148, 136, 0.96);
+}
+
+/* ==========================================================
+   ICON AND LABEL
+========================================================== */
+
+.meeting-toolbar__button-icon {
+  display: inline-flex;
+  min-height: 23px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.22rem;
+  line-height: 1;
+}
+
+.meeting-toolbar__button-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.meeting-toolbar__hand-icon {
+  display: inline-flex;
+  font-size: 1.16rem;
+  line-height: 1;
+}
+
+.meeting-toolbar__button-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   BADGE
+========================================================== */
+
+.meeting-toolbar__button-badge {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  display: inline-flex;
+  min-width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid #1e293b;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.63rem;
+  font-weight: 800;
+}
+
+/* ==========================================================
+   SPLIT MICROPHONE CONTROL
+========================================================== */
+
+.meeting-toolbar__split-control {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+}
+
+.meeting-toolbar__button--split-main {
+  min-width: 92px;
+  border-radius: 14px 0 0 14px;
+}
+
+.meeting-toolbar__device-arrow {
+  display: inline-flex;
+  width: 38px;
+  min-height: 64px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid
+    rgba(148, 163, 184, 0.18);
+  border-left: 0;
+  border-radius: 0 14px 14px 0;
+  background:
+    rgba(30, 41, 59, 0.92);
+  color: #cbd5e1;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.meeting-toolbar__device-arrow:hover:not(
+    :disabled
+  ),
+.meeting-toolbar__device-arrow--active {
+  background: #334155;
+  color: #ffffff;
+}
+
+.meeting-toolbar__device-arrow:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.meeting-toolbar__device-arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==========================================================
+   LEAVE BUTTON
+========================================================== */
+
+.meeting-toolbar__leave-button {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 20px;
+  border: 1px solid
+    rgba(254, 202, 202, 0.22);
+  border-radius: 13px;
+  background: #b91c1c;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.meeting-toolbar__leave-button:hover:not(
+    :disabled
+  ) {
+  background: #991b1b;
+  transform: translateY(-1px);
+}
+
+.meeting-toolbar__leave-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.meeting-toolbar__leave-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ==========================================================
+   COMPACT
+========================================================== */
+
+.meeting-toolbar--compact {
+  gap: 10px;
+  padding: 10px 14px;
+}
+
+.meeting-toolbar--compact
+  .meeting-toolbar__section {
+  gap: 7px;
+}
+
+.meeting-toolbar--compact
+  .meeting-toolbar__button {
+  min-width: 67px;
+  min-height: 54px;
+  padding: 7px 9px;
+  border-radius: 11px;
+}
+
+.meeting-toolbar--compact
+  .meeting-toolbar__button--split-main {
+  border-radius: 11px 0 0 11px;
+}
+
+.meeting-toolbar--compact
+  .meeting-toolbar__device-arrow {
+  width: 31px;
+  min-height: 54px;
+  border-radius: 0 11px 11px 0;
+}
+
+.meeting-toolbar--compact
+  .meeting-toolbar__leave-button {
+  min-height: 46px;
+  padding: 0 15px;
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 1100px) {
+  .meeting-toolbar {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      auto;
+    gap: 10px;
+    padding: 11px 14px;
+  }
+
+  .meeting-toolbar__section {
+    gap: 7px;
+  }
+
+  .meeting-toolbar__button {
+    min-width: 68px;
+    min-height: 56px;
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+
+  .meeting-toolbar__button--split-main {
+    min-width: 72px;
+  }
+
+  .meeting-toolbar__device-arrow {
+    width: 31px;
+    min-height: 56px;
+  }
+
+  .meeting-toolbar__leave-button {
+    min-height: 47px;
+    padding: 0 15px;
+  }
+}
+
+/* ==========================================================
+   SMALL TABLETS
+========================================================== */
+
+@media (max-width: 820px) {
+  .meeting-toolbar {
+    display: flex;
+    overflow-x: auto;
+    gap: 9px;
+    padding: 10px;
+    scrollbar-width: none;
+  }
+
+  .meeting-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .meeting-toolbar__section {
+    flex: 0 0 auto;
+  }
+
+  .meeting-toolbar__section--left {
+    order: 0;
+  }
+
+  .meeting-toolbar__section--centre {
+    order: 1;
+  }
+
+  .meeting-toolbar__section--right {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .meeting-toolbar__button {
+    min-width: 63px;
+    min-height: 53px;
+  }
+
+  .meeting-toolbar__device-arrow {
+    min-height: 53px;
+  }
+
+  .meeting-toolbar__leave-button {
+    min-height: 46px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 560px) {
+  .meeting-toolbar {
+    gap: 7px;
+    padding:
+      8px
+      max(8px, env(safe-area-inset-right))
+      calc(
+        8px +
+        env(safe-area-inset-bottom)
+      )
+      max(8px, env(safe-area-inset-left));
+  }
+
+  .meeting-toolbar__section {
+    gap: 6px;
+  }
+
+  .meeting-toolbar__button {
+    min-width: 50px;
+    min-height: 48px;
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+
+  .meeting-toolbar__button-label {
+    display: none;
+  }
+
+  .meeting-toolbar__button-icon {
+    font-size: 1.1rem;
+  }
+
+  .meeting-toolbar__button-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .meeting-toolbar__button--split-main {
+    min-width: 51px;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .meeting-toolbar__device-arrow {
+    width: 27px;
+    min-height: 48px;
+    border-radius: 0 10px 10px 0;
+  }
+
+  .meeting-toolbar__button-badge {
+    top: 3px;
+    right: 3px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    font-size: 0.56rem;
+  }
+
+  .meeting-toolbar__leave-button {
+    width: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .meeting-toolbar__leave-button span {
+    display: none;
+  }
+
+  .meeting-toolbar__leave-button svg {
+    width: 20px;
+    height: 20px;
+  }
+}

@@ -17,6 +17,7 @@ import eventRoutes from "./routes/event.routes.js";
 import leaderRoutes from "./routes/leader.routes.js";
 import leadershipCardRoutes from "./routes/leadershipCard.routes.js";
 import meetingRoutes from "./routes/meeting.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 
@@ -120,6 +121,8 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/member", memberRoutes);
 
+app.use("/api/users", userRoutes);
+
 app.use("/api/payments", paymentRoutes);
 
 app.use("/api/admin", adminRoutes);
@@ -134,6 +137,7 @@ app.use(
   "/api/meetings",
   meetingRoutes
 );
+
 
 /* ==========================================================
    404
