@@ -83,10 +83,7 @@ export const login = async (payload) => {
 ========================================================== */
 
 export const getCurrentMember = async () => {
-  const response = await api.get(
-    "/auth/me"
-  );
-
+  const response = await api.get("/member/me");
   return response.data;
 };
 
