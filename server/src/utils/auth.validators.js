@@ -74,13 +74,30 @@ export const registerValidator = [
       max: 20,
     }),
 
-  body("phone")
-    .trim()
-    .notEmpty()
-    .withMessage("Phone number is required.")
-    .matches(/^(07|01|\+2547|\+2541)[0-9]{8}$/)
-    .withMessage("Invalid Kenyan phone number."),
+ body("phone")
+  .trim()
+  .notEmpty()
+  .withMessage("Phone number is required.")
+  .customSanitizer((value) => {
+    let phone = String(value)
+      .replace(/\s+/g, "")
+      .replace(/-/g, "")
+      .replace(/^\+/, "");
 
+    if (
+      phone.startsWith("07") ||
+      phone.startsWith("01")
+    ) {
+      phone = `254${phone.slice(1)}`;
+    }
+
+    return phone;
+  })
+  .matches(/^254(?:7|1)\d{8}$/)
+  .withMessage(
+    "Invalid Kenyan phone number. Use 07XXXXXXXX, 01XXXXXXXX, 2547XXXXXXXX, or 2541XXXXXXXX."
+  ),
+  
   body("occupation")
     .trim()
     .notEmpty()

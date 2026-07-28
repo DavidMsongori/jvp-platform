@@ -617,11 +617,9 @@ export const activateExistingMember = async (data) => {
 ========================================================== */
 
 export const verifyOTP = async (data) => {
-
   const session = await startTransaction();
 
   try {
-
     const {
       email,
       code,
@@ -633,21 +631,17 @@ export const verifyOTP = async (data) => {
     ---------------------------------------- */
 
     if (!email) {
-
       throw new AppError(
         "Email address is required.",
         400
       );
-
     }
 
     if (!code) {
-
       throw new AppError(
         "Verification code is required.",
         400
       );
-
     }
 
     /* ----------------------------------------
@@ -662,18 +656,14 @@ export const verifyOTP = async (data) => {
     ---------------------------------------- */
 
     const user = await User.findOne({
-
       email: normalizedEmail,
-
     }).session(session);
 
     if (!user) {
-
       throw new AppError(
         "Account not found.",
         404
       );
-
     }
 
     /* ----------------------------------------
@@ -681,13 +671,9 @@ export const verifyOTP = async (data) => {
     ---------------------------------------- */
 
     await otpService.verifyOTP({
-
       user,
-
       purpose,
-
       code,
-
     });
 
     /* ----------------------------------------
@@ -695,21 +681,14 @@ export const verifyOTP = async (data) => {
     ---------------------------------------- */
 
     const member = await Member.findOne({
-
       user: user._id,
-
     }).session(session);
 
     if (!member) {
-
       throw new AppError(
-
         "Member profile not found.",
-
         404
-
       );
-
     }
 
     /* ----------------------------------------
@@ -717,28 +696,36 @@ export const verifyOTP = async (data) => {
     ---------------------------------------- */
 
     if (
-
       purpose ===
       OTP_PURPOSE.ACCOUNT_ACTIVATION
-
     ) {
-
       user.emailVerified = true;
+      user.isActive = true;
 
       await user.save({
-
         session,
-
+        validateBeforeSave: false,
       });
 
       member.accountActivated = true;
 
+      /*
+       * New members should still remain
+       * pending payment after OTP verification.
+       */
+      if (
+        member.source === "new" &&
+        member.membershipStatus !== "active"
+      ) {
+        member.membershipStatus =
+          "pending_payment";
+
+        member.membershipFeePaid = false;
+      }
+
       await member.save({
-
         session,
-
       });
-
     }
 
     /* ----------------------------------------
@@ -746,7 +733,6 @@ export const verifyOTP = async (data) => {
     ---------------------------------------- */
 
     await logActivity({
-
       user: user._id,
 
       action:
@@ -765,13 +751,15 @@ export const verifyOTP = async (data) => {
         "OTP Verified",
 
       description:
-        "Member successfully verified their OTP.",
+        purpose ===
+        OTP_PURPOSE.ACCOUNT_ACTIVATION
+          ? "Member successfully verified their account activation OTP."
+          : "Member successfully verified their OTP.",
 
       status:
         "success",
 
       session,
-
     });
 
     /* ----------------------------------------
@@ -782,26 +770,25 @@ export const verifyOTP = async (data) => {
 
     /* ----------------------------------------
        SEND WELCOME EMAIL
-       Only after successful commit
+       Do not fail OTP verification if
+       email delivery fails.
     ---------------------------------------- */
 
     if (
-
       purpose ===
       OTP_PURPOSE.ACCOUNT_ACTIVATION
-
     ) {
-
-      await emailService.sendWelcomeEmail({
-
-        email:
-          user.email,
-
-        firstName:
-          member.firstName,
-
-      });
-
+      try {
+        await emailService.sendWelcomeEmail({
+          email: user.email,
+          firstName: member.firstName,
+        });
+      } catch (emailError) {
+        console.error(
+          "Welcome email failed:",
+          emailError
+        );
+      }
     }
 
     /* ----------------------------------------
@@ -809,42 +796,45 @@ export const verifyOTP = async (data) => {
     ---------------------------------------- */
 
     return {
-
       success: true,
-
       verified: true,
 
       nextStep:
-
         purpose ===
         OTP_PURPOSE.ACCOUNT_ACTIVATION
-
           ? "create-password"
-
           : "reset-password",
 
+      user: {
+        id: user._id,
+        email: user.email,
+        emailVerified:
+          user.emailVerified,
+        isActive:
+          user.isActive,
+      },
+
+      member: {
+        id: member._id,
+        accountActivated:
+          member.accountActivated,
+        membershipStatus:
+          member.membershipStatus,
+        membershipFeePaid:
+          member.membershipFeePaid,
+      },
     };
-
   } catch (error) {
-
     if (
-
       session.inTransaction()
-
     ) {
-
       await session.abortTransaction();
-
     }
 
     throw error;
-
   } finally {
-
     await session.endSession();
-
   }
-
 };
 
 /* ==========================================================
@@ -1065,12 +1055,9 @@ export const createPassword = async (data) => {
     if (!user.emailVerified) {
 
       throw new AppError(
-
-        "Please verify your email before creating a password.",
-
-        400
-
-      );
+  "Please verify your email before creating a password.",
+  400
+);
 
     }
 

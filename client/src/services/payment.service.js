@@ -1,111 +1,245 @@
 import api from "./api";
 
-/* ==========================================================
-   INITIALIZE MEMBERSHIP PAYMENT
-========================================================== */
+/* ==========================================
+   MEMBERSHIP PAYMENT
+========================================== */
 
-export const initiateMembershipPayment = async () => {
-
-  const response = await api.post(
-
-    "/payments/membership"
-
-  );
-
-  return response.data;
-
-};
-
-/* ==========================================================
-   VERIFY MEMBERSHIP PAYMENT
-========================================================== */
-
-export const verifyMembershipPayment = async (
-
-  transactionId
-
+/**
+ * Initiate a new membership M-Pesa STK Push.
+ *
+ * @param {string} phoneNumber
+ * @returns {Promise<object>}
+ */
+export const initiateMembershipPayment = async (
+  phoneNumber
 ) => {
+  try {
+    const response = await api.post(
+      "/payments/membership",
+      {
+        phoneNumber,
+      }
+    );
 
-  const response = await api.get(
-
-    `/payments/verify/${transactionId}`
-
-  );
-
-  return response.data;
-
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        success: false,
+        message:
+          "Unable to initiate membership payment.",
+      }
+    );
+  }
 };
 
-/* ==========================================================
-   PAYMENT HISTORY
-========================================================== */
+/* ==========================================
+   MEMBERSHIP RENEWAL
+========================================== */
 
-export const getPaymentHistory = async () => {
+/**
+ * Initiate an M-Pesa membership-renewal payment.
+ *
+ * @param {string} phoneNumber
+ * @returns {Promise<object>}
+ */
+export const initiateRenewalPayment = async (
+  phoneNumber
+) => {
+  try {
+    const response = await api.post(
+      "/payments/renewal",
+      {
+        phoneNumber,
+      }
+    );
 
-  const response = await api.get(
-
-    "/payments/history"
-
-  );
-
-  return response.data;
-
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        success: false,
+        message:
+          "Unable to initiate membership renewal.",
+      }
+    );
+  }
 };
 
-/* ==========================================================
-   GET SINGLE PAYMENT
-========================================================== */
+/* ==========================================
+   PAYMENT STATUS
+========================================== */
 
-export const getPayment = async (
-
+/**
+ * Retrieve or query a payment's current status.
+ *
+ * @param {string} reference
+ * @returns {Promise<object>}
+ */
+export const checkPaymentStatus = async (
   reference
-
 ) => {
+  try {
+    const response = await api.post(
+      "/payments/status",
+      {
+        reference,
+      }
+    );
 
-  const response = await api.get(
-
-    `/payments/${reference}`
-
-  );
-
-  return response.data;
-
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        success: false,
+        message:
+          "Unable to retrieve payment status.",
+      }
+    );
+  }
 };
 
-/* ==========================================================
-   ADMIN
-========================================================== */
+/* ==========================================
+   RETRY PAYMENT
+========================================== */
 
-export const getAllPayments = async (
-
-  filters = {}
-
+/**
+ * Retry an existing failed, cancelled or expired payment.
+ *
+ * @param {string} reference
+ * @param {string} phoneNumber
+ * @returns {Promise<object>}
+ */
+export const retryPayment = async (
+  reference,
+  phoneNumber
 ) => {
+  try {
+    const response = await api.post(
+      "/payments/retry",
+      {
+        reference,
+        phoneNumber,
+      }
+    );
 
-  const response = await api.get(
-
-    "/payments/admin/all",
-
-    {
-
-      params: filters,
-
-    }
-
-  );
-
-  return response.data;
-
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        success: false,
+        message:
+          "Unable to retry the payment.",
+      }
+    );
+  }
 };
 
-export const getPaymentStatistics = async () => {
+/* ==========================================
+   PAYMENT HISTORY
+========================================== */
 
-  const response = await api.get(
+/**
+ * Retrieve the signed-in member's payment history.
+ *
+ * @param {object} params
+ * @returns {Promise<object>}
+ */
+export const getPaymentHistory = async (
+  params = {}
+) => {
+  try {
+    const response = await api.get(
+      "/payments/history",
+      {
+        params,
+      }
+    );
 
-    "/payments/admin/statistics"
-
-  );
-
-  return response.data;
-
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        success: false,
+        message:
+          "Unable to retrieve payment history.",
+      }
+    );
+  }
 };
+
+/* ==========================================
+   PAYMENT BY REFERENCE
+========================================== */
+
+/**
+ * Retrieve a payment using its internal reference.
+ *
+ * @param {string} reference
+ * @returns {Promise<object>}
+ */
+export const getPaymentByReference = async (
+  reference
+) => {
+  try {
+    const response = await api.get(
+      `/payments/reference/${reference}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        success: false,
+        message:
+          "Unable to retrieve the payment.",
+      }
+    );
+  }
+};
+
+/* ==========================================
+   PAYMENT BY ID
+========================================== */
+
+/**
+ * Retrieve a payment using its MongoDB ID.
+ *
+ * @param {string} paymentId
+ * @returns {Promise<object>}
+ */
+export const getPaymentById = async (
+  paymentId
+) => {
+  try {
+    const response = await api.get(
+      `/payments/id/${paymentId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        success: false,
+        message:
+          "Unable to retrieve the payment.",
+      }
+    );
+  }
+};
+
+/* ==========================================
+   DEFAULT EXPORT
+========================================== */
+
+const paymentService = {
+  initiateMembershipPayment,
+  initiateRenewalPayment,
+  checkPaymentStatus,
+  retryPayment,
+  getPaymentHistory,
+  getPaymentByReference,
+  getPaymentById,
+};
+
+export default paymentService;

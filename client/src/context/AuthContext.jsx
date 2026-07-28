@@ -1,7 +1,9 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -11,14 +13,52 @@ import {
   hasPermission as checkPermission,
 } from "../utils/permissions";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
+
+/* ==========================================================
+   LOCAL STORAGE KEYS
+========================================================== */
+
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
+const MEMBER_KEY = "member";
+
+/* ==========================================================
+   STORAGE HELPERS
+========================================================== */
+
+const readStoredJSON = (key) => {
+  const storedValue = localStorage.getItem(key);
+
+  if (!storedValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedValue);
+  } catch {
+    localStorage.removeItem(key);
+    return null;
+  }
+};
+
+const saveStoredJSON = (key, value) => {
+  if (!value) {
+    localStorage.removeItem(key);
+    return;
+  }
+
+  localStorage.setItem(
+    key,
+    JSON.stringify(value)
+  );
+};
 
 /* ==========================================================
    AUTH PROVIDER
 ========================================================== */
 
 export function AuthProvider({ children }) {
-
   const [token, setToken] = useState(null);
 
   const [user, setUser] = useState(null);
@@ -27,222 +67,303 @@ export function AuthProvider({ children }) {
 
   const [loading, setLoading] = useState(true);
 
+  const [refreshingMember, setRefreshingMember] =
+    useState(false);
+
+  /* ==========================================
+     CLEAR AUTH STATE
+  ========================================== */
+
+  const clearAuthState = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(MEMBER_KEY);
+
+    setToken(null);
+    setUser(null);
+    setMember(null);
+  }, []);
+
+  /* ==========================================
+     SAVE AUTH STATE
+  ========================================== */
+
+  const saveAuthState = useCallback(
+    ({
+      token: newToken,
+      user: newUser,
+      member: newMember,
+    }) => {
+      if (newToken !== undefined) {
+        if (newToken) {
+          localStorage.setItem(
+            TOKEN_KEY,
+            newToken
+          );
+        } else {
+          localStorage.removeItem(TOKEN_KEY);
+        }
+
+        setToken(newToken || null);
+      }
+
+      if (newUser !== undefined) {
+        saveStoredJSON(
+          USER_KEY,
+          newUser
+        );
+
+        setUser(newUser || null);
+      }
+
+      if (newMember !== undefined) {
+        saveStoredJSON(
+          MEMBER_KEY,
+          newMember
+        );
+
+        setMember(newMember || null);
+      }
+    },
+    []
+  );
+
   /* ==========================================
      INITIALIZE AUTH
   ========================================== */
 
   useEffect(() => {
-
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-    const storedMember = localStorage.getItem("member");
-
-    if (storedToken) {
-      setToken(storedToken);
-    }
-
-    if (storedUser) {
-
+    const initializeAuth = () => {
       try {
+        const storedToken =
+          localStorage.getItem(TOKEN_KEY);
 
-        setUser(JSON.parse(storedUser));
+        const storedUser =
+          readStoredJSON(USER_KEY);
 
-      } catch {
+        const storedMember =
+          readStoredJSON(MEMBER_KEY);
 
-        localStorage.removeItem("user");
-
+        setToken(storedToken || null);
+        setUser(storedUser);
+        setMember(storedMember);
+      } finally {
+        setLoading(false);
       }
+    };
 
-    }
-
-    if (storedMember) {
-
-      try {
-
-        setMember(JSON.parse(storedMember));
-
-      } catch {
-
-        localStorage.removeItem("member");
-
-      }
-
-    }
-
-    setLoading(false);
-
+    initializeAuth();
   }, []);
 
   /* ==========================================
      LOGIN
   ========================================== */
 
-  const login = async (credentials) => {
+  const login = useCallback(
+    async (credentials) => {
+      const response =
+        await authService.login(credentials);
 
-    const response =
-      await authService.login(credentials);
+      const data = response?.data;
 
-    const data = response.data;
+      if (!data?.token) {
+        throw new Error(
+          "Login response did not include an authentication token."
+        );
+      }
 
-    localStorage.setItem(
-      "token",
-      data.token
-    );
+      saveAuthState({
+        token: data.token,
+        user: data.user || null,
+        member: data.member || null,
+      });
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(data.user)
-    );
-
-    localStorage.setItem(
-      "member",
-      JSON.stringify(data.member)
-    );
-
-    setToken(data.token);
-    setUser(data.user);
-    setMember(data.member);
-
-    return data;
-
-  };
+      return data;
+    },
+    [saveAuthState]
+  );
 
   /* ==========================================
      LOGOUT
   ========================================== */
 
-  const logout = async () => {
-
+  const logout = useCallback(async () => {
     try {
-
       await authService.logout();
-
     } catch {
-
-      // Ignore logout API errors
-
+      // Clear the local session even when
+      // the backend logout request fails.
+    } finally {
+      clearAuthState();
     }
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("member");
-
-    setToken(null);
-    setUser(null);
-    setMember(null);
-
-  };
+  }, [clearAuthState]);
 
   /* ==========================================
-     REFRESH MEMBER
+     REFRESH MEMBER PROFILE
   ========================================== */
 
-  const refreshMember = async () => {
+  const refreshMember = useCallback(async () => {
+    if (!localStorage.getItem(TOKEN_KEY)) {
+      return null;
+    }
 
     try {
+      setRefreshingMember(true);
 
       const response =
         await authService.getCurrentMember();
 
-      const data = response.data;
+      const data = response?.data;
 
-      if (data.user) {
-
-        localStorage.setItem(
-          "user",
-          JSON.stringify(data.user)
+      if (!data) {
+        throw new Error(
+          "Member profile response was empty."
         );
-
-        setUser(data.user);
-
       }
 
-      if (data.member) {
+      /*
+       * Supports either:
+       *
+       * response.data = {
+       *   user,
+       *   member
+       * }
+       *
+       * or:
+       *
+       * response.data = {
+       *   data: {
+       *     user,
+       *     member
+       *   }
+       * }
+       */
 
-        localStorage.setItem(
-          "member",
-          JSON.stringify(data.member)
+      const profileData =
+        data.data || data;
+
+      const refreshedUser =
+        profileData.user || null;
+
+      const refreshedMember =
+        profileData.member ||
+        profileData.profile ||
+        null;
+
+      if (refreshedUser) {
+        saveStoredJSON(
+          USER_KEY,
+          refreshedUser
         );
 
-        setMember(data.member);
-
+        setUser(refreshedUser);
       }
 
+      if (refreshedMember) {
+        saveStoredJSON(
+          MEMBER_KEY,
+          refreshedMember
+        );
+
+        setMember(refreshedMember);
+      }
+
+      return {
+        user:
+          refreshedUser || user,
+        member:
+          refreshedMember || member,
+      };
     } catch (error) {
+      console.error(
+        "Unable to refresh member profile:",
+        error
+      );
 
-      console.error(error);
+      if (error?.response?.status === 401) {
+        clearAuthState();
+      }
 
+      throw error;
+    } finally {
+      setRefreshingMember(false);
     }
+  }, [
+    clearAuthState,
+    member,
+    user,
+  ]);
 
-  };
+  /*
+   * Payment.jsx currently calls refreshProfile().
+   * This alias allows that page to work without
+   * changing its imports or function call.
+   */
+  const refreshProfile = refreshMember;
 
   /* ==========================================
      UPDATE USER
   ========================================== */
 
-  const updateUser = (userData) => {
+  const updateUser = useCallback(
+    (userData) => {
+      setUser((currentUser) => {
+        const updatedUser = {
+          ...(currentUser || {}),
+          ...userData,
+        };
 
-    const updatedUser = {
+        saveStoredJSON(
+          USER_KEY,
+          updatedUser
+        );
 
-      ...user,
-
-      ...userData,
-
-    };
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(updatedUser)
-    );
-
-    setUser(updatedUser);
-
-  };
+        return updatedUser;
+      });
+    },
+    []
+  );
 
   /* ==========================================
      UPDATE MEMBER
   ========================================== */
 
-  const updateMember = (memberData) => {
+  const updateMember = useCallback(
+    (memberData) => {
+      setMember((currentMember) => {
+        const updatedMember = {
+          ...(currentMember || {}),
+          ...memberData,
+        };
 
-    const updatedMember = {
+        saveStoredJSON(
+          MEMBER_KEY,
+          updatedMember
+        );
 
-      ...member,
-
-      ...memberData,
-
-    };
-
-    localStorage.setItem(
-      "member",
-      JSON.stringify(updatedMember)
-    );
-
-    setMember(updatedMember);
-
-  };
+        return updatedMember;
+      });
+    },
+    []
+  );
 
   /* ==========================================
      PERMISSIONS
   ========================================== */
 
-  const hasPermission = (permission) => {
+  const hasPermission = useCallback(
+    (permission) => {
+      if (!user?.role) {
+        return false;
+      }
 
-    if (!user?.role) {
-
-      return false;
-
-    }
-
-    return checkPermission(
-
-      user.role,
-
-      permission
-
-    );
-
-  };
+      return checkPermission(
+        user.role,
+        permission
+      );
+    },
+    [user?.role]
+  );
 
   /* ==========================================
      AUTH STATE
@@ -277,7 +398,8 @@ export function AuthProvider({ children }) {
     membershipStatus === "active";
 
   const needsPayment =
-    membershipStatus === "pending_payment";
+    membershipStatus ===
+    "pending_payment";
 
   const membershipExpired =
     membershipStatus === "expired";
@@ -286,68 +408,98 @@ export function AuthProvider({ children }) {
     membershipStatus === "inactive";
 
   const membershipFeePaid =
-    member?.membershipFeePaid ?? false;
+    member?.membershipFeePaid ??
+    false;
+
+  const canAccessDashboard =
+    membershipActive &&
+    membershipFeePaid;
 
   /* ==========================================
-     PROVIDER
+     PROVIDER VALUE
   ========================================== */
 
-  return (
+  const contextValue = useMemo(
+    () => ({
+      /* Authentication */
 
-    <AuthContext.Provider
+      token,
+      user,
+      member,
 
-      value={{
+      loading,
+      refreshingMember,
 
-        /* Authentication */
+      role,
 
-        token,
-        user,
-        member,
+      isAuthenticated,
+      isAdmin,
 
-        loading,
+      /* Membership */
 
-        role,
+      membershipStatus,
+      membershipType,
+      membershipNumber,
 
-        isAuthenticated,
-        isAdmin,
+      membershipFeePaid,
 
-        /* Membership */
+      membershipActive,
+      membershipInactive,
+      membershipExpired,
+      needsPayment,
 
-        membershipStatus,
-        membershipType,
-        membershipNumber,
+      canAccessDashboard,
 
-        membershipFeePaid,
+      /* Permissions */
 
-        membershipActive,
-        membershipInactive,
-        membershipExpired,
-        needsPayment,
+      hasPermission,
 
-        /* Permissions */
+      /* Actions */
 
-        hasPermission,
+      login,
+      logout,
 
-        /* Actions */
+      refreshMember,
+      refreshProfile,
 
-        login,
-        logout,
-
-        refreshMember,
-
-        updateUser,
-        updateMember,
-
-      }}
-
-    >
-
-      {children}
-
-    </AuthContext.Provider>
-
+      updateUser,
+      updateMember,
+    }),
+    [
+      token,
+      user,
+      member,
+      loading,
+      refreshingMember,
+      role,
+      isAuthenticated,
+      isAdmin,
+      membershipStatus,
+      membershipType,
+      membershipNumber,
+      membershipFeePaid,
+      membershipActive,
+      membershipInactive,
+      membershipExpired,
+      needsPayment,
+      canAccessDashboard,
+      hasPermission,
+      login,
+      logout,
+      refreshMember,
+      refreshProfile,
+      updateUser,
+      updateMember,
+    ]
   );
 
+  return (
+    <AuthContext.Provider
+      value={contextValue}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 /* ==========================================================
@@ -355,22 +507,16 @@ export function AuthProvider({ children }) {
 ========================================================== */
 
 export function useAuth() {
-
   const context =
     useContext(AuthContext);
 
   if (!context) {
-
     throw new Error(
-
       "useAuth must be used inside an AuthProvider."
-
     );
-
   }
 
   return context;
-
 }
 
 export default AuthContext;
