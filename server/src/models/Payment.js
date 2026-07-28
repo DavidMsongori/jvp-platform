@@ -195,7 +195,7 @@ const paymentSchema = new mongoose.Schema(
 
       receiptNumber: {
         type: String,
-        default: null,
+        default: undefined,
         uppercase: true,
         trim: true,
   
@@ -409,17 +409,6 @@ const paymentSchema = new mongoose.Schema(
     /* ==========================================
        RECEIPT
     ========================================== */
-
-    receiptNumber: {
-      type: String,
-      default: null,
-      unique: true,
-      sparse: true,
-      uppercase: true,
-      trim: true,
-      index: true,
-    },
-
     receiptSent: {
       type: Boolean,
       default: false,
@@ -498,9 +487,19 @@ paymentSchema.index({
   "mpesa.checkoutRequestId": 1,
 });
 
-paymentSchema.index({
-  "mpesa.receiptNumber": 1,
-});
+paymentSchema.index(
+  {
+    "mpesa.receiptNumber": 1,
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      "mpesa.receiptNumber": {
+        $type: "string",
+      },
+    },
+  }
+);
 
 paymentSchema.index({
   event: 1,
@@ -641,25 +640,29 @@ paymentSchema.methods.markAsSuccessful = function ({
 
   this.failureReason = null;
 
+ if (receiptNumber) {
   this.mpesa.receiptNumber =
-    receiptNumber || this.mpesa.receiptNumber;
+    receiptNumber.toUpperCase();
 
-  this.mpesa.transactionDate =
-    transactionDate || now;
+  this.gatewayReference =
+    receiptNumber.toUpperCase();
+}
 
-  this.mpesa.resultCode = resultCode;
+this.mpesa.transactionDate =
+  transactionDate || now;
 
-  this.mpesa.resultDescription =
-    resultDescription || null;
+this.mpesa.resultCode = resultCode;
 
+this.mpesa.resultDescription =
+  resultDescription || null;
+
+if (verificationMethod === "callback") {
   this.mpesa.callbackReceived = true;
   this.mpesa.callbackReceivedAt = now;
 
-  this.gatewayReference =
-    receiptNumber || this.gatewayReference;
-
   this.callbackPayload =
     callbackPayload || this.callbackPayload;
+}
 
   this.paidAt = transactionDate || now;
   this.verifiedAt = now;
