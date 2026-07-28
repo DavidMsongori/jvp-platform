@@ -6,6 +6,7 @@ import {
   FaUsers,
   FaUserTie,
   FaMoneyBillWave,
+  FaTicketAlt,
   FaCalendarAlt,
   FaClipboardList,
   FaHistory,
@@ -75,6 +76,13 @@ function AdminSidebar({
       path: "/admin/events",
       permission: PERMISSIONS.VIEW_EVENTS,
     },
+
+   {
+  name: "Summit",
+  icon: <FaTicketAlt />,
+  path: "/admin/summit",
+  permission: PERMISSIONS.VIEW_EVENTS,
+},
 
     {
       name: "Reports",

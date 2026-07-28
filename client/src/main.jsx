@@ -16,6 +16,9 @@ import { PaymentProvider } from "./context/PaymentContext";
 import { EventProvider } from "./context/EventContext";
 import { LeaderProvider } from "./context/LeaderContext";
 import { LeadershipDashboardProvider } from "./context/LeadershipDashboardContext";
+import {
+  SummitProvider,
+} from "./context/SummitContext";
 
 /* ==========================================
    GLOBAL PROFILE IMAGE FALLBACK
@@ -51,7 +54,9 @@ ReactDOM.createRoot(
 
             <LeaderProvider>
 
-              <App />
+               <SummitProvider>
+                  <App />
+               </SummitProvider>
 
             </LeaderProvider>
 

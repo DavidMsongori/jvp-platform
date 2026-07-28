@@ -69,3 +69,7 @@ Thumbs.db
 
 # Uncomment if uploads should NOT be committed.
 # uploads/
+# Environment variables
+**/.env
+**/.env.*
+!**/.env.example

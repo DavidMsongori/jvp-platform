@@ -1,0 +1,880 @@
+/* ==========================================
+   PAGE
+========================================== */
+
+.summit-ticket-lookup-page {
+  min-height: 100vh;
+  color: #1d2a35;
+  background: #f4f7f5;
+}
+
+.summit-ticket-lookup-container {
+  width: min(
+    1180px,
+    calc(100% - 2rem)
+  );
+  margin: 0 auto;
+}
+
+/* ==========================================
+   HERO
+========================================== */
+
+.summit-ticket-lookup-hero {
+  padding: 3.5rem 0;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(247, 200, 79, 0.2),
+      transparent 28%
+    ),
+    linear-gradient(
+      135deg,
+      #04392f,
+      #087f5b
+    );
+}
+
+.summit-ticket-lookup-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+  color: rgba(
+    255,
+    255,
+    255,
+    0.8
+  );
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.summit-ticket-lookup-back:hover {
+  color: #ffd66d;
+}
+
+.summit-ticket-lookup-hero-content {
+  max-width: 750px;
+}
+
+.summit-ticket-lookup-kicker {
+  display: inline-block;
+  color: #ffd66d;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.summit-ticket-lookup-hero h1 {
+  margin: 0.7rem 0 0;
+  font-size: clamp(
+    2.2rem,
+    5vw,
+    4rem
+  );
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.summit-ticket-lookup-hero p {
+  max-width: 680px;
+  margin: 1rem 0 0;
+  color: rgba(
+    255,
+    255,
+    255,
+    0.82
+  );
+  font-size: 0.94rem;
+  line-height: 1.75;
+}
+
+/* ==========================================
+   CONTENT
+========================================== */
+
+.summit-ticket-lookup-content {
+  padding: 3rem 0 5rem;
+}
+
+.summit-ticket-lookup-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(260px, 330px);
+  align-items: start;
+  gap: 1.2rem;
+}
+
+.summit-ticket-lookup-layout
+  > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ==========================================
+   SEARCH CARD
+========================================== */
+
+.summit-ticket-lookup-card,
+.summit-ticket-result-card,
+.summit-ticket-lookup-sidebar
+  section {
+  background: #ffffff;
+  border: 1px solid #dfe6e2;
+  border-radius: 15px;
+  box-shadow: 0 6px 22px
+    rgba(25, 49, 40, 0.045);
+}
+
+.summit-ticket-lookup-card {
+  padding: 1.4rem;
+}
+
+.summit-ticket-lookup-card
+  > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.2rem;
+}
+
+.summit-ticket-lookup-card
+  > header
+  > span {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e7f6f0;
+  border-radius: 10px;
+}
+
+.summit-ticket-lookup-card
+  header
+  small {
+  color: #087f5b;
+  font-size: 0.61rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.summit-ticket-lookup-card
+  header
+  h2 {
+  margin: 0.2rem 0 0;
+  color: #25343f;
+  font-size: 1rem;
+}
+
+.summit-ticket-lookup-card
+  header
+  p {
+  margin: 0.35rem 0 0;
+  color: #7a8690;
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+/* ==========================================
+   TABS
+========================================== */
+
+.summit-ticket-lookup-tabs {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  padding: 0.3rem;
+  margin-bottom: 1rem;
+  background: #f0f4f2;
+  border-radius: 10px;
+}
+
+.summit-ticket-lookup-tabs
+  button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.7rem;
+  color: #687580;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.summit-ticket-lookup-tabs
+  button.active {
+  color: #087f5b;
+  background: #ffffff;
+  box-shadow: 0 3px 10px
+    rgba(25, 49, 40, 0.08);
+}
+
+/* ==========================================
+   FORM
+========================================== */
+
+.summit-ticket-lookup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.summit-ticket-lookup-field
+  label {
+  display: block;
+  margin-bottom: 0.42rem;
+  color: #596773;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.summit-ticket-lookup-field
+  label
+  strong {
+  margin-left: 0.15rem;
+  color: #b03e3e;
+}
+
+.summit-ticket-lookup-input {
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #d8e0e4;
+  border-radius: 9px;
+}
+
+.summit-ticket-lookup-input:focus-within {
+  border-color: #087f5b;
+  box-shadow: 0 0 0 3px
+    rgba(8, 127, 91, 0.1);
+}
+
+.summit-ticket-lookup-input
+  svg {
+  flex-shrink: 0;
+  margin-left: 0.8rem;
+  color: #7f8b95;
+}
+
+.summit-ticket-lookup-input
+  input {
+  width: 100%;
+  min-width: 0;
+  min-height: 45px;
+  padding: 0.7rem;
+  color: #33424e;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.summit-ticket-lookup-field
+  > small {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+  color: #aa3d3d;
+  font-size: 0.61rem;
+}
+
+.summit-ticket-lookup-submit {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #ffffff;
+  background: #087f5b;
+  border: 0;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 7px 18px
+    rgba(8, 127, 91, 0.17);
+}
+
+.summit-ticket-lookup-submit:hover:not(:disabled) {
+  background: #066d50;
+}
+
+.summit-ticket-lookup-submit:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   ALERT
+========================================== */
+
+.summit-ticket-lookup-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid;
+  border-radius: 9px;
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.summit-ticket-lookup-alert.error {
+  color: #9d3b35;
+  background: #fff0ee;
+  border-color: #efc4be;
+}
+
+.summit-ticket-lookup-alert
+  svg {
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   RESULT CARD
+========================================== */
+
+.summit-ticket-result-card {
+  overflow: hidden;
+}
+
+.summit-ticket-result-top {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 1.3rem;
+  border-bottom: 1px solid
+    #e8ecef;
+}
+
+.summit-ticket-result-icon {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  color: #087f5b;
+  background: #e7f6f0;
+  border-radius: 50%;
+}
+
+.summit-ticket-result-top
+  small {
+  color: #087f5b;
+  font-size: 0.61rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.summit-ticket-result-top
+  h2 {
+  margin: 0.2rem 0 0;
+  color: #25343f;
+  font-size: 1.1rem;
+}
+
+.summit-ticket-result-top
+  p {
+  margin: 0.3rem 0 0;
+  color: #7a8690;
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.summit-ticket-result-status {
+  display: inline-flex;
+  padding: 0.38rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.61rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.summit-ticket-result-status.success {
+  color: #126a3c;
+  background: #eaf8ef;
+}
+
+.summit-ticket-result-status.warning {
+  color: #8a590d;
+  background: #fff3d4;
+}
+
+/* ==========================================
+   TICKET NUMBER
+========================================== */
+
+.summit-ticket-number-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.3rem;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #04392f,
+      #087f5b
+    );
+}
+
+.summit-ticket-number-box
+  > span {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #04392f;
+  background: #ffd66d;
+  border-radius: 10px;
+}
+
+.summit-ticket-number-box
+  > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-ticket-number-box
+  small {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.72
+  );
+  font-size: 0.61rem;
+  text-transform: uppercase;
+}
+
+.summit-ticket-number-box
+  strong {
+  margin-top: 0.15rem;
+  font-size: clamp(
+    1rem,
+    3vw,
+    1.35rem
+  );
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   RESULT DETAILS
+========================================== */
+
+.summit-ticket-result-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 1.2rem;
+}
+
+.summit-ticket-result-grid
+  > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  background: #f8faf9;
+  border: 1px solid #e6ebe8;
+  border-radius: 9px;
+}
+
+.summit-ticket-result-grid
+  svg {
+  flex-shrink: 0;
+  color: #087f5b;
+}
+
+.summit-ticket-result-grid
+  span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-ticket-result-grid
+  small {
+  color: #83909a;
+  font-size: 0.58rem;
+}
+
+.summit-ticket-result-grid
+  strong {
+  margin-top: 0.18rem;
+  overflow-wrap: anywhere;
+  color: #33424e;
+  font-size: 0.68rem;
+}
+
+/* ==========================================
+   EVENT DETAILS
+========================================== */
+
+.summit-ticket-event-section {
+  padding: 1.2rem;
+  border-top: 1px solid #e8ecef;
+}
+
+.summit-ticket-event-section
+  h3 {
+  margin: 0 0 0.8rem;
+  color: #263540;
+  font-size: 0.86rem;
+}
+
+.summit-ticket-event-section
+  > div {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.summit-ticket-event-section
+  > div
+  > span {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 0.75rem;
+  background: #f8faf9;
+  border: 1px solid #e6ebe8;
+  border-radius: 9px;
+}
+
+.summit-ticket-event-section
+  svg {
+  margin-bottom: 0.4rem;
+  color: #087f5b;
+}
+
+.summit-ticket-event-section
+  small {
+  color: #83909a;
+  font-size: 0.58rem;
+}
+
+.summit-ticket-event-section
+  strong {
+  margin-top: 0.18rem;
+  color: #33424e;
+  font-size: 0.67rem;
+  line-height: 1.45;
+}
+
+/* ==========================================
+   RESULT FOOTER
+========================================== */
+
+.summit-ticket-result-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  background: #f8faf9;
+  border-top: 1px solid #e8ecef;
+}
+
+.summit-ticket-result-footer
+  > div:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-ticket-result-footer
+  small {
+  color: #83909a;
+  font-size: 0.58rem;
+}
+
+.summit-ticket-result-footer
+  strong {
+  margin-top: 0.18rem;
+  color: #33424e;
+  font-size: 0.66rem;
+}
+
+.summit-ticket-result-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.summit-ticket-result-actions
+  button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.66rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.summit-ticket-result-actions
+  button.primary {
+  color: #ffffff;
+  background: #087f5b;
+  border: 1px solid #087f5b;
+}
+
+.summit-ticket-result-actions
+  button.secondary {
+  color: #40505c;
+  background: #ffffff;
+  border: 1px solid #d9e1e5;
+}
+
+.summit-ticket-result-actions
+  button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.summit-ticket-lookup-sidebar {
+  position: sticky;
+  top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.summit-ticket-lookup-sidebar
+  section {
+  padding: 1.2rem;
+}
+
+.summit-ticket-lookup-sidebar
+  section
+  > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: #087f5b;
+  background: #e7f6f0;
+  border-radius: 10px;
+}
+
+.summit-ticket-lookup-sidebar
+  h2 {
+  margin: 0.8rem 0 0;
+  color: #263540;
+  font-size: 0.92rem;
+}
+
+.summit-ticket-lookup-sidebar
+  p,
+.summit-ticket-lookup-sidebar
+  li {
+  color: #75818c;
+  font-size: 0.67rem;
+  line-height: 1.65;
+}
+
+.summit-ticket-lookup-sidebar
+  ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  list-style: none;
+}
+
+.summit-ticket-lookup-sidebar
+  li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.summit-ticket-lookup-sidebar
+  li
+  svg {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  color: #087f5b;
+}
+
+.summit-ticket-lookup-sidebar
+  a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+  color: #087f5b;
+  font-size: 0.7rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+/* ==========================================
+   ANIMATION
+========================================== */
+
+@keyframes summit-ticket-lookup-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.summit-ticket-lookup-spinning {
+  animation:
+    summit-ticket-lookup-spin
+    0.8s linear infinite;
+}
+
+/* ==========================================
+   FOCUS
+========================================== */
+
+.summit-ticket-lookup-page
+  input:focus-visible,
+.summit-ticket-lookup-page
+  button:focus-visible,
+.summit-ticket-lookup-page
+  a:focus-visible {
+  outline: 3px solid
+    rgba(8, 127, 91, 0.18);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 960px) {
+  .summit-ticket-lookup-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-ticket-lookup-sidebar {
+    position: static;
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .summit-ticket-lookup-hero {
+    padding: 2.5rem 0;
+  }
+
+  .summit-ticket-lookup-content {
+    padding: 2rem 0 4rem;
+  }
+
+  .summit-ticket-result-grid,
+  .summit-ticket-event-section
+    > div {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-ticket-result-top {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .summit-ticket-result-status {
+    grid-column: 2;
+    width: fit-content;
+  }
+
+  .summit-ticket-result-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .summit-ticket-result-actions {
+    width: 100%;
+  }
+
+  .summit-ticket-result-actions
+    button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .summit-ticket-lookup-container {
+    width: min(
+      100% - 1rem,
+      1180px
+    );
+  }
+
+  .summit-ticket-lookup-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-ticket-lookup-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-ticket-result-actions {
+    flex-direction: column;
+  }
+
+  .summit-ticket-result-actions
+    button {
+    width: 100%;
+  }
+
+  .summit-ticket-result-top {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-ticket-result-status {
+    grid-column: auto;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+  .summit-ticket-lookup-spinning {
+    animation: none;
+  }
+}

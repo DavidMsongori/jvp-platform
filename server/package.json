@@ -6,7 +6,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "seed:summit": "node src/scripts/seedSummitEvent.js"
   },
   "keywords": [],
   "author": "JVP Connect",
@@ -25,6 +26,8 @@
     "mongoose": "^9.7.4",
     "morgan": "^1.11.0",
     "multer": "^2.2.0",
+    "pdfkit": "^0.19.1",
+    "qrcode": "^1.5.4",
     "resend": "^6.17.2",
     "slugify": "^1.6.9",
     "socket.io": "^4.8.3",

@@ -18,6 +18,8 @@ import leaderRoutes from "./routes/leader.routes.js";
 import leadershipCardRoutes from "./routes/leadershipCard.routes.js";
 import meetingRoutes from "./routes/meeting.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import publicSummitRoutes from "./routes/publicSummit.routes.js";
+import adminSummitRoutes from "./routes/adminSummit.routes.js";
 
 const app = express();
 
@@ -27,6 +29,18 @@ const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+app.use(
+  "/uploads/summit-tickets",
+  express.static(
+    path.join(
+      process.cwd(),
+      "src",
+      "uploads",
+      "summit-tickets"
+    )
+  )
+);
 
 /* ==========================================================
    SECURITY
@@ -136,6 +150,16 @@ app.use("/api/leadership-card", leadershipCardRoutes);
 app.use(
   "/api/meetings",
   meetingRoutes
+);
+
+app.use(
+  "/api/summit/public",
+  publicSummitRoutes
+);
+
+app.use(
+  "/api/summit/admin",
+  adminSummitRoutes
 );
 
 

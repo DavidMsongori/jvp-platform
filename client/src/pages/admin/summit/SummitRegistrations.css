@@ -1,0 +1,1175 @@
+/* ==========================================
+   PAGE
+========================================== */
+
+.summit-registrations-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 1.5rem;
+  color: #17202a;
+  background: #f5f7fa;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.summit-registrations-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.4rem;
+}
+
+.summit-registrations-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  color: #687583;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.summit-registrations-back-link:hover {
+  color: #087f5b;
+}
+
+.summit-registrations-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.summit-registrations-title-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e7f6f0;
+  border-radius: 12px;
+}
+
+.summit-registrations-title-row p {
+  margin: 0 0 0.18rem;
+  color: #087f5b;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summit-registrations-title-row h1 {
+  margin: 0;
+  color: #172534;
+  font-size: clamp(
+    1.45rem,
+    2.4vw,
+    2rem
+  );
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.summit-registrations-description {
+  max-width: 660px;
+  margin: 0.7rem 0 0;
+  color: #74808c;
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.summit-registrations-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.summit-registrations-primary-button,
+.summit-registrations-secondary-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.summit-registrations-primary-button {
+  color: #ffffff;
+  background: #087f5b;
+  box-shadow: 0 7px 16px
+    rgba(8, 127, 91, 0.16);
+}
+
+.summit-registrations-primary-button:hover {
+  background: #066f50;
+  transform: translateY(-1px);
+}
+
+.summit-registrations-secondary-button {
+  color: #34414e;
+  background: #ffffff;
+  border-color: #dce3e8;
+}
+
+.summit-registrations-secondary-button:hover {
+  color: #087f5b;
+  border-color: #9ecdbd;
+  background: #f9fcfb;
+}
+
+.summit-registrations-primary-button:disabled,
+.summit-registrations-secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==========================================
+   SUMMARY CARDS
+========================================== */
+
+.summit-registration-summary-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+
+.summit-registration-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.95rem 1rem;
+  background: #ffffff;
+  border: 1px solid #e3e8ec;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px
+    rgba(23, 32, 42, 0.035);
+}
+
+.summit-registration-summary-card > span {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e9f7f2;
+  border-radius: 10px;
+}
+
+.summit-registration-summary-card > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-registration-summary-card small {
+  color: #7a8793;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.summit-registration-summary-card strong {
+  margin-top: 0.18rem;
+  color: #1e2c39;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* ==========================================
+   ALERT
+========================================== */
+
+.summit-registrations-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 0.95rem;
+  color: #963d34;
+  background: #fff0ee;
+  border: 1px solid #f3c3bd;
+  border-radius: 10px;
+  font-size: 0.78rem;
+}
+
+.summit-registrations-alert > span {
+  flex: 1;
+}
+
+.summit-registrations-alert button {
+  padding: 0;
+  color: #963d34;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ==========================================
+   TOOLBAR
+========================================== */
+
+.summit-registrations-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.summit-registrations-search {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #dfe5ea;
+  border-radius: 10px;
+}
+
+.summit-registrations-search > svg {
+  margin-left: 0.85rem;
+  color: #87929d;
+  flex-shrink: 0;
+}
+
+.summit-registrations-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.75rem;
+  color: #273542;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.summit-registrations-search input::placeholder {
+  color: #9ba4ad;
+}
+
+.summit-search-clear {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-right: 0.35rem;
+  color: #7d8893;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.summit-search-clear:hover {
+  color: #b43b3b;
+  background: #fceeee;
+}
+
+.summit-search-submit {
+  align-self: stretch;
+  padding: 0 1rem;
+  color: #ffffff;
+  background: #087f5b;
+  border: 0;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.summit-search-submit:hover {
+  background: #066f50;
+}
+
+.summit-filter-toggle {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.9rem;
+  color: #475461;
+  background: #ffffff;
+  border: 1px solid #dfe5ea;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.summit-filter-toggle:hover,
+.summit-filter-toggle.is-active {
+  color: #087f5b;
+  border-color: #9cccbc;
+  background: #f5fbf8;
+}
+
+.summit-filter-toggle > span {
+  min-width: 19px;
+  height: 19px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 0.28rem;
+  color: #ffffff;
+  background: #087f5b;
+  border-radius: 999px;
+  font-size: 0.58rem;
+}
+
+/* ==========================================
+   FILTER PANEL
+========================================== */
+
+.summit-registration-filter-panel {
+  padding: 1rem;
+  margin-bottom: 0.9rem;
+  background: #ffffff;
+  border: 1px solid #e0e6ea;
+  border-radius: 12px;
+}
+
+.summit-registration-filter-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.summit-registration-filter-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.summit-registration-filter-grid label > span {
+  color: #66727f;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.summit-registration-filter-grid select,
+.summit-registration-filter-grid input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.55rem 0.7rem;
+  color: #34414d;
+  background: #ffffff;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+  outline: none;
+  font: inherit;
+  font-size: 0.74rem;
+}
+
+.summit-registration-filter-grid select:focus,
+.summit-registration-filter-grid input:focus {
+  border-color: #087f5b;
+  box-shadow: 0 0 0 3px
+    rgba(8, 127, 91, 0.1);
+}
+
+.summit-registration-filter-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.85rem;
+  margin-top: 0.9rem;
+  border-top: 1px solid #edf0f2;
+}
+
+.summit-registration-filter-footer > span {
+  color: #788490;
+  font-size: 0.7rem;
+}
+
+.summit-registration-filter-footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  color: #a13e3e;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ==========================================
+   SELECTED ACTION BAR
+========================================== */
+
+.summit-selected-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.8rem;
+  color: #ffffff;
+  background: #153f35;
+  border-radius: 10px;
+}
+
+.summit-selected-action-bar > div {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.summit-selected-action-bar span {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.summit-selected-action-bar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.48rem 0.65rem;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid
+    rgba(255, 255, 255, 0.17);
+  border-radius: 7px;
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.summit-selected-action-bar button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ==========================================
+   TABLE CARD
+========================================== */
+
+.summit-registrations-table-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e1e6ea;
+  border-radius: 13px;
+  box-shadow: 0 5px 18px
+    rgba(23, 32, 42, 0.04);
+}
+
+.summit-registrations-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.summit-registrations-table {
+  width: 100%;
+  min-width: 1180px;
+  border-collapse: collapse;
+}
+
+.summit-registrations-table th {
+  padding: 0.78rem 0.75rem;
+  color: #677480;
+  background: #f8fafb;
+  border-bottom: 1px solid #e4e9ed;
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.035em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.summit-registrations-table td {
+  padding: 0.82rem 0.75rem;
+  color: #394652;
+  border-bottom: 1px solid #eef1f3;
+  font-size: 0.72rem;
+  vertical-align: middle;
+}
+
+.summit-registrations-table tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.summit-registrations-table tbody tr:hover {
+  background: #fafcfb;
+}
+
+.summit-registrations-table tbody tr.is-selected {
+  background: #eff9f5;
+}
+
+.summit-registrations-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.summit-checkbox-column {
+  width: 44px;
+  text-align: center !important;
+}
+
+.summit-actions-column {
+  width: 90px;
+  text-align: right !important;
+}
+
+/* ==========================================
+   CHECKBOX
+========================================== */
+
+.summit-checkbox {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+
+.summit-checkbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.summit-checkbox span {
+  width: 18px;
+  height: 18px;
+  display: block;
+  border: 1.5px solid #bdc7cf;
+  border-radius: 5px;
+  background: #ffffff;
+}
+
+.summit-checkbox input:checked + span {
+  background: #087f5b;
+  border-color: #087f5b;
+}
+
+.summit-checkbox input:checked + span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 6px;
+  width: 4px;
+  height: 8px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* ==========================================
+   PARTICIPANT
+========================================== */
+
+.summit-registration-participant {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 180px;
+}
+
+.summit-registration-avatar {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e8f7f1;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 850;
+}
+
+.summit-registration-participant > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-registration-participant strong {
+  max-width: 190px;
+  overflow: hidden;
+  color: #263441;
+  font-size: 0.74rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summit-registration-participant small {
+  margin-top: 0.15rem;
+  color: #87929c;
+  font-size: 0.61rem;
+  text-transform: capitalize;
+}
+
+/* ==========================================
+   CONTACT
+========================================== */
+
+.summit-registration-contact {
+  min-width: 185px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.summit-registration-contact span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 220px;
+  overflow: hidden;
+  color: #40505d;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summit-registration-contact span svg {
+  color: #8a96a1;
+  flex-shrink: 0;
+}
+
+.summit-registration-contact small {
+  color: #87929c;
+  font-size: 0.63rem;
+}
+
+/* ==========================================
+   COUNTY
+========================================== */
+
+.summit-registration-county {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 120px;
+}
+
+.summit-registration-county > svg {
+  color: #80909b;
+  flex-shrink: 0;
+}
+
+.summit-registration-county > span {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-registration-county strong {
+  color: #35434f;
+  font-size: 0.7rem;
+}
+
+.summit-registration-county small {
+  margin-top: 0.1rem;
+  color: #8a959f;
+  font-size: 0.57rem;
+}
+
+/* ==========================================
+   BADGES
+========================================== */
+
+.summit-registration-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.48rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.summit-registration-badge.is-success {
+  color: #116b3a;
+  background: #e7f7ed;
+}
+
+.summit-registration-badge.is-warning {
+  color: #8a590d;
+  background: #fff4d6;
+}
+
+.summit-registration-badge.is-danger {
+  color: #9f3535;
+  background: #fdeaea;
+}
+
+.summit-registration-badge.is-neutral {
+  color: #5e6b77;
+  background: #edf0f2;
+}
+
+.summit-registration-ticket {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.summit-registration-ticket small {
+  max-width: 130px;
+  overflow: hidden;
+  color: #7f8a94;
+  font-size: 0.56rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   CHECK-IN
+========================================== */
+
+.summit-check-in-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  font-size: 0.63rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.summit-check-in-indicator.is-checked-in {
+  color: #147443;
+}
+
+.summit-check-in-indicator.is-not-checked-in {
+  color: #89949e;
+}
+
+/* ==========================================
+   DATE AND ACTION
+========================================== */
+
+.summit-registration-date {
+  display: block;
+  max-width: 130px;
+  color: #73808b;
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.summit-view-registration-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.42rem 0.56rem;
+  color: #087f5b;
+  background: #eaf7f2;
+  border-radius: 7px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.summit-view-registration-button:hover {
+  color: #ffffff;
+  background: #087f5b;
+}
+
+/* ==========================================
+   LOADING AND EMPTY
+========================================== */
+
+.summit-registration-loading-row td {
+  padding: 3rem 1rem;
+}
+
+.summit-registration-loading-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  color: #74808b;
+  font-size: 0.76rem;
+}
+
+.summit-registrations-empty {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.summit-empty-icon {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.9rem;
+  color: #7e8a95;
+  background: #f0f3f5;
+  border-radius: 50%;
+}
+
+.summit-registrations-empty h3 {
+  margin: 0;
+  color: #36434f;
+  font-size: 0.95rem;
+}
+
+.summit-registrations-empty p {
+  max-width: 420px;
+  margin: 0.45rem 0 1rem;
+  color: #818c96;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+/* ==========================================
+   PAGINATION
+========================================== */
+
+.summit-registrations-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid #e6eaed;
+  background: #fafbfc;
+}
+
+.summit-pagination-summary {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  color: #74808a;
+  font-size: 0.66rem;
+}
+
+.summit-pagination-summary label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.summit-pagination-summary select {
+  padding: 0.35rem 0.5rem;
+  color: #46525e;
+  background: #ffffff;
+  border: 1px solid #d8e0e5;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.65rem;
+}
+
+.summit-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.summit-pagination-controls button {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0.38rem 0.55rem;
+  color: #53606c;
+  background: #ffffff;
+  border: 1px solid #dce3e8;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 0.63rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.summit-pagination-controls button:hover:not(:disabled) {
+  color: #087f5b;
+  border-color: #9cccbc;
+  background: #f4faf8;
+}
+
+.summit-pagination-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.summit-pagination-controls button:first-child,
+.summit-pagination-controls button:last-child {
+  gap: 0;
+}
+
+.summit-pagination-controls button:first-child svg:last-child,
+.summit-pagination-controls button:last-child svg:last-child {
+  margin-left: -0.45rem;
+}
+
+.summit-pagination-controls > span {
+  padding: 0 0.45rem;
+  color: #6d7984;
+  font-size: 0.65rem;
+}
+
+/* ==========================================
+   FULL PAGE STATE
+========================================== */
+
+.summit-registrations-state {
+  min-height: 430px;
+  max-width: 720px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 2.5rem;
+  margin: 2rem auto;
+  background: #ffffff;
+  border: 1px solid #e1e6ea;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.summit-registrations-error-state {
+  color: #a13b3b;
+}
+
+.summit-registrations-state h1 {
+  margin: 0.9rem 0 0;
+  color: #35424e;
+  font-size: 1.2rem;
+}
+
+.summit-registrations-state p {
+  max-width: 520px;
+  margin: 0.6rem 0 0;
+  color: #78838e;
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.summit-registrations-state code {
+  margin: 0 0.3rem;
+  padding: 0.15rem 0.35rem;
+  color: #31574b;
+  background: #edf6f2;
+  border-radius: 5px;
+}
+
+/* ==========================================
+   FOOTER NOTE
+========================================== */
+
+.summit-registration-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  margin-top: 1rem;
+  color: #89949d;
+  font-size: 0.64rem;
+}
+
+/* ==========================================
+   ANIMATION
+========================================== */
+
+@keyframes summit-registration-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.summit-registrations-page
+  .is-spinning {
+  animation:
+    summit-registration-spin
+    0.8s linear infinite;
+}
+
+/* ==========================================
+   FOCUS
+========================================== */
+
+.summit-registrations-page
+  button:focus-visible,
+.summit-registrations-page
+  a:focus-visible,
+.summit-registrations-page
+  input:focus-visible,
+.summit-registrations-page
+  select:focus-visible {
+  outline: 3px solid
+    rgba(8, 127, 91, 0.18);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1100px) {
+  .summit-registration-summary-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .summit-registration-filter-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .summit-registrations-page {
+    padding: 1rem;
+  }
+
+  .summit-registrations-header {
+    flex-direction: column;
+  }
+
+  .summit-registrations-header-actions {
+    width: 100%;
+  }
+
+  .summit-registrations-header-actions
+    > * {
+    flex: 1;
+  }
+
+  .summit-registrations-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .summit-filter-toggle {
+    width: 100%;
+  }
+
+  .summit-selected-action-bar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .summit-selected-action-bar
+    > div:last-child {
+    width: 100%;
+  }
+
+  .summit-selected-action-bar
+    button {
+    flex: 1;
+  }
+
+  .summit-registrations-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .summit-pagination-summary,
+  .summit-pagination-controls {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 560px) {
+  .summit-registration-summary-grid,
+  .summit-registration-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-registrations-header-actions {
+    flex-direction: column;
+  }
+
+  .summit-registrations-header-actions
+    > * {
+    width: 100%;
+  }
+
+  .summit-registrations-title-row {
+    align-items: flex-start;
+  }
+
+  .summit-registrations-search {
+    flex-wrap: wrap;
+  }
+
+  .summit-search-submit {
+    width: 100%;
+    min-height: 38px;
+  }
+
+  .summit-registration-filter-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .summit-pagination-summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .summit-pagination-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .summit-pagination-controls
+    > span {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+  .summit-registrations-page
+    .is-spinning {
+    animation: none;
+  }
+
+  .summit-registrations-primary-button,
+  .summit-registrations-secondary-button,
+  .summit-registrations-table tbody tr {
+    transition: none;
+  }
+}

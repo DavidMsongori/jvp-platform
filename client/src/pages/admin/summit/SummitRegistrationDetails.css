@@ -1,0 +1,922 @@
+/* ==========================================
+   PAGE
+========================================== */
+
+.summit-registration-detail-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 1.5rem;
+  color: #17202a;
+  background: #f5f7fa;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.summit-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.summit-detail-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
+  color: #687583;
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.summit-detail-back-link:hover {
+  color: #087f5b;
+}
+
+.summit-detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.summit-detail-avatar {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e8f7f1;
+  border: 1px solid #cdeade;
+  border-radius: 50%;
+  font-size: 0.92rem;
+  font-weight: 850;
+}
+
+.summit-detail-title-row p {
+  margin: 0 0 0.18rem;
+  color: #087f5b;
+  font-size: 0.67rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summit-detail-title-row h1 {
+  margin: 0;
+  color: #172534;
+  font-size: clamp(
+    1.45rem,
+    2.5vw,
+    2rem
+  );
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.summit-detail-title-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
+  margin-top: 0.55rem;
+  color: #7b8792;
+  font-size: 0.68rem;
+}
+
+.summit-detail-title-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.summit-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.summit-detail-primary-button,
+.summit-detail-secondary-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.48rem;
+  padding: 0.65rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.summit-detail-primary-button {
+  color: #ffffff;
+  background: #087f5b;
+  box-shadow: 0 7px 16px
+    rgba(8, 127, 91, 0.16);
+}
+
+.summit-detail-primary-button:hover {
+  background: #066f50;
+  transform: translateY(-1px);
+}
+
+.summit-detail-secondary-button {
+  color: #394651;
+  background: #ffffff;
+  border-color: #dce3e8;
+}
+
+.summit-detail-secondary-button:hover {
+  color: #087f5b;
+  border-color: #9cccbc;
+}
+
+.summit-detail-primary-button:disabled,
+.summit-detail-secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==========================================
+   ALERTS
+========================================== */
+
+.summit-detail-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.8rem 0.95rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.summit-detail-alert.is-error {
+  color: #9d3c35;
+  background: #fff0ee;
+  border-color: #f1c0ba;
+}
+
+.summit-detail-alert.is-success {
+  color: #12693c;
+  background: #eaf8ef;
+  border-color: #bfe5cd;
+}
+
+/* ==========================================
+   STATUS GRID
+========================================== */
+
+.summit-detail-status-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.summit-detail-status-grid article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.95rem;
+  background: #ffffff;
+  border: 1px solid #e2e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px
+    rgba(23, 32, 42, 0.035);
+}
+
+.summit-detail-status-grid article > span:first-child {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: #087f5b;
+  background: #e9f7f2;
+  border-radius: 10px;
+}
+
+.summit-detail-status-grid article > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-detail-status-grid small {
+  margin-bottom: 0.25rem;
+  color: #7d8994;
+  font-size: 0.61rem;
+  font-weight: 750;
+}
+
+.summit-detail-status-grid article > button {
+  padding: 0;
+  color: #087f5b;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.summit-detail-status-grid article > time,
+.summit-detail-muted {
+  color: #8a949d;
+  font-size: 0.56rem;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.summit-detail-status-badge {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.24rem 0.48rem;
+  border-radius: 999px;
+  font-size: 0.57rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.summit-detail-status-badge.is-success {
+  color: #126c3d;
+  background: #e7f7ed;
+}
+
+.summit-detail-status-badge.is-warning {
+  color: #8b590c;
+  background: #fff4d6;
+}
+
+.summit-detail-status-badge.is-danger {
+  color: #a03737;
+  background: #fdeaea;
+}
+
+.summit-detail-status-badge.is-neutral {
+  color: #606d78;
+  background: #edf0f2;
+}
+
+.summit-detail-ticket-number {
+  max-width: 160px;
+  overflow: hidden;
+  color: #253441;
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   MAIN CONTENT
+========================================== */
+
+.summit-detail-content-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(260px, 340px);
+  align-items: start;
+  gap: 1rem;
+}
+
+.summit-detail-main-column,
+.summit-detail-side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ==========================================
+   PANELS
+========================================== */
+
+.summit-detail-panel,
+.summit-detail-action-panel,
+.summit-detail-record-panel {
+  min-width: 0;
+  padding: 1.1rem;
+  background: #ffffff;
+  border: 1px solid #e2e7eb;
+  border-radius: 13px;
+  box-shadow: 0 4px 16px
+    rgba(23, 32, 42, 0.035);
+}
+
+.summit-detail-panel > header,
+.summit-detail-action-panel > header,
+.summit-detail-record-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.summit-detail-panel header p,
+.summit-detail-action-panel header p,
+.summit-detail-record-panel header p {
+  margin: 0 0 0.18rem;
+  color: #087f5b;
+  font-size: 0.61rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.summit-detail-panel header h2,
+.summit-detail-action-panel header h2,
+.summit-detail-record-panel header h2 {
+  margin: 0;
+  color: #263441;
+  font-size: 0.92rem;
+  font-weight: 820;
+}
+
+.summit-detail-panel header > svg {
+  color: #87939e;
+}
+
+/* ==========================================
+   INFO GRID
+========================================== */
+
+.summit-detail-info-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.summit-detail-info-item {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  background: #fafbfc;
+  border: 1px solid #edf0f2;
+  border-radius: 9px;
+}
+
+.summit-detail-info-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e9f7f2;
+  border-radius: 8px;
+}
+
+.summit-detail-info-item > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-detail-info-item small {
+  margin-bottom: 0.2rem;
+  color: #84909b;
+  font-size: 0.6rem;
+  font-weight: 750;
+}
+
+.summit-detail-info-item strong {
+  overflow-wrap: anywhere;
+  color: #34424e;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+/* ==========================================
+   RESPONSES
+========================================== */
+
+.summit-detail-response-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.summit-detail-response-list > div {
+  padding: 0.8rem;
+  background: #fafbfc;
+  border: 1px solid #edf0f2;
+  border-radius: 9px;
+}
+
+.summit-detail-response-list small {
+  color: #7c8893;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.summit-detail-response-list p {
+  margin: 0.35rem 0 0;
+  color: #414f5b;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* ==========================================
+   ACTION LIST
+========================================== */
+
+.summit-detail-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.summit-detail-action-list button {
+  width: 100%;
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.72rem;
+  color: #33424e;
+  background: #fafbfc;
+  border: 1px solid #e5e9ed;
+  border-radius: 9px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.summit-detail-action-list button:hover {
+  color: #087f5b;
+  background: #f5fbf8;
+  border-color: #acd4c6;
+  transform: translateY(-1px);
+}
+
+.summit-detail-action-list button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.summit-detail-action-list button > svg {
+  color: #087f5b;
+}
+
+.summit-detail-action-list button > span {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-detail-action-list strong {
+  font-size: 0.69rem;
+}
+
+.summit-detail-action-list small {
+  margin-top: 0.12rem;
+  color: #89949e;
+  font-size: 0.58rem;
+  line-height: 1.4;
+}
+
+/* ==========================================
+   AUDIT RECORD
+========================================== */
+
+.summit-detail-record-panel dl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.summit-detail-record-panel dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #eef1f3;
+}
+
+.summit-detail-record-panel dl > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.summit-detail-record-panel dt {
+  color: #7d8994;
+  font-size: 0.61rem;
+}
+
+.summit-detail-record-panel dd {
+  max-width: 170px;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #35434f;
+  font-size: 0.61rem;
+  font-weight: 750;
+  text-align: right;
+}
+
+/* ==========================================
+   MODALS
+========================================== */
+
+.summit-detail-modal-backdrop {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(12, 20, 27, 0.6);
+  backdrop-filter: blur(3px);
+}
+
+.summit-detail-modal {
+  width: min(100%, 540px);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 20px 70px
+    rgba(0, 0, 0, 0.22);
+}
+
+.summit-detail-modal > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid #e9edef;
+}
+
+.summit-detail-modal h2 {
+  margin: 0;
+  color: #263441;
+  font-size: 1rem;
+}
+
+.summit-detail-modal header p {
+  margin: 0.3rem 0 0;
+  color: #7d8994;
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.summit-detail-modal header > button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #687580;
+  background: #f1f3f5;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.summit-detail-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.2rem;
+}
+
+.summit-detail-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding: 0.9rem 1.2rem;
+  background: #fafbfc;
+  border-top: 1px solid #e9edef;
+}
+
+.summit-detail-modal-cancel,
+.summit-detail-modal-confirm {
+  min-height: 39px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.58rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.summit-detail-modal-cancel {
+  color: #4f5c68;
+  background: #ffffff;
+  border-color: #dce3e8;
+}
+
+.summit-detail-modal-confirm.primary {
+  color: #ffffff;
+  background: #087f5b;
+}
+
+.summit-detail-modal-confirm.danger {
+  color: #ffffff;
+  background: #b33b3b;
+}
+
+.summit-detail-modal button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   FORMS
+========================================== */
+
+.summit-detail-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.summit-detail-form-field > span {
+  color: #5f6c78;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.summit-detail-form-field input,
+.summit-detail-form-field select,
+.summit-detail-form-field textarea {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  color: #34424e;
+  background: #ffffff;
+  border: 1px solid #d9e1e6;
+  border-radius: 8px;
+  outline: none;
+  resize: vertical;
+  font: inherit;
+  font-size: 0.72rem;
+}
+
+.summit-detail-form-field input:focus,
+.summit-detail-form-field select:focus,
+.summit-detail-form-field textarea:focus {
+  border-color: #087f5b;
+  box-shadow: 0 0 0 3px
+    rgba(8, 127, 91, 0.1);
+}
+
+.summit-detail-form-note {
+  margin: 0;
+  color: #9b6411;
+  font-size: 0.65rem;
+}
+
+/* ==========================================
+   LOADING / ERROR
+========================================== */
+
+.summit-detail-loading-state,
+.summit-detail-error-state {
+  min-height: 430px;
+  max-width: 720px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 2.5rem;
+  margin: 2rem auto;
+  background: #ffffff;
+  border: 1px solid #e1e6ea;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.summit-detail-loading-state > svg {
+  color: #087f5b;
+}
+
+.summit-detail-error-state > svg {
+  color: #a53b3b;
+}
+
+.summit-detail-loading-state h1,
+.summit-detail-error-state h1 {
+  margin: 0.8rem 0 0;
+  color: #34424e;
+  font-size: 1.15rem;
+}
+
+.summit-detail-loading-state p,
+.summit-detail-error-state p {
+  max-width: 500px;
+  margin: 0.55rem 0 1rem;
+  color: #7b8792;
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.summit-detail-error-state > div {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.summit-detail-error-state button,
+.summit-detail-error-state a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.85rem;
+  color: #ffffff;
+  background: #087f5b;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ==========================================
+   ANIMATION
+========================================== */
+
+@keyframes summit-detail-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.summit-registration-detail-page
+  .is-spinning {
+  animation:
+    summit-detail-spin
+    0.8s linear infinite;
+}
+
+/* ==========================================
+   FOCUS
+========================================== */
+
+.summit-registration-detail-page
+  button:focus-visible,
+.summit-registration-detail-page
+  a:focus-visible,
+.summit-registration-detail-page
+  input:focus-visible,
+.summit-registration-detail-page
+  select:focus-visible,
+.summit-registration-detail-page
+  textarea:focus-visible {
+  outline: 3px solid
+    rgba(8, 127, 91, 0.18);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1150px) {
+  .summit-detail-status-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .summit-detail-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-detail-side-column {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .summit-detail-record-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .summit-registration-detail-page {
+    padding: 1rem;
+  }
+
+  .summit-detail-header {
+    flex-direction: column;
+  }
+
+  .summit-detail-header-actions {
+    width: 100%;
+  }
+
+  .summit-detail-header-actions > * {
+    flex: 1;
+  }
+
+  .summit-detail-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-detail-side-column {
+    display: flex;
+  }
+}
+
+@media (max-width: 520px) {
+  .summit-detail-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-detail-title-row {
+    align-items: flex-start;
+  }
+
+  .summit-detail-header-actions {
+    flex-direction: column;
+  }
+
+  .summit-detail-header-actions > * {
+    width: 100%;
+  }
+
+  .summit-detail-error-state > div {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .summit-detail-error-state button,
+  .summit-detail-error-state a {
+    width: 100%;
+  }
+
+  .summit-detail-modal > footer {
+    flex-direction: column;
+  }
+
+  .summit-detail-modal-cancel,
+  .summit-detail-modal-confirm {
+    width: 100%;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+  .summit-registration-detail-page
+    .is-spinning {
+    animation: none;
+  }
+
+  .summit-detail-primary-button,
+  .summit-detail-secondary-button,
+  .summit-detail-action-list button {
+    transition: none;
+  }
+}

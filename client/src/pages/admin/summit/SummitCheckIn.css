@@ -1,0 +1,1019 @@
+/* ==========================================
+   PAGE
+========================================== */
+
+.summit-checkin-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 1.5rem;
+  color: #17202a;
+  background: #f5f7fa;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.summit-checkin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.summit-checkin-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  color: #687583;
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.summit-checkin-back-link:hover {
+  color: #087f5b;
+}
+
+.summit-checkin-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.summit-checkin-title-icon {
+  width: 49px;
+  height: 49px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e8f7f1;
+  border-radius: 12px;
+}
+
+.summit-checkin-title-row p {
+  margin: 0 0 0.18rem;
+  color: #087f5b;
+  font-size: 0.67rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summit-checkin-title-row h1 {
+  margin: 0;
+  color: #172534;
+  font-size: clamp(
+    1.45rem,
+    2.5vw,
+    2rem
+  );
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.summit-checkin-description {
+  max-width: 650px;
+  margin: 0.65rem 0 0;
+  color: #74808c;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.summit-checkin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.summit-checkin-primary-button,
+.summit-checkin-secondary-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.summit-checkin-primary-button {
+  color: #ffffff;
+  background: #087f5b;
+  box-shadow: 0 7px 16px
+    rgba(8, 127, 91, 0.16);
+}
+
+.summit-checkin-primary-button:hover {
+  background: #066f50;
+  transform: translateY(-1px);
+}
+
+.summit-checkin-secondary-button {
+  color: #3c4955;
+  background: #ffffff;
+  border-color: #dce3e8;
+}
+
+.summit-checkin-secondary-button:hover {
+  color: #087f5b;
+  border-color: #9cccbc;
+}
+
+/* ==========================================
+   ALERTS
+========================================== */
+
+.summit-checkin-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.8rem 0.95rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.summit-checkin-alert > span {
+  flex: 1;
+}
+
+.summit-checkin-alert > button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.summit-checkin-alert.is-error {
+  color: #9e3c35;
+  background: #fff0ee;
+  border-color: #f0bfb9;
+}
+
+.summit-checkin-alert.is-success {
+  color: #126a3c;
+  background: #eaf8ef;
+  border-color: #bee4cc;
+}
+
+/* ==========================================
+   MAIN GRID
+========================================== */
+
+.summit-checkin-main-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(250px, 330px);
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.summit-checkin-search-panel,
+.summit-checkin-session-panel,
+.summit-checkin-recent-panel {
+  min-width: 0;
+  padding: 1.1rem;
+  background: #ffffff;
+  border: 1px solid #e2e7eb;
+  border-radius: 13px;
+  box-shadow: 0 4px 16px
+    rgba(23, 32, 42, 0.035);
+}
+
+.summit-checkin-search-panel > header,
+.summit-checkin-session-panel > header,
+.summit-checkin-recent-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.summit-checkin-search-panel header p,
+.summit-checkin-session-panel header p,
+.summit-checkin-recent-panel header p {
+  margin: 0 0 0.18rem;
+  color: #087f5b;
+  font-size: 0.61rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.summit-checkin-search-panel header h2,
+.summit-checkin-session-panel header h2,
+.summit-checkin-recent-panel header h2 {
+  margin: 0;
+  color: #263441;
+  font-size: 0.92rem;
+  font-weight: 820;
+}
+
+.summit-checkin-search-panel header > svg,
+.summit-checkin-session-panel header > svg {
+  color: #86929d;
+}
+
+/* ==========================================
+   MODE TABS
+========================================== */
+
+.summit-checkin-mode-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.28rem;
+  margin-bottom: 0.9rem;
+  background: #f1f4f5;
+  border-radius: 9px;
+}
+
+.summit-checkin-mode-tabs button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 0.4rem;
+  padding: 0.5rem 0.65rem;
+  color: #687580;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.summit-checkin-mode-tabs button.is-active {
+  color: #087f5b;
+  background: #ffffff;
+  box-shadow: 0 2px 8px
+    rgba(23, 32, 42, 0.08);
+}
+
+/* ==========================================
+   SEARCH FORM
+========================================== */
+
+.summit-checkin-search-form {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(0, 0.8fr)
+    auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.summit-checkin-search-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.summit-checkin-search-form label > span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #64717d;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.summit-checkin-search-form label small {
+  color: #9aa3ab;
+  font-size: 0.56rem;
+  font-weight: 700;
+}
+
+.summit-checkin-input {
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #dbe2e7;
+  border-radius: 9px;
+}
+
+.summit-checkin-input:focus-within {
+  border-color: #087f5b;
+  box-shadow: 0 0 0 3px
+    rgba(8, 127, 91, 0.1);
+}
+
+.summit-checkin-input > svg {
+  margin-left: 0.75rem;
+  color: #87939e;
+  flex-shrink: 0;
+}
+
+.summit-checkin-input input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem;
+  color: #34424e;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font: inherit;
+  font-size: 0.74rem;
+}
+
+.summit-checkin-input button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-right: 0.3rem;
+  color: #78848f;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.summit-checkin-input button:hover {
+  color: #a33b3b;
+  background: #fceeee;
+}
+
+.summit-checkin-search-button {
+  min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.9rem;
+  color: #ffffff;
+  background: #087f5b;
+  border: 0;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.summit-checkin-search-button:hover:not(:disabled) {
+  background: #066f50;
+}
+
+.summit-checkin-search-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.summit-checkin-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+  color: #88939d;
+  font-size: 0.61rem;
+}
+
+.summit-checkin-shortcuts kbd {
+  margin: 0 0.25rem;
+  padding: 0.12rem 0.3rem;
+  color: #596671;
+  background: #f0f3f5;
+  border: 1px solid #dce2e6;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.56rem;
+  font-weight: 800;
+}
+
+/* ==========================================
+   SESSION PANEL
+========================================== */
+
+.summit-checkin-session-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-checkin-session-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.75rem;
+  margin-bottom: 0.65rem;
+  background: #fafbfc;
+  border: 1px solid #edf0f2;
+  border-radius: 9px;
+}
+
+.summit-checkin-session-stat > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e8f7f1;
+  border-radius: 9px;
+}
+
+.summit-checkin-session-stat > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-checkin-session-stat small {
+  color: #7f8b96;
+  font-size: 0.6rem;
+  font-weight: 750;
+}
+
+.summit-checkin-session-stat strong {
+  margin-top: 0.18rem;
+  overflow: hidden;
+  color: #263441;
+  font-size: 0.85rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summit-checkin-session-reset {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+  color: #5f6c77;
+  background: #ffffff;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.64rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.summit-checkin-session-reset:hover:not(:disabled) {
+  color: #087f5b;
+  border-color: #a2cfbf;
+}
+
+.summit-checkin-session-reset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   RESULT
+========================================== */
+
+.summit-checkin-result-section {
+  margin-bottom: 1rem;
+}
+
+.summit-checkin-empty-result {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 2rem;
+  background: #ffffff;
+  border: 1px solid #e1e6ea;
+  border-radius: 13px;
+  text-align: center;
+}
+
+.summit-checkin-empty-result > span {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.9rem;
+  color: #7b8792;
+  background: #f0f3f5;
+  border-radius: 50%;
+}
+
+.summit-checkin-empty-result > svg {
+  margin-bottom: 0.9rem;
+  color: #087f5b;
+}
+
+.summit-checkin-empty-result h2 {
+  margin: 0;
+  color: #35434f;
+  font-size: 1rem;
+}
+
+.summit-checkin-empty-result p {
+  max-width: 430px;
+  margin: 0.45rem 0 0;
+  color: #818c96;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+/* ==========================================
+   PARTICIPANT CARD
+========================================== */
+
+.summit-checkin-participant-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #dfe5e9;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px
+    rgba(23, 32, 42, 0.05);
+}
+
+.summit-checkin-participant-card.is-complete {
+  border-color: #b8dfc8;
+}
+
+.summit-checkin-participant-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.summit-checkin-participant-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.summit-checkin-avatar {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e8f7f1;
+  border-radius: 50%;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.summit-checkin-avatar.small {
+  width: 38px;
+  height: 38px;
+  font-size: 0.65rem;
+}
+
+.summit-checkin-participant-profile p {
+  margin: 0 0 0.15rem;
+  color: #087f5b;
+  font-size: 0.6rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.summit-checkin-participant-profile h2 {
+  margin: 0;
+  color: #24323f;
+  font-size: 1.1rem;
+}
+
+.summit-checkin-participant-profile > div > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  color: #7c8893;
+  font-size: 0.64rem;
+}
+
+.summit-checkin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.summit-checkin-status.is-success {
+  color: #126c3d;
+  background: #e7f7ed;
+}
+
+.summit-checkin-status.is-pending {
+  color: #8a590d;
+  background: #fff4d6;
+}
+
+.summit-checkin-details-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 1.1rem;
+}
+
+.summit-checkin-details-grid > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.75rem;
+  background: #fafbfc;
+  border: 1px solid #edf0f2;
+  border-radius: 9px;
+}
+
+.summit-checkin-details-grid > div > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e9f7f2;
+  border-radius: 8px;
+}
+
+.summit-checkin-details-grid > div > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-checkin-details-grid small {
+  color: #85909a;
+  font-size: 0.58rem;
+  font-weight: 750;
+}
+
+.summit-checkin-details-grid strong {
+  margin-top: 0.18rem;
+  overflow-wrap: anywhere;
+  color: #35434f;
+  font-size: 0.69rem;
+  line-height: 1.4;
+}
+
+.summit-checkin-participant-card > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  background: #fafbfc;
+  border-top: 1px solid #edf0f2;
+}
+
+.summit-checkin-view-button,
+.summit-checkin-confirm-button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  padding: 0.58rem 0.85rem;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.summit-checkin-view-button {
+  color: #40505c;
+  background: #ffffff;
+  border: 1px solid #dce3e8;
+}
+
+.summit-checkin-view-button:hover {
+  color: #087f5b;
+  border-color: #9cccbc;
+}
+
+.summit-checkin-confirm-button {
+  color: #ffffff;
+  background: #087f5b;
+  border: 0;
+  cursor: pointer;
+}
+
+.summit-checkin-confirm-button:hover:not(:disabled) {
+  background: #066f50;
+}
+
+.summit-checkin-confirm-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.summit-checkin-complete-message {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #126b3c;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.summit-checkin-blocked {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.75rem 1.1rem;
+  color: #9d3b35;
+  background: #fff0ee;
+  border-top: 1px solid #f0c4be;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+/* ==========================================
+   RECENT CHECK-INS
+========================================== */
+
+.summit-checkin-recent-panel > header > span {
+  min-width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0 0.4rem;
+  color: #ffffff;
+  background: #087f5b;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+.summit-checkin-recent-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-checkin-recent-item {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eef1f3;
+}
+
+.summit-checkin-recent-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.summit-checkin-recent-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-checkin-recent-copy strong {
+  overflow: hidden;
+  color: #32414d;
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summit-checkin-recent-copy small {
+  margin-top: 0.14rem;
+  color: #87929c;
+  font-size: 0.59rem;
+}
+
+.summit-checkin-recent-meta {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.summit-checkin-recent-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #147042;
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.summit-checkin-recent-meta time {
+  color: #929ca5;
+  font-size: 0.55rem;
+  white-space: nowrap;
+}
+
+.summit-checkin-recent-empty {
+  min-height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #87929c;
+  text-align: center;
+}
+
+.summit-checkin-recent-empty h3 {
+  margin: 0.65rem 0 0;
+  color: #3d4a55;
+  font-size: 0.82rem;
+}
+
+.summit-checkin-recent-empty p {
+  margin: 0.35rem 0 0;
+  font-size: 0.66rem;
+}
+
+/* ==========================================
+   ANIMATION
+========================================== */
+
+@keyframes summit-checkin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.summit-checkin-page
+  .is-spinning {
+  animation:
+    summit-checkin-spin
+    0.8s linear infinite;
+}
+
+/* ==========================================
+   FOCUS
+========================================== */
+
+.summit-checkin-page
+  button:focus-visible,
+.summit-checkin-page
+  a:focus-visible,
+.summit-checkin-page
+  input:focus-visible {
+  outline: 3px solid
+    rgba(8, 127, 91, 0.18);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1000px) {
+  .summit-checkin-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-checkin-session-panel {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .summit-checkin-session-panel > header,
+  .summit-checkin-session-reset {
+    grid-column: 1 / -1;
+  }
+
+  .summit-checkin-session-stat {
+    margin-bottom: 0;
+  }
+
+  .summit-checkin-details-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .summit-checkin-page {
+    padding: 1rem;
+  }
+
+  .summit-checkin-header {
+    flex-direction: column;
+  }
+
+  .summit-checkin-header-actions {
+    width: 100%;
+  }
+
+  .summit-checkin-header-actions > * {
+    flex: 1;
+  }
+
+  .summit-checkin-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-checkin-participant-card > header,
+  .summit-checkin-participant-card > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .summit-checkin-status {
+    width: fit-content;
+  }
+
+  .summit-checkin-confirm-button,
+  .summit-checkin-view-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .summit-checkin-header-actions {
+    flex-direction: column;
+  }
+
+  .summit-checkin-header-actions > * {
+    width: 100%;
+  }
+
+  .summit-checkin-session-panel,
+  .summit-checkin-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-checkin-participant-profile {
+    align-items: flex-start;
+  }
+
+  .summit-checkin-recent-item {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .summit-checkin-recent-meta {
+    grid-column: 2;
+    align-items: flex-start;
+  }
+
+  .summit-checkin-shortcuts {
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+  .summit-checkin-page
+    .is-spinning {
+    animation: none;
+  }
+
+  .summit-checkin-primary-button,
+  .summit-checkin-secondary-button {
+    transition: none;
+  }
+}

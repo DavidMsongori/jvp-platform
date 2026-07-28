@@ -21,6 +21,10 @@ import Event from "../pages/events/Event";
 import News from "../pages/news/News";
 import Membership from "../pages/membership/Membership";
 import Summit from "../pages/summit/SummitPage";
+import SummitRegistration from"../pages/summit/SummitRegistration";
+import SummitTicketLookup from "../pages/summit/SummitTicketLookup";
+import SummitVerifyTicket from "../pages/summit/SummitVerifyTicket";
+import SummitPlanningCommittee from "../pages/summit/SummitPlanningCommittee";
 import Contact from "../pages/contact/Contact";
 import Leadership from "../pages/leadership/Leadership";
 
@@ -105,6 +109,12 @@ import CreateEvent from "../pages/admin/events/CreateEvent";
 import EditEvent from "../pages/admin/events/EditEvent";
 import ViewEvent from "../pages/admin/events/ViewEvent";
 
+/* Summit */
+import SummitDashboard from "../pages/admin/summit/SummitDashboard";
+import SummitRegistrations from "../pages/admin/summit/SummitRegistrations";
+import SummitRegistrationDetails from "../pages/admin/summit/SummitRegistrationDetails";
+import SummitCheckIn from "../pages/admin/summit/SummitCheckIn";
+
 /* ==========================================
    OTHER
 ========================================== */
@@ -135,6 +145,21 @@ function AppRoutes() {
   element={<Leadership />}
 />
         <Route path="/summit" element={<Summit />} />
+        <Route path="/summit/register" element={<SummitRegistration />} />
+        <Route
+  path="/summit/ticket"
+  element={<SummitTicketLookup />}
+/>
+<Route
+  path="/summit/verify-ticket"
+  element={<SummitVerifyTicket />}
+/>
+
+<Route
+  path="/summit/planning-committee"
+  element={<SummitPlanningCommittee />}
+/>
+
         <Route path="/contact" element={<Contact />} />
 
 
@@ -448,6 +473,55 @@ function AppRoutes() {
               </PermissionRoute>
             }
           />
+
+{/* =====================================
+    SUMMIT
+===================================== */}
+
+<Route
+  path="summit"
+  element={
+    <PermissionRoute
+      permission={PERMISSIONS.VIEW_EVENTS}
+    >
+      <SummitDashboard />
+    </PermissionRoute>
+  }
+/>
+
+<Route
+  path="summit/registrations"
+  element={
+    <PermissionRoute
+      permission={PERMISSIONS.VIEW_EVENTS}
+    >
+      <SummitRegistrations />
+    </PermissionRoute>
+  }
+/>
+
+<Route
+  path="summit/registrations/:registrationId"
+  element={
+    <PermissionRoute
+      permission={PERMISSIONS.VIEW_EVENTS}
+    >
+      <SummitRegistrationDetails />
+    </PermissionRoute>
+  }
+/>
+
+<Route
+  path="summit/check-in"
+  element={
+    <PermissionRoute
+      permission={PERMISSIONS.VIEW_EVENTS}
+    >
+      <SummitCheckIn />
+    </PermissionRoute>
+  }
+/>
+
         </Route>
 
         {/* =====================================

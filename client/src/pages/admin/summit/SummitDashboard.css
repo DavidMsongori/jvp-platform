@@ -1,0 +1,982 @@
+/* ==========================================
+   SUMMIT ADMIN DASHBOARD
+========================================== */
+
+.summit-admin-dashboard {
+  width: 100%;
+  min-height: 100%;
+  padding: 1.5rem;
+  color: #17202a;
+  background: #f5f7fa;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.summit-dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.summit-dashboard-heading {
+  min-width: 0;
+}
+
+.summit-dashboard-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
+  color: #087f5b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summit-dashboard-heading h1 {
+  margin: 0;
+  color: #12202f;
+  font-size: clamp(1.55rem, 2.5vw, 2.15rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.summit-dashboard-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.7rem;
+  color: #687483;
+  font-size: 0.9rem;
+}
+
+.summit-dashboard-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.summit-dashboard-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.summit-primary-button,
+.summit-secondary-button {
+  min-height: 42px;
+  padding: 0.68rem 1rem;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.summit-primary-button {
+  color: #ffffff;
+  background: #087f5b;
+  box-shadow: 0 7px 18px rgba(8, 127, 91, 0.18);
+}
+
+.summit-primary-button:hover {
+  background: #066f50;
+  transform: translateY(-1px);
+}
+
+.summit-secondary-button {
+  color: #334150;
+  background: #ffffff;
+  border-color: #dfe5eb;
+}
+
+.summit-secondary-button:hover {
+  border-color: #b9c3cd;
+  background: #fafbfc;
+}
+
+.summit-primary-button:focus-visible,
+.summit-secondary-button:focus-visible,
+.summit-panel-link:focus-visible,
+.summit-recent-row:focus-visible,
+.summit-quick-action-card:focus-visible {
+  outline: 3px solid rgba(8, 127, 91, 0.2);
+  outline-offset: 2px;
+}
+
+.summit-primary-button:disabled,
+.summit-secondary-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==========================================
+   ALERT
+========================================== */
+
+.summit-inline-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  color: #8a4b08;
+  background: #fff8e6;
+  border: 1px solid #f6d894;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.summit-inline-alert svg {
+  flex-shrink: 0;
+  margin-top: 0.08rem;
+}
+
+/* ==========================================
+   STATISTICS
+========================================== */
+
+.summit-stat-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.summit-stat-card {
+  position: relative;
+  min-width: 0;
+  padding: 1.15rem;
+  background: #ffffff;
+  border: 1px solid #e5e9ee;
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgba(23, 32, 42, 0.045);
+  overflow: hidden;
+}
+
+.summit-stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--summit-card-accent, #087f5b);
+}
+
+.summit-stat-card-primary {
+  --summit-card-accent: #087f5b;
+  --summit-card-soft: #e8f7f1;
+}
+
+.summit-stat-card-accent {
+  --summit-card-accent: #e89c20;
+  --summit-card-soft: #fff6df;
+}
+
+.summit-stat-card-success {
+  --summit-card-accent: #15803d;
+  --summit-card-soft: #eaf8ef;
+}
+
+.summit-stat-card-info {
+  --summit-card-accent: #2563eb;
+  --summit-card-soft: #edf3ff;
+}
+
+.summit-stat-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.summit-stat-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: var(--summit-card-accent);
+  background: var(--summit-card-soft);
+  border-radius: 11px;
+}
+
+.summit-stat-percent {
+  padding: 0.28rem 0.48rem;
+  color: var(--summit-card-accent);
+  background: var(--summit-card-soft);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.summit-stat-label {
+  margin: 0 0 0.35rem;
+  color: #647181;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.summit-stat-value {
+  margin: 0;
+  color: #17202a;
+  font-size: 1.85rem;
+  font-weight: 850;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.summit-stat-helper {
+  min-height: 2.4em;
+  margin: 0.55rem 0 0;
+  color: #7a8694;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.summit-stat-progress {
+  width: 100%;
+  height: 5px;
+  margin-top: 0.85rem;
+  background: #edf0f3;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.summit-stat-progress span {
+  display: block;
+  height: 100%;
+  background: var(--summit-card-accent);
+  border-radius: inherit;
+}
+
+/* ==========================================
+   QUICK ACTIONS
+========================================== */
+
+.summit-quick-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(
+    135deg,
+    #073c32,
+    #087f5b
+  );
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(7, 60, 50, 0.14);
+}
+
+.summit-quick-actions-copy {
+  color: #ffffff;
+}
+
+.summit-quick-actions-copy h2 {
+  margin: 0 0 0.28rem;
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.summit-quick-actions-copy p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.8rem;
+}
+
+.summit-quick-action-links {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.summit-quick-action-card {
+  min-width: 210px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.75rem;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.11);
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  border-radius: 10px;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.summit-quick-action-card:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.summit-quick-action-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #073c32;
+  background: #ffffff;
+  border-radius: 9px;
+}
+
+.summit-quick-action-card > span:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-quick-action-card strong {
+  font-size: 0.8rem;
+}
+
+.summit-quick-action-card small {
+  margin-top: 0.12rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.68rem;
+}
+
+/* ==========================================
+   MAIN GRID
+========================================== */
+
+.summit-dashboard-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.summit-dashboard-panel {
+  min-width: 0;
+  padding: 1.15rem;
+  background: #ffffff;
+  border: 1px solid #e5e9ee;
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgba(23, 32, 42, 0.04);
+}
+
+.summit-panel-header {
+  min-height: 48px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.summit-panel-eyebrow {
+  margin: 0 0 0.18rem;
+  color: #087f5b;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summit-panel-header h2 {
+  margin: 0;
+  color: #1c2936;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.summit-panel-header > svg {
+  color: #8b96a2;
+}
+
+.summit-panel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #087f5b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   COUNTY LIST
+========================================== */
+
+.summit-county-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-county-row {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #f0f2f4;
+}
+
+.summit-county-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.summit-county-row-top,
+.summit-county-row-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.summit-county-row-top > div {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.summit-county-row-top strong {
+  color: #263442;
+  font-size: 0.8rem;
+}
+
+.summit-county-row-top > div span {
+  padding: 0.18rem 0.36rem;
+  color: #687584;
+  background: #f0f3f5;
+  border-radius: 5px;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.summit-county-row-top p {
+  margin: 0;
+  color: #7b8793;
+  font-size: 0.73rem;
+  white-space: nowrap;
+}
+
+.summit-county-row-top p strong {
+  color: #182532;
+  font-size: 0.8rem;
+}
+
+.summit-county-progress {
+  width: 100%;
+  height: 5px;
+  margin: 0.55rem 0 0.4rem;
+  background: #edf1f3;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.summit-county-progress span {
+  display: block;
+  height: 100%;
+  background: #087f5b;
+  border-radius: inherit;
+}
+
+.summit-county-row-footer {
+  color: #89949f;
+  font-size: 0.63rem;
+}
+
+/* ==========================================
+   RECENT REGISTRATIONS
+========================================== */
+
+.summit-recent-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-recent-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  padding: 0.78rem 0;
+  color: inherit;
+  border-bottom: 1px solid #f0f2f4;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    padding 160ms ease;
+}
+
+.summit-recent-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.summit-recent-row:hover {
+  padding-right: 0.35rem;
+  padding-left: 0.35rem;
+  background: #fafbfc;
+  border-radius: 8px;
+}
+
+.summit-participant-avatar {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #087f5b;
+  background: #e8f7f1;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.summit-participant-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summit-participant-details strong {
+  overflow: hidden;
+  color: #263442;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summit-participant-details small {
+  overflow: hidden;
+  margin-top: 0.18rem;
+  color: #83909c;
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summit-recent-meta {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.summit-recent-meta time {
+  color: #919ba5;
+  font-size: 0.58rem;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   STATUS BADGES
+========================================== */
+
+.summit-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.42rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.summit-status-badge.is-success {
+  color: #146c3b;
+  background: #e9f8ef;
+}
+
+.summit-status-badge.is-warning {
+  color: #8b5808;
+  background: #fff5d9;
+}
+
+.summit-status-badge.is-danger {
+  color: #a83232;
+  background: #fdecec;
+}
+
+.summit-status-badge.is-neutral {
+  color: #5f6d7a;
+  background: #eef1f4;
+}
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+.summit-panel-empty {
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 2rem 1rem;
+  color: #87929d;
+  text-align: center;
+}
+
+.summit-panel-empty svg {
+  margin-bottom: 0.75rem;
+  color: #a1abb4;
+}
+
+.summit-panel-empty h3 {
+  margin: 0;
+  color: #3e4b57;
+  font-size: 0.88rem;
+}
+
+.summit-panel-empty p {
+  max-width: 280px;
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+/* ==========================================
+   SUMMARY STRIP
+========================================== */
+
+.summit-summary-strip {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  background: #e3e8ec;
+  border: 1px solid #e3e8ec;
+  border-radius: 14px;
+}
+
+.summit-summary-strip > div {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.9rem 1rem;
+  background: #ffffff;
+}
+
+.summit-summary-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #087f5b;
+  background: #e9f7f2;
+  border-radius: 9px;
+}
+
+.summit-summary-strip > div > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.summit-summary-strip strong {
+  color: #21303d;
+  font-size: 0.92rem;
+}
+
+.summit-summary-strip span:not(.summit-summary-icon) {
+  margin-top: 0.1rem;
+  color: #7d8995;
+  font-size: 0.66rem;
+}
+
+/* ==========================================
+   FULL PAGE ERROR STATE
+========================================== */
+
+.summit-dashboard-state {
+  min-height: 430px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  max-width: 740px;
+  padding: 3rem 2rem;
+  margin: 2rem auto;
+  background: #ffffff;
+  border: 1px solid #e3e8ec;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(23, 32, 42, 0.05);
+}
+
+.summit-state-icon {
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1rem;
+  color: #b33a3a;
+  background: #fdecec;
+  border-radius: 50%;
+}
+
+.summit-dashboard-state h1 {
+  margin: 0;
+  color: #273543;
+  font-size: 1.25rem;
+}
+
+.summit-dashboard-state p {
+  max-width: 520px;
+  margin: 0.65rem 0 1rem;
+  color: #74808c;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.summit-dashboard-state code {
+  max-width: 100%;
+  margin-bottom: 1.25rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  color: #29443b;
+  background: #eef5f2;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+/* ==========================================
+   LOADING SKELETON
+========================================== */
+
+.summit-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e9edf0;
+  border-radius: 8px;
+}
+
+.summit-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.7),
+    transparent
+  );
+  animation: summit-skeleton-loading 1.4s infinite;
+}
+
+.summit-skeleton-title {
+  width: 280px;
+  height: 32px;
+  margin-bottom: 0.75rem;
+}
+
+.summit-skeleton-subtitle {
+  width: 220px;
+  height: 16px;
+}
+
+.summit-skeleton-button {
+  width: 130px;
+  height: 42px;
+}
+
+.summit-skeleton-icon {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 1rem;
+}
+
+.summit-skeleton-stat-label {
+  width: 60%;
+  height: 12px;
+  margin-bottom: 0.7rem;
+}
+
+.summit-skeleton-stat-value {
+  width: 40%;
+  height: 28px;
+  margin-bottom: 0.8rem;
+}
+
+.summit-skeleton-stat-footer {
+  width: 80%;
+  height: 10px;
+}
+
+.summit-skeleton-panel-title {
+  width: 180px;
+  height: 18px;
+  margin-bottom: 1.5rem;
+}
+
+.summit-skeleton-row {
+  width: 100%;
+  height: 48px;
+  margin-bottom: 0.65rem;
+}
+
+@keyframes summit-skeleton-loading {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes summit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.is-spinning {
+  animation: summit-spin 0.8s linear infinite;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+========================================== */
+
+@media (max-width: 1180px) {
+  .summit-stat-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .summit-quick-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .summit-quick-action-links {
+    width: 100%;
+  }
+
+  .summit-quick-action-card {
+    flex: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .summit-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .summit-admin-dashboard {
+    padding: 1rem;
+  }
+
+  .summit-dashboard-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .summit-dashboard-header-actions {
+    width: 100%;
+  }
+
+  .summit-dashboard-header-actions > * {
+    flex: 1;
+  }
+
+  .summit-quick-action-links {
+    flex-direction: column;
+  }
+
+  .summit-quick-action-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .summit-summary-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .summit-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summit-dashboard-header-actions {
+    flex-direction: column;
+  }
+
+  .summit-dashboard-header-actions > * {
+    width: 100%;
+  }
+
+  .summit-recent-row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .summit-recent-meta {
+    grid-column: 2;
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .summit-county-row-top {
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+  .summit-primary-button,
+  .summit-secondary-button,
+  .summit-quick-action-card,
+  .summit-recent-row {
+    transition: none;
+  }
+
+  .summit-skeleton::after,
+  .is-spinning {
+    animation: none;
+  }
+}
+
+.summit-dashboard-location-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.summit-dashboard-location-link:hover {
+  color: #087f5b;
+  text-decoration: underline;
+}
