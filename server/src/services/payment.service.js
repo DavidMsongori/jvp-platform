@@ -1137,30 +1137,56 @@ export const renewMembership =
 async function processSuccessfulPayment(
   payment
 ) {
-  if (!payment.membershipProcessed) {
-  try {
-    await processSuccessfulPayment(payment);
-  } catch (error) {
-    payment.membershipProcessingError =
-      error.message;
-
-    await payment.save();
-
-    throw error;
-  }
-}
+  const memberId =
+    payment.member?._id ||
+    payment.member;
 
   if (
-    payment.paymentFor ===
-    "renewal"
+    ["membership", "renewal"].includes(
+      payment.paymentFor
+    ) &&
+    !memberId
   ) {
-    if (
-      !payment.membershipProcessed
-    ) {
-      await renewMembership(
-        payment.member._id ||
-          payment.member
-      );
+    throw new AppError(
+      "Payment is not linked to a member.",
+      400
+    );
+  }
+
+  /* ----------------------------------------
+     MEMBERSHIP ACTIVATION
+  ---------------------------------------- */
+
+  if (
+    payment.paymentFor === "membership"
+  ) {
+    if (!payment.membershipProcessed) {
+      await activateMembership(memberId);
+
+      payment.membershipProcessed =
+        true;
+
+      payment.membershipProcessedAt =
+        new Date();
+
+      payment.membershipProcessingError =
+        null;
+
+      await payment.save();
+    }
+
+    return payment;
+  }
+
+  /* ----------------------------------------
+     MEMBERSHIP RENEWAL
+  ---------------------------------------- */
+
+  if (
+    payment.paymentFor === "renewal"
+  ) {
+    if (!payment.membershipProcessed) {
+      await renewMembership(memberId);
 
       payment.membershipProcessed =
         true;
@@ -1178,8 +1204,8 @@ async function processSuccessfulPayment(
   }
 
   /*
-   * Event and summit processing will be connected
-   * to their respective registration services.
+   * Event and summit processing will be
+   * connected to their registration services.
    */
   return payment;
 }
@@ -1449,9 +1475,6 @@ export const processMpesaCallback =
         "callback",
     });
 
-    payment.receiptNumber =
-      callback.receiptNumber;
-
     await payment.save();
 
     try {
@@ -1567,45 +1590,19 @@ if (
    * Retry membership activation before returning.
    */
 
-  if (
-    payment.paymentFor === "membership" &&
-    !payment.membershipProcessed
-  ) {
-    try {
-      const memberId =
-        payment.member?._id ||
-        payment.member;
+  try {
+  await processSuccessfulPayment(
+    payment
+  );
+} catch (processingError) {
+  payment.membershipProcessingError =
+    processingError.message;
 
-      if (!memberId) {
-        throw new AppError(
-          "Payment is not linked to a member.",
-          400
-        );
-      }
+  await payment.save();
 
-      await activateMembership(
-        memberId
-      );
+  throw processingError;
+}
 
-      payment.membershipProcessed =
-        true;
-
-      payment.membershipProcessedAt =
-        new Date();
-
-      payment.membershipProcessingError =
-        null;
-
-      await payment.save();
-    } catch (membershipError) {
-      payment.membershipProcessingError =
-        membershipError.message;
-
-      await payment.save();
-
-      throw membershipError;
-    }
-  }
 
   const refreshedPayment =
     await Payment.findById(
@@ -1734,46 +1731,18 @@ if (
          PROCESS MEMBERSHIP
       -------------------------------------- */
 
-      if (
-        payment.paymentFor ===
-          "membership" &&
-        !payment.membershipProcessed
-      ) {
-        try {
-          const memberId =
-            payment.member?._id ||
-            payment.member;
+      try {
+  await processSuccessfulPayment(
+    payment
+  );
+} catch (processingError) {
+  payment.membershipProcessingError =
+    processingError.message;
 
-          if (!memberId) {
-            throw new AppError(
-              "Payment is not linked to a member.",
-              400
-            );
-          }
+  await payment.save();
 
-          await activateMembership(
-            memberId
-          );
-
-          payment.membershipProcessed =
-            true;
-
-          payment.membershipProcessedAt =
-            new Date();
-
-          payment.membershipProcessingError =
-            null;
-        } catch (
-          membershipError
-        ) {
-          payment.membershipProcessingError =
-            membershipError.message;
-
-          await payment.save();
-
-          throw membershipError;
-        }
-      }
+  throw processingError;
+}
 
       await payment.save();
 
@@ -1803,88 +1772,100 @@ if (
     }
 
     /* ----------------------------------------
-       PAYMENT CANCELLED
-    ---------------------------------------- */
+   PAYMENT CANCELLED
+---------------------------------------- */
 
-    if (resultCode === 1032) {
-      payment.status =
-        "cancelled";
+if (resultCode === 1032) {
+  payment.status = "cancelled";
 
-      payment.cancelledAt =
-        payment.cancelledAt ||
-        new Date();
+  payment.cancelledAt =
+    payment.cancelledAt ||
+    new Date();
 
-      payment.statusMessage =
-        result.resultDescription ||
-        "The payment request was cancelled.";
+  payment.failedAt = null;
 
-      payment.failureReason =
-        result.resultDescription ||
-        "The payment request was cancelled.";
-    }
+  payment.statusMessage =
+    result.resultDescription ||
+    "The payment request was cancelled.";
 
-    /* ----------------------------------------
-       PAYMENT EXPIRED / TIMEOUT
-    ---------------------------------------- */
+  payment.failureReason =
+    payment.statusMessage;
+}
 
-    else if (
-      resultCode === 1037
-    ) {
-      payment.status =
-        "expired";
+/* ----------------------------------------
+   PAYMENT EXPIRED / TIMEOUT
+---------------------------------------- */
 
-      payment.failedAt =
-        payment.failedAt ||
-        new Date();
+else if (resultCode === 1037) {
+  payment.status = "expired";
 
-      payment.statusMessage =
-        result.resultDescription ||
-        "The payment request expired.";
+  payment.failedAt =
+    payment.failedAt ||
+    new Date();
 
-      payment.failureReason =
-        result.resultDescription ||
-        "The payment request expired.";
-    }
+  payment.cancelledAt = null;
 
-    /* ----------------------------------------
-       OTHER FAILED PAYMENT
-    ---------------------------------------- */
+  payment.statusMessage =
+    result.resultDescription ||
+    "The payment request expired.";
 
-    else if (
-      resultCode !== null
-    ) {
-      payment.status =
-        getMpesaResultStatus(
-          resultCode
-        );
+  payment.failureReason =
+    payment.statusMessage;
+}
 
-      payment.failedAt =
-        payment.failedAt ||
-        new Date();
+/* ----------------------------------------
+   STILL PROCESSING
+---------------------------------------- */
 
-      payment.statusMessage =
-        result.resultDescription ||
-        "The payment was unsuccessful.";
+else if (
+  resultCode === 4999 ||
+  resultCode === null
+) {
+  payment.status = "processing";
 
-      payment.failureReason =
-        result.resultDescription ||
-        "The payment was unsuccessful.";
-    }
+  payment.statusMessage =
+    result.resultDescription ||
+    "The transaction is still under processing.";
 
-    /* ----------------------------------------
-       STILL PROCESSING
-    ---------------------------------------- */
+  payment.failureReason = null;
+  payment.failedAt = null;
+  payment.cancelledAt = null;
+}
 
-    else {
-      payment.status =
-        "processing";
+/* ----------------------------------------
+   OTHER FAILED PAYMENT
+---------------------------------------- */
 
-      payment.statusMessage =
-        "The transaction is still under processing.";
+else {
+  payment.status =
+    getMpesaResultStatus(
+      resultCode
+    );
 
-      payment.failureReason =
-        null;
-    }
+  /*
+   * Protect against an unknown result code
+   * being mapped back to processing.
+   */
+  if (
+    payment.status === "pending" ||
+    payment.status === "processing"
+  ) {
+    payment.status = "failed";
+  }
+
+  payment.failedAt =
+    payment.failedAt ||
+    new Date();
+
+  payment.cancelledAt = null;
+
+  payment.statusMessage =
+    result.resultDescription ||
+    "The payment was unsuccessful.";
+
+  payment.failureReason =
+    payment.statusMessage;
+}
 
     await payment.save();
 
