@@ -407,7 +407,6 @@ export function AuthProvider({ children }) {
       login,
       logout,
 
-      refreshMember,
       refreshProfile,
 
       updateUser,
@@ -434,7 +433,6 @@ export function AuthProvider({ children }) {
       hasPermission,
       login,
       logout,
-      refreshMember,
       refreshProfile,
       updateUser,
       updateMember,

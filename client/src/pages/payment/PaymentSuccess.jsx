@@ -27,7 +27,7 @@ function PaymentSuccess() {
 
   const {
 
-    refreshMember,
+    refreshProfile,
 
   } = useAuth();
 
@@ -57,7 +57,7 @@ function PaymentSuccess() {
 
         );
 
-        await refreshMember();
+        await refreshProfile();
 
         setLoading(false);
 
@@ -103,7 +103,7 @@ function PaymentSuccess() {
 
     verifyMembershipPayment,
 
-    refreshMember,
+    refreshProfile,
 
     navigate,
 
