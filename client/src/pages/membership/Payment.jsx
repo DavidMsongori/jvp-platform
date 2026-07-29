@@ -90,31 +90,57 @@ function Payment() {
      HANDLE SUCCESSFUL PAYMENT
   ========================================== */
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess =
+  useCallback(async () => {
     stopPolling();
 
     setError("");
+
     setMessage(
-      "Payment received successfully. Your membership has been activated."
+      "Payment received successfully. Activating your membership..."
     );
 
     try {
-      if (refreshProfile) {
+      const refreshed =
         await refreshProfile();
+
+      const refreshedMember =
+        refreshed?.member;
+
+      if (
+        refreshedMember
+          ?.membershipStatus !== "active" ||
+        !refreshedMember
+          ?.membershipFeePaid
+      ) {
+        setMessage(
+          "Payment received. Finalizing your membership activation..."
+        );
+
+        return;
       }
+
+      clearSavedPayment();
+
+      navigate("/dashboard", {
+        replace: true,
+      });
     } catch (refreshError) {
       console.error(
         "Unable to refresh member profile:",
         refreshError
       );
-    }
 
-    setTimeout(() => {
-      navigate("/dashboard", {
-        replace: true,
-      });
-    }, 2000);
-  };
+      setMessage(
+        "Payment received. Refreshing your membership details..."
+      );
+    }
+  }, [
+    stopPolling,
+    refreshProfile,
+    clearSavedPayment,
+    navigate,
+  ]);
 
   /* ==========================================
      PAYMENT STATUS POLLING
@@ -133,7 +159,10 @@ function Payment() {
             );
 
           const responseData =
-            response?.data || {};
+  response?.data?.data ||
+  response?.data ||
+  response ||
+  {};
 
           const payment =
             responseData.payment;
@@ -201,9 +230,11 @@ function Payment() {
           trimmedPhone
         );
 
-      const responseData =
-        response?.data || {};
-
+     const responseData =
+  response?.data?.data ||
+  response?.data ||
+  response ||
+  {};
       const payment =
         responseData.payment;
 
