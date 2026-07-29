@@ -159,15 +159,25 @@ function Payment() {
      PAYMENT SUCCESS
   ========================================== */
 
-  const handlePaymentSuccess =
-    useCallback(async () => {
+ const handlePaymentSuccess =
+  useCallback(
+    async (successfulPayment = null) => {
       stopPolling();
 
       setError("");
+      setChecking(false);
 
-     setMessage(
-  `Payment received successfully. Welcome to JVP Connect! Your membership number is ${member?.memberNumber || ""}. Redirecting to your dashboard...`
-);
+      const returnedMemberNumber =
+        successfulPayment?.member
+          ?.memberNumber ||
+        member?.memberNumber ||
+        "";
+
+      setMessage(
+        returnedMemberNumber
+          ? `Payment received successfully. Welcome to JVP Connect! Your membership number is ${returnedMemberNumber}. Redirecting to your dashboard...`
+          : "Payment received successfully. Welcome to JVP Connect! Redirecting to your dashboard..."
+      );
 
       try {
         await refreshProfile();
@@ -180,15 +190,24 @@ function Payment() {
 
       clearSavedPayment();
 
-      navigate("/dashboard", {
-        replace: true,
-      });
-    }, [
+      /*
+       * Give AuthContext enough time to update
+       * the member before ProtectedRoute checks it.
+       */
+      setTimeout(() => {
+        navigate("/dashboard", {
+          replace: true,
+        });
+      }, 800);
+    },
+    [
       stopPolling,
       refreshProfile,
       clearSavedPayment,
       navigate,
-    ]);
+      member?.memberNumber,
+    ]
+  );
 
   /* ==========================================
      CHECK PAYMENT ONCE
@@ -213,24 +232,42 @@ function Payment() {
               paymentReference
             );
 
-          const responseData =
-            response?.data || {};
-
-          const completed =
-  responseData.completed;
+         const responseData =
+  response?.data?.data ||
+  response?.data ||
+  response ||
+  {};
 
 const payment =
-  responseData.payment;
+  responseData.payment ||
+  responseData.data?.payment ||
+  null;
+
+const completed =
+  responseData.completed === true ||
+  responseData.data?.completed === true;
 
 const status =
   payment?.status;
 
+const membershipProcessed =
+  payment?.membershipProcessed === true;
+
+/*
+ * A successful payment should redirect once
+ * backend membership processing is complete.
+ */
 if (
-  completed &&
-  status === "successful" &&
-  payment?.membershipProcessed
+  completed === true ||
+  (
+    status === "successful" &&
+    membershipProcessed
+  )
 ) {
-  await handlePaymentSuccess();
+  await handlePaymentSuccess(
+    payment
+  );
+
   return;
 }
 
@@ -403,11 +440,15 @@ if (
        * Refresh first in case the callback
        * already activated the membership.
        */
-      const refreshed =
-        await refreshProfile();
+     const refreshed =
+  await refreshProfile();
 
-      const refreshedMember =
-        refreshed?.member;
+const refreshedMember =
+  refreshed?.data?.data?.member ||
+  refreshed?.data?.member ||
+  refreshed?.member ||
+  refreshed ||
+  null;
 
       if (
         refreshedMember
