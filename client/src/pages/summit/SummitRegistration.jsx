@@ -639,32 +639,29 @@ const SummitRegistration = () => {
     useRef(false);
 
   const {
-    user,
-    member,
+  user,
+  member,
+  loading: authLoading,
+  isAuthenticated,
+  membershipActive,
+  refreshProfile,
+} = useAuth();
 
-    loading: authLoading,
+ const {
+  summit,
+  summitLoading,
+  summitError,
 
-    isAuthenticated,
-    membershipActive,
+  registrationLoading,
+  registrationError,
+  registrationSuccess,
 
-    refreshMember,
-  } = useAuth();
+  fetchPublicSummitBySlug,
+  submitSummitRegistration,
 
-  const {
-    summit,
-    summitLoading,
-    summitError,
-
-    registrationLoading,
-    registrationError,
-    registrationSuccess,
-
-    fetchPublicSummitBySlug,
-    registerForSummit,
-
-    clearRegistrationState,
-    clearSummitError,
-  } = useSummit();
+  clearRegistrationState,
+  clearSummitError,
+} = useSummit();
 
   const [
     pathwayStep,
@@ -989,7 +986,7 @@ const SummitRegistration = () => {
       setProfileMessage("");
 
       try {
-        await refreshMember();
+        await refreshProfile();
 
         memberPrefilledRef.current =
           false;
@@ -1132,8 +1129,24 @@ const SummitRegistration = () => {
       registrationMode ===
       REGISTRATION_MODES.MEMBER;
 
-    const payload = {
-      summitSlug: SUMMIT_SLUG,
+   const summitEventId =
+  summit?._id ||
+  summit?.id ||
+  summit?.summitEventId ||
+  null;
+
+if (!summitEventId) {
+  setProfileMessage(
+    "The summit event could not be identified. Please refresh the page and try again."
+  );
+
+  return;
+}
+
+const payload = {
+  summitEventId,
+
+  summitSlug: SUMMIT_SLUG,
 
       participantType:
         registeringAsMember
@@ -1215,28 +1228,71 @@ const SummitRegistration = () => {
         ),
     };
 
-    const result =
-      await registerForSummit(
-        payload
+        try {
+      const result =
+        await submitSummitRegistration(
+          payload
+        );
+
+      if (result?.success !== true) {
+        setProfileMessage(
+          result?.message ||
+            "Registration could not be completed. Please try again."
+        );
+
+        return;
+      }
+
+      const registration =
+        getRegistrationResult(
+          result
+        ) ||
+        getRegistrationResult(
+          result?.data
+        ) ||
+        result?.data?.registration ||
+        result?.data?.data
+          ?.registration ||
+        result?.data?.data ||
+        result?.data ||
+        null;
+
+      if (!registration) {
+        console.error(
+          "Registration succeeded but no registration data was returned:",
+          result
+        );
+
+        setProfileMessage(
+          "Registration was received, but the ticket information was not returned. Please use the ticket lookup page."
+        );
+
+        return;
+      }
+
+      setSubmittedRegistration(
+        registration
       );
 
-    if (!result?.success) {
-      return;
+      setProfileMessage("");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    } catch (submitError) {
+      console.error(
+        "Summit registration failed:",
+        submitError
+      );
+
+      setProfileMessage(
+        submitError?.response?.data
+          ?.message ||
+          submitError?.message ||
+          "Registration could not be completed. Please try again."
+      );
     }
-
-    const registration =
-      getRegistrationResult(
-        result
-      );
-
-    setSubmittedRegistration(
-      registration || payload
-    );
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
   };
 
   const handleNewRegistration =
