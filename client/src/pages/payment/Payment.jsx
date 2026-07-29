@@ -135,25 +135,24 @@ function Payment() {
      REDIRECT ACTIVE MEMBERS
   ========================================== */
 
-  useEffect(() => {
-    if (
-      membershipActive &&
-      membershipFeePaid
-    ) {
-      clearSavedPayment();
-      stopPolling();
+ useEffect(() => {
+  if (
+    membershipActive &&
+    membershipFeePaid
+  ) {
+    clearSavedPayment();
+    stopPolling();
 
-      navigate("/dashboard", {
-        replace: true,
-      });
-    }
-  }, [
-    membershipActive,
-    membershipFeePaid,
-    clearSavedPayment,
-    stopPolling,
-    navigate,
-  ]);
+    window.location.replace(
+      "/dashboard"
+    );
+  }
+}, [
+  membershipActive,
+  membershipFeePaid,
+  clearSavedPayment,
+  stopPolling,
+]);
 
   /* ==========================================
      PAYMENT SUCCESS
@@ -175,36 +174,58 @@ function Payment() {
 
       setMessage(
         returnedMemberNumber
-          ? `Payment received successfully. Welcome to JVP Connect! Your membership number is ${returnedMemberNumber}. Redirecting to your dashboard...`
-          : "Payment received successfully. Welcome to JVP Connect! Redirecting to your dashboard..."
+          ? `Payment received successfully. Your membership number is ${returnedMemberNumber}. Redirecting to your dashboard...`
+          : "Payment received successfully. Redirecting to your dashboard..."
       );
-
-      try {
-        await refreshProfile();
-      } catch (refreshError) {
-        console.error(
-          "Unable to refresh member profile:",
-          refreshError
-        );
-      }
 
       clearSavedPayment();
 
+      try {
+  const refreshedMember =
+    await refreshProfile();
+
+  console.log(
+    "Refreshed member after payment:",
+    refreshedMember
+  );
+
+  if (
+    refreshedMember
+      ?.membershipStatus ===
+      "active" &&
+    refreshedMember
+      ?.membershipFeePaid === true
+  ) {
+    clearSavedPayment();
+
+    navigate("/dashboard", {
+      replace: true,
+    });
+
+    return;
+  }
+} catch (refreshError) {
+  console.error(
+    "Unable to refresh member profile:",
+    refreshError
+  );
+}
+
       /*
-       * Give AuthContext enough time to update
-       * the member before ProtectedRoute checks it.
+       * Force the application to reload.
+       * This prevents ProtectedRoute from using
+       * the old pending_payment context state.
        */
       setTimeout(() => {
-        navigate("/dashboard", {
-          replace: true,
-        });
-      }, 800);
+        window.location.replace(
+          "/dashboard"
+        );
+      }, 1000);
     },
     [
       stopPolling,
       refreshProfile,
       clearSavedPayment,
-      navigate,
       member?.memberNumber,
     ]
   );
@@ -440,15 +461,8 @@ if (
        * Refresh first in case the callback
        * already activated the membership.
        */
-     const refreshed =
+    const refreshedMember =
   await refreshProfile();
-
-const refreshedMember =
-  refreshed?.data?.data?.member ||
-  refreshed?.data?.member ||
-  refreshed?.member ||
-  refreshed ||
-  null;
 
       if (
         refreshedMember

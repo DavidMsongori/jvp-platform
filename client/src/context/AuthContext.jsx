@@ -202,104 +202,52 @@ export function AuthProvider({ children }) {
      REFRESH MEMBER PROFILE
   ========================================== */
 
-  const refreshMember = useCallback(async () => {
-    if (!localStorage.getItem(TOKEN_KEY)) {
-      return null;
-    }
-
+ const refreshProfile =
+  useCallback(async () => {
     try {
-      setRefreshingMember(true);
-
       const response =
-        await authService.getCurrentMember();
-
-      const data = response?.data;
-
-      if (!data) {
-        throw new Error(
-          "Member profile response was empty."
-        );
-      }
+        await getMyProfile();
 
       /*
-       * Supports either:
+       * getMyProfile may already return
+       * response.data from Axios.
        *
-       * response.data = {
-       *   user,
-       *   member
-       * }
-       *
-       * or:
-       *
-       * response.data = {
-       *   data: {
-       *     user,
-       *     member
-       *   }
-       * }
+       * Supported response shapes:
+       * 1. { success, data: member }
+       * 2. Axios response:
+       *    { data: { success, data: member } }
        */
-
-      const profileData =
-        data.data || data;
-
-      const refreshedUser =
-        profileData.user || null;
-
-      const refreshedMember =
-        profileData.member ||
-        profileData.profile ||
+      const updatedMember =
+        response?.data?.data ||
+        response?.data?.member ||
+        response?.data ||
+        response?.member ||
         null;
 
-      if (refreshedUser) {
-        saveStoredJSON(
-          USER_KEY,
-          refreshedUser
-        );
+      if (
+        updatedMember &&
+        updatedMember._id
+      ) {
+        setMember(updatedMember);
 
-        setUser(refreshedUser);
+        localStorage.setItem(
+          "member",
+          JSON.stringify(
+            updatedMember
+          )
+        );
       }
 
-      if (refreshedMember) {
-        saveStoredJSON(
-          MEMBER_KEY,
-          refreshedMember
-        );
-
-        setMember(refreshedMember);
-      }
-
-      return {
-        user:
-          refreshedUser || user,
-        member:
-          refreshedMember || member,
-      };
+      return updatedMember;
     } catch (error) {
       console.error(
         "Unable to refresh member profile:",
         error
       );
 
-      if (error?.response?.status === 401) {
-        clearAuthState();
-      }
-
       throw error;
-    } finally {
-      setRefreshingMember(false);
     }
-  }, [
-    clearAuthState,
-    member,
-    user,
-  ]);
-
-  /*
-   * Payment.jsx currently calls refreshProfile().
-   * This alias allows that page to work without
-   * changing its imports or function call.
-   */
-  const refreshProfile = refreshMember;
+  }, []);
 
   /* ==========================================
      UPDATE USER
