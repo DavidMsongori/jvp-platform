@@ -1199,3 +1199,431 @@
 .public-summit-committee-button:hover svg {
   transform: translateX(4px);
 }
+
+
+.public-summit-premium-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:2rem;
+    margin-top:3rem;
+    margin-bottom:5rem;
+}
+
+.public-summit-host-heading{
+    text-align:center;
+    margin-bottom:2rem;
+}
+
+.public-summit-host-heading h3{
+    font-size:2rem;
+    color:var(--primary-color);
+    margin-bottom:.5rem;
+}
+
+.public-summit-hosts-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:2rem;
+}
+
+.public-summit-premium-card{
+    overflow:hidden;
+    border-radius:28px;
+    background:#fff;
+    box-shadow:0 18px 45px rgba(0,0,0,.08);
+}
+
+.public-summit-host-card{
+    overflow:hidden;
+    border-radius:22px;
+    background:#fff;
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+}
+
+
+.public-summit-links-grid {
+  margin-top: 4rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  width: 100%;
+}
+
+.public-summit-link-card {
+  background: #fff;
+  border-radius: 24px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+
+  padding: 2rem;
+
+  min-height: 240px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  transition: all 0.3s ease;
+}
+
+.public-summit-link-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 55px rgba(15, 23, 42, 0.12);
+}
+
+.public-summit-link-tag{
+    font-size:.75rem;
+    font-weight:700;
+    letter-spacing:.12em;
+    color:#0f766e;
+    text-transform:uppercase;
+    margin-bottom:.75rem;
+}
+
+.public-summit-link-card h3 {
+  font-size: 1.8rem;
+  margin: 0.8rem 0 1rem;
+  color: #0f172a;
+}
+
+.public-summit-link-card p {
+  color: #64748b;
+  line-height: 1.8;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.public-summit-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  width: fit-content;
+
+  padding: 0.9rem 1.5rem;
+
+  background: #0f766e;
+  color: #fff;
+
+  border-radius: 999px;
+
+  text-decoration: none;
+  font-weight: 600;
+
+  transition: 0.3s ease;
+}
+
+.public-summit-link-button:hover {
+  background: #0b5d56;
+}
+
+@media (max-width:768px){
+
+    .public-summit-links-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+/* ==========================================
+   EXHIBITOR BOOKING
+========================================== */
+
+.public-summit-exhibitors {
+  padding: 6rem 0;
+  background:
+    radial-gradient(
+      circle at 8% 12%,
+      rgba(8, 118, 107, 0.08),
+      transparent 24%
+    ),
+    #f5f9f7;
+}
+
+.public-summit-exhibitor-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.public-summit-exhibitor-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.6rem;
+  background: #ffffff;
+  border: 1px solid #dfe8e4;
+  border-radius: 20px;
+  box-shadow:
+    0 12px 35px
+    rgba(20, 55, 45, 0.07);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.public-summit-exhibitor-card:hover {
+  transform: translateY(-6px);
+  border-color: #9acdc2;
+  box-shadow:
+    0 22px 48px
+    rgba(20, 55, 45, 0.13);
+}
+
+.public-summit-exhibitor-card.featured {
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(247, 200, 79, 0.24),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #043c31,
+      #08766b
+    );
+  border-color: #08766b;
+  transform: translateY(-10px);
+}
+
+.public-summit-exhibitor-card.featured:hover {
+  transform: translateY(-15px);
+}
+
+.public-summit-exhibitor-featured-label {
+  position: absolute;
+  top: -13px;
+  right: 18px;
+  padding: 0.4rem 0.75rem;
+  color: #17372f;
+  background: #f7c84f;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.public-summit-exhibitor-card-header small {
+  color: #08766b;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-summit-exhibitor-card.featured
+  .public-summit-exhibitor-card-header
+  small {
+  color: #ffda70;
+}
+
+.public-summit-exhibitor-card-header h3 {
+  margin: 0.55rem 0 0;
+  color: #172a24;
+  font-size: 1.45rem;
+}
+
+.public-summit-exhibitor-card.featured
+  .public-summit-exhibitor-card-header
+  h3 {
+  color: #ffffff;
+}
+
+.public-summit-exhibitor-price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-top: 1.4rem;
+}
+
+.public-summit-exhibitor-price span {
+  color: #75847e;
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.public-summit-exhibitor-price strong {
+  color: #14253c;
+  font-size: clamp(
+    1.7rem,
+    3vw,
+    2.4rem
+  );
+  letter-spacing: -0.04em;
+}
+
+.public-summit-exhibitor-card.featured
+  .public-summit-exhibitor-price
+  span {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  );
+}
+
+.public-summit-exhibitor-card.featured
+  .public-summit-exhibitor-price
+  strong {
+  color: #ffffff;
+}
+
+.public-summit-exhibitor-card > p {
+  flex: 1;
+  margin: 1rem 0 1.7rem;
+  color: #68766f;
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+.public-summit-exhibitor-card.featured
+  > p {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.76
+  );
+}
+
+.public-summit-exhibitor-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.7rem 0.85rem;
+  color: #08766b;
+  background: #edf7f3;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-align: center;
+  text-decoration: none;
+}
+
+.public-summit-exhibitor-card.featured
+  .public-summit-exhibitor-button {
+  color: #17372f;
+  background: #f7c84f;
+}
+
+.public-summit-exhibitor-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #dfe7e3;
+  border-radius: 16px;
+}
+
+.public-summit-exhibitor-contact > div:first-child {
+  max-width: 660px;
+}
+
+.public-summit-exhibitor-contact span {
+  color: #08766b;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-summit-exhibitor-contact p {
+  margin: 0.45rem 0 0;
+  color: #6a7872;
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.public-summit-exhibitor-contact-links {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-shrink: 0;
+}
+
+.public-summit-exhibitor-contact-links a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 0.9rem;
+  color: #ffffff;
+  background: #08766b;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.public-summit-exhibitor-contact-links a:last-child {
+  color: #08766b;
+  background: #ffffff;
+  border: 1px solid #9bcac0;
+}
+
+
+@media (max-width: 1050px) {
+  .public-summit-exhibitor-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .public-summit-exhibitor-card.featured {
+    transform: none;
+  }
+
+  .public-summit-exhibitor-card.featured:hover {
+    transform: translateY(-6px);
+  }
+}
+
+@media (max-width: 760px) {
+  .public-summit-exhibitor-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .public-summit-exhibitor-contact {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .public-summit-exhibitor-contact-links {
+    width: 100%;
+  }
+
+  .public-summit-exhibitor-contact-links a {
+    flex: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .public-summit-exhibitors {
+    padding: 4rem 0;
+  }
+
+  .public-summit-exhibitor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-summit-exhibitor-contact-links {
+    flex-direction: column;
+  }
+
+  .public-summit-exhibitor-contact-links a {
+    width: 100%;
+  }
+}

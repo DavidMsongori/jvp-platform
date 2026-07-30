@@ -69,55 +69,50 @@ const summitEventData = {
 
   totalRegistered: 0,
 
-  countyAllocations: [
-    {
-      county: "Kilifi",
-      countyCode: "KLF",
-      allocatedSlots: 7500,
-      registeredCount: 0,
-      isRegistrationOpen: true,
-    },
-
-    {
-      county: "Mombasa",
-      countyCode: "MSA",
-      allocatedSlots: 500,
-      registeredCount: 0,
-      isRegistrationOpen: true,
-    },
-
-    {
-      county: "Kwale",
-      countyCode: "KWL",
-      allocatedSlots: 500,
-      registeredCount: 0,
-      isRegistrationOpen: true,
-    },
-
-    {
-      county: "Taita Taveta",
-      countyCode: "TTV",
-      allocatedSlots: 500,
-      registeredCount: 0,
-      isRegistrationOpen: true,
-    },
-
-    {
-      county: "Tana River",
-      countyCode: "TNR",
-      allocatedSlots: 500,
-      registeredCount: 0,
-      isRegistrationOpen: true,
-    },
-
-    {
-      county: "Lamu",
-      countyCode: "LMU",
-      allocatedSlots: 500,
-      registeredCount: 0,
-      isRegistrationOpen: true,
-    },
-  ],
+  "countyAllocations": [
+  {
+    "county": "Kilifi",
+    "countyCode": "KLF",
+    "allocatedSlots": 5000,
+    "registeredCount": 0,
+    "isRegistrationOpen": true
+  },
+  {
+    "county": "Mombasa",
+    "countyCode": "MSA",
+    "allocatedSlots": 1000,
+    "registeredCount": 0,
+    "isRegistrationOpen": true
+  },
+  {
+    "county": "Kwale",
+    "countyCode": "KWL",
+    "allocatedSlots": 1000,
+    "registeredCount": 0,
+    "isRegistrationOpen": true
+  },
+  {
+    "county": "Taita Taveta",
+    "countyCode": "TTV",
+    "allocatedSlots": 1000,
+    "registeredCount": 0,
+    "isRegistrationOpen": true
+  },
+  {
+    "county": "Tana River",
+    "countyCode": "TNR",
+    "allocatedSlots": 1000,
+    "registeredCount": 0,
+    "isRegistrationOpen": true
+  },
+  {
+    "county": "Lamu",
+    "countyCode": "LMU",
+    "allocatedSlots": 1000,
+    "registeredCount": 0,
+    "isRegistrationOpen": true
+  }
+],
 
   allowMemberRegistration: true,
 

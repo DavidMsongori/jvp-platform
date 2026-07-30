@@ -43,30 +43,92 @@ const SUMMIT_SLUG =
 
 const SUMMIT_GUESTS = [
   {
-    role: "Chief Guest",
     name: "H.E. Dr. William Samoei Ruto, E.G.H.",
     title:
       "President of the Republic of Kenya and Commander-in-Chief of the Defence Forces",
-    image:
-      "/images/summit/guests/william-ruto.jpg",
+    role: "Chief Guest",
+    image: "/images/summit/guests/william-ruto.jpg",
   },
+
   {
-    role: "Host",
     name: "H.E. Gideon Mung'aro, E.G.H.",
     title:
       "Governor, Kilifi County and Patron, Jumuiya ya Vijana wa Pwani",
-    image:
-      "/images/summit/guests/gideon-mungaro.jpg",
-  },
-  {
     role: "Host",
+    image: "/images/summit/guests/gideon-mungaro.jpg",
+  },
+
+  {
+    name: "Hon. Fikirini Jacobs",
+    title:
+      "Principal Secretary, State Department for Youth Affairs and Creative Economy",
+    role: "Host",
+    image: "/images/summit/guests/fikirini.jpg",
+  },
+
+  {
     name: "H.E. David Msongori",
     title:
       "President, Jumuiya ya Vijana wa Pwani",
-    image:
-      "/images/summit/guests/david-msongori.jpg",
+    role: "Host",
+    image: "/images/summit/guests/david-msongori.jpg",
   },
-];  
+
+  {
+    name: "Hon. James Kahindi",
+    title:
+      "Secretary General, Jumuiya ya Vijana wa Pwani",
+    role: "Host",
+    image: "/images/summit/guests/kahindi.jpg",
+  },
+
+  {
+    name:
+      "Hon. Sebastian Macgowan Mungah",
+    title:
+      "Youth Governor, Kilifi County, Jumuiya ya Vijana wa Pwani",
+    role: "Host",
+    image: "/images/summit/guests/sebastian.jpg",
+  },
+];
+
+const EXHIBITOR_PLANS = [
+  {
+    name: "Youth",
+    price: 10000,
+    description:
+      "Designed for youth-led enterprises, startups and community initiatives.",
+    featured: false,
+  },
+  {
+    name: "Bronze",
+    price: 50000,
+    description:
+      "An entry-level exhibition package for organizations and growing brands.",
+    featured: false,
+  },
+  {
+    name: "Silver",
+    price: 75000,
+    description:
+      "Enhanced exhibition visibility and engagement with summit participants.",
+    featured: false,
+  },
+  {
+    name: "Gold",
+    price: 100000,
+    description:
+      "A high-visibility package for institutions, companies and development partners.",
+    featured: false,
+  },
+  {
+    name: "Premium",
+    price: 150000,
+    description:
+      "Our highest-level exhibition package with premium visibility and positioning.",
+    featured: true,
+  },
+];
 
 /* ==========================================
    HELPERS
@@ -958,87 +1020,170 @@ const registrationOpen =
         </div>
       </section>
 
+      
       {/* ======================================
-          SUMMIT LEADERSHIP AND GUESTS
-      ====================================== */}
+    SUMMIT LEADERSHIP AND GUESTS
+====================================== */}
 
-      <section className="public-summit-section public-summit-guests-section">
-        <div className="public-summit-container">
-          <div className="public-summit-centered-heading">
-            <span>
-              Summit leadership
-            </span>
+<section className="public-summit-section public-summit-guests-section">
+  <div className="public-summit-container">
+    <div className="public-summit-centered-heading">
+      <span>Summit leadership</span>
 
-            <h2>
-              Chief Guest and Hosts
-            </h2>
+      <h2>Chief Guest and Hosts</h2>
 
-            <p>
-              Meet the distinguished leaders
-              expected to grace and host the
-              Coast Youth Summit 2026.
-            </p>
-          </div>
+      <p>
+        Meet the distinguished leaders
+        expected to grace and host the Coast
+        Youth Summit 2026.
+      </p>
+    </div>
+      
+      
+      {/* ======================================
+    PREMIUM LEADERSHIP
+====================================== */}
 
-          <div className="public-summit-guests-grid">
-            {SUMMIT_GUESTS.map(
-              (guest, index) => (
-                <article
-                  key={guest.name}
-                  className={`public-summit-guest-card ${
-                    index === 0
-                      ? "chief-guest"
-                      : ""
-                  }`}
-                >
-                  <div className="public-summit-guest-image">
-                    <img
-                      src={guest.image}
-                      alt={guest.name}
-                      loading="lazy"
-                    />
 
-                    <span className="public-summit-guest-role">
-                      {guest.role}
-                    </span>
-                  </div>
+<div className="public-summit-premium-grid">
+  {SUMMIT_GUESTS.slice(0, 2).map(
+    (guest, index) => (
+      <article
+        key={guest.name}
+        className={`public-summit-premium-card ${
+          index === 0 ? "chief-guest" : "host"
+        }`}
+      >
+        <div className="public-summit-guest-image">
+          <img
+            src={guest.image}
+            alt={guest.name}
+            loading="lazy"
+          />
 
-                  <div className="public-summit-guest-content">
-                    <small>
-                      {index === 0
-                        ? "Guest of Honour"
-                        : "Summit Host"}
-                    </small>
+          <span className="public-summit-guest-role">
+            {guest.role}
+          </span>
+        </div>
 
-                    <h3>
-                      {guest.name}
-                    </h3>
+        <div className="public-summit-guest-content">
+          <small>
+            {index === 0
+              ? "Guest of Honour"
+              : "Summit Host"}
+          </small>
 
-                    <p>
-                      {guest.title}
-                    </p>
-                  </div>
-                </article>
-              )
-            )}
-          </div>
-          <div className="public-summit-guests-footer">
+          <h3>{guest.name}</h3>
+
+          <p>{guest.title}</p>
+        </div>
+      </article>
+    )
+  )}
+</div>
+
+{/* ======================================
+    ORGANIZING HOSTS
+====================================== */}
+
+<div className="public-summit-host-heading">
+  <h3>Summit Organizing Hosts</h3>
+
   <p>
-    Meet the dedicated team coordinating the
-    successful planning and delivery of the
-    Coast Youth Summit 2026.
+    Working together to deliver the Coast
+    Youth Summit 2026.
   </p>
+</div>
 
-  <Link
-    to="/summit/planning-committee"
-    className="public-summit-committee-button"
-  >
-    Planning Committee
-    <ArrowRight
-      size={18}
-      aria-hidden="true"
-    />
-  </Link>
+<div className="public-summit-hosts-grid">
+  {SUMMIT_GUESTS.slice(2).map(
+    (guest) => (
+      <article
+        key={guest.name}
+        className="public-summit-host-card"
+      >
+        <div className="public-summit-guest-image">
+          <img
+            src={guest.image}
+            alt={guest.name}
+            loading="lazy"
+          />
+
+          <span className="public-summit-guest-role">
+            {guest.role}
+          </span>
+        </div>
+
+        <div className="public-summit-guest-content">
+          <small>Summit Host</small>
+
+          <h3>{guest.name}</h3>
+
+          <p>{guest.title}</p>
+        </div>
+      </article>
+    )
+  )}
+</div>
+
+{/* IMPORTANT:
+    public-summit-hosts-grid ends above
+*/}
+
+<div className="public-summit-links-grid">
+  <article className="public-summit-link-card">
+    <span className="public-summit-link-tag">
+      Organizing Team
+    </span>
+
+    <h3>Planning Committee</h3>
+
+    <p>
+      Meet the dedicated team coordinating
+      the planning, logistics and successful
+      delivery of the Coast Youth Summit
+      2026.
+    </p>
+
+    <Link
+      to="/summit/planning-committee"
+      className="public-summit-link-button"
+    >
+      View Planning Committee
+
+      <ArrowRight
+        size={18}
+        aria-hidden="true"
+      />
+    </Link>
+  </article>
+
+  <article className="public-summit-link-card">
+    <span className="public-summit-link-tag">
+      Confirmed Guests
+    </span>
+
+    <h3>Distinguished Guests</h3>
+
+    <p>
+      View the leaders, government officials,
+      development partners, keynote speakers
+      and invited guests who have confirmed
+      participation.
+    </p>
+
+    <Link
+      to="/summit/guests"
+      className="public-summit-link-button"
+    >
+      View Confirmed Guests
+
+      <ArrowRight
+        size={18}
+        aria-hidden="true"
+      />
+    </Link>
+  </article>
 </div>
         </div>
       </section>
@@ -1194,6 +1339,145 @@ const registrationOpen =
           </div>
         </section>
       )}
+
+{/* ======================================
+    EXHIBITOR BOOKING
+====================================== */}
+
+<section className="public-summit-exhibitors">
+  <div className="public-summit-container">
+    <div className="public-summit-centered-heading">
+      <span>
+        Exhibitor opportunities
+      </span>
+
+      <h2>
+        Showcase your brand at the summit
+      </h2>
+
+      <p>
+        Engage thousands of young people,
+        leaders, institutions and partners
+        attending the Coast Youth Summit
+        2026.
+      </p>
+    </div>
+
+    <div className="public-summit-exhibitor-grid">
+      {EXHIBITOR_PLANS.map(
+        (plan) => (
+          <article
+            key={plan.name}
+            className={`public-summit-exhibitor-card ${
+              plan.featured
+                ? "featured"
+                : ""
+            }`}
+          >
+            {plan.featured && (
+              <span className="public-summit-exhibitor-featured-label">
+                Best visibility
+              </span>
+            )}
+
+            <div className="public-summit-exhibitor-card-header">
+              <small>
+                Exhibitor package
+              </small>
+
+              <h3>
+                {plan.name}
+              </h3>
+            </div>
+
+            <div className="public-summit-exhibitor-price">
+              <span>KES</span>
+
+              <strong>
+                {formatNumber(
+                  plan.price
+                )}
+              </strong>
+            </div>
+
+            <p>
+              {plan.description}
+            </p>
+
+            <a
+              href={`mailto:${
+                contact.email ||
+                "admin@jvp.co.ke"
+              }?subject=${encodeURIComponent(
+                `${plan.name} Exhibitor Package - Coast Youth Summit 2026`
+              )}`}
+              className="public-summit-exhibitor-button"
+            >
+              Book this package
+
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+            </a>
+          </article>
+        )
+      )}
+    </div>
+
+    <div className="public-summit-exhibitor-contact">
+      <div>
+        <span>
+          Need a customized package?
+        </span>
+
+        <p>
+          Contact the summit team to discuss
+          exhibition space, branding,
+          sponsorship visibility and other
+          partnership opportunities.
+        </p>
+      </div>
+
+      <div className="public-summit-exhibitor-contact-links">
+        <a
+          href={`mailto:${
+            contact.email ||
+            "admin@jvp.co.ke"
+          }?subject=${encodeURIComponent(
+            "Exhibitor Booking Enquiry - Coast Youth Summit 2026"
+          )}`}
+        >
+          <Mail
+            size={17}
+            aria-hidden="true"
+          />
+
+          Email the summit team
+        </a>
+
+        {(contact.phone ||
+          "0740504969") && (
+          <a
+            href={`https://wa.me/254${String(
+              contact.phone ||
+                "0740504969"
+            )
+              .replace(/\D/g, "")
+              .replace(/^0/, "")}?text=${encodeURIComponent(
+              "Hello JVP, I would like to enquire about exhibiting at the Coast Youth Summit 2026."
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Enquire on WhatsApp
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
     </main>
       <Footer />
   </>

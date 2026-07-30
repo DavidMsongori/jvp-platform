@@ -1174,15 +1174,15 @@ const payload = {
        * included only for authenticated
        * JVP members.
        */
-      user:
-        registeringAsMember
-          ? getUserId(user)
-          : undefined,
+     userId:
+  registeringAsMember
+    ? getUserId(user)
+    : undefined,
 
-      member:
-        registeringAsMember
-          ? getMemberId(member)
-          : undefined,
+memberId:
+  registeringAsMember
+    ? getMemberId(member)
+    : undefined,
 
       fullName: cleanText(
         form.fullName

@@ -54,7 +54,7 @@ const determineSequenceLength = ({
   sequence,
   allocatedSlots,
 }) => {
-  const minimumLength = 3;
+  const minimumLength = 4;
 
   const allocationLength =
     Number.isInteger(allocatedSlots) &&

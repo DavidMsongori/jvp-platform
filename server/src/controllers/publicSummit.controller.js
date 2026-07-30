@@ -194,11 +194,13 @@ export const registerSummitParticipant =
     req.user?._id ||
     req.user?.id ||
     req.body.userId ||
+    req.body.user ||
     null,
 
-  memberId:
-    req.body.memberId ||
-    null,
+ memberId:
+  req.body.memberId ||
+  req.body.member ||
+  null,
 
   requestMeta: {
     ipAddress:

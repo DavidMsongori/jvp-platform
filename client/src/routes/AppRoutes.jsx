@@ -25,6 +25,7 @@ import SummitRegistration from"../pages/summit/SummitRegistration";
 import SummitTicketLookup from "../pages/summit/SummitTicketLookup";
 import SummitVerifyTicket from "../pages/summit/SummitVerifyTicket";
 import SummitPlanningCommittee from "../pages/summit/SummitPlanningCommittee";
+import SummitGuests from "../pages/summit/SummitGuests";
 import Contact from "../pages/contact/Contact";
 import Leadership from "../pages/leadership/Leadership";
 
@@ -158,6 +159,11 @@ function AppRoutes() {
 <Route
   path="/summit/planning-committee"
   element={<SummitPlanningCommittee />}
+/>
+
+<Route
+  path="/summit/guests"
+  element={<SummitGuests />}
 />
 
         <Route path="/contact" element={<Contact />} />
