@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useState,
 } from "react";
 
 import {
@@ -27,6 +28,10 @@ import {
 import {
   useSummit,
 } from "../../../context/SummitContext";
+
+import {
+  getSummitExhibitors,
+} from "../../../services/summitExhibitor.service";
 
 import "./SummitDashboard.css";
 
@@ -117,6 +122,23 @@ const formatStatus = (value) => {
 
   return String(value)
     .replace(/_/g, " ")
+    .replace(
+      /\b\w/g,
+      (character) =>
+        character.toUpperCase()
+    );
+};
+
+
+const formatExhibitorStatus = (
+  value
+) => {
+  if (!value) {
+    return "Pending";
+  }
+
+  return String(value)
+    .replaceAll("_", " ")
     .replace(
       /\b\w/g,
       (character) =>
@@ -445,7 +467,7 @@ const SummitDashboardSkeleton =
           ))}
         </div>
 
-        <div className="summit-dashboard-grid">
+       <div className="summit-dashboard-grid summit-dashboard-grid-three">
           <div className="summit-dashboard-panel">
             <div className="summit-skeleton summit-skeleton-panel-title" />
 
@@ -566,6 +588,26 @@ const SummitDashboard = () => {
     fetchAdminDashboard,
   } = useSummit();
 
+    const [
+    recentExhibitors,
+    setRecentExhibitors,
+  ] = useState([]);
+
+  const [
+    exhibitorsLoading,
+    setExhibitorsLoading,
+  ] = useState(true);
+
+  const [
+    totalExhibitors,
+    setTotalExhibitors,
+  ] = useState(0);
+
+  const [
+    exhibitorsError,
+    setExhibitorsError,
+  ] = useState("");
+
   const loadDashboard =
     useCallback(async () => {
       if (!SUMMIT_EVENT_ID) {
@@ -579,9 +621,82 @@ const SummitDashboard = () => {
       fetchAdminDashboard,
     ]);
 
+  const loadRecentExhibitors =
+    useCallback(async () => {
+      try {
+        setExhibitorsLoading(
+          true
+        );
+
+        setExhibitorsError("");
+
+        const response =
+          await getSummitExhibitors({
+            summitEventId:
+              SUMMIT_EVENT_ID,
+
+            page: 1,
+            limit: 6,
+          });
+
+        const result =
+          response?.data?.data ||
+          response?.data ||
+          response ||
+          {};
+
+        setRecentExhibitors(
+          Array.isArray(
+            result?.exhibitors
+          )
+            ? result.exhibitors
+            : []
+        );
+
+        setTotalExhibitors(
+          ensureNumber(
+            result?.pagination
+              ?.total
+          )
+        );
+      } catch (error) {
+        console.error(
+          "Unable to load recent exhibitors:",
+          error
+        );
+
+        setRecentExhibitors(
+          []
+        );
+
+        setTotalExhibitors(
+          0
+        );
+
+        setExhibitorsError(
+          error?.response?.data
+            ?.message ||
+            error?.message ||
+            "Unable to load exhibitors."
+        );
+      } finally {
+        setExhibitorsLoading(
+          false
+        );
+      }
+    }, []);
+
+
+
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
+
+   useEffect(() => {
+    loadRecentExhibitors();
+  }, [
+    loadRecentExhibitors,
+  ]);
 
   const dashboardData =
     useMemo(
@@ -1444,6 +1559,188 @@ const summitVenue = getVenueDetails(summitEvent);
                 New participant
                 registrations will
                 appear here.
+              </p>
+            </div>
+          )}
+               </section>
+
+        {/* RECENT EXHIBITORS */}
+
+        <section className="summit-dashboard-panel summit-dashboard-exhibitors">
+          <div className="summit-panel-header">
+            <div>
+              <p className="summit-panel-eyebrow">
+                Exhibitor activity
+              </p>
+
+              <h2>
+                Recent exhibitors
+              </h2>
+            </div>
+
+            <Link
+              to="/admin/summit/exhibitors"
+              className="summit-panel-link"
+            >
+              View all
+
+              <ArrowRight
+                size={16}
+                aria-hidden="true"
+              />
+            </Link>
+          </div>
+
+          {exhibitorsLoading ? (
+            <div className="summit-panel-empty">
+              <RefreshCw
+                size={28}
+                className="is-spinning"
+                aria-hidden="true"
+              />
+
+              <h3>
+                Loading exhibitors
+              </h3>
+
+              <p>
+                Retrieving recent
+                exhibitor applications.
+              </p>
+            </div>
+          ) : exhibitorsError ? (
+            <div className="summit-panel-empty">
+              <AlertCircle
+                size={30}
+                aria-hidden="true"
+              />
+
+              <h3>
+                Unable to load
+                exhibitors
+              </h3>
+
+              <p>
+                {exhibitorsError}
+              </p>
+
+              <button
+                type="button"
+                className="summit-secondary-button"
+                onClick={
+                  loadRecentExhibitors
+                }
+              >
+                Try again
+              </button>
+            </div>
+          ) : recentExhibitors.length >
+            0 ? (
+            <>
+              <div className="summit-recent-list">
+                {recentExhibitors.map(
+                  (
+                    exhibitor,
+                    index
+                  ) => {
+                    const organizationName =
+                      exhibitor.organizationName ||
+                      "Unnamed organization";
+
+                    const exhibitorId =
+                      exhibitor._id ||
+                      exhibitor.id;
+
+                    const status =
+                      exhibitor.status ||
+                      "pending";
+
+                    return (
+                      <Link
+                        className="summit-recent-row"
+                        key={
+                          exhibitorId ||
+                          index
+                        }
+                        to="/admin/summit/exhibitors"
+                      >
+                        <span className="summit-participant-avatar">
+                          {getInitials(
+                            organizationName
+                          )}
+                        </span>
+
+                        <span className="summit-participant-details">
+                          <strong>
+                            {
+                              organizationName
+                            }
+                          </strong>
+
+                          <small>
+                            {exhibitor.packageName ||
+                              formatStatus(
+                                exhibitor.packageId
+                              )}
+
+                            {exhibitor.county
+                              ? ` • ${exhibitor.county}`
+                              : ""}
+                          </small>
+                        </span>
+
+                        <span className="summit-recent-meta">
+                          <span
+                            className={`summit-status-badge ${getStatusClassName(
+                              status
+                            )}`}
+                          >
+                            {formatStatus(
+                              status
+                            )}
+                          </span>
+
+                          <time>
+                            {formatDateTime(
+                              exhibitor.submittedAt ||
+                                exhibitor.createdAt
+                            )}
+                          </time>
+                        </span>
+                      </Link>
+                    );
+                  }
+                )}
+              </div>
+
+              <div className="summit-exhibitor-total">
+                <span>
+                  Total exhibitor
+                  applications
+                </span>
+
+                <strong>
+                  {formatNumber(
+                    totalExhibitors
+                  )}
+                </strong>
+              </div>
+            </>
+          ) : (
+            <div className="summit-panel-empty">
+              <Users
+                size={30}
+                aria-hidden="true"
+              />
+
+              <h3>
+                No exhibitors yet
+              </h3>
+
+              <p>
+                New exhibitor
+                applications will appear
+                here.
               </p>
             </div>
           )}

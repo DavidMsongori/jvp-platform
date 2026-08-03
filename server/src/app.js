@@ -20,6 +20,7 @@ import meetingRoutes from "./routes/meeting.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import publicSummitRoutes from "./routes/publicSummit.routes.js";
 import adminSummitRoutes from "./routes/adminSummit.routes.js";
+import summitExhibitorRoutes from "./routes/summitExhibitor.routes.js";
 
 const app = express();
 
@@ -160,6 +161,11 @@ app.use(
 app.use(
   "/api/summit/admin",
   adminSummitRoutes
+);
+
+app.use(
+  "/api/summit-exhibitors",
+  summitExhibitorRoutes
 );
 
 

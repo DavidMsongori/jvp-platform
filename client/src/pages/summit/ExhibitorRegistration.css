@@ -1,0 +1,968 @@
+/* ==========================================================
+   PAGE
+========================================================== */
+
+.exhibitor-registration-page {
+  min-height: 100vh;
+
+  background: #f4f8fb;
+
+  color: #122238;
+}
+
+.exhibitor-registration-container {
+  width: min(
+    1180px,
+    calc(100% - 32px)
+  );
+
+  margin: 0 auto;
+}
+
+/* ==========================================================
+   HERO
+========================================================== */
+
+.exhibitor-registration-hero {
+  padding: 72px 0 58px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #043f73,
+      #05689d 55%,
+      #08796d
+    );
+
+  color: #ffffff;
+}
+
+.exhibitor-registration-back {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 34px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+.exhibitor-registration-back:hover {
+  color: #ffffff;
+}
+
+.exhibitor-registration-hero-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.35fr)
+    minmax(280px, 0.65fr);
+
+  align-items: center;
+
+  gap: 54px;
+}
+
+.exhibitor-registration-kicker {
+  display: inline-block;
+
+  margin-bottom: 13px;
+
+  color: #bcefe5;
+
+  font-size: 0.73rem;
+  font-weight: 850;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.exhibitor-registration-hero h1 {
+  max-width: 690px;
+
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size:
+    clamp(
+      2.2rem,
+      5vw,
+      4rem
+    );
+
+  line-height: 1.08;
+}
+
+.exhibitor-registration-hero-grid > div > p {
+  max-width: 670px;
+
+  margin: 18px 0 0;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.78
+    );
+
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+/* ==========================================================
+   PACKAGE CARD
+========================================================== */
+
+.exhibitor-registration-package {
+  padding: 28px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.12
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.2
+    );
+
+  border-radius: 22px;
+
+  backdrop-filter: blur(12px);
+
+  box-shadow:
+    0 24px 60px
+    rgba(4, 25, 48, 0.2);
+}
+
+.exhibitor-registration-package small {
+  display: block;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.7
+    );
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.exhibitor-registration-package h2 {
+  margin: 9px 0 8px;
+
+  color: #ffffff;
+
+  font-size: 1.65rem;
+}
+
+.exhibitor-registration-package > strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 1.35rem;
+}
+
+.exhibitor-registration-package p {
+  margin: 14px 0 0;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.76
+    );
+
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.exhibitor-registration-content {
+  padding: 52px 0 80px;
+}
+
+.exhibitor-registration-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    310px;
+
+  align-items: start;
+
+  gap: 28px;
+}
+
+/* ==========================================================
+   FORM
+========================================================== */
+
+.exhibitor-registration-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+.exhibitor-registration-alert {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 14px 16px;
+
+  color: #a92118;
+
+  background: #fff1f0;
+
+  border: 1px solid #f0b7b0;
+  border-radius: 12px;
+
+  font-size: 0.83rem;
+  font-weight: 650;
+}
+
+/* ==========================================================
+   FORM SECTION
+========================================================== */
+
+.exhibitor-registration-form-section {
+  padding: 24px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce6ec;
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 28px
+    rgba(19, 50, 74, 0.05);
+}
+
+.exhibitor-registration-form-section > header {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 22px;
+  padding-bottom: 17px;
+
+  border-bottom: 1px solid #edf1f4;
+}
+
+.exhibitor-registration-form-section > header > span {
+  width: 43px;
+  height: 43px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  color: #08796d;
+
+  background: #e7f5f1;
+
+  border-radius: 12px;
+}
+
+.exhibitor-registration-form-section header small {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #08796d;
+
+  font-size: 0.65rem;
+  font-weight: 850;
+
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.exhibitor-registration-form-section header h2 {
+  margin: 0;
+
+  color: #15263b;
+
+  font-size: 1.08rem;
+}
+
+/* ==========================================================
+   FORM GRID
+========================================================== */
+
+.exhibitor-registration-form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 18px;
+}
+
+.exhibitor-registration-field {
+  min-width: 0;
+}
+
+.exhibitor-registration-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.exhibitor-registration-field label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.exhibitor-registration-field-label {
+  color: #2b3b4f;
+
+  font-size: 0.77rem;
+  font-weight: 750;
+}
+
+.exhibitor-registration-field-label strong {
+  margin-left: 3px;
+
+  color: #d92d20;
+}
+
+.exhibitor-registration-field input,
+.exhibitor-registration-field select,
+.exhibitor-registration-field textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  color: #17283b;
+
+  background: #ffffff;
+
+  border: 1px solid #cbd8df;
+  border-radius: 11px;
+
+  outline: none;
+
+  font-family: inherit;
+  font-size: 0.82rem;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.exhibitor-registration-field input,
+.exhibitor-registration-field select {
+  min-height: 46px;
+
+  padding: 0.72rem 0.85rem;
+}
+
+.exhibitor-registration-field textarea {
+  min-height: 105px;
+
+  padding: 0.8rem 0.9rem;
+
+  resize: vertical;
+
+  line-height: 1.55;
+}
+
+.exhibitor-registration-field input:focus,
+.exhibitor-registration-field select:focus,
+.exhibitor-registration-field textarea:focus {
+  border-color: #08796d;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(8, 121, 109, 0.11);
+}
+
+.exhibitor-registration-field-error {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  margin-top: 6px;
+
+  color: #c32720;
+
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+/* ==========================================================
+   INPUT ICON
+========================================================== */
+
+.exhibitor-registration-input-icon {
+  position: relative;
+}
+
+.exhibitor-registration-input-icon svg {
+  position: absolute;
+
+  top: 50%;
+  left: 13px;
+
+  z-index: 2;
+
+  transform: translateY(-50%);
+
+  color: #748493;
+
+  pointer-events: none;
+}
+
+.exhibitor-registration-input-icon input {
+  padding-left: 40px;
+}
+
+/* ==========================================================
+   CONSENT
+========================================================== */
+
+.exhibitor-registration-consent {
+  padding: 17px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce6ec;
+  border-radius: 14px;
+}
+
+.exhibitor-registration-consent.has-error {
+  border-color: #e5a39e;
+}
+
+.exhibitor-registration-consent > label {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 12px;
+
+  cursor: pointer;
+}
+
+.exhibitor-registration-consent input {
+  width: 18px;
+  height: 18px;
+
+  margin-top: 2px;
+
+  flex-shrink: 0;
+
+  accent-color: #08796d;
+}
+
+.exhibitor-registration-consent label > span {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.exhibitor-registration-consent strong {
+  color: #25364a;
+
+  font-size: 0.8rem;
+}
+
+.exhibitor-registration-consent label small {
+  color: #71808e;
+
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.exhibitor-registration-consent-error {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  margin:
+    10px 0 0 30px;
+
+  color: #c32720;
+
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+/* ==========================================================
+   SUBMIT AREA
+========================================================== */
+
+.exhibitor-registration-submit-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 18px;
+
+  background: #eaf6f3;
+
+  border: 1px solid #c7e4dd;
+  border-radius: 15px;
+}
+
+.exhibitor-registration-submit-area > div {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  color: #496c67;
+}
+
+.exhibitor-registration-submit-area svg {
+  flex-shrink: 0;
+}
+
+.exhibitor-registration-submit-area p {
+  margin: 0;
+
+  max-width: 470px;
+
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.exhibitor-registration-submit-area button {
+  min-height: 45px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+
+  padding: 0.75rem 1.2rem;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #08796d,
+      #076aa2
+    );
+
+  border: 0;
+  border-radius: 11px;
+
+  font-family: inherit;
+  font-size: 0.77rem;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 19px
+    rgba(8, 121, 109, 0.2);
+}
+
+.exhibitor-registration-submit-area button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+/* ==========================================================
+   SIDEBAR
+========================================================== */
+
+.exhibitor-registration-sidebar {
+  position: sticky;
+
+  top: 100px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.exhibitor-registration-sidebar section {
+  padding: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce6ec;
+  border-radius: 17px;
+
+  box-shadow:
+    0 9px 24px
+    rgba(20, 50, 74, 0.045);
+}
+
+.exhibitor-registration-sidebar section > svg {
+  color: #08796d;
+}
+
+.exhibitor-registration-sidebar h2 {
+  margin: 12px 0 9px;
+
+  color: #18293d;
+
+  font-size: 1rem;
+}
+
+.exhibitor-registration-sidebar p,
+.exhibitor-registration-sidebar li {
+  color: #71808d;
+
+  font-size: 0.75rem;
+  line-height: 1.65;
+}
+
+.exhibitor-registration-sidebar p {
+  margin: 0;
+}
+
+.exhibitor-registration-sidebar ol {
+  margin: 0;
+  padding-left: 19px;
+}
+
+.exhibitor-registration-sidebar li +
+.exhibitor-registration-sidebar li {
+  margin-top: 7px;
+}
+
+/* ==========================================================
+   SUCCESS
+========================================================== */
+
+.exhibitor-registration-success {
+  width: min(
+    760px,
+    calc(100% - 32px)
+  );
+
+  margin: 70px auto;
+  padding: 42px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border: 1px solid #dce6ec;
+  border-radius: 24px;
+
+  box-shadow:
+    0 24px 65px
+    rgba(17, 47, 72, 0.11);
+}
+
+.exhibitor-registration-success-icon {
+  width: 78px;
+  height: 78px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  color: #08796d;
+
+  background: #e5f5f0;
+
+  border-radius: 50%;
+}
+
+.exhibitor-registration-success-label {
+  display: block;
+
+  color: #08796d;
+
+  font-size: 0.7rem;
+  font-weight: 850;
+
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.exhibitor-registration-success h1 {
+  margin: 13px 0 11px;
+
+  color: #13243a;
+
+  font-size:
+    clamp(
+      1.8rem,
+      4vw,
+      2.7rem
+    );
+
+  line-height: 1.15;
+}
+
+.exhibitor-registration-success > p {
+  max-width: 610px;
+
+  margin: 0 auto;
+
+  color: #6c7b88;
+
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.exhibitor-registration-success-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 13px;
+
+  margin-top: 28px;
+
+  text-align: left;
+}
+
+.exhibitor-registration-success-grid > div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  padding: 15px;
+
+  background: #f6f9fb;
+
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+}
+
+.exhibitor-registration-success-grid small {
+  color: #788693;
+
+  font-size: 0.67rem;
+  font-weight: 750;
+
+  text-transform: uppercase;
+}
+
+.exhibitor-registration-success-grid strong {
+  color: #1a2b40;
+
+  font-size: 0.84rem;
+}
+
+.exhibitor-registration-success-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 11px;
+
+  margin-top: 27px;
+}
+
+.exhibitor-registration-success-actions a,
+.exhibitor-registration-success-actions button {
+  min-height: 43px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.7rem 1.1rem;
+
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+
+  text-decoration: none;
+
+  cursor: pointer;
+}
+
+.exhibitor-registration-success-actions .primary {
+  color: #ffffff;
+
+  background: #08796d;
+
+  border: 1px solid #08796d;
+}
+
+.exhibitor-registration-success-actions button {
+  color: #344457;
+
+  background: #ffffff;
+
+  border: 1px solid #c6d2da;
+}
+
+/* ==========================================================
+   SPINNER
+========================================================== */
+
+.exhibitor-registration-spinning {
+  animation:
+    exhibitorRegistrationSpin
+    0.8s linear infinite;
+}
+
+@keyframes exhibitorRegistrationSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 900px) {
+  .exhibitor-registration-hero-grid {
+    grid-template-columns: 1fr;
+
+    gap: 30px;
+  }
+
+  .exhibitor-registration-package {
+    max-width: 520px;
+  }
+
+  .exhibitor-registration-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .exhibitor-registration-sidebar {
+    position: static;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 640px) {
+  .exhibitor-registration-container {
+    width: min(
+      100% - 22px,
+      1180px
+    );
+  }
+
+  .exhibitor-registration-hero {
+    padding: 52px 0 40px;
+  }
+
+  .exhibitor-registration-back {
+    margin-bottom: 24px;
+  }
+
+  .exhibitor-registration-content {
+    padding: 30px 0 55px;
+  }
+
+  .exhibitor-registration-form-section {
+    padding: 17px;
+  }
+
+  .exhibitor-registration-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exhibitor-registration-field.full-width {
+    grid-column: auto;
+  }
+
+  .exhibitor-registration-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .exhibitor-registration-submit-area {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .exhibitor-registration-submit-area button {
+    width: 100%;
+  }
+
+  .exhibitor-registration-success {
+    margin: 30px auto;
+    padding: 28px 18px;
+  }
+
+  .exhibitor-registration-success-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exhibitor-registration-success-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .exhibitor-registration-success-actions a,
+  .exhibitor-registration-success-actions button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

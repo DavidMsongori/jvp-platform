@@ -1365,63 +1365,75 @@ const registrationOpen =
 
     <div className="public-summit-exhibitor-grid">
       {EXHIBITOR_PLANS.map(
-        (plan) => (
-          <article
-            key={plan.name}
-            className={`public-summit-exhibitor-card ${
-              plan.featured
-                ? "featured"
-                : ""
-            }`}
-          >
-            {plan.featured && (
-              <span className="public-summit-exhibitor-featured-label">
-                Best visibility
-              </span>
-            )}
+        (plan) => {
+          const packageId =
+            String(
+              plan.id ||
+                plan.name ||
+                ""
+            )
+              .trim()
+              .toLowerCase()
+              .replace(/\s+/g, "_");
 
-            <div className="public-summit-exhibitor-card-header">
-              <small>
-                Exhibitor package
-              </small>
-
-              <h3>
-                {plan.name}
-              </h3>
-            </div>
-
-            <div className="public-summit-exhibitor-price">
-              <span>KES</span>
-
-              <strong>
-                {formatNumber(
-                  plan.price
-                )}
-              </strong>
-            </div>
-
-            <p>
-              {plan.description}
-            </p>
-
-            <a
-              href={`mailto:${
-                contact.email ||
-                "admin@jvp.co.ke"
-              }?subject=${encodeURIComponent(
-                `${plan.name} Exhibitor Package - Coast Youth Summit 2026`
-              )}`}
-              className="public-summit-exhibitor-button"
+          return (
+            <article
+              key={
+                plan.id ||
+                plan.name
+              }
+              className={`public-summit-exhibitor-card ${
+                plan.featured
+                  ? "featured"
+                  : ""
+              }`}
             >
-              Book this package
+              {plan.featured && (
+                <span className="public-summit-exhibitor-featured-label">
+                  Best visibility
+                </span>
+              )}
 
-              <ArrowRight
-                size={17}
-                aria-hidden="true"
-              />
-            </a>
-          </article>
-        )
+              <div className="public-summit-exhibitor-card-header">
+                <small>
+                  Exhibitor package
+                </small>
+
+                <h3>
+                  {plan.name}
+                </h3>
+              </div>
+
+              <div className="public-summit-exhibitor-price">
+                <span>KES</span>
+
+                <strong>
+                  {formatNumber(
+                    plan.price
+                  )}
+                </strong>
+              </div>
+
+              <p>
+                {plan.description}
+              </p>
+
+              <Link
+                to={`/summit/exhibitor-register?package=${encodeURIComponent(
+                  packageId
+                )}`}
+                className="public-summit-exhibitor-button"
+              >
+                Book this package
+
+                <ArrowRight
+                  size={17}
+                  aria-hidden="true"
+                />
+              </Link>
+            </article>
+          );
+        }
       )}
     </div>
 
@@ -1456,23 +1468,23 @@ const registrationOpen =
           Email the summit team
         </a>
 
-        {(contact.phone ||
-          "0740504969") && (
-          <a
-            href={`https://wa.me/254${String(
-              contact.phone ||
-                "0740504969"
-            )
-              .replace(/\D/g, "")
-              .replace(/^0/, "")}?text=${encodeURIComponent(
-              "Hello JVP, I would like to enquire about exhibiting at the Coast Youth Summit 2026."
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Enquire on WhatsApp
-          </a>
-        )}
+        <a
+          href={`https://wa.me/${String(
+            contact.phone ||
+              "0740504969"
+          )
+            .replace(/\D/g, "")
+            .replace(
+              /^0/,
+              "254"
+            )}?text=${encodeURIComponent(
+            "Hello JVP, I would like to enquire about exhibiting at the Coast Youth Summit 2026."
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Enquire on WhatsApp
+        </a>
       </div>
     </div>
   </div>
