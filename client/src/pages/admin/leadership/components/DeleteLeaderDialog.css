@@ -1,0 +1,325 @@
+/* =========================================================
+   DELETE LEADER DIALOG OVERLAY
+========================================================= */
+
+.delete-leader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1.5rem;
+
+  background: rgba(8, 18, 32, 0.72);
+  backdrop-filter: blur(8px);
+
+  overflow-y: auto;
+}
+
+/* =========================================================
+   DIALOG
+========================================================= */
+
+.delete-leader-dialog {
+  width: min(620px, calc(100vw - 3rem));
+
+  padding: 1.75rem;
+
+  background: #ffffff;
+
+  border: 1px solid #e1e7ec;
+  border-radius: 22px;
+
+  box-shadow:
+    0 30px 80px
+    rgba(10, 24, 43, 0.28);
+
+  animation:
+    deleteLeaderDialogEnter
+    180ms ease-out;
+}
+
+/* =========================================================
+   WARNING ICON
+========================================================= */
+
+.delete-leader-icon {
+  width: 62px;
+  height: 62px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 1.1rem;
+
+  color: #c62828;
+
+  background: #fff0f0;
+
+  border: 1px solid #f2c3c3;
+  border-radius: 18px;
+}
+
+/* =========================================================
+   TITLE AND DESCRIPTION
+========================================================= */
+
+.delete-leader-dialog h2 {
+  margin: 0;
+
+  color: #13233a;
+
+  font-size: 1.6rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.delete-leader-dialog > p {
+  margin: 0.75rem 0 0;
+
+  color: #657382;
+
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.delete-leader-dialog > p strong {
+  color: #18283d;
+}
+
+/* =========================================================
+   LEADER SUMMARY
+========================================================= */
+
+.delete-leader-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 0.85rem;
+
+  margin-top: 1.4rem;
+}
+
+.delete-leader-summary-item {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.35rem;
+
+  padding: 0.9rem 1rem;
+
+  background: #f7f9fb;
+
+  border: 1px solid #e0e7ec;
+  border-radius: 13px;
+}
+
+.delete-leader-summary-item span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 0.35rem;
+
+  color: #74818d;
+
+  font-size: 0.68rem;
+  font-weight: 800;
+
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.delete-leader-summary-item strong {
+  overflow-wrap: anywhere;
+
+  color: #17273d;
+
+  font-size: 0.86rem;
+  font-weight: 800;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   WARNING MESSAGE
+========================================================= */
+
+.delete-leader-warning {
+  margin-top: 1.2rem;
+
+  padding: 0.9rem 1rem;
+
+  color: #8a4c00;
+
+  background: #fff8e7;
+
+  border: 1px solid #f2d598;
+  border-radius: 12px;
+
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.delete-leader-warning strong {
+  color: #6f3c00;
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.delete-leader-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 0.75rem;
+
+  margin-top: 1.4rem;
+}
+
+.delete-leader-actions button {
+  min-height: 43px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.7rem 1.2rem;
+
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.delete-leader-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.delete-leader-cancel {
+  color: #364558;
+
+  background: #ffffff;
+
+  border: 1px solid #bdc9d2;
+}
+
+.delete-leader-cancel:hover:not(:disabled) {
+  background: #f2f5f7;
+}
+
+.delete-leader-confirm {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d92d20,
+      #b91c1c
+    );
+
+  border: 1px solid #b91c1c;
+
+  box-shadow:
+    0 8px 18px
+    rgba(185, 28, 28, 0.2);
+}
+
+.delete-leader-confirm:hover:not(:disabled) {
+  background:
+    linear-gradient(
+      135deg,
+      #c5221f,
+      #991b1b
+    );
+
+  box-shadow:
+    0 11px 24px
+    rgba(185, 28, 28, 0.28);
+}
+
+.delete-leader-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes deleteLeaderDialogEnter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(14px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+  .delete-leader-overlay {
+    align-items: flex-end;
+
+    padding: 0;
+  }
+
+  .delete-leader-dialog {
+    width: 100%;
+
+    padding:
+      1.3rem
+      1rem
+      1.1rem;
+
+    border: 0;
+    border-radius: 22px 22px 0 0;
+  }
+
+  .delete-leader-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-leader-actions {
+    display: grid;
+
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+  .delete-leader-actions button {
+    width: 100%;
+  }
+}

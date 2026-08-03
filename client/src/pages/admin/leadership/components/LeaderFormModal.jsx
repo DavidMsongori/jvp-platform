@@ -1,12 +1,19 @@
 import {
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
 import {
-  X,
+  BriefcaseBusiness,
+  CalendarDays,
+  CheckCircle2,
+  FileText,
   Search,
+  ShieldCheck,
   UserRound,
+  UsersRound,
+  X,
 } from "lucide-react";
 
 import "./LeaderFormModal.css";
@@ -18,12 +25,11 @@ import {
   LEADERSHIP_DEPARTMENTS,
   LEADERSHIP_SCOPE,
   APPOINTMENT_TYPES,
-  LEADERSHIP_OFFICE_OPTIONS,
   OFFICE_CONFIGURATION,
 } from "../../../../constants/leadership.constants";
 
 /* ============================================================
-   CONSTANTS
+   OPTIONS
 ============================================================ */
 
 const CATEGORIES = [
@@ -31,52 +37,53 @@ const CATEGORIES = [
     label: "Patron",
     value: "patron",
   },
-
   {
     label: "Regional Executive",
-    value: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
+    value:
+      LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
   },
-
   {
     label: "Council of Governors",
-    value: LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
+    value:
+      LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
   },
-
   {
     label: "Youth Assembly",
-    value: LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
+    value:
+      LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
   },
-
   {
     label: "County Leadership",
-    value: LEADERSHIP_LEVELS.COUNTY_LEADERSHIP,
+    value:
+      LEADERSHIP_LEVELS.COUNTY_LEADERSHIP,
   },
 ];
 
 const DEPARTMENTS = [
   {
     label: "Executive",
-    value: LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+    value:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
   },
-
   {
     label: "Governance",
-    value: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
+    value:
+      LEADERSHIP_DEPARTMENTS.GOVERNANCE,
   },
-
   {
     label: "Legislative",
-    value: LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+    value:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
   },
-
   {
     label: "Secretariat",
-    value: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
+    value:
+      LEADERSHIP_DEPARTMENTS.SECRETARIAT,
   },
-
   {
     label: "Patronage",
-    value: LEADERSHIP_DEPARTMENTS.PATRONAGE,
+    value:
+      LEADERSHIP_DEPARTMENTS.PATRONAGE,
   },
 ];
 
@@ -85,17 +92,15 @@ const SCOPES = [
     label: "Regional",
     value: LEADERSHIP_SCOPE.REGIONAL,
   },
-
   {
     label: "County",
     value: LEADERSHIP_SCOPE.COUNTY,
   },
-
   {
     label: "Constituency",
-    value: LEADERSHIP_SCOPE.CONSTITUENCY,
+    value:
+      LEADERSHIP_SCOPE.CONSTITUENCY,
   },
-
   {
     label: "Ward",
     value: LEADERSHIP_SCOPE.WARD,
@@ -107,43 +112,23 @@ const APPOINTMENT_TYPE_OPTIONS = [
     label: "Elected",
     value: APPOINTMENT_TYPES.ELECTED,
   },
-
   {
     label: "Nominated",
     value: APPOINTMENT_TYPES.NOMINATED,
   },
-
   {
     label: "Appointed",
     value: APPOINTMENT_TYPES.APPOINTED,
   },
 ];
 
-/*
- * Build the position list directly from the
- * official office configuration.
- *
- * Example:
- *
- * governor:
- * {
- *   title: "Governor",
- *   level: "...",
- *   department: "...",
- *   scope: "...",
- *   appointmentType: "..."
- * }
- */
-
 const POSITIONS = Object.entries(
   OFFICE_CONFIGURATION
 ).map(
   ([value, configuration]) => ({
     value,
-
     label:
       configuration.title,
-
     configuration,
   })
 );
@@ -167,14 +152,12 @@ const DEFAULT_FORM = {
   ward: "",
 
   displayOrder: 999,
-
   featured: false,
 
   termStart: "",
   termEnd: "",
 
   verified: true,
-
   remarks: "",
 
   patron: {
@@ -193,9 +176,22 @@ const DEFAULT_FORM = {
 const formatDateForInput = (
   date
 ) => {
-  if (!date) return "";
+  if (!date) {
+    return "";
+  }
 
-  return new Date(date)
+  const parsedDate =
+    new Date(date);
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
+    return "";
+  }
+
+  return parsedDate
     .toISOString()
     .split("T")[0];
 };
@@ -203,7 +199,9 @@ const formatDateForInput = (
 const getMemberName = (
   member
 ) => {
-  if (!member) return "";
+  if (!member) {
+    return "";
+  }
 
   return [
     member.firstName,
@@ -211,7 +209,25 @@ const getMemberName = (
     member.lastName,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const getMemberLocation = (
+  member
+) => {
+  if (!member) {
+    return "";
+  }
+
+  return [
+    member.county,
+    member.constituency,
+    member.ward,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 };
 
 /* ============================================================
@@ -220,13 +236,9 @@ const getMemberName = (
 
 export default function LeaderFormModal({
   open,
-
   leader = null,
-
   loading = false,
-
   onClose,
-
   onSave,
 }) {
   const [
@@ -242,9 +254,9 @@ export default function LeaderFormModal({
   ] = useState([]);
 
   const [
-  selectedMember,
-  setSelectedMember,
-] = useState(null);
+    selectedMember,
+    setSelectedMember,
+  ] = useState(null);
 
   const [
     memberSearch,
@@ -262,13 +274,52 @@ export default function LeaderFormModal({
   ] = useState("");
 
   /* ==========================================================
-     EDIT MODE
+     DERIVED VALUES
+  ========================================================== */
+
+  const isPatron =
+    form.category ===
+    "patron";
+
+  const filteredPositions =
+    useMemo(() => {
+      if (!form.category) {
+        return POSITIONS;
+      }
+
+      return POSITIONS.filter(
+        (position) => {
+          const level =
+            position.configuration
+              ?.level;
+
+          return (
+            form.category ===
+              "patron" ||
+            level ===
+              form.category
+          );
+        }
+      );
+    }, [form.category]);
+
+  /* ==========================================================
+     INITIALIZE FORM
   ========================================================== */
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     if (leader) {
+      const leaderMember =
+        leader.member &&
+        typeof leader.member ===
+          "object"
+          ? leader.member
+          : null;
+
       setForm({
         member:
           leader.member?._id ||
@@ -297,14 +348,18 @@ export default function LeaderFormModal({
 
         county:
           leader.county ||
+          leaderMember?.county ||
           "",
 
         constituency:
           leader.constituency ||
+          leaderMember
+            ?.constituency ||
           "",
 
         ward:
           leader.ward ||
+          leaderMember?.ward ||
           "",
 
         displayOrder:
@@ -361,10 +416,14 @@ export default function LeaderFormModal({
         },
       });
 
+      setSelectedMember(
+        leaderMember
+      );
+
       setMemberSearch(
-        leader.member
+        leaderMember
           ? getMemberName(
-              leader.member
+              leaderMember
             )
           : ""
       );
@@ -372,15 +431,24 @@ export default function LeaderFormModal({
       setForm({
         ...DEFAULT_FORM,
 
+        patron: {
+          ...DEFAULT_FORM.patron,
+        },
+
         termStart:
           formatDateForInput(
             new Date()
           ),
       });
 
+      setSelectedMember(
+        null
+      );
+
       setMemberSearch("");
     }
 
+    setMembers([]);
     setError("");
   }, [
     open,
@@ -388,28 +456,30 @@ export default function LeaderFormModal({
   ]);
 
   /* ==========================================================
-     LOAD MEMBERS
+     SEARCH MEMBERS
   ========================================================== */
 
   useEffect(() => {
-    if (!open) return;
-
     if (
-      form.category ===
-      "patron"
+      !open ||
+      isPatron
     ) {
       setMembers([]);
-
       return;
     }
 
+    const searchValue =
+      memberSearch.trim();
+
     if (
-      !memberSearch.trim()
+      !searchValue ||
+      form.member
     ) {
       setMembers([]);
-
       return;
     }
+
+    let active = true;
 
     const loadMembers =
       async () => {
@@ -419,9 +489,10 @@ export default function LeaderFormModal({
           );
 
           const response =
-            await memberService.searchMembers(
-              memberSearch
-            );
+            await memberService
+              .searchMembers(
+                searchValue
+              );
 
           const results =
             response?.data ||
@@ -429,24 +500,30 @@ export default function LeaderFormModal({
             response ||
             [];
 
-          setMembers(
-            Array.isArray(
-              results
-            )
-              ? results
-              : []
-          );
-        } catch (err) {
+          if (active) {
+            setMembers(
+              Array.isArray(
+                results
+              )
+                ? results
+                : []
+            );
+          }
+        } catch (requestError) {
           console.error(
             "Member search failed:",
-            err
+            requestError
           );
 
-          setMembers([]);
+          if (active) {
+            setMembers([]);
+          }
         } finally {
-          setMembersLoading(
-            false
-          );
+          if (active) {
+            setMembersLoading(
+              false
+            );
+          }
         }
       };
 
@@ -456,18 +533,19 @@ export default function LeaderFormModal({
         350
       );
 
-    return () =>
+    return () => {
+      active = false;
       clearTimeout(timer);
+    };
   }, [
     open,
     memberSearch,
-    form.category,
+    form.member,
+    isPatron,
   ]);
 
-  
-
   /* ==========================================================
-     FIELD UPDATE
+     FIELD HELPERS
   ========================================================== */
 
   const updateField = (
@@ -477,7 +555,6 @@ export default function LeaderFormModal({
     setForm(
       (previous) => ({
         ...previous,
-
         [field]: value,
       })
     );
@@ -493,7 +570,6 @@ export default function LeaderFormModal({
 
         patron: {
           ...previous.patron,
-
           [field]: value,
         },
       })
@@ -525,7 +601,8 @@ export default function LeaderFormModal({
       }
 
       const configuration =
-        selectedPosition.configuration;
+        selectedPosition
+          .configuration;
 
       setForm(
         (previous) => ({
@@ -537,13 +614,15 @@ export default function LeaderFormModal({
             configuration.level,
 
           department:
-            configuration.department,
+            configuration
+              .department,
 
           scope:
             configuration.scope,
 
           appointmentType:
-            configuration.appointmentType,
+            configuration
+              .appointmentType,
         })
       );
     };
@@ -560,6 +639,8 @@ export default function LeaderFormModal({
 
           category,
 
+          position: "",
+
           member:
             category ===
             "patron"
@@ -570,13 +651,21 @@ export default function LeaderFormModal({
             category ===
             "patron"
               ? "honorary"
-              : previous.appointmentType,
+              : previous
+                  .appointmentType,
 
           scope:
             category ===
             "patron"
               ? "organization"
               : previous.scope,
+
+          department:
+            category ===
+            "patron"
+              ? LEADERSHIP_DEPARTMENTS
+                  .PATRONAGE
+              : previous.department,
         })
       );
 
@@ -584,66 +673,94 @@ export default function LeaderFormModal({
         category ===
         "patron"
       ) {
+        setSelectedMember(
+          null
+        );
+
         setMemberSearch("");
+        setMembers([]);
       }
     };
 
   /* ==========================================================
-   SELECT MEMBER
-========================================================== */
+     MEMBER SELECTION
+  ========================================================== */
 
-const handleSelectMember = (member) => {
-  setSelectedMember(member);
+  const handleSelectMember =
+    (member) => {
+      setSelectedMember(
+        member
+      );
 
-  setForm((previous) => ({
-    ...previous,
+      setForm(
+        (previous) => ({
+          ...previous,
 
-    member: member._id,
+          member:
+            member._id,
 
-    county:
-      member.county || "",
+          county:
+            member.county ||
+            "",
 
-    constituency:
-      member.constituency || "",
+          constituency:
+            member
+              .constituency ||
+            "",
 
-    ward:
-      member.ward || "",
-  }));
+          ward:
+            member.ward ||
+            "",
+        })
+      );
 
-  setMemberSearch(
-    getMemberName(member)
-  );
+      setMemberSearch(
+        getMemberName(member)
+      );
 
-  setMembers([]);
-};
+      setMembers([]);
+      setError("");
+    };
 
+  const handleRemoveSelectedMember =
+    () => {
+      setSelectedMember(
+        null
+      );
+
+      setForm(
+        (previous) => ({
+          ...previous,
+
+          member: "",
+          county: "",
+          constituency: "",
+          ward: "",
+        })
+      );
+
+      setMemberSearch("");
+      setMembers([]);
+    };
 
   /* ==========================================================
      VALIDATION
   ========================================================== */
 
   const validate = () => {
-    if (
-      !form.category
-    ) {
+    if (!form.category) {
       return "Please select a leadership category.";
     }
 
-    if (
-      !form.position
-    ) {
-      return "Please select a leadership position.";
+    if (!form.position) {
+      return "Please select a leadership office.";
     }
 
-    if (
-      !form.department
-    ) {
+    if (!form.department) {
       return "Please select a department.";
     }
 
-    if (
-      !form.scope
-    ) {
+    if (!form.scope) {
       return "Please select a leadership scope.";
     }
 
@@ -654,28 +771,34 @@ const handleSelectMember = (member) => {
     }
 
     if (
-      form.category !==
-        "patron" &&
+      !isPatron &&
       !form.member
     ) {
-      return "Please select a member.";
+      return "Please search for and select a member.";
     }
 
     if (
-      form.category ===
-      "patron"
+      isPatron &&
+      !form.patron.fullName
+        .trim()
     ) {
-      if (
-        !form.patron.fullName.trim()
-      ) {
-        return "Patron full name is required.";
-      }
+      return "Patron full name is required.";
     }
 
-    if (
-      !form.termStart
-    ) {
+    if (!form.termStart) {
       return "Term start date is required.";
+    }
+
+    if (
+      form.termEnd &&
+      new Date(
+        form.termEnd
+      ) <
+        new Date(
+          form.termStart
+        )
+    ) {
+      return "Term end date cannot be before the term start date.";
     }
 
     return null;
@@ -726,7 +849,9 @@ const handleSelectMember = (member) => {
           ),
 
         featured:
-          form.featured,
+          Boolean(
+            form.featured
+          ),
 
         termStart:
           form.termStart,
@@ -736,37 +861,43 @@ const handleSelectMember = (member) => {
           null,
 
         verified:
-          form.verified,
+          Boolean(
+            form.verified
+          ),
 
         remarks:
-          form.remarks,
+          form.remarks
+            .trim(),
 
-        ...(form.category ===
-        "patron"
+        ...(isPatron
           ? {
-              member:
-                null,
+              member: null,
 
               patron: {
                 fullName:
                   form.patron
-                    .fullName,
+                    .fullName
+                    .trim(),
 
                 title:
                   form.patron
-                    .title,
+                    .title
+                    .trim(),
 
                 organization:
                   form.patron
-                    .organization,
+                    .organization
+                    .trim(),
 
                 photo:
                   form.patron
-                    .photo,
+                    .photo
+                    .trim(),
 
                 bio:
                   form.patron
-                    .bio,
+                    .bio
+                    .trim(),
               },
             }
           : {
@@ -804,940 +935,1077 @@ const handleSelectMember = (member) => {
 
   const handleClose =
     () => {
-      if (loading) return;
+      if (loading) {
+        return;
+      }
 
-      setForm(
-        DEFAULT_FORM
+      setForm({
+        ...DEFAULT_FORM,
+        patron: {
+          ...DEFAULT_FORM.patron,
+        },
+      });
+
+      setSelectedMember(
+        null
       );
 
-      setSelectedMember(null);
-
       setMemberSearch("");
-
+      setMembers([]);
       setError("");
 
       onClose();
     };
 
-  if (!open) return null;
-
-  const isPatron =
-    form.category ===
-    "patron";
+  if (!open) {
+    return null;
+  }
 
   /* ==========================================================
      RENDER
   ========================================================== */
 
   return (
-    <div className="modal-overlay">
-      <div className="leader-form-modal">
-
-        {/* ==================================================
+    <div
+      className="leader-form-modal-overlay"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (
+          event.target ===
+          event.currentTarget
+        ) {
+          handleClose();
+        }
+      }}
+    >
+      <div
+        className="leader-form-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="leader-form-title"
+      >
+        {/* ===============================================
             HEADER
-        ================================================== */}
+        =============================================== */}
 
-        <div className="modal-header">
+        <header className="leader-form-modal-header">
+          <div className="leader-form-modal-heading">
+            <div className="leader-form-modal-heading-icon">
+              <ShieldCheck
+                size={25}
+              />
+            </div>
 
-          <div>
-            <h2>
-              {leader
-                ? "Edit Leadership Assignment"
-                : "Assign New Leader"}
-            </h2>
+            <div>
+              <span>
+                Leadership administration
+              </span>
 
-            <p>
-              Assign an existing member
-              to an official JVP leadership
-              position.
-            </p>
+              <h2 id="leader-form-title">
+                {leader
+                  ? "Edit Leadership Assignment"
+                  : "Assign New Leader"}
+              </h2>
+
+              <p>
+                Assign an existing
+                member to an official
+                JVP leadership office.
+              </p>
+            </div>
           </div>
 
           <button
             type="button"
-            className="modal-close"
+            className="leader-form-modal-close"
             onClick={
               handleClose
             }
             disabled={loading}
+            aria-label="Close leadership form"
           >
-            <X size={20} />
+            <X size={21} />
           </button>
+        </header>
 
-        </div>
-
-        {/* ==================================================
+        {/* ===============================================
             ERROR
-        ================================================== */}
+        =============================================== */}
 
         {error && (
-          <div className="form-error">
-            {error}
+          <div
+            className="leader-form-alert"
+            role="alert"
+          >
+            <span>{error}</span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setError("")
+              }
+              aria-label="Close error"
+            >
+              <X size={17} />
+            </button>
           </div>
         )}
 
         <form
+          className="leader-form"
           onSubmit={
             handleSubmit
           }
-          className="leader-form"
         >
+          <div className="leader-form-modal-body">
+            {/* ===========================================
+                CLASSIFICATION
+            =========================================== */}
 
-          {/* =================================================
-              CATEGORY AND POSITION
-          ================================================= */}
-
-          <section className="form-section">
-
-            <h3>
-              Leadership Classification
-            </h3>
-
-            <div className="form-grid">
-
-              {/* CATEGORY */}
-
-              <div className="form-field">
-
-                <label>
-                  Leadership Category *
-                </label>
-
-                <select
-                  value={
-                    form.category
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    handleCategoryChange(
-                      event.target
-                        .value
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                >
-                  <option value="">
-                    Select category
-                  </option>
-
-                  {CATEGORIES.map(
-                    (
-                      category
-                    ) => (
-                      <option
-                        key={
-                          category.value
-                        }
-                        value={
-                          category.value
-                        }
-                      >
-                        {
-                          category.label
-                        }
-                      </option>
-                    )
-                  )}
-                </select>
-
-              </div>
-
-              {/* POSITION */}
-
-              <div className="form-field">
-
-                <label>
-                  Leadership Office *
-                </label>
-
-                <select
-                  value={
-                    form.position
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    handlePositionChange(
-                      event.target
-                        .value
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                >
-                  <option value="">
-                    Select leadership office
-                  </option>
-
-                  {POSITIONS.map(
-                    (
-                      position
-                    ) => (
-                      <option
-                        key={
-                          position.value
-                        }
-                        value={
-                          position.value
-                        }
-                      >
-                        {
-                          position.label
-                        }
-                      </option>
-                    )
-                  )}
-                </select>
-
-              </div>
-
-              {/* DEPARTMENT */}
-
-              <div className="form-field">
-
-                <label>
-                  Department *
-                </label>
-
-                <select
-                  value={
-                    form.department
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateField(
-                      "department",
-                      event.target
-                        .value
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                >
-                  <option value="">
-                    Select department
-                  </option>
-
-                  {DEPARTMENTS.map(
-                    (
-                      department
-                    ) => (
-                      <option
-                        key={
-                          department.value
-                        }
-                        value={
-                          department.value
-                        }
-                      >
-                        {
-                          department.label
-                        }
-                      </option>
-                    )
-                  )}
-                </select>
-
-              </div>
-
-              {/* SCOPE */}
-
-              <div className="form-field">
-
-                <label>
-                  Leadership Scope *
-                </label>
-
-                <select
-                  value={
-                    form.scope
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateField(
-                      "scope",
-                      event.target
-                        .value
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                >
-                  <option value="">
-                    Select scope
-                  </option>
-
-                  {SCOPES.map(
-                    (
-                      scope
-                    ) => (
-                      <option
-                        key={
-                          scope.value
-                        }
-                        value={
-                          scope.value
-                        }
-                      >
-                        {
-                          scope.label
-                        }
-                      </option>
-                    )
-                  )}
-                </select>
-
-              </div>
-
-              {/* APPOINTMENT */}
-
-              <div className="form-field">
-
-                <label>
-                  Appointment Type *
-                </label>
-
-                <select
-                  value={
-                    form.appointmentType
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateField(
-                      "appointmentType",
-                      event.target
-                        .value
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                >
-                  <option value="">
-                    Select appointment type
-                  </option>
-
-                  {APPOINTMENT_TYPE_OPTIONS.map(
-                    (
-                      type
-                    ) => (
-                      <option
-                        key={
-                          type.value
-                        }
-                        value={
-                          type.value
-                        }
-                      >
-                        {
-                          type.label
-                        }
-                      </option>
-                    )
-                  )}
-                </select>
-
-              </div>
-
-            </div>
-
-          </section>
-
-          {/* =================================================
-              MEMBER SELECTION
-          ================================================= */}
-
-          {!isPatron && (
-            <section className="form-section">
-
-              <h3>
-                Member Assignment
-              </h3>
-
-              <div className="form-field">
-
-                <label>
-                  Search and Select Member *
-                </label>
-
-                <div className="member-search">
-
-                  <Search
-                    size={18}
+            <section className="leader-form-section">
+              <div className="leader-form-section-heading">
+                <span className="leader-form-section-icon">
+                  <BriefcaseBusiness
+                    size={20}
                   />
+                </span>
 
-                  <input
-                    type="text"
-                    placeholder="Search by name, phone, ID or member number..."
+                <div>
+                  <small>
+                    Section 01
+                  </small>
+
+                  <h3>
+                    Leadership Classification
+                  </h3>
+
+                  <p>
+                    Select the office and
+                    define how the
+                    leadership assignment
+                    is classified.
+                  </p>
+                </div>
+              </div>
+
+              <div className="leader-form-grid">
+                <div className="leader-form-group">
+                  <label htmlFor="leader-category">
+                    Leadership Category
+                    <span>*</span>
+                  </label>
+
+                  <select
+                    id="leader-category"
                     value={
-                      memberSearch
+                      form.category
                     }
                     onChange={(
                       event
-                    ) => {
-                      setMemberSearch(
+                    ) =>
+                      handleCategoryChange(
                         event.target
                           .value
-                      );
-
-                      if (
-                        form.member
-                      ) {
-                        updateField(
-                          "member",
-                          ""
-                        );
-                      }
-                    }}
-                    disabled={
-                      loading
+                      )
                     }
-                  />
+                    disabled={loading}
+                  >
+                    <option value="">
+                      Select category
+                    </option>
 
+                    {CATEGORIES.map(
+                      (category) => (
+                        <option
+                          key={
+                            category.value
+                          }
+                          value={
+                            category.value
+                          }
+                        >
+                          {
+                            category.label
+                          }
+                        </option>
+                      )
+                    )}
+                  </select>
                 </div>
 
-                {membersLoading && (
-                  <div className="member-search-status">
-                    Searching members...
-                  </div>
-                )}
+                <div className="leader-form-group">
+                  <label htmlFor="leader-position">
+                    Leadership Office
+                    <span>*</span>
+                  </label>
 
-                {!membersLoading &&
-                  memberSearch &&
-                  !form.member &&
-                  members.length >
-                    0 && (
-                    <div className="member-results">
+                  <select
+                    id="leader-position"
+                    value={
+                      form.position
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      handlePositionChange(
+                        event.target
+                          .value
+                      )
+                    }
+                    disabled={loading}
+                  >
+                    <option value="">
+                      Select leadership
+                      office
+                    </option>
 
-                      {members.map(
-                        (
-                          member
-                        ) => (
-                          <button
-                            type="button"
-                            key={
-                              member._id
-                            }
-                            className="member-result"
-                            onClick={() =>
-                              handleSelectMember(
-                                member
-                              )
-                            }
-                          >
+                    {filteredPositions.map(
+                      (position) => (
+                        <option
+                          key={
+                            position.value
+                          }
+                          value={
+                            position.value
+                          }
+                        >
+                          {
+                            position.label
+                          }
+                        </option>
+                      )
+                    )}
+                  </select>
 
-                            <div className="member-avatar">
+                  <small className="leader-form-help">
+                    Selecting an office
+                    automatically fills its
+                    official classification.
+                  </small>
+                </div>
 
-                              {member.profilePhoto ? (
-                                <img
-                                  src={
-                                    member.profilePhoto
-                                  }
-                                  alt=""
-                                />
-                              ) : (
-                                <UserRound
-                                  size={
-                                    20
-                                  }
-                                />
-                              )}
+                <div className="leader-form-group">
+                  <label htmlFor="leader-department">
+                    Department
+                    <span>*</span>
+                  </label>
 
-                            </div>
+                  <select
+                    id="leader-department"
+                    value={
+                      form.department
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updateField(
+                        "department",
+                        event.target
+                          .value
+                      )
+                    }
+                    disabled={loading}
+                  >
+                    <option value="">
+                      Select department
+                    </option>
 
-                            <div>
+                    {DEPARTMENTS.map(
+                      (department) => (
+                        <option
+                          key={
+                            department.value
+                          }
+                          value={
+                            department.value
+                          }
+                        >
+                          {
+                            department.label
+                          }
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
 
-                              <strong>
-                                {getMemberName(
-                                  member
-                                )}
-                              </strong>
+                <div className="leader-form-group">
+                  <label htmlFor="leader-scope">
+                    Leadership Scope
+                    <span>*</span>
+                  </label>
 
-                              <small>
-                                {member.memberNumber ||
-                                  "No membership number"}
-                                {" · "}
-                                {
-                                  member.county
-                                }
-                              </small>
+                  <select
+                    id="leader-scope"
+                    value={
+                      form.scope
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updateField(
+                        "scope",
+                        event.target
+                          .value
+                      )
+                    }
+                    disabled={loading}
+                  >
+                    <option value="">
+                      Select scope
+                    </option>
 
-                            </div>
-
-                          </button>
-                        )
-                      )}
-
-                    </div>
-                  )}
-
-                {!membersLoading &&
-                  memberSearch &&
-                  !form.member &&
-                  members.length ===
-                    0 && (
-                    <div className="member-search-status">
-                      No active members found.
-                    </div>
-                  )}
-
-              </div>
-
-              {selectedMember && (
-                <div className="selected-member">
-
-                  <div className="selected-member-avatar">
-
-                    {selectedMember.profilePhoto ? (
-                      <img
-                        src={
-                          selectedMember.profilePhoto
-                        }
-                        alt=""
-                      />
-                    ) : (
-                      <UserRound
-                        size={
-                          24
-                        }
-                      />
+                    {SCOPES.map(
+                      (scope) => (
+                        <option
+                          key={
+                            scope.value
+                          }
+                          value={
+                            scope.value
+                          }
+                        >
+                          {scope.label}
+                        </option>
+                      )
                     )}
 
-                  </div>
+                    {isPatron && (
+                      <option value="organization">
+                        Organization
+                      </option>
+                    )}
+                  </select>
+                </div>
+
+                <div className="leader-form-group">
+                  <label htmlFor="leader-appointment">
+                    Appointment Type
+                    <span>*</span>
+                  </label>
+
+                  <select
+                    id="leader-appointment"
+                    value={
+                      form.appointmentType
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updateField(
+                        "appointmentType",
+                        event.target
+                          .value
+                      )
+                    }
+                    disabled={loading}
+                  >
+                    <option value="">
+                      Select appointment
+                      type
+                    </option>
+
+                    {APPOINTMENT_TYPE_OPTIONS.map(
+                      (type) => (
+                        <option
+                          key={
+                            type.value
+                          }
+                          value={
+                            type.value
+                          }
+                        >
+                          {type.label}
+                        </option>
+                      )
+                    )}
+
+                    {isPatron && (
+                      <option value="honorary">
+                        Honorary
+                      </option>
+                    )}
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            {/* ===========================================
+                MEMBER ASSIGNMENT
+            =========================================== */}
+
+            {!isPatron && (
+              <section className="leader-form-section">
+                <div className="leader-form-section-heading">
+                  <span className="leader-form-section-icon">
+                    <UsersRound
+                      size={20}
+                    />
+                  </span>
 
                   <div>
-
-                    <strong>
-                      {getMemberName(
-                        selectedMember
-                      )}
-                    </strong>
-
-                    <span>
-                      {
-                        selectedMember.memberNumber
-                      }
-                    </span>
-
                     <small>
-                      {
-                        selectedMember.county
-                      }
-                      {" · "}
-                      {
-                        selectedMember
-                          .constituency ||
-                        "No constituency"
-                      }
-                      {" · "}
-                      {
-                        selectedMember
-                          .ward ||
-                        "No ward"
-                      }
+                      Section 02
                     </small>
 
+                    <h3>
+                      Member Assignment
+                    </h3>
+
+                    <p>
+                      Search for an active
+                      JVP member and assign
+                      the selected leadership
+                      office.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="leader-form-group leader-form-group--full">
+                  <label htmlFor="leader-member-search">
+                    Search and Select Member
+                    <span>*</span>
+                  </label>
+
+                  <div className="member-search-wrapper">
+                    <Search
+                      className="member-search-icon"
+                      size={20}
+                    />
+
+                    <input
+                      id="leader-member-search"
+                      type="search"
+                      placeholder="Search by name, phone, National ID or member number..."
+                      value={
+                        memberSearch
+                      }
+                      onChange={(
+                        event
+                      ) => {
+                        const value =
+                          event.target
+                            .value;
+
+                        setMemberSearch(
+                          value
+                        );
+
+                        if (
+                          form.member
+                        ) {
+                          setSelectedMember(
+                            null
+                          );
+
+                          setForm(
+                            (
+                              previous
+                            ) => ({
+                              ...previous,
+                              member: "",
+                            })
+                          );
+                        }
+                      }}
+                      disabled={loading}
+                      autoComplete="off"
+                    />
+
+                    {membersLoading && (
+                      <span className="member-search-loading">
+                        Searching...
+                      </span>
+                    )}
+
+                    {!membersLoading &&
+                      memberSearch.trim() &&
+                      !form.member &&
+                      members.length >
+                        0 && (
+                        <div className="member-search-results">
+                          {members.map(
+                            (
+                              member
+                            ) => (
+                              <button
+                                type="button"
+                                key={
+                                  member._id
+                                }
+                                className="member-search-result"
+                                onClick={() =>
+                                  handleSelectMember(
+                                    member
+                                  )
+                                }
+                              >
+                                <span className="member-search-result-avatar">
+                                  {member.profilePhoto ? (
+                                    <img
+                                      src={
+                                        member.profilePhoto
+                                      }
+                                      alt=""
+                                    />
+                                  ) : (
+                                    <UserRound
+                                      size={
+                                        20
+                                      }
+                                    />
+                                  )}
+                                </span>
+
+                                <span className="member-search-result-info">
+                                  <strong>
+                                    {getMemberName(
+                                      member
+                                    )}
+                                  </strong>
+
+                                  <span>
+                                    {member.memberNumber ||
+                                      "No member number"}
+                                  </span>
+
+                                  <small>
+                                    {getMemberLocation(
+                                      member
+                                    ) ||
+                                      "Location not available"}
+                                  </small>
+                                </span>
+                              </button>
+                            )
+                          )}
+                        </div>
+                      )}
+
+                    {!membersLoading &&
+                      memberSearch.trim() &&
+                      !form.member &&
+                      members.length ===
+                        0 && (
+                        <div className="member-search-empty">
+                          No active members
+                          found.
+                        </div>
+                      )}
+                  </div>
+                </div>
+
+                {selectedMember && (
+                  <article className="selected-member">
+                    <div className="selected-member-avatar">
+                      {selectedMember.profilePhoto ? (
+                        <img
+                          src={
+                            selectedMember.profilePhoto
+                          }
+                          alt={getMemberName(
+                            selectedMember
+                          )}
+                        />
+                      ) : (
+                        <UserRound
+                          size={30}
+                        />
+                      )}
+                    </div>
+
+                    <div className="selected-member-content">
+                      <span className="selected-member-label">
+                        Selected member
+                      </span>
+
+                      <strong>
+                        {getMemberName(
+                          selectedMember
+                        )}
+                      </strong>
+
+                      <span className="selected-member-number">
+                        {selectedMember.memberNumber ||
+                          "No membership number"}
+                      </span>
+
+                      <small>
+                        {getMemberLocation(
+                          selectedMember
+                        ) ||
+                          "Location not available"}
+                      </small>
+                    </div>
+
+                    <div className="selected-member-status">
+                      <CheckCircle2
+                        size={18}
+                      />
+
+                      Selected
+                    </div>
+
+                    <button
+                      type="button"
+                      className="selected-member-remove"
+                      onClick={
+                        handleRemoveSelectedMember
+                      }
+                      disabled={loading}
+                      aria-label="Remove selected member"
+                    >
+                      <X size={18} />
+                    </button>
+                  </article>
+                )}
+              </section>
+            )}
+
+            {/* ===========================================
+                PATRON
+            =========================================== */}
+
+            {isPatron && (
+              <section className="leader-form-section">
+                <div className="leader-form-section-heading">
+                  <span className="leader-form-section-icon">
+                    <UserRound
+                      size={20}
+                    />
+                  </span>
+
+                  <div>
+                    <small>
+                      Section 02
+                    </small>
+
+                    <h3>
+                      Patron Information
+                    </h3>
+
+                    <p>
+                      Record the patron's
+                      official details and
+                      organizational profile.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="leader-form-grid">
+                  <div className="leader-form-group">
+                    <label htmlFor="patron-name">
+                      Full Name
+                      <span>*</span>
+                    </label>
+
+                    <input
+                      id="patron-name"
+                      type="text"
+                      value={
+                        form.patron
+                          .fullName
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        updatePatronField(
+                          "fullName",
+                          event.target
+                            .value
+                        )
+                      }
+                      disabled={loading}
+                      placeholder="Enter full name"
+                    />
                   </div>
 
+                  <div className="leader-form-group">
+                    <label htmlFor="patron-title">
+                      Official Title
+                    </label>
+
+                    <input
+                      id="patron-title"
+                      type="text"
+                      value={
+                        form.patron
+                          .title
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        updatePatronField(
+                          "title",
+                          event.target
+                            .value
+                        )
+                      }
+                      disabled={loading}
+                      placeholder="e.g. Governor"
+                    />
+                  </div>
+
+                  <div className="leader-form-group">
+                    <label htmlFor="patron-organization">
+                      Organization
+                    </label>
+
+                    <input
+                      id="patron-organization"
+                      type="text"
+                      value={
+                        form.patron
+                          .organization
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        updatePatronField(
+                          "organization",
+                          event.target
+                            .value
+                        )
+                      }
+                      disabled={loading}
+                      placeholder="Enter organization"
+                    />
+                  </div>
+
+                  <div className="leader-form-group">
+                    <label htmlFor="patron-photo">
+                      Photo URL
+                    </label>
+
+                    <input
+                      id="patron-photo"
+                      type="url"
+                      value={
+                        form.patron
+                          .photo
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        updatePatronField(
+                          "photo",
+                          event.target
+                            .value
+                        )
+                      }
+                      disabled={loading}
+                      placeholder="https://..."
+                    />
+                  </div>
+
+                  <div className="leader-form-group leader-form-group--full">
+                    <label htmlFor="patron-bio">
+                      Biography
+                    </label>
+
+                    <textarea
+                      id="patron-bio"
+                      rows="5"
+                      value={
+                        form.patron
+                          .bio
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        updatePatronField(
+                          "bio",
+                          event.target
+                            .value
+                        )
+                      }
+                      disabled={loading}
+                      placeholder="Enter a brief professional biography..."
+                    />
+                  </div>
                 </div>
-              )}
+              </section>
+            )}
 
-            </section>
-          )}
+            {/* ===========================================
+                TERM
+            =========================================== */}
 
-          {/* =================================================
-              PATRON
-          ================================================= */}
-
-          {isPatron && (
-            <section className="form-section">
-
-              <h3>
-                Patron Information
-              </h3>
-
-              <div className="form-grid">
-
-                <div className="form-field">
-
-                  <label>
-                    Full Name *
-                  </label>
-
-                  <input
-                    type="text"
-                    value={
-                      form.patron
-                        .fullName
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      updatePatronField(
-                        "fullName",
-                        event.target
-                          .value
-                      )
-                    }
-                    disabled={
-                      loading
-                    }
+            <section className="leader-form-section">
+              <div className="leader-form-section-heading">
+                <span className="leader-form-section-icon">
+                  <CalendarDays
+                    size={20}
                   />
+                </span>
 
+                <div>
+                  <small>
+                    Section 03
+                  </small>
+
+                  <h3>
+                    Leadership Term
+                  </h3>
+
+                  <p>
+                    Set the term period,
+                    display priority and
+                    verification status.
+                  </p>
                 </div>
-
-                <div className="form-field">
-
-                  <label>
-                    Title
-                  </label>
-
-                  <input
-                    type="text"
-                    value={
-                      form.patron
-                        .title
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      updatePatronField(
-                        "title",
-                        event.target
-                          .value
-                      )
-                    }
-                    disabled={
-                      loading
-                    }
-                  />
-
-                </div>
-
-                <div className="form-field">
-
-                  <label>
-                    Organization
-                  </label>
-
-                  <input
-                    type="text"
-                    value={
-                      form.patron
-                        .organization
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      updatePatronField(
-                        "organization",
-                        event.target
-                          .value
-                      )
-                    }
-                    disabled={
-                      loading
-                    }
-                  />
-
-                </div>
-
-                <div className="form-field">
-
-                  <label>
-                    Photo URL
-                  </label>
-
-                  <input
-                    type="url"
-                    value={
-                      form.patron
-                        .photo
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      updatePatronField(
-                        "photo",
-                        event.target
-                          .value
-                      )
-                    }
-                    disabled={
-                      loading
-                    }
-                  />
-
-                </div>
-
               </div>
 
-              <div className="form-field">
+              <div className="leader-form-grid leader-form-grid--three">
+                <div className="leader-form-group">
+                  <label htmlFor="term-start">
+                    Term Start
+                    <span>*</span>
+                  </label>
 
-                <label>
-                  Biography
+                  <input
+                    id="term-start"
+                    type="date"
+                    value={
+                      form.termStart
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updateField(
+                        "termStart",
+                        event.target
+                          .value
+                      )
+                    }
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="leader-form-group">
+                  <label htmlFor="term-end">
+                    Term End
+                  </label>
+
+                  <input
+                    id="term-end"
+                    type="date"
+                    value={
+                      form.termEnd
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updateField(
+                        "termEnd",
+                        event.target
+                          .value
+                      )
+                    }
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="leader-form-group">
+                  <label htmlFor="display-order">
+                    Display Order
+                  </label>
+
+                  <input
+                    id="display-order"
+                    type="number"
+                    min="1"
+                    value={
+                      form.displayOrder
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updateField(
+                        "displayOrder",
+                        event.target
+                          .value
+                      )
+                    }
+                    disabled={loading}
+                  />
+
+                  <small className="leader-form-help">
+                    Lower numbers appear
+                    first.
+                  </small>
+                </div>
+              </div>
+
+              <div className="leader-form-checkboxes">
+                <label className="leader-form-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={
+                      form.featured
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updateField(
+                        "featured",
+                        event.target
+                          .checked
+                      )
+                    }
+                    disabled={loading}
+                  />
+
+                  <span>
+                    <strong>
+                      Featured Leader
+                    </strong>
+
+                    Display this leader
+                    prominently.
+                  </span>
+                </label>
+
+                <label className="leader-form-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={
+                      form.verified
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updateField(
+                        "verified",
+                        event.target
+                          .checked
+                      )
+                    }
+                    disabled={loading}
+                  />
+
+                  <span>
+                    <strong>
+                      Verified Assignment
+                    </strong>
+
+                    Confirm the assignment
+                    as official.
+                  </span>
+                </label>
+              </div>
+            </section>
+
+            {/* ===========================================
+                REMARKS
+            =========================================== */}
+
+            <section className="leader-form-section">
+              <div className="leader-form-section-heading">
+                <span className="leader-form-section-icon">
+                  <FileText
+                    size={20}
+                  />
+                </span>
+
+                <div>
+                  <small>
+                    Section 04
+                  </small>
+
+                  <h3>
+                    Administrative Remarks
+                  </h3>
+
+                  <p>
+                    Add optional internal
+                    notes about this
+                    assignment.
+                  </p>
+                </div>
+              </div>
+
+              <div className="leader-form-group leader-form-group--full">
+                <label htmlFor="leader-remarks">
+                  Remarks
                 </label>
 
                 <textarea
+                  id="leader-remarks"
                   rows="4"
+                  maxLength="500"
                   value={
-                    form.patron
-                      .bio
+                    form.remarks
                   }
                   onChange={(
                     event
                   ) =>
-                    updatePatronField(
-                      "bio",
+                    updateField(
+                      "remarks",
                       event.target
                         .value
                     )
                   }
-                  disabled={
-                    loading
-                  }
+                  disabled={loading}
+                  placeholder="Optional administrative remarks..."
                 />
 
+                <small className="leader-form-character-count">
+                  {
+                    form.remarks
+                      .length
+                  }
+                  /500
+                </small>
               </div>
-
             </section>
-          )}
-
-          {/* =================================================
-              TERM
-          ================================================= */}
-
-          <section className="form-section">
-
-            <h3>
-              Leadership Term
-            </h3>
-
-            <div className="form-grid">
-
-              <div className="form-field">
-
-                <label>
-                  Term Start *
-                </label>
-
-                <input
-                  type="date"
-                  value={
-                    form.termStart
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateField(
-                      "termStart",
-                      event.target
-                        .value
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                />
-
-              </div>
-
-              <div className="form-field">
-
-                <label>
-                  Term End
-                </label>
-
-                <input
-                  type="date"
-                  value={
-                    form.termEnd
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateField(
-                      "termEnd",
-                      event.target
-                        .value
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                />
-
-              </div>
-
-              <div className="form-field">
-
-                <label>
-                  Display Order
-                </label>
-
-                <input
-                  type="number"
-                  min="1"
-                  value={
-                    form.displayOrder
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateField(
-                      "displayOrder",
-                      event.target
-                        .value
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                />
-
-              </div>
-
-            </div>
-
-            <div className="form-checkboxes">
-
-              <label>
-
-                <input
-                  type="checkbox"
-                  checked={
-                    form.featured
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateField(
-                      "featured",
-                      event.target
-                        .checked
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                />
-
-                Featured Leader
-
-              </label>
-
-              <label>
-
-                <input
-                  type="checkbox"
-                  checked={
-                    form.verified
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateField(
-                      "verified",
-                      event.target
-                        .checked
-                    )
-                  }
-                  disabled={
-                    loading
-                  }
-                />
-
-                Verified
-
-              </label>
-
-            </div>
-
-          </section>
-
-          {/* =================================================
-              REMARKS
-          ================================================= */}
-
-          <section className="form-section">
-
-            <div className="form-field">
-
-              <label>
-                Remarks
-              </label>
-
-              <textarea
-                rows="3"
-                maxLength="500"
-                value={
-                  form.remarks
-                }
-                onChange={(
-                  event
-                ) =>
-                  updateField(
-                    "remarks",
-                    event.target
-                      .value
-                  )
-                }
-                disabled={
-                  loading
-                }
-                placeholder="Optional administrative remarks..."
-              />
-
-            </div>
-
-          </section>
-
-          {/* =================================================
-              ACTIONS
-          ================================================= */}
-
-          <div className="modal-actions">
-
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={
-                handleClose
-              }
-              disabled={
-                loading
-              }
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={
-                loading
-              }
-            >
-              {loading
-                ? "Saving..."
-                : leader
-                ? "Update Leader"
-                : "Assign Leader"}
-            </button>
-
           </div>
 
-        </form>
+          {/* ===============================================
+              ACTIONS
+          =============================================== */}
 
+          <footer className="leader-form-modal-footer">
+            <div className="leader-form-footer-note">
+              <ShieldCheck
+                size={17}
+              />
+
+              Leadership assignments
+              should only be made by
+              authorized administrators.
+            </div>
+
+            <div className="leader-form-footer-actions">
+              <button
+                type="button"
+                className="leader-form-cancel"
+                onClick={
+                  handleClose
+                }
+                disabled={loading}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="leader-form-submit"
+                disabled={loading}
+              >
+                <CheckCircle2
+                  size={18}
+                />
+
+                {loading
+                  ? "Saving..."
+                  : leader
+                    ? "Update Leader"
+                    : "Assign Leader"}
+              </button>
+            </div>
+          </footer>
+        </form>
       </div>
     </div>
   );

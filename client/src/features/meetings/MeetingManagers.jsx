@@ -34,13 +34,31 @@ const getUserId = (value) => {
     return value;
   }
 
+  /*
+   * Meeting participants are subdocuments.
+   * Their own _id is not the User ID.
+   * Always prefer the nested user reference.
+   */
+  if (value?.user) {
+    if (typeof value.user === "string") {
+      return value.user;
+    }
+
+    return (
+      value.user?._id ||
+      value.user?.id ||
+      value.user?.userId ||
+      ""
+    );
+  }
+
+  /*
+   * Fall back to a direct User object.
+   */
   return (
+    value?.userId ||
     value?._id ||
     value?.id ||
-    value?.userId ||
-    value?.user?._id ||
-    value?.user?.id ||
-    value?.user ||
     ""
   );
 };
@@ -209,26 +227,42 @@ const normalizeParticipant = (
     participant?.user ||
     participant;
 
+  const userId =
+    String(
+      getUserId(user) ||
+      getUserId(participant) ||
+      ""
+    );
+
   return {
     raw: participant,
     user,
-    id: String(
-      getUserId(participant) ||
-      getUserId(user) ||
-      ""
-    ),
+
+    /*
+     * This must be the User collection ID,
+     * not the meeting participant subdocument ID.
+     */
+    id: userId,
+
     key:
-      String(
-        getUserId(participant) ||
-        getUserId(user) ||
-        ""
-      ) ||
+      userId ||
       `participant-${index}`,
-    name: getUserName(participant),
-    email: getUserEmail(participant),
-    phone: getUserPhone(participant),
-    county: getUserCounty(participant),
-    position: getUserPosition(participant),
+
+    name:
+      getUserName(participant),
+
+    email:
+      getUserEmail(participant),
+
+    phone:
+      getUserPhone(participant),
+
+    county:
+      getUserCounty(participant),
+
+    position:
+      getUserPosition(participant),
+
     profilePhoto:
       getProfilePhoto(participant),
   };
@@ -265,6 +299,7 @@ const MeetingManagers = ({
   moderators = [],
   participants = [],
   canManage = false,
+  canChangeHost = false,
   onMeetingRefresh,
 }) => {
   const [localHost, setLocalHost] =
@@ -796,6 +831,7 @@ const MeetingManagers = ({
 
         {canManage && (
           <div className="meeting-managers__header-actions">
+            {canChangeHost && (
             <button
               type="button"
               className="meeting-managers__secondary-button"
@@ -811,6 +847,7 @@ const MeetingManagers = ({
                 ? "Close host transfer"
                 : "Change host"}
             </button>
+            )}
 
             <button
               type="button"
@@ -888,7 +925,7 @@ const MeetingManagers = ({
         </article>
       </div>
 
-      {canManage && showHostForm && (
+      {canChangeHost && showHostForm && (
         <section className="meeting-managers__form-panel">
           <div className="meeting-managers__form-heading">
             <div>

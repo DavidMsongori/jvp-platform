@@ -1,4 +1,10 @@
-import { AlertTriangle, MapPin, UserRound } from "lucide-react";
+import {
+  AlertTriangle,
+  MapPin,
+  UserRound,
+} from "lucide-react";
+
+import "./DeleteLeaderDialog.css";
 
 export default function DeleteLeaderDialog({
   open,
@@ -7,35 +13,49 @@ export default function DeleteLeaderDialog({
   onCancel,
   onConfirm,
 }) {
-  if (!open || !leader) return null;
+  if (!open || !leader) {
+    return null;
+  }
 
   /* ==========================================================
      HELPERS
   ========================================================== */
 
   const formatLabel = (value) => {
-    if (!value) return "-";
+    if (!value) {
+      return "-";
+    }
 
-    return value
+    return String(value)
       .replaceAll("_", " ")
       .replace(/\b\w/g, (char) =>
         char.toUpperCase()
       );
   };
 
-  const isPatron = !leader.member;
+  const isPatron =
+    !leader.member;
 
-  const leaderName = isPatron
-    ? leader.patron?.fullName || "Unknown Patron"
-    : [
-        leader.member?.firstName,
-        leader.member?.middleName,
-        leader.member?.lastName,
-      ]
-        .filter(Boolean)
-        .join(" ") || "Unknown Member";
+  const leaderName =
+    isPatron
+      ? leader.patron?.fullName ||
+        "Unknown Patron"
+      : [
+          leader.member?.firstName,
+          leader.member?.middleName,
+          leader.member?.lastName,
+        ]
+          .filter(Boolean)
+          .join(" ") ||
+        "Unknown Member";
 
-  const profile = leader.profile || {};
+  const location = [
+    leader.ward,
+    leader.constituency,
+    leader.county,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   /* ==========================================================
      RENDER
@@ -43,19 +63,34 @@ export default function DeleteLeaderDialog({
 
   return (
     <div
-      className="modal-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="delete-leader-title"
+      className="delete-leader-overlay"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (
+          event.target ===
+            event.currentTarget &&
+          !loading
+        ) {
+          onCancel();
+        }
+      }}
     >
-      <div className="delete-dialog">
-
+      <div
+        className="delete-leader-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-leader-title"
+        aria-describedby="delete-leader-description"
+      >
         {/* ==========================================
             WARNING ICON
         ========================================== */}
 
-        <div className="delete-icon">
-          <AlertTriangle size={42} />
+        <div className="delete-leader-icon">
+          <AlertTriangle
+            size={38}
+            aria-hidden="true"
+          />
         </div>
 
         {/* ==========================================
@@ -66,51 +101,48 @@ export default function DeleteLeaderDialog({
           Remove Leadership Assignment
         </h2>
 
-        <p>
-          Are you sure you want to remove the leadership
-          assignment for{" "}
-          <strong>{leaderName}</strong>?
+        <p id="delete-leader-description">
+          Are you sure you want to remove
+          the leadership assignment for{" "}
+          <strong>
+            {leaderName}
+          </strong>
+          ?
         </p>
 
         {/* ==========================================
             LEADER SUMMARY
         ========================================== */}
 
-        <div className="delete-summary">
-
-          {/* Leader */}
-
-          <div className="delete-summary-item">
-
+        <div className="delete-leader-summary">
+          <div className="delete-leader-summary-item">
             <span>
-              <UserRound size={14} />
+              <UserRound
+                size={14}
+                aria-hidden="true"
+              />
+
               Leader
             </span>
 
             <strong>
               {leaderName}
             </strong>
-
           </div>
 
-          {/* Position */}
-
-          <div className="delete-summary-item">
-
+          <div className="delete-leader-summary-item">
             <span>
               Position
             </span>
 
             <strong>
-              {leader.position || "-"}
+              {formatLabel(
+                leader.position
+              )}
             </strong>
-
           </div>
 
-          {/* Category */}
-
-          <div className="delete-summary-item">
-
+          <div className="delete-leader-summary-item">
             <span>
               Category
             </span>
@@ -120,15 +152,10 @@ export default function DeleteLeaderDialog({
                 leader.category
               )}
             </strong>
-
           </div>
 
-          {/* Department */}
-
           {leader.department && (
-
-            <div className="delete-summary-item">
-
+            <div className="delete-leader-summary-item">
               <span>
                 Department
               </span>
@@ -138,17 +165,11 @@ export default function DeleteLeaderDialog({
                   leader.department
                 )}
               </strong>
-
             </div>
-
           )}
 
-          {/* Scope */}
-
           {leader.scope && (
-
-            <div className="delete-summary-item">
-
+            <div className="delete-leader-summary-item">
               <span>
                 Scope
               </span>
@@ -158,89 +179,71 @@ export default function DeleteLeaderDialog({
                   leader.scope
                 )}
               </strong>
-
             </div>
-
           )}
 
-          {/* Geography */}
-
           {!isPatron && (
-
-            <div className="delete-summary-item">
-
+            <div className="delete-leader-summary-item">
               <span>
-                <MapPin size={14} />
+                <MapPin
+                  size={14}
+                  aria-hidden="true"
+                />
+
                 Location
               </span>
 
               <strong>
-
-                {[
-                  leader.ward,
-                  leader.constituency,
-                  leader.county,
-                ]
-                  .filter(Boolean)
-                  .join(", ") || "-"}
-
+                {location || "-"}
               </strong>
-
             </div>
-
           )}
 
-          {/* Patron Organization */}
-
           {isPatron &&
-            leader.patron?.organization && (
-
-              <div className="delete-summary-item">
-
+            leader.patron
+              ?.organization && (
+              <div className="delete-leader-summary-item">
                 <span>
                   Organization
                 </span>
 
                 <strong>
-                  {leader.patron.organization}
+                  {
+                    leader.patron
+                      .organization
+                  }
                 </strong>
-
               </div>
-
             )}
-
         </div>
 
         {/* ==========================================
             WARNING
         ========================================== */}
 
-        <div className="delete-warning">
-
+        <div className="delete-leader-warning">
           <strong>
             Important:
           </strong>{" "}
 
-          This will permanently remove the leadership
-          assignment. The{" "}
+          This action permanently removes
+          the leadership assignment. The{" "}
 
           {isPatron
             ? "patron record"
-            : "member account"}
+            : "member account"}{" "}
 
-          {" "}will remain in the system.
-
+          will remain in the system.
         </div>
 
         {/* ==========================================
             ACTIONS
         ========================================== */}
 
-        <div className="modal-actions">
-
+        <div className="delete-leader-actions">
           <button
             type="button"
-            className="btn-secondary"
+            className="delete-leader-cancel"
             onClick={onCancel}
             disabled={loading}
           >
@@ -249,7 +252,7 @@ export default function DeleteLeaderDialog({
 
           <button
             type="button"
-            className="btn-danger"
+            className="delete-leader-confirm"
             disabled={loading}
             onClick={() =>
               onConfirm(leader)
@@ -259,9 +262,7 @@ export default function DeleteLeaderDialog({
               ? "Removing..."
               : "Remove Leader"}
           </button>
-
         </div>
-
       </div>
     </div>
   );

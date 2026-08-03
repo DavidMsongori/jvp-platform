@@ -82,17 +82,31 @@ const normalizeNationalId = (nationalId = "") =>
   String(nationalId).trim().replace(/\s+/g, "");
 
 const normalizePhone = (phone = "") => {
-  let normalized = String(phone).trim().replace(/[\s()-]/g, "");
+  const normalized = String(phone)
+    .trim()
+    .replace(/[\s()-]/g, "");
 
-  if (normalized.startsWith("+254")) {
-    normalized = `0${normalized.slice(4)}`;
+  if (/^\+254[17]\d{8}$/.test(normalized)) {
+    return normalized;
   }
 
-  if (normalized.startsWith("254")) {
-    normalized = `0${normalized.slice(3)}`;
+  if (/^254[17]\d{8}$/.test(normalized)) {
+    return `+${normalized}`;
   }
 
-  return normalized;
+  if (/^0[17]\d{8}$/.test(normalized)) {
+    return `+254${normalized.slice(1)}`;
+  }
+
+  if (/^[17]\d{8}$/.test(normalized)) {
+    return `+254${normalized}`;
+  }
+
+  throw new SummitServiceError(
+    "Please provide a valid Kenyan mobile phone number.",
+    400,
+    "INVALID_PHONE_NUMBER"
+  );
 };
 
 const getNationalIdLastFour = (nationalId) =>

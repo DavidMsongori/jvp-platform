@@ -814,6 +814,58 @@ const assertCanManageMeeting = (
   }
 };
 
+const assertCanStartMeeting = (
+  meeting,
+  user
+) => {
+  const userId =
+    user?._id ||
+    user?.id;
+
+  const isHost =
+    meeting.isHost(
+      userId
+    );
+
+  const isCoHost =
+    meeting.isCoHost(
+      userId
+    );
+
+  if (
+    !isHost &&
+    !isCoHost
+  ) {
+    throw createServiceError(
+      "Only the meeting host or a co-host can start this meeting.",
+      403,
+      "MEETING_START_FORBIDDEN"
+    );
+  }
+};
+
+const assertCanEndMeeting = (
+  meeting,
+  user
+) => {
+  const userId =
+    user?._id ||
+    user?.id;
+
+  if (
+    !meeting.isHost(
+      userId
+    )
+  ) {
+    throw createServiceError(
+      "Only the primary meeting host can end this meeting.",
+      403,
+      "MEETING_END_FORBIDDEN"
+    );
+  }
+};
+
+
 const assertCanEditMeeting = (
   meeting,
   user
@@ -2457,10 +2509,10 @@ export const startMeeting =
         meetingId
       );
 
-    assertCanManageMeeting(
-      meeting,
-      currentUser
-    );
+   assertCanStartMeeting(
+  meeting,
+  currentUser
+);
 
     if (
       ![
@@ -2871,10 +2923,10 @@ export const endMeeting =
         meetingId
       );
 
-    assertCanManageMeeting(
-      meeting,
-      currentUser
-    );
+    assertCanEndMeeting(
+  meeting,
+  currentUser
+);
 
     if (meeting.status !== "live") {
       throw createServiceError(

@@ -89,10 +89,14 @@ const summitRegistrationSchema = new mongoose.Schema(
     },
 
     phone: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+  type: String,
+  required: true,
+  trim: true,
+  match: [
+    /^\+254[17]\d{8}$/,
+    "Please provide a valid Kenyan mobile phone number.",
+  ],
+},
 
     nationalId: {
       type: String,

@@ -675,6 +675,60 @@ const LeadershipMeetingDetails =
       "hybrid",
     ].includes(meeting?.format);
 
+  /* ========================================================
+   CURRENT USER PERMISSIONS
+======================================================== */
+
+const currentUserId =
+  String(
+    user?._id ||
+    user?.id ||
+    user?.userId ||
+    ""
+  );
+
+const getId = (value) =>
+  String(
+    value?._id ||
+    value?.id ||
+    value?.user?._id ||
+    value?.user?.id ||
+    value?.user ||
+    value ||
+    ""
+  );
+
+const isHost =
+  getId(meeting?.host) ===
+  currentUserId;
+
+const isCoHost =
+  Array.isArray(meeting?.coHosts) &&
+  meeting.coHosts.some(
+    (coHost) =>
+      getId(coHost) ===
+      currentUserId
+  );
+
+const isModerator =
+  Array.isArray(meeting?.moderators) &&
+  meeting.moderators.some(
+    (moderator) =>
+      getId(moderator) ===
+      currentUserId
+  );
+
+const canManageMeeting =
+  isHost ||
+  isCoHost;
+
+const canStartMeeting =
+  isHost ||
+  isCoHost;
+
+const canEndMeeting =
+  isHost;  
+
     /* ========================================================
        ACTION HANDLER
     ======================================================== */
@@ -1249,7 +1303,7 @@ const renderAgenda = () => {
         participants={
           meeting?.participants || []
         }
-        canManage={true}
+      canManage={canManageMeeting}
         onMeetingRefresh={loadMeeting}
       />
     </div>
@@ -1265,7 +1319,7 @@ const renderAgenda = () => {
     <MeetingParticipants
       meetingId={meetingId}
       participants={meeting?.participants || []}
-      canManage={true}
+      canManage={canManageMeeting}
       onMeetingRefresh={loadMeeting}
     />
   );
@@ -1283,7 +1337,7 @@ const renderManagers = () => {
       coHosts={meeting?.coHosts || []}
       moderators={meeting?.moderators || []}
       participants={meeting?.participants || []}
-      canManage={true}
+      canManage={canManageMeeting}
       onMeetingRefresh={loadMeeting}
     />
   );
@@ -1297,7 +1351,7 @@ const renderManagers = () => {
   return (
     <MeetingAttendance
       meetingId={meetingId}
-      canManage={true}
+      canManage={canManageMeeting}
       onMeetingRefresh={loadMeeting}
     />
   );
@@ -1312,7 +1366,7 @@ const renderManagers = () => {
     <MeetingDocuments
       meetingId={meetingId}
       documents={meeting?.documents || []}
-      canManage={true}
+      canManage={canManageMeeting}
       onMeetingRefresh={loadMeeting}
     />
   );
@@ -1328,7 +1382,7 @@ const renderManagers = () => {
       meetingId={meetingId}
       meetingTitle={meeting?.title || ""}
       minutes={meeting?.minutes || null}
-      canManage={true}
+      canManage={canManageMeeting}
       canApprove={true}
       onMeetingRefresh={loadMeeting}
     />
@@ -1344,7 +1398,7 @@ const renderManagers = () => {
     <MeetingResolutions
       meetingId={meetingId}
       resolutions={meeting?.resolutions || []}
-      canManage={true}
+      canManage={canManageMeeting}
       canApprove={true}
       onMeetingRefresh={loadMeeting}
     />
@@ -1360,7 +1414,7 @@ const renderManagers = () => {
     <MeetingActionItems
       meetingId={meetingId}
       actionItems={meeting?.actionItems || []}
-      canManage={true}
+      canManage={canManageMeeting}
       onMeetingRefresh={loadMeeting}
     />
   );
@@ -1380,7 +1434,7 @@ const renderManagers = () => {
       recording={
         meeting?.recording || null
       }
-      canManage={true}
+      canManage={canManageMeeting}
       onMeetingRefresh={loadMeeting}
     />
   );
@@ -1394,7 +1448,7 @@ const renderRoomControls = () => {
     <MeetingLiveRoomControls
       meetingId={meetingId}
       meeting={meeting}
-      canManage={true}
+      canManage={canManageMeeting}
       onMeetingRefresh={loadMeeting}
     />
   );
@@ -1422,7 +1476,7 @@ const renderRoomControls = () => {
         localStorage.getItem("accessToken") ||
         ""
       }
-       canManage={true}
+       canManage={canManageMeeting}
   enterRoom={enterLiveRoom}
   onMeetingRefresh={loadMeeting}
   onLiveRoomExit={() => {
@@ -1630,12 +1684,11 @@ const renderRoomControls = () => {
             </div>
 
             <div className="leadership-details-header__actions">
-              {[
-                "draft",
-                "postponed",
-              ].includes(
-                meeting.status
-              ) && (
+              {isHost &&
+  [
+    "draft",
+    "postponed",
+  ].includes(meeting.status) && (
                 <button
                   type="button"
                   className="leadership-details-button leadership-details-button--primary"
@@ -1651,7 +1704,8 @@ const renderRoomControls = () => {
               )}
 
               {meeting.status ===
-                "scheduled" && (
+  "scheduled" &&
+  canStartMeeting && (
                 <button
                   type="button"
                   className="leadership-details-button leadership-details-button--success"
@@ -1680,27 +1734,24 @@ const renderRoomControls = () => {
   Join Room
 </button>
 
-                  <button
-                    type="button"
-                    className="leadership-details-button leadership-details-button--danger"
-                    onClick={
-                      handleEnd
-                    }
-                    disabled={
-                      actionLoading
-                    }
-                  >
-                    End Meeting
-                  </button>
+                  {canEndMeeting && (
+  <button
+    type="button"
+    className="leadership-details-button leadership-details-button--danger"
+    onClick={handleEnd}
+    disabled={actionLoading}
+  >
+    End Meeting
+  </button>
+)}
                 </>
               )}
 
-              {![
-                "completed",
-                "cancelled",
-              ].includes(
-                meeting.status
-              ) && (
+             {isHost &&
+  ![
+    "completed",
+    "cancelled",
+  ].includes(meeting.status) && (
                 <button
                   type="button"
                   className="leadership-details-button leadership-details-button--light"

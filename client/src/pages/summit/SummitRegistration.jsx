@@ -8,8 +8,6 @@ import {
 
 import {
   Link,
-  useNavigate,
-  useSearchParams,
 } from "react-router-dom";
 
 import {
@@ -19,7 +17,6 @@ import {
   CalendarDays,
   CheckCircle2,
   LoaderCircle,
-  LogIn,
   Mail,
   MapPin,
   RefreshCw,
@@ -27,7 +24,6 @@ import {
   Ticket,
   User,
   UserCheck,
-  UserPlus,
 } from "lucide-react";
 
 import Navbar from "../../components/layout/Navbar";
@@ -50,15 +46,6 @@ import "./SummitRegistration.css";
 const SUMMIT_SLUG =
   import.meta.env.VITE_SUMMIT_SLUG ||
   "coast-youth-summit-2026";
-
-const SUMMIT_REGISTRATION_PATH =
-  "/summit/register";
-
-const MEMBER_LOGIN_PATH =
-  "/login";
-
-const MEMBERSHIP_REGISTRATION_PATH =
-  "/register";
 
 const COUNTY_OPTIONS = [
   {
@@ -87,16 +74,8 @@ const COUNTY_OPTIONS = [
   },
 ];
 
-const PATHWAY_STEPS = {
-  MEMBER_QUESTION: "member_question",
-  MEMBERSHIP_QUESTION: "membership_question",
-  FORM: "registration_form",
-};
-
-const REGISTRATION_MODES = {
-  MEMBER: "member",
-  PUBLIC: "public",
-};
+const REGISTRATION_MODE =
+  "public";
 
 const INITIAL_FORM = {
   fullName: "",
@@ -491,160 +470,12 @@ const FormField = ({
 };
 
 /* ==========================================
-   REGISTRATION PATHWAY
-========================================== */
-
-const RegistrationPathway = ({
-  step,
-  onRegisteredMember,
-  onNotMember,
-  onJoinJvp,
-  onContinuePublic,
-  onBack,
-}) => {
-  if (
-    step ===
-    PATHWAY_STEPS.MEMBER_QUESTION
-  ) {
-    return (
-      <section className="summit-registration-pathway-card">
-        <span className="summit-registration-pathway-icon">
-          <UserCheck size={32} />
-        </span>
-
-        <span className="summit-registration-pathway-label">
-          Registration pathway
-        </span>
-
-        <h1>
-          Are you a registered member
-          of JVP?
-        </h1>
-
-        <p>
-          Registered members can sign
-          in and use their saved JVP
-          membership information to
-          complete summit registration.
-        </p>
-
-        <div className="summit-registration-pathway-actions">
-          <button
-            type="button"
-            className="primary"
-            onClick={
-              onRegisteredMember
-            }
-          >
-            <LogIn size={18} />
-            Yes, I am a member
-          </button>
-
-          <button
-            type="button"
-            onClick={onNotMember}
-          >
-            <User size={18} />
-            No, I am not a member
-          </button>
-        </div>
-
-        <Link
-          to="/summit"
-          className="summit-registration-pathway-link"
-        >
-          <ArrowLeft size={16} />
-          Return to summit information
-        </Link>
-      </section>
-    );
-  }
-
-  if (
-    step ===
-    PATHWAY_STEPS.MEMBERSHIP_QUESTION
-  ) {
-    return (
-      <section className="summit-registration-pathway-card">
-        <span className="summit-registration-pathway-icon">
-          <UserPlus size={32} />
-        </span>
-
-        <span className="summit-registration-pathway-label">
-          JVP membership
-        </span>
-
-        <h1>
-          Would you like to register
-          as a JVP member?
-        </h1>
-
-        <p>
-          You may first register as a
-          JVP member and return to this
-          page with your profile details
-          prefilled. You may also
-          continue without creating a
-          membership account.
-        </p>
-
-        <div className="summit-registration-pathway-actions">
-          <button
-            type="button"
-            className="primary"
-            onClick={onJoinJvp}
-          >
-            <UserPlus size={18} />
-            Yes, register as a member
-          </button>
-
-          <button
-            type="button"
-            onClick={
-              onContinuePublic
-            }
-          >
-            <ArrowRight size={18} />
-            No, continue as public
-          </button>
-        </div>
-
-        <button
-          type="button"
-          className="summit-registration-pathway-back"
-          onClick={onBack}
-        >
-          <ArrowLeft size={16} />
-          Go back
-        </button>
-      </section>
-    );
-  }
-
-  return null;
-};
-
-/* ==========================================
    MAIN COMPONENT
 ========================================== */
 
 const SummitRegistration = () => {
-  const navigate = useNavigate();
-
-  const [
-    searchParams,
-  ] = useSearchParams();
-
-  const memberPrefilledRef =
-    useRef(false);
-
-  const {
-  user,
-  member,
+ const {
   loading: authLoading,
-  isAuthenticated,
-  membershipActive,
-  refreshProfile,
 } = useAuth();
 
  const {
@@ -664,23 +495,6 @@ const SummitRegistration = () => {
 } = useSummit();
 
   const [
-    pathwayStep,
-    setPathwayStep,
-  ] = useState(
-    PATHWAY_STEPS.MEMBER_QUESTION
-  );
-
-  const [
-    registrationMode,
-    setRegistrationMode,
-  ] = useState(null);
-
-  const [
-    registrationSource,
-    setRegistrationSource,
-  ] = useState(null);
-
-  const [
     form,
     setForm,
   ] = useState(INITIAL_FORM);
@@ -696,17 +510,10 @@ const SummitRegistration = () => {
   ] = useState(null);
 
   const [
-    profileRefreshLoading,
-    setProfileRefreshLoading,
-  ] = useState(false);
-
-  const [
     profileMessage,
     setProfileMessage,
   ] = useState("");
 
-  const returnSource =
-    searchParams.get("source");
 
   const summitEvent = useMemo(
     () =>
@@ -749,9 +556,6 @@ const SummitRegistration = () => {
       ?.isOpen === true ||
     registrationStatus === "open";
 
-  const authenticatedMember =
-    isAuthenticated &&
-    isMemberProfileAvailable(member);
 
   /* ========================================
      LOAD SUMMIT
@@ -778,245 +582,6 @@ const SummitRegistration = () => {
   }, [
     loadSummit,
     clearRegistrationState,
-  ]);
-
-  /* ========================================
-     MEMBER PREFILL
-  ======================================== */
-
-  const prefillMemberForm =
-    useCallback(() => {
-      if (
-        !user ||
-        !member ||
-        memberPrefilledRef.current
-      ) {
-        return;
-      }
-
-      const memberCounty =
-        getCountyName(
-          member?.county
-        );
-
-      setForm((current) => ({
-        ...current,
-
-        fullName:
-          getMemberFullName(
-            member
-          ) ||
-          current.fullName,
-
-        email:
-          user?.email ||
-          member?.email ||
-          current.email,
-
-        phone:
-          member?.phone ||
-          member?.phoneNumber ||
-          current.phone,
-
-        /*
-         * National ID may be hidden by
-         * the profile endpoint because
-         * the model uses select: false.
-         */
-        nationalId:
-          member?.nationalId ||
-          current.nationalId,
-
-        county:
-          memberCounty ||
-          current.county,
-
-        constituency:
-          member?.constituency ||
-          current.constituency,
-
-        ward:
-          member?.ward ||
-          current.ward,
-      }));
-
-      memberPrefilledRef.current =
-        true;
-    }, [
-      user,
-      member,
-    ]);
-
-  useEffect(() => {
-    if (
-      authLoading ||
-      !authenticatedMember
-    ) {
-      return;
-    }
-
-    setRegistrationMode(
-      REGISTRATION_MODES.MEMBER
-    );
-
-    setRegistrationSource(
-      returnSource ===
-        "membership_registration"
-        ? "membership_registration"
-        : "public_member_login"
-    );
-
-    setPathwayStep(
-      PATHWAY_STEPS.FORM
-    );
-
-    prefillMemberForm();
-  }, [
-    authLoading,
-    authenticatedMember,
-    returnSource,
-    prefillMemberForm,
-  ]);
-
-  /* ========================================
-     PATHWAY ACTIONS
-  ======================================== */
-
-  const handleRegisteredMember =
-    () => {
-      if (authenticatedMember) {
-        setRegistrationMode(
-          REGISTRATION_MODES.MEMBER
-        );
-
-        setRegistrationSource(
-          "public_member_login"
-        );
-
-        setPathwayStep(
-          PATHWAY_STEPS.FORM
-        );
-
-        prefillMemberForm();
-        return;
-      }
-
-      const redirect =
-        encodeURIComponent(
-          SUMMIT_REGISTRATION_PATH
-        );
-
-      navigate(
-        `${MEMBER_LOGIN_PATH}?redirect=${redirect}&source=summit`
-      );
-    };
-
-  const handleNotMember = () => {
-    setPathwayStep(
-      PATHWAY_STEPS.MEMBERSHIP_QUESTION
-    );
-  };
-
-  const handleJoinJvp = () => {
-    const redirect =
-      encodeURIComponent(
-        `${SUMMIT_REGISTRATION_PATH}?source=membership_registration`
-      );
-
-    navigate(
-      `${MEMBERSHIP_REGISTRATION_PATH}?redirect=${redirect}&source=summit`
-    );
-  };
-
-  const handleContinuePublic =
-    () => {
-      setRegistrationMode(
-        REGISTRATION_MODES.PUBLIC
-      );
-
-      setRegistrationSource(
-        "public_guest"
-      );
-
-      setForm(INITIAL_FORM);
-      setErrors({});
-      setProfileMessage("");
-
-      setPathwayStep(
-        PATHWAY_STEPS.FORM
-      );
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    };
-
-  const handleChangePathway =
-    () => {
-      setRegistrationMode(null);
-      setRegistrationSource(null);
-
-      setForm(INITIAL_FORM);
-      setErrors({});
-      setProfileMessage("");
-
-      memberPrefilledRef.current =
-        false;
-
-      setPathwayStep(
-        PATHWAY_STEPS.MEMBER_QUESTION
-      );
-
-      clearRegistrationState();
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    };
-
-  /* ========================================
-     REFRESH MEMBER PROFILE
-  ======================================== */
-
-  const handleRefreshMember =
-    async () => {
-      setProfileRefreshLoading(true);
-      setProfileMessage("");
-
-      try {
-        await refreshProfile();
-
-        memberPrefilledRef.current =
-          false;
-
-        setProfileMessage(
-          "Your latest member profile has been loaded."
-        );
-      } catch {
-        setProfileMessage(
-          "We could not refresh your member profile."
-        );
-      } finally {
-        setProfileRefreshLoading(
-          false
-        );
-      }
-    };
-
-  useEffect(() => {
-    if (
-      authenticatedMember &&
-      !memberPrefilledRef.current
-    ) {
-      prefillMemberForm();
-    }
-  }, [
-    authenticatedMember,
-    member,
-    user,
-    prefillMemberForm,
   ]);
 
   /* ========================================
@@ -1081,23 +646,6 @@ const SummitRegistration = () => {
   ) => {
     event.preventDefault();
 
-    if (!registrationMode) {
-      setProfileMessage(
-        "Select a registration pathway before submitting."
-      );
-      return;
-    }
-
-    if (
-      registrationMode ===
-        REGISTRATION_MODES.MEMBER &&
-      !authenticatedMember
-    ) {
-      setProfileMessage(
-        "Please sign in again before registering as a JVP member."
-      );
-      return;
-    }
 
     const validationErrors =
       validateForm(form);
@@ -1125,10 +673,6 @@ const SummitRegistration = () => {
         form.nationalId
       );
 
-    const registeringAsMember =
-      registrationMode ===
-      REGISTRATION_MODES.MEMBER;
-
    const summitEventId =
   summit?._id ||
   summit?.id ||
@@ -1148,41 +692,21 @@ const payload = {
 
   summitSlug: SUMMIT_SLUG,
 
-      participantType:
-        registeringAsMember
-          ? "member"
-          : "public",
+      participantType: "public",
 
-      registrationSource:
-        registeringAsMember
-          ? registrationSource ||
-            "public_member_login"
-          : "public_guest",
+registrationSource:
+  "public_guest",
 
-      isRegisteredMember:
-        registeringAsMember,
+isRegisteredMember: false,
 
-      membershipInterest:
-        false,
+membershipInterest: false,
 
-      membershipRegistrationStarted:
-        registrationSource ===
-        "membership_registration",
+membershipRegistrationStarted:
+  false,
 
-      /*
-       * Member and user references are
-       * included only for authenticated
-       * JVP members.
-       */
-     userId:
-  registeringAsMember
-    ? getUserId(user)
-    : undefined,
+userId: undefined,
 
-memberId:
-  registeringAsMember
-    ? getMemberId(member)
-    : undefined,
+memberId: undefined,
 
       fullName: cleanText(
         form.fullName
@@ -1295,42 +819,24 @@ memberId:
     }
   };
 
-  const handleNewRegistration =
-    () => {
-      setSubmittedRegistration(
-        null
-      );
+ const handleNewRegistration =
+  () => {
+    setSubmittedRegistration(
+      null
+    );
 
-      setErrors({});
-      setProfileMessage("");
+    setErrors({});
+    setProfileMessage("");
 
-      clearRegistrationState();
+    clearRegistrationState();
 
-      /*
-       * Keep the member's details when
-       * an authenticated member returns
-       * to the form.
-       */
-      if (authenticatedMember) {
-        setForm((current) => ({
-          ...current,
-          acceptedTerms: false,
-          consentedToCommunication:
-            false,
-        }));
+    setForm(INITIAL_FORM);
 
-        return;
-      }
-
-      setForm(INITIAL_FORM);
-
-      setRegistrationMode(null);
-      setRegistrationSource(null);
-
-      setPathwayStep(
-        PATHWAY_STEPS.MEMBER_QUESTION
-      );
-    };
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   /* ========================================
      INITIAL LOADING
@@ -1457,47 +963,7 @@ memberId:
     );
   }
 
-  /* ========================================
-     PATHWAY QUESTIONS
-  ======================================== */
-
-  if (
-    pathwayStep !==
-    PATHWAY_STEPS.FORM
-  ) {
-    return (
-      <>
-        <Navbar />
-
-        <main className="summit-registration-page">
-          <section className="summit-registration-pathway-wrapper">
-            <RegistrationPathway
-              step={pathwayStep}
-              onRegisteredMember={
-                handleRegisteredMember
-              }
-              onNotMember={
-                handleNotMember
-              }
-              onJoinJvp={
-                handleJoinJvp
-              }
-              onContinuePublic={
-                handleContinuePublic
-              }
-              onBack={() =>
-                setPathwayStep(
-                  PATHWAY_STEPS.MEMBER_QUESTION
-                )
-              }
-            />
-          </section>
-        </main>
-
-        <Footer />
-      </>
-    );
-  }
+  
 
   /* ========================================
      SUCCESS
@@ -1515,10 +981,10 @@ memberId:
       submittedRegistration?.status ||
       "confirmed";
 
-    const resultParticipantType =
-      submittedRegistration
-        ?.participantType ||
-      registrationMode;
+   const resultParticipantType =
+  submittedRegistration
+    ?.participantType ||
+  REGISTRATION_MODE;
 
     return (
       <>
@@ -1722,11 +1188,8 @@ memberId:
             <div className="summit-registration-hero-grid">
               <div>
                 <span className="summit-registration-kicker">
-                  {registrationMode ===
-                  REGISTRATION_MODES.MEMBER
-                    ? "JVP member registration"
-                    : "Public summit registration"}
-                </span>
+  Summit registration
+</span>
 
                 <h1>
                   Register for{" "}
@@ -1793,48 +1256,6 @@ memberId:
 
         <section className="summit-registration-content">
           <div className="summit-registration-container">
-            <div
-              className={`summit-registration-mode-banner ${
-                registrationMode ===
-                REGISTRATION_MODES.MEMBER
-                  ? "member"
-                  : "public"
-              }`}
-            >
-              {registrationMode ===
-              REGISTRATION_MODES.MEMBER ? (
-                <UserCheck size={20} />
-              ) : (
-                <User size={20} />
-              )}
-
-              <div>
-                <strong>
-                  {registrationMode ===
-                  REGISTRATION_MODES.MEMBER
-                    ? "Registering as a JVP member"
-                    : "Registering as a public participant"}
-                </strong>
-
-                <span>
-                  {registrationMode ===
-                  REGISTRATION_MODES.MEMBER
-                    ? membershipActive
-                      ? "Your active JVP membership profile has been used to prefill this form."
-                      : "Your JVP account is signed in. Confirm the details below before submitting."
-                    : "This summit registration will not create a JVP membership account."}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={
-                  handleChangePathway
-                }
-              >
-                Change
-              </button>
-            </div>
 
             {profileMessage && (
               <div className="summit-registration-profile-message">
@@ -1989,12 +1410,7 @@ memberId:
                       error={
                         errors.nationalId
                       }
-                      hint={
-                        registrationMode ===
-                        REGISTRATION_MODES.MEMBER
-                          ? "For security, your saved National ID may not be returned by the profile API. Enter it again when blank."
-                          : "This is used to prevent duplicate summit registrations."
-                      }
+                      hint="This is used to prevent duplicate summit registrations."
                       className="full-width"
                     >
                       <input
@@ -2331,51 +1747,6 @@ memberId:
               </form>
 
               <aside className="summit-registration-sidebar">
-                {registrationMode ===
-                  REGISTRATION_MODES.MEMBER && (
-                  <section>
-                    <span>
-                      <UserCheck
-                        size={22}
-                      />
-                    </span>
-
-                    <h2>
-                      Member registration
-                    </h2>
-
-                    <p>
-                      This registration
-                      will be linked to
-                      your JVP user and
-                      member records.
-                    </p>
-
-                    <button
-                      type="button"
-                      className="summit-registration-sidebar-button"
-                      onClick={
-                        handleRefreshMember
-                      }
-                      disabled={
-                        profileRefreshLoading
-                      }
-                    >
-                      <RefreshCw
-                        size={16}
-                        className={
-                          profileRefreshLoading
-                            ? "summit-registration-spinning"
-                            : ""
-                        }
-                      />
-
-                      {profileRefreshLoading
-                        ? "Refreshing..."
-                        : "Refresh member details"}
-                    </button>
-                  </section>
-                )}
 
                 <section>
                   <span>

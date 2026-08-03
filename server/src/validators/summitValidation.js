@@ -85,8 +85,16 @@ const normalizePhone = (value) => {
   }
 
   if (/^[17]\d{8}$/.test(trimmedValue)) {
-    return `+254${trimmedValue}`;
-  }
+  return `+254${trimmedValue}`;
+}
+
+if (/^0[17]\d{8}$/.test(trimmedValue)) {
+  return `+254${trimmedValue.slice(1)}`;
+}
+
+if (/^254[17]\d{8}$/.test(trimmedValue)) {
+  return `+${trimmedValue}`;
+}
 
   return trimmedValue;
 };

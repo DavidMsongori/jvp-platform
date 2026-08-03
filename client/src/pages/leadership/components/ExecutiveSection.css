@@ -3,7 +3,7 @@
 ========================================================== */
 
 .executive-section {
-  padding: 80px 0;
+  padding: 64px 0;
 }
 
 /* ==========================================================
@@ -12,40 +12,37 @@
 
 .executive-header {
   max-width: 760px;
-
-  margin: 0 auto 48px;
-
+  margin: 0 auto 40px;
+  padding: 0 16px;
   text-align: center;
 }
 
 .section-tag {
   display: inline-block;
 
-  padding: 8px 18px;
+  padding: 7px 15px;
 
   border-radius: 999px;
 
   background: rgba(0, 75, 141, 0.08);
-
   color: #004b8d;
 
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
 
   letter-spacing: 0.08em;
-
   text-transform: uppercase;
 }
 
 .executive-header h2 {
-  margin: 18px 0 14px;
+  margin: 15px 0 12px;
 
   color: #0f172a;
 
   font-size: clamp(
-    2rem,
-    4vw,
-    2.7rem
+    1.8rem,
+    3vw,
+    2.4rem
   );
 
   line-height: 1.15;
@@ -56,12 +53,12 @@
 
   color: #64748b;
 
-  font-size: 1.02rem;
-  line-height: 1.8;
+  font-size: 0.95rem;
+  line-height: 1.7;
 }
 
 /* ==========================================================
-   GRID
+   GRID — 6 CARDS ON LARGE DESKTOP
 ========================================================== */
 
 .executive-grid {
@@ -71,26 +68,25 @@
 
   grid-template-columns:
     repeat(
-      3,
+      6,
       minmax(0, 1fr)
     );
 
-  gap: 26px;
+  gap: 14px;
 
   align-items: stretch;
 }
 
 /* ==========================================================
-   EXECUTIVE CARD SIZE CONTROL
+   CARD SIZE CONTROL
 ========================================================== */
 
 .executive-grid > * {
   width: 100%;
   min-width: 0;
+  max-width: none;
 
-  max-width: 390px;
-
-  justify-self: center;
+  justify-self: stretch;
 }
 
 /* ==========================================================
@@ -99,7 +95,7 @@
 
 .executive-grid img {
   width: 100%;
-  height: 310px;
+  height: 190px;
 
   display: block;
 
@@ -113,20 +109,43 @@
 
 .executive-grid h3,
 .executive-grid h4 {
-  font-size: 1.15rem;
-  line-height: 1.3;
+  margin-top: 0;
+
+  font-size: 0.92rem;
+  line-height: 1.25;
 }
 
-.executive-grid p {
-  line-height: 1.55;
+.executive-grid p,
+.executive-grid span,
+.executive-grid small {
+  font-size: 0.72rem;
+  line-height: 1.4;
 }
 
 /* ==========================================================
    LARGE DESKTOP
 ========================================================== */
 
-@media (min-width: 1400px) {
+@media (min-width: 1600px) {
+  .executive-grid {
+    gap: 18px;
+  }
 
+  .executive-grid img {
+    height: 220px;
+  }
+
+  .executive-grid h3,
+  .executive-grid h4 {
+    font-size: 1rem;
+  }
+}
+
+/* ==========================================================
+   STANDARD LAPTOP
+========================================================== */
+
+@media (max-width: 1350px) {
   .executive-grid {
     grid-template-columns:
       repeat(
@@ -134,24 +153,46 @@
         minmax(0, 1fr)
       );
 
-    gap: 24px;
-  }
-
-  .executive-grid > * {
-    max-width: 340px;
+    gap: 16px;
   }
 
   .executive-grid img {
-    height: 280px;
+    height: 230px;
   }
-
 }
 
 /* ==========================================================
    TABLET
 ========================================================== */
 
-@media (max-width: 1100px) {
+@media (max-width: 1000px) {
+  .executive-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+
+    gap: 18px;
+  }
+
+  .executive-grid img {
+    height: 240px;
+  }
+}
+
+/* ==========================================================
+   SMALL TABLET
+========================================================== */
+
+@media (max-width: 760px) {
+  .executive-section {
+    padding: 52px 0;
+  }
+
+  .executive-header {
+    margin-bottom: 30px;
+  }
 
   .executive-grid {
     grid-template-columns:
@@ -160,76 +201,43 @@
         minmax(0, 1fr)
       );
 
-    gap: 24px;
+    gap: 16px;
   }
 
-  .executive-grid > * {
-    max-width: 420px;
+  .executive-grid img {
+    height: 240px;
   }
-
 }
 
 /* ==========================================================
    MOBILE
 ========================================================== */
 
-@media (max-width: 768px) {
-
+@media (max-width: 520px) {
   .executive-section {
-    padding: 64px 0;
-  }
-
-  .executive-header {
-    margin-bottom: 36px;
-
-    padding: 0 8px;
+    padding: 44px 0;
   }
 
   .executive-header h2 {
-    font-size: 2rem;
+    font-size: 1.7rem;
   }
 
   .executive-header p {
-    font-size: 0.98rem;
-    line-height: 1.7;
+    font-size: 0.9rem;
   }
 
   .executive-grid {
     grid-template-columns: 1fr;
 
-    gap: 22px;
+    gap: 18px;
   }
 
   .executive-grid > * {
-    max-width: 420px;
-  }
-
-  .executive-grid img {
-    height: 300px;
-  }
-
-}
-
-/* ==========================================================
-   SMALL PHONES
-========================================================== */
-
-@media (max-width: 480px) {
-
-  .executive-section {
-    padding: 52px 0;
-  }
-
-  .executive-header h2 {
-    font-size: 1.75rem;
-  }
-
-  .executive-grid > * {
-    max-width: 100%;
+    max-width: 360px;
+    justify-self: center;
   }
 
   .executive-grid img {
     height: 280px;
   }
-
 }
