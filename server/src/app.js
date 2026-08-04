@@ -21,6 +21,7 @@ import userRoutes from "./routes/user.routes.js";
 import publicSummitRoutes from "./routes/publicSummit.routes.js";
 import adminSummitRoutes from "./routes/adminSummit.routes.js";
 import summitExhibitorRoutes from "./routes/summitExhibitor.routes.js";
+import intasendRoutes from "./routes/intasend.routes.js";
 
 const app = express();
 
@@ -130,28 +131,55 @@ app.get("/", (req, res) => {
    API ROUTES
 ========================================================== */
 
+/* ---------- System ---------- */
+
 app.use("/api/health", healthRoutes);
+
+/* ---------- Authentication ---------- */
 
 app.use("/api/auth", authRoutes);
 
-app.use("/api/member", memberRoutes);
+/* ---------- Members ---------- */
 
+app.use("/api/member", memberRoutes);
 app.use("/api/users", userRoutes);
+
+/* ---------- Payments ---------- */
+
+app.use(
+  "/api/payments/intasend",
+  intasendRoutes
+);
 
 app.use("/api/payments", paymentRoutes);
 
+
+
+/* ---------- Administration ---------- */
+
 app.use("/api/admin", adminRoutes);
+
+/* ---------- Events ---------- */
 
 app.use("/api/events", eventRoutes);
 
+/* ---------- Leadership ---------- */
+
 app.use("/api/leaders", leaderRoutes);
 
-app.use("/api/leadership-card", leadershipCardRoutes);
+app.use(
+  "/api/leadership-card",
+  leadershipCardRoutes
+);
+
+/* ---------- Meetings ---------- */
 
 app.use(
   "/api/meetings",
   meetingRoutes
 );
+
+/* ---------- Summit ---------- */
 
 app.use(
   "/api/summit/public",
@@ -164,10 +192,9 @@ app.use(
 );
 
 app.use(
-  "/api/summit-exhibitors",
+  "/api/summit/exhibitors",
   summitExhibitorRoutes
 );
-
 
 /* ==========================================================
    404

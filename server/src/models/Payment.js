@@ -9,6 +9,7 @@ const PAYMENT_FOR = [
   "renewal",
   "event",
   "summit",
+   "summit_exhibitor",
   "donation",
 ];
 
@@ -17,6 +18,7 @@ const PAYMENT_METHODS = [
   "card",
   "bank",
   "cash",
+  "unknown",
 ];
 
 const PAYMENT_STATUSES = [
@@ -27,6 +29,12 @@ const PAYMENT_STATUSES = [
   "cancelled",
   "expired",
   "refunded",
+];
+
+const PAYMENT_PROVIDERS = [
+  "intasend",
+  "mpesa_direct",
+  "manual",
 ];
 
 /* ==========================================
@@ -77,6 +85,13 @@ const paymentSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+
+    summitExhibitor: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "SummitExhibitor",
+  default: null,
+  index: true,
+},
 
     /* ==========================================
        INTERNAL REFERENCES
@@ -134,11 +149,18 @@ const paymentSchema = new mongoose.Schema(
     /* ==========================================
        PAYMENT METHOD
     ========================================== */
+    provider: {
+  type: String,
+  enum: PAYMENT_PROVIDERS,
+  default: "intasend",
+  required: true,
+  index: true,
+},
 
     paymentMethod: {
       type: String,
       enum: PAYMENT_METHODS,
-      default: "mpesa",
+      default: "unknown",
       required: true,
       index: true,
     },
@@ -274,6 +296,101 @@ const paymentSchema = new mongoose.Schema(
     },
 
     /* ==========================================
+   INTASEND DETAILS
+========================================== */
+
+intasend: {
+  invoiceId: {
+    type: String,
+    default: null,
+    trim: true,
+  },
+
+  apiReference: {
+    type: String,
+    default: null,
+    uppercase: true,
+    trim: true,
+  },
+
+  checkoutUrl: {
+    type: String,
+    default: null,
+    trim: true,
+  },
+
+  state: {
+    type: String,
+    enum: [
+      "PENDING",
+      "PROCESSING",
+      "COMPLETE",
+      "FAILED",
+      null,
+    ],
+    default: null,
+  },
+
+  provider: {
+    type: String,
+    default: null,
+    trim: true,
+  },
+
+  providerReference: {
+    type: String,
+    default: null,
+    trim: true,
+    index: true,
+  },
+
+  charges: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+
+  netAmount: {
+    type: Number,
+    default: null,
+    min: 0,
+  },
+
+  failedReason: {
+    type: String,
+    default: null,
+    trim: true,
+  },
+
+  failedCode: {
+    type: String,
+    default: null,
+    trim: true,
+  },
+
+  webhookReceived: {
+    type: Boolean,
+    default: false,
+  },
+
+  webhookReceivedAt: {
+    type: Date,
+    default: null,
+  },
+
+  statusQueryAttempts: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+
+  lastStatusQueryAt: {
+    type: Date,
+    default: null,
+  },
+},
+
+    /* ==========================================
        GATEWAY DETAILS
     ========================================== */
 
@@ -343,16 +460,17 @@ const paymentSchema = new mongoose.Schema(
     },
 
     verificationMethod: {
-      type: String,
-      enum: [
-        "callback",
-        "status_query",
-        "stk_query",
-        "manual",
-        null,
-      ],
-      default: null,
-    },
+  type: String,
+  enum: [
+    "webhook",
+    "status_query",
+    "callback",
+    "stk_query",
+    "manual",
+    null,
+  ],
+  default: null,
+},
 
     verifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -511,6 +629,19 @@ paymentSchema.index({
   status: 1,
 });
 
+paymentSchema.index({
+  "intasend.invoiceId": 1,
+});
+
+paymentSchema.index({
+  "intasend.apiReference": 1,
+});
+
+paymentSchema.index({
+  summitExhibitor: 1,
+  status: 1,
+});
+
 /* ==========================================
    VIRTUALS
 ========================================== */
@@ -540,15 +671,15 @@ paymentSchema.virtual("isFailed").get(function () {
 
 paymentSchema.pre("validate", function (next) {
   if (
-    this.paymentMethod === "mpesa" &&
-    !this.phoneNumber
-  ) {
-    return next(
-      new Error(
-        "Phone number is required for M-Pesa payments."
-      )
-    );
-  }
+  this.paymentMethod === "mpesa" &&
+  !this.phoneNumber
+) {
+  return next(
+    new Error(
+      "Phone number is required for M-Pesa payments."
+    )
+  );
+}
 
   if (
     this.paymentFor === "event" &&
@@ -572,6 +703,19 @@ paymentSchema.pre("validate", function (next) {
       )
     );
   }
+
+if (
+  this.paymentFor ===
+    "summit_exhibitor" &&
+  !this.summitExhibitor
+) {
+  return next(
+    new Error(
+      "A summit exhibitor payment must be linked to an exhibitor registration."
+    )
+  );
+}
+
 
   if (
     ["membership", "renewal"].includes(
@@ -705,6 +849,165 @@ paymentSchema.methods.markAsFailed = function ({
   return this.save();
 };
 
+paymentSchema.methods.markIntaSendProcessing =
+  function ({
+    invoiceId,
+    apiReference,
+    checkoutUrl,
+    state = "PROCESSING",
+    provider,
+    gatewayResponse,
+  }) {
+    this.provider = "intasend";
+    this.status = "processing";
+    this.initiatedAt =
+      this.initiatedAt || new Date();
+
+    this.intasend.invoiceId =
+      invoiceId || null;
+
+    this.intasend.apiReference =
+      apiReference || this.reference;
+
+    this.intasend.checkoutUrl =
+      checkoutUrl || null;
+
+    this.intasend.state =
+      state;
+
+    this.intasend.provider =
+      provider || null;
+
+    this.gatewayReference =
+      invoiceId || null;
+
+    this.gatewayResponse =
+      gatewayResponse || null;
+
+    return this.save();
+  };
+
+  paymentSchema.methods.markIntaSendSuccessful =
+  function ({
+    invoiceId,
+    providerReference,
+    provider,
+    charges = 0,
+    netAmount,
+    callbackPayload,
+    paidAt,
+    verificationMethod = "webhook",
+  }) {
+    const now = new Date();
+
+    this.provider = "intasend";
+    this.status = "successful";
+
+    this.statusMessage =
+      "Payment completed successfully.";
+
+    this.failureReason = null;
+
+    this.intasend.invoiceId =
+      invoiceId ||
+      this.intasend.invoiceId;
+
+    this.intasend.state =
+      "COMPLETE";
+
+    this.intasend.provider =
+      provider || null;
+
+    this.intasend.providerReference =
+      providerReference || null;
+
+    this.intasend.charges =
+      Number(charges) || 0;
+
+    this.intasend.netAmount =
+      netAmount !== undefined &&
+      netAmount !== null
+        ? Number(netAmount)
+        : null;
+
+    this.intasend.webhookReceived =
+      verificationMethod ===
+      "webhook";
+
+    this.intasend.webhookReceivedAt =
+      verificationMethod ===
+      "webhook"
+        ? now
+        : this.intasend
+            .webhookReceivedAt;
+
+    this.gatewayReference =
+      providerReference ||
+      invoiceId ||
+      this.gatewayReference;
+
+    this.callbackPayload =
+      callbackPayload ||
+      this.callbackPayload;
+
+    this.paidAt =
+      paidAt || now;
+
+    this.verifiedAt = now;
+    this.isVerified = true;
+    this.verificationMethod =
+      verificationMethod;
+
+    return this.save();
+  };
+
+  paymentSchema.methods.markIntaSendFailed =
+  function ({
+    invoiceId,
+    failedReason,
+    failedCode,
+    callbackPayload,
+  }) {
+    const now = new Date();
+
+    this.provider = "intasend";
+    this.status = "failed";
+
+    this.failureReason =
+      failedReason ||
+      "The IntaSend payment was not completed.";
+
+    this.statusMessage =
+      this.failureReason;
+
+    this.intasend.invoiceId =
+      invoiceId ||
+      this.intasend.invoiceId;
+
+    this.intasend.state =
+      "FAILED";
+
+    this.intasend.failedReason =
+      failedReason || null;
+
+    this.intasend.failedCode =
+      failedCode || null;
+
+    this.intasend.webhookReceived =
+      true;
+
+    this.intasend.webhookReceivedAt =
+      now;
+
+    this.callbackPayload =
+      callbackPayload ||
+      this.callbackPayload;
+
+    this.failedAt = now;
+
+    return this.save();
+  };
+
 /* ==========================================
    STATIC METHODS
 ========================================== */
@@ -724,6 +1027,25 @@ paymentSchema.statics.findByMpesaReceipt =
     });
   };
 
+
+  paymentSchema.statics.findByIntaSendInvoiceId =
+  function (invoiceId) {
+    return this.findOne({
+      "intasend.invoiceId":
+        invoiceId,
+    });
+  };
+
+paymentSchema.statics.findByIntaSendApiReference =
+  function (apiReference) {
+    return this.findOne({
+      "intasend.apiReference":
+        apiReference
+          ?.trim()
+          .toUpperCase(),
+    });
+  };
+
 /* ==========================================
    MODEL
 ========================================== */
@@ -736,6 +1058,7 @@ export {
   PAYMENT_FOR,
   PAYMENT_METHODS,
   PAYMENT_STATUSES,
+  PAYMENT_PROVIDERS,
 };
 
 export default Payment;
