@@ -1,25 +1,28 @@
 import {
-  useCallback,
   useEffect,
-  useRef,
   useState,
 } from "react";
 
 import {
   CheckCircle2,
   Circle,
-  Smartphone,
-  ShieldCheck,
+  ExternalLink,
   Loader2,
+  ShieldCheck,
+  Smartphone,
 } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+} from "react-router-dom";
 
-import { useAuth } from "../../context/AuthContext";
+import {
+  useAuth,
+} from "../../context/AuthContext";
 
 import {
   initiateMembershipPayment,
-  checkPaymentStatus,
+  redirectToCheckout,
 } from "../../services/payment.service";
 
 import "./Payment.css";
@@ -34,14 +37,64 @@ const MEMBERSHIP_FEES = {
 };
 
 /* ==========================================
-   STORAGE
+   LOCAL STORAGE
 ========================================== */
 
 const PAYMENT_REFERENCE_KEY =
   "membershipPaymentReference";
 
+const PAYMENT_INVOICE_KEY =
+  "membershipPaymentInvoiceId";
+
+/* ==========================================
+   PHONE NORMALIZATION
+========================================== */
+
+const normalizeKenyanPhone = (
+  value
+) => {
+  const phone = String(
+    value || ""
+  )
+    .trim()
+    .replace(/[\s()-]/g, "");
+
+  if (
+    /^254[17]\d{8}$/.test(
+      phone
+    )
+  ) {
+    return phone;
+  }
+
+  if (
+    /^\+254[17]\d{8}$/.test(
+      phone
+    )
+  ) {
+    return phone.slice(1);
+  }
+
+  if (
+    /^0[17]\d{8}$/.test(
+      phone
+    )
+  ) {
+    return `254${phone.slice(
+      1
+    )}`;
+  }
+
+  return null;
+};
+
+/* ==========================================
+   COMPONENT
+========================================== */
+
 function Payment() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   const {
     member,
@@ -50,42 +103,36 @@ function Payment() {
     refreshProfile,
   } = useAuth();
 
-  const [phone, setPhone] = useState(
+  const [
+    phone,
+    setPhone,
+  ] = useState(
     member?.phone || ""
   );
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  const [checking, setChecking] =
-    useState(false);
+  const [
+    message,
+    setMessage,
+  ] = useState("");
 
-  const [reference, setReference] =
-    useState(() => {
-      return (
-        localStorage.getItem(
-          PAYMENT_REFERENCE_KEY
-        ) || ""
-      );
-    });
-
-  const [message, setMessage] =
-    useState("");
-
-  const [error, setError] =
-    useState("");
-
-  const intervalRef = useRef(null);
-
-  const pollingRequestRef =
-    useRef(false);
+  const [
+    error,
+    setError,
+  ] = useState("");
 
   const membershipType =
     member?.membershipType ||
     "ordinary";
 
   const amount =
-    MEMBERSHIP_FEES[membershipType] ??
+    MEMBERSHIP_FEES[
+      membershipType
+    ] ??
     MEMBERSHIP_FEES.ordinary;
 
   const membershipStatus =
@@ -93,292 +140,32 @@ function Payment() {
     "pending_payment";
 
   const memberNumber =
-    membershipStatus === "active" &&
+    membershipStatus ===
+      "active" &&
     member?.memberNumber
       ? member.memberNumber
       : "Will be assigned after payment";
 
   /* ==========================================
-     CLEAR SAVED PAYMENT
+     KEEP PHONE IN SYNC
   ========================================== */
 
-  const clearSavedPayment =
-    useCallback(() => {
-      localStorage.removeItem(
-        PAYMENT_REFERENCE_KEY
+  useEffect(() => {
+    if (
+      member?.phone &&
+      !phone
+    ) {
+      setPhone(
+        member.phone
       );
-
-      setReference("");
-    }, []);
-
-  /* ==========================================
-     STOP POLLING
-  ========================================== */
-
-  const stopPolling =
-    useCallback(() => {
-      if (intervalRef.current) {
-        clearInterval(
-          intervalRef.current
-        );
-
-        intervalRef.current = null;
-      }
-
-      pollingRequestRef.current =
-        false;
-
-      setChecking(false);
-    }, []);
+    }
+  }, [
+    member?.phone,
+    phone,
+  ]);
 
   /* ==========================================
      REDIRECT ACTIVE MEMBERS
-  ========================================== */
-
- useEffect(() => {
-  if (
-    membershipActive &&
-    membershipFeePaid
-  ) {
-    clearSavedPayment();
-    stopPolling();
-
-    window.location.replace(
-      "/dashboard"
-    );
-  }
-}, [
-  membershipActive,
-  membershipFeePaid,
-  clearSavedPayment,
-  stopPolling,
-]);
-
-  /* ==========================================
-     PAYMENT SUCCESS
-  ========================================== */
-
- const handlePaymentSuccess =
-  useCallback(
-    async (successfulPayment = null) => {
-      stopPolling();
-
-      setError("");
-      setChecking(false);
-
-      const returnedMemberNumber =
-        successfulPayment?.member
-          ?.memberNumber ||
-        member?.memberNumber ||
-        "";
-
-      setMessage(
-        returnedMemberNumber
-          ? `Payment received successfully. Your membership number is ${returnedMemberNumber}. Redirecting to your dashboard...`
-          : "Payment received successfully. Redirecting to your dashboard..."
-      );
-
-      clearSavedPayment();
-
-      try {
-  const refreshedMember =
-    await refreshProfile();
-
-  console.log(
-    "Refreshed member after payment:",
-    refreshedMember
-  );
-
-  if (
-    refreshedMember
-      ?.membershipStatus ===
-      "active" &&
-    refreshedMember
-      ?.membershipFeePaid === true
-  ) {
-    clearSavedPayment();
-
-    navigate("/dashboard", {
-      replace: true,
-    });
-
-    return;
-  }
-} catch (refreshError) {
-  console.error(
-    "Unable to refresh member profile:",
-    refreshError
-  );
-}
-
-      /*
-       * Force the application to reload.
-       * This prevents ProtectedRoute from using
-       * the old pending_payment context state.
-       */
-      setTimeout(() => {
-        window.location.replace(
-          "/dashboard"
-        );
-      }, 1000);
-    },
-    [
-      stopPolling,
-      refreshProfile,
-      clearSavedPayment,
-      member?.memberNumber,
-    ]
-  );
-
-  /* ==========================================
-     CHECK PAYMENT ONCE
-  ========================================== */
-
-  const checkStatus =
-    useCallback(
-      async (paymentReference) => {
-        if (
-          !paymentReference ||
-          pollingRequestRef.current
-        ) {
-          return;
-        }
-
-        pollingRequestRef.current =
-          true;
-
-        try {
-          const response =
-            await checkPaymentStatus(
-              paymentReference
-            );
-
-         const responseData =
-  response?.data?.data ||
-  response?.data ||
-  response ||
-  {};
-
-const payment =
-  responseData.payment ||
-  responseData.data?.payment ||
-  null;
-
-const completed =
-  responseData.completed === true ||
-  responseData.data?.completed === true;
-
-const status =
-  payment?.status;
-
-const membershipProcessed =
-  payment?.membershipProcessed === true;
-
-/*
- * A successful payment should redirect once
- * backend membership processing is complete.
- */
-if (
-  completed === true ||
-  (
-    status === "successful" &&
-    membershipProcessed
-  )
-) {
-  await handlePaymentSuccess(
-    payment
-  );
-
-  return;
-}
-
-          if (
-            status === "failed" ||
-            status === "cancelled" ||
-            status === "expired"
-          ) {
-            stopPolling();
-            clearSavedPayment();
-
-            setMessage("");
-
-            setError(
-              payment?.failureReason ||
-                payment?.statusMessage ||
-                `Payment ${status}. Please try again.`
-            );
-
-            return;
-          }
-
-          /*
-           * A processing status is normal while
-           * waiting for the Safaricom callback.
-           * Do not show it as an error.
-           */
-          setError("");
-
-          setMessage(
-            "Your payment is being processed. Please do not initiate another payment."
-          );
-        } catch (statusError) {
-          console.error(
-            "Unable to check payment status:",
-            statusError
-          );
-
-          /*
-           * Do not clear the reference because
-           * this may only be a temporary network
-           * or backend problem.
-           */
-          setMessage(
-            "Confirming your payment. Please wait..."
-          );
-        } finally {
-          pollingRequestRef.current =
-            false;
-        }
-      },
-      [
-        handlePaymentSuccess,
-        stopPolling,
-        clearSavedPayment,
-      ]
-    );
-
-  /* ==========================================
-     START POLLING
-  ========================================== */
-
-  const startPolling =
-    useCallback(
-      (paymentReference) => {
-        if (!paymentReference) {
-          return;
-        }
-
-        stopPolling();
-
-        setChecking(true);
-
-        checkStatus(paymentReference);
-
-        intervalRef.current =
-          setInterval(() => {
-            checkStatus(
-              paymentReference
-            );
-          }, 5000);
-      },
-      [
-        stopPolling,
-        checkStatus,
-      ]
-    );
-
-  /* ==========================================
-     RESUME PAYMENT AFTER REFRESH
   ========================================== */
 
   useEffect(() => {
@@ -386,150 +173,219 @@ if (
       membershipActive &&
       membershipFeePaid
     ) {
-      return;
-    }
-
-    const savedReference =
-      localStorage.getItem(
+      localStorage.removeItem(
         PAYMENT_REFERENCE_KEY
       );
 
-    if (savedReference) {
-      setReference(savedReference);
-
-      setMessage(
-        "A payment is already being processed. Confirming its status..."
+      localStorage.removeItem(
+        PAYMENT_INVOICE_KEY
       );
 
-      startPolling(savedReference);
+      navigate(
+        "/dashboard",
+        {
+          replace: true,
+        }
+      );
     }
-
-    return () => {
-      stopPolling();
-    };
   }, [
     membershipActive,
     membershipFeePaid,
-    startPolling,
-    stopPolling,
+    navigate,
   ]);
 
   /* ==========================================
      INITIATE PAYMENT
   ========================================== */
 
-  const handlePayment = async () => {
-    setError("");
-    setMessage("");
+  const handlePayment =
+    async () => {
+      setError("");
+      setMessage("");
 
-    const trimmedPhone =
-      phone.trim();
+      const normalizedPhone =
+        normalizeKenyanPhone(
+          phone
+        );
 
-    if (!trimmedPhone) {
-      setError(
-        "Enter the Safaricom phone number that will receive the STK Push."
-      );
-
-      return;
-    }
-
-    const existingReference =
-      localStorage.getItem(
-        PAYMENT_REFERENCE_KEY
-      );
-
-    if (existingReference) {
-      setReference(
-        existingReference
-      );
-
-      setMessage(
-        "A payment is already being processed. Please wait for confirmation."
-      );
-
-      startPolling(
-        existingReference
-      );
-
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      /*
-       * Refresh first in case the callback
-       * already activated the membership.
-       */
-    const refreshedMember =
-  await refreshProfile();
-
-      if (
-        refreshedMember
-          ?.membershipStatus ===
-          "active" &&
-        refreshedMember
-          ?.membershipFeePaid
-      ) {
-        navigate("/dashboard", {
-          replace: true,
-        });
+      if (!normalizedPhone) {
+        setError(
+          "Enter a valid Kenyan mobile number, for example 0712345678 or 0112345678."
+        );
 
         return;
       }
 
-      const response =
-        await initiateMembershipPayment(
-          trimmedPhone
+      try {
+        setLoading(true);
+
+        /*
+         * Refresh before creating another
+         * payment in case membership was
+         * activated in another browser tab.
+         */
+        const refreshedMember =
+          await refreshProfile();
+
+        if (
+          refreshedMember
+            ?.membershipStatus ===
+            "active" &&
+          refreshedMember
+            ?.membershipFeePaid ===
+            true
+        ) {
+          navigate(
+            "/dashboard",
+            {
+              replace: true,
+            }
+          );
+
+          return;
+        }
+
+        const fullName = [
+          member?.firstName,
+          member?.middleName,
+          member?.lastName,
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        const response =
+          await initiateMembershipPayment(
+            {
+              phoneNumber:
+                normalizedPhone,
+
+              email:
+                member?.user?.email ||
+                member?.email ||
+                null,
+
+              fullName:
+                fullName ||
+                null,
+
+              method:
+                "M-PESA",
+
+              redirectUrl:
+                `${window.location.origin}/payment/success`,
+            }
+          );
+
+        const responseData =
+          response?.data ||
+          {};
+
+        const payment =
+          responseData.payment ||
+          null;
+
+        const reference =
+          responseData.reference ||
+          payment?.reference ||
+          null;
+
+        const invoiceId =
+          responseData.invoiceId ||
+          payment?.intasend
+            ?.invoiceId ||
+          null;
+
+        const checkoutUrl =
+          responseData.checkoutUrl ||
+          payment?.intasend
+            ?.checkoutUrl ||
+          null;
+
+        /*
+         * The account might already have
+         * been activated by a previously
+         * completed payment.
+         */
+        if (
+          responseData
+            .alreadyCompleted
+        ) {
+          await refreshProfile();
+
+          navigate(
+            "/dashboard",
+            {
+              replace: true,
+            }
+          );
+
+          return;
+        }
+
+        if (!checkoutUrl) {
+          throw new Error(
+            "IntaSend did not return a checkout URL."
+          );
+        }
+
+        if (reference) {
+          localStorage.setItem(
+            PAYMENT_REFERENCE_KEY,
+            reference
+          );
+        }
+
+        if (invoiceId) {
+          localStorage.setItem(
+            PAYMENT_INVOICE_KEY,
+            invoiceId
+          );
+        }
+
+        setMessage(
+          "Your secure IntaSend checkout is ready. Redirecting you to complete payment..."
         );
 
-      const responseData =
-        response?.data || {};
-
-      const payment =
-        responseData.payment;
-
-      const paymentReference =
-        responseData.reference ||
-        payment?.reference;
-
-      if (!paymentReference) {
-        throw new Error(
-          "The payment reference was not returned."
+        /*
+         * Give React a moment to display
+         * the redirect message.
+         */
+        window.setTimeout(
+          () => {
+            redirectToCheckout(
+              checkoutUrl
+            );
+          },
+          500
         );
+      } catch (
+        paymentError
+      ) {
+        console.error(
+          "Unable to create IntaSend checkout:",
+          paymentError
+        );
+
+        setError(
+          paymentError?.message ||
+            "Unable to start payment. Please try again."
+        );
+
+        setLoading(false);
       }
+    };
 
-      localStorage.setItem(
-        PAYMENT_REFERENCE_KEY,
-        paymentReference
-      );
-
-      setReference(
-        paymentReference
-      );
-
-      setMessage(
-        "STK Push sent. Check your phone, enter your M-Pesa PIN, and remain on this page while we confirm payment."
-      );
-
-      startPolling(
-        paymentReference
-      );
-    } catch (paymentError) {
-      setError(
-        paymentError?.message ||
-          "Unable to initiate payment. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  /* ==========================================
+     RENDER
+  ========================================== */
 
   return (
     <div className="payment-page">
       <div className="payment-card">
         <div className="payment-header">
-          <ShieldCheck size={50} />
+          <ShieldCheck
+            size={50}
+          />
 
           <h1>
             Activate Your Membership
@@ -537,34 +393,50 @@ if (
 
           <p>
             Complete your membership
-            payment to unlock the JVP
+            payment securely through
+            IntaSend to unlock the JVP
             Connect Dashboard.
           </p>
         </div>
 
         <div className="activation-steps">
           <div className="step complete">
-            <CheckCircle2 size={20} />
+            <CheckCircle2
+              size={20}
+            />
+
             Registration
           </div>
 
           <div className="step complete">
-            <CheckCircle2 size={20} />
+            <CheckCircle2
+              size={20}
+            />
+
             Email Verification
           </div>
 
           <div className="step complete">
-            <CheckCircle2 size={20} />
+            <CheckCircle2
+              size={20}
+            />
+
             Password Created
           </div>
 
           <div className="step active">
-            <Circle size={20} />
+            <Circle
+              size={20}
+            />
+
             Membership Payment
           </div>
 
           <div className="step">
-            <Circle size={20} />
+            <Circle
+              size={20}
+            />
+
             Dashboard Access
           </div>
         </div>
@@ -596,11 +468,13 @@ if (
             </div>
 
             <div>
-              <small>Status</small>
+              <small>
+                Status
+              </small>
 
               <strong>
-                {checking
-                  ? "Processing Payment"
+                {loading
+                  ? "Preparing Checkout"
                   : membershipStatus ===
                       "pending_payment"
                     ? "Pending Payment"
@@ -622,32 +496,36 @@ if (
 
         <div className="payment-method">
           <h2>
-            Pay with M-Pesa
+            Pay securely with IntaSend
           </h2>
 
           <p>
-            Enter the Safaricom phone
-            number that will receive the
-            STK Push.
+            Enter the Kenyan mobile
+            number you will use to
+            complete the M-Pesa payment.
+            You will be redirected to a
+            secure IntaSend checkout.
           </p>
 
-          <label htmlFor="mpesa-phone">
-            Phone Number
+          <label htmlFor="intasend-phone">
+            M-Pesa Phone Number
           </label>
 
           <input
-            id="mpesa-phone"
+            id="intasend-phone"
             type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             value={phone}
-            onChange={(event) =>
+            onChange={(
+              event
+            ) =>
               setPhone(
                 event.target.value
               )
             }
-            placeholder="254712345678"
-            disabled={
-              loading || checking
-            }
+            placeholder="0712345678 or 0112345678"
+            disabled={loading}
           />
 
           {error && (
@@ -668,32 +546,25 @@ if (
             </div>
           )}
 
-          {checking && (
+          {loading && (
             <div className="payment-processing">
               <Loader2
                 size={18}
                 className="spin"
               />
 
-              Confirming payment...
+              Connecting to secure
+              checkout...
             </div>
-          )}
-
-          {reference && (
-            <small className="payment-reference">
-              Reference: {reference}
-            </small>
           )}
 
           <button
             type="button"
             className="pay-btn"
-            onClick={handlePayment}
-            disabled={
-              loading ||
-              checking ||
-              Boolean(reference)
+            onClick={
+              handlePayment
             }
+            disabled={loading}
           >
             {loading ? (
               <>
@@ -702,17 +573,7 @@ if (
                   className="spin"
                 />
 
-                Sending STK Push...
-              </>
-            ) : checking ||
-              reference ? (
-              <>
-                <Loader2
-                  size={20}
-                  className="spin"
-                />
-
-                Awaiting Confirmation...
+                Preparing Checkout...
               </>
             ) : (
               <>
@@ -721,9 +582,20 @@ if (
                 />
 
                 Pay KES {amount}
+
+                <ExternalLink
+                  size={17}
+                />
               </>
             )}
           </button>
+
+          <small className="payment-security-note">
+            Payment is processed
+            securely by IntaSend. JVP
+            Connect does not receive or
+            store your M-Pesa PIN.
+          </small>
         </div>
       </div>
     </div>

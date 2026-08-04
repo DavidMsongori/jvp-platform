@@ -26,132 +26,278 @@ const getPaginationOptions = (query = {}) => {
    INITIATE MEMBERSHIP PAYMENT
 ========================================================== */
 
-export const initiateMembershipPayment = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const memberId = getRequestMemberId(req);
+export const initiateMembershipPayment =
+  async (
+    req,
+    res,
+    next
+  ) => {
+    try {
+      const memberId =
+        getRequestMemberId(
+          req
+        );
 
-    if (!memberId) {
-      return res.status(404).json({
-        success: false,
-        message: "Member profile not found.",
-      });
+      if (!memberId) {
+        return res
+          .status(404)
+          .json({
+            success: false,
+            message:
+              "Member profile not found.",
+          });
+      }
+
+      const {
+        phoneNumber = null,
+        email = null,
+        fullName = null,
+        method = "M-PESA",
+        redirectUrl = null,
+      } = req.body || {};
+
+      const result =
+        await paymentService
+          .initiateMembershipPayment(
+            memberId,
+            {
+              phoneNumber,
+              email,
+              fullName,
+              method,
+              redirectUrl,
+            }
+          );
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            result.message ||
+            "IntaSend checkout created successfully.",
+
+          data: {
+            payment:
+              result.payment,
+
+            member:
+              result.member,
+
+            reference:
+              result.reference,
+
+            amount:
+              result.amount,
+
+            checkoutUrl:
+              result.checkoutUrl,
+
+            invoiceId:
+              result.invoiceId,
+
+            reused:
+              Boolean(
+                result.reused
+              ),
+
+            isExisting:
+              Boolean(
+                result.isExisting
+              ),
+
+            alreadyCompleted:
+              Boolean(
+                result.alreadyCompleted
+              ),
+          },
+        });
+    } catch (error) {
+      next(error);
     }
-
-    const { phoneNumber } = req.body;
-
-    const result =
-      await paymentService.initiateMembershipPayment(
-        memberId,
-        {
-          phoneNumber,
-        }
-      );
-
-    return res.status(200).json({
-      success: true,
-
-      message:
-        result.customerMessage ||
-        result.message ||
-        "M-Pesa payment prompt sent successfully.",
-
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  };
 
 /* ==========================================================
    INITIATE MEMBERSHIP RENEWAL PAYMENT
 ========================================================== */
 
-export const initiateRenewalPayment = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const memberId = getRequestMemberId(req);
+export const initiateRenewalPayment =
+  async (
+    req,
+    res,
+    next
+  ) => {
+    try {
+      const memberId =
+        getRequestMemberId(
+          req
+        );
 
-    if (!memberId) {
-      return res.status(404).json({
-        success: false,
-        message: "Member profile not found.",
-      });
+      if (!memberId) {
+        return res
+          .status(404)
+          .json({
+            success: false,
+            message:
+              "Member profile not found.",
+          });
+      }
+
+      const {
+        phoneNumber = null,
+        email = null,
+        fullName = null,
+        method = "M-PESA",
+        redirectUrl = null,
+      } = req.body || {};
+
+      const result =
+        await paymentService
+          .initiateRenewalPayment(
+            memberId,
+            {
+              phoneNumber,
+              email,
+              fullName,
+              method,
+              redirectUrl,
+            }
+          );
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            result.message ||
+            "IntaSend renewal checkout created successfully.",
+
+          data: {
+            payment:
+              result.payment,
+
+            member:
+              result.member,
+
+            reference:
+              result.reference,
+
+            amount:
+              result.amount,
+
+            checkoutUrl:
+              result.checkoutUrl,
+
+            invoiceId:
+              result.invoiceId,
+
+            reused:
+              Boolean(
+                result.reused
+              ),
+
+            isExisting:
+              Boolean(
+                result.isExisting
+              ),
+
+            alreadyCompleted:
+              Boolean(
+                result.alreadyCompleted
+              ),
+          },
+        });
+    } catch (error) {
+      next(error);
     }
-
-    const { phoneNumber } = req.body;
-
-    const result =
-      await paymentService.initiateRenewalPayment(
-        memberId,
-        {
-          phoneNumber,
-        }
-      );
-
-    return res.status(200).json({
-      success: true,
-
-      message:
-        result.customerMessage ||
-        result.message ||
-        "M-Pesa renewal prompt sent successfully.",
-
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  };
 
 /* ==========================================================
    INITIATE EXISTING PAYMENT
 ========================================================== */
 
-export const initiatePayment = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const { paymentId, reference, phoneNumber } =
-      req.body;
+export const initiatePayment =
+  async (
+    req,
+    res,
+    next
+  ) => {
+    try {
+      const {
+        paymentId = null,
+        reference = null,
+        phoneNumber = null,
+        email = null,
+        fullName = null,
+        method = "M-PESA",
+        redirectUrl = null,
+      } = req.body || {};
 
-    if (!paymentId && !reference) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Payment ID or payment reference is required.",
-      });
+      if (
+        !paymentId &&
+        !reference
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "Payment ID or payment reference is required.",
+          });
+      }
+
+      const result =
+        await paymentService
+          .initiatePayment({
+            paymentId,
+            reference,
+            phoneNumber,
+            email,
+            fullName,
+            method,
+            redirectUrl,
+          });
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            result.message ||
+            "IntaSend checkout created successfully.",
+
+          data: {
+            payment:
+              result.payment,
+
+            reference:
+              result.reference,
+
+            checkoutUrl:
+              result.checkoutUrl,
+
+            invoiceId:
+              result.invoiceId,
+
+            reused:
+              Boolean(
+                result.reused
+              ),
+
+            alreadyCompleted:
+              Boolean(
+                result.alreadyCompleted
+              ),
+          },
+        });
+    } catch (error) {
+      next(error);
     }
-
-    const result =
-      await paymentService.initiatePayment({
-        paymentId,
-        reference,
-        phoneNumber,
-      });
-
-    return res.status(200).json({
-      success: true,
-
-      message:
-        result.customerMessage ||
-        result.message ||
-        "M-Pesa payment prompt sent successfully.",
-
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  };
 
 /* ==========================================================
    M-PESA CALLBACK
@@ -208,98 +354,179 @@ export const mpesaCallback = async (
    QUERY PAYMENT STATUS
 ========================================================== */
 
-export const queryPaymentStatus = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const paymentId =
-      req.params.paymentId ||
-      req.body.paymentId ||
-      null;
+export const queryPaymentStatus =
+  async (
+    req,
+    res,
+    next
+  ) => {
+    try {
+      const paymentId =
+        req.params
+          ?.paymentId ||
+        req.body
+          ?.paymentId ||
+        null;
 
-    const reference =
-      req.params.reference ||
-      req.body.reference ||
-      null;
+      const reference =
+        req.params
+          ?.reference ||
+        req.body
+          ?.reference ||
+        req.body
+          ?.paymentReference ||
+        null;
 
-    if (!paymentId && !reference) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Payment ID or payment reference is required.",
-      });
+      const invoiceId =
+        req.params
+          ?.invoiceId ||
+        req.body
+          ?.invoiceId ||
+        null;
+
+      if (
+        !paymentId &&
+        !reference &&
+        !invoiceId
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "Payment ID, payment reference or IntaSend invoice ID is required.",
+          });
+      }
+
+      const result =
+        await paymentService
+          .queryPaymentStatus({
+            paymentId,
+            reference,
+            invoiceId,
+          });
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            result.completed
+              ? "Payment completed and verified successfully."
+              : "Payment status retrieved successfully.",
+
+          data: {
+            completed:
+              Boolean(
+                result.completed
+              ),
+
+            payment:
+              result.payment,
+
+            invoice:
+              result.invoice ||
+              null,
+          },
+        });
+    } catch (error) {
+      next(error);
     }
-
-    const result =
-      await paymentService.queryPaymentStatus({
-        paymentId,
-        reference,
-      });
-
-    return res.status(200).json({
-      success: true,
-      message:
-        "Payment status retrieved successfully.",
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  };
 
 /* ==========================================================
    RETRY PAYMENT
 ========================================================== */
 
-export const retryPayment = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const paymentId =
-      req.params.paymentId ||
-      req.body.paymentId ||
-      null;
+export const retryPayment =
+  async (
+    req,
+    res,
+    next
+  ) => {
+    try {
+      const paymentId =
+        req.params
+          ?.paymentId ||
+        req.body
+          ?.paymentId ||
+        null;
 
-    const reference =
-      req.params.reference ||
-      req.body.reference ||
-      null;
+      const reference =
+        req.params
+          ?.reference ||
+        req.body
+          ?.reference ||
+        null;
 
-    const { phoneNumber } = req.body;
+      const {
+        phoneNumber = null,
+        email = null,
+        fullName = null,
+        method = "M-PESA",
+        redirectUrl = null,
+      } = req.body || {};
 
-    if (!paymentId && !reference) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Payment ID or payment reference is required.",
-      });
+      if (
+        !paymentId &&
+        !reference
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "Payment ID or payment reference is required.",
+          });
+      }
+
+      const result =
+        await paymentService
+          .retryPayment({
+            paymentId,
+            reference,
+            phoneNumber,
+            email,
+            fullName,
+            method,
+            redirectUrl,
+          });
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            result.message ||
+            "A new IntaSend checkout was created successfully.",
+
+          data: {
+            payment:
+              result.payment,
+
+            reference:
+              result.reference,
+
+            checkoutUrl:
+              result.checkoutUrl,
+
+            invoiceId:
+              result.invoiceId,
+
+            reused:
+              Boolean(
+                result.reused
+              ),
+          },
+        });
+    } catch (error) {
+      next(error);
     }
-
-    const result =
-      await paymentService.retryPayment({
-        paymentId,
-        reference,
-        phoneNumber,
-      });
-
-    return res.status(200).json({
-      success: true,
-
-      message:
-        result.customerMessage ||
-        result.message ||
-        "M-Pesa payment prompt sent again successfully.",
-
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  };
 
 /* ==========================================================
    MEMBER PAYMENT HISTORY

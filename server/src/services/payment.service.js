@@ -11,15 +11,17 @@ import {
   getMembershipFee,
 } from "../config/membership.js";
 
-import mpesaConfig from "../config/mpesa.config.js";
+import {
+  createIntaSendCheckout,
+  queryIntaSendPaymentStatus,
+} from "./intasend.service.js";
+
+import SummitExhibitor from "../models/summitExhibitor.model.js";
 
 import {
-  initiateMpesaStkPush,
-  queryMpesaStkPushStatus,
   parseMpesaStkCallback,
   normalizeMpesaPhoneNumber,
   getMpesaResultStatus,
-  MpesaServiceError,
 } from "./mpesa.service.js";
 
 /* ==========================================================
@@ -65,13 +67,14 @@ function generateAccountReference({
   paymentFor,
   member,
 }) {
-  const typePrefix = {
-    membership: "MEM",
-    renewal: "REN",
-    event: "EVT",
-    summit: "SUM",
-    donation: "DON",
-  }[paymentFor] || "PAY";
+ const typePrefix = {
+  membership: "MEM",
+  renewal: "REN",
+  event: "EVT",
+  summit: "SUM",
+  summit_exhibitor: "EXH",
+  donation: "DON",
+}[paymentFor] || "PAY";
 
   const memberReference =
     member?.memberNumber ||
@@ -88,13 +91,14 @@ function generateAccountReference({
 }
 
 function getTransactionDescription(paymentFor) {
-  const descriptions = {
-    membership: "JVP Membership",
-    renewal: "JVP Renewal",
-    event: "JVP Event",
-    summit: "JVP Summit",
-    donation: "JVP Donation",
-  };
+ const descriptions = {
+  membership: "JVP Membership",
+  renewal: "JVP Renewal",
+  event: "JVP Event",
+  summit: "JVP Summit",
+  summit_exhibitor: "JVP Exhibitor",
+  donation: "JVP Donation",
+};
 
   return (
     descriptions[paymentFor] ||
@@ -220,28 +224,61 @@ function getMemberUserId(member) {
   );
 }
 
-function getMemberPhone(member, phoneNumber) {
+function normalizeKenyanPhoneNumber(
+  value
+) {
+  if (!value) {
+    return null;
+  }
+
+  const phone = String(value)
+    .trim()
+    .replace(/[\s()-]/g, "");
+
+  if (/^254[17]\d{8}$/.test(phone)) {
+    return phone;
+  }
+
+  if (/^\+254[17]\d{8}$/.test(phone)) {
+    return phone.slice(1);
+  }
+
+  if (/^0[17]\d{8}$/.test(phone)) {
+    return `254${phone.slice(1)}`;
+  }
+
+  throw new AppError(
+    "Enter a valid Kenyan mobile phone number.",
+    400
+  );
+}
+
+function getMemberPhone(
+  member,
+  phoneNumber,
+  {
+    required = false,
+  } = {}
+) {
   const resolvedPhone =
-    phoneNumber || member.phone;
+    phoneNumber ||
+    member?.phone ||
+    null;
 
   if (!resolvedPhone) {
-    throw new AppError(
-      "A phone number is required for M-Pesa payment.",
-      400
-    );
+    if (required) {
+      throw new AppError(
+        "A phone number is required for this payment.",
+        400
+      );
+    }
+
+    return null;
   }
 
-  try {
-    return normalizeMpesaPhoneNumber(
-      resolvedPhone
-    );
-  } catch (error) {
-    throw new AppError(
-      error.message ||
-        "Enter a valid Safaricom phone number.",
-      error.statusCode || 400
-    );
-  }
+  return normalizeKenyanPhoneNumber(
+    resolvedPhone
+  );
 }
 
 /* ==========================================================
@@ -334,7 +371,7 @@ async function getReusablePayment({
 
     paymentFor,
 
-    paymentMethod: "mpesa",
+    provider: "intasend",
 
     status: {
       $in: PENDING_PAYMENT_STATUSES,
@@ -401,6 +438,7 @@ export const createPayment = async ({
   eventId = null,
   registrationId = null,
   summitRegistrationId = null,
+  summitExhibitorId = null,
 
   paymentFor,
   amount,
@@ -443,11 +481,14 @@ export const createPayment = async ({
     );
   }
 
-  const normalizedPhone =
-    getMemberPhone(
-      member,
-      phoneNumber
-    );
+ const normalizedPhone =
+  getMemberPhone(
+    member,
+    phoneNumber,
+    {
+      required: false,
+    }
+  );
 
   const referencePrefix = {
     membership: "MEM",
@@ -486,6 +527,9 @@ export const createPayment = async ({
     summitRegistration:
       summitRegistrationId,
 
+    summitExhibitor:
+  summitExhibitorId,
+
     reference,
 
     accountReference:
@@ -502,12 +546,14 @@ export const createPayment = async ({
 
     currency,
 
-    paymentMethod: "mpesa",
+    provider: "intasend",
 
-    phoneNumber:
-      normalizedPhone,
+paymentMethod: "unknown",
 
-    status: "pending",
+phoneNumber:
+  normalizedPhone,
+
+status: "pending",
 
     initiatedBy:
       userId ||
@@ -520,23 +566,24 @@ export const createPayment = async ({
     expiresAt:
       calculatePaymentExpiry(),
 
-    metadata: {
-      ...metadata,
+   metadata: {
+  ...metadata,
 
-      environment:
-        mpesaConfig.environment,
+  paymentProvider:
+    "intasend",
 
-      transactionType:
-        mpesaConfig.transactionType,
-    },
-
-    mpesa: {
-      transactionType:
-        mpesaConfig.transactionType,
-
-      businessShortCode:
-        mpesaConfig.shortCode,
-    },
+  environment:
+    String(
+      process.env
+        .INTASEND_TEST_MODE ??
+        "true"
+    )
+      .trim()
+      .toLowerCase() ===
+    "true"
+      ? "sandbox"
+      : "production",
+},
   });
 
   await createActivityLog({
@@ -719,23 +766,34 @@ export const createRenewalPayment =
   };
 
 /* ==========================================================
-   INITIATE STK PUSH
+   INITIATE INTASEND PAYMENT
 ========================================================== */
 
 export const initiatePayment = async ({
   paymentId = null,
   reference = null,
+
   phoneNumber = null,
+  email = null,
+  fullName = null,
+
+  method = "M-PESA",
+  redirectUrl = null,
 }) => {
   let payment;
 
+  /* ========================================
+     FIND PAYMENT
+  ======================================== */
+
   if (paymentId) {
-    payment = await findPaymentById(
-      paymentId,
-      {
-        includeGatewayData: true,
-      }
-    );
+    payment =
+      await findPaymentById(
+        paymentId,
+        {
+          includeGatewayData: true,
+        }
+      );
   } else if (reference) {
     payment =
       await findPaymentByReference(
@@ -751,8 +809,13 @@ export const initiatePayment = async ({
     );
   }
 
+  /* ========================================
+     ALREADY COMPLETED
+  ======================================== */
+
   if (
-    payment.status === "successful"
+    payment.status ===
+    "successful"
   ) {
     return {
       success: true,
@@ -763,14 +826,35 @@ export const initiatePayment = async ({
         "Payment has already been completed.",
 
       payment,
+
+      reference:
+        payment.reference,
+
+      checkoutUrl:
+        payment.intasend
+          ?.checkoutUrl ||
+        null,
+
+      invoiceId:
+        payment.intasend
+          ?.invoiceId ||
+        null,
     };
   }
+
+  /* ========================================
+     VALID STATUS
+  ======================================== */
 
   if (
     FINAL_PAYMENT_STATUSES.includes(
       payment.status
     ) &&
-    payment.status !== "failed"
+    ![
+      "failed",
+      "cancelled",
+      "expired",
+    ].includes(payment.status)
   ) {
     throw new AppError(
       `A ${payment.status} payment cannot be initiated again.`,
@@ -778,13 +862,23 @@ export const initiatePayment = async ({
     );
   }
 
+  /* ========================================
+     PAYMENT EXPIRY
+  ======================================== */
+
   if (
     payment.expiresAt &&
-    payment.expiresAt <= new Date()
+    payment.expiresAt <=
+      new Date()
   ) {
-    payment.status = "expired";
+    payment.status =
+      "expired";
+
     payment.statusMessage =
       "The payment request expired.";
+
+    payment.failureReason =
+      "Payment request expired before completion.";
 
     await payment.save();
 
@@ -794,96 +888,153 @@ export const initiatePayment = async ({
     );
   }
 
-  const normalizedPhone =
+  /* ========================================
+     CUSTOMER DETAILS
+  ======================================== */
+
+  const member =
+    payment.member || null;
+
+  const resolvedPhone =
     getMemberPhone(
-      payment.member,
+      member,
       phoneNumber ||
-        payment.phoneNumber
+        payment.phoneNumber,
+      {
+        required:
+          method ===
+          "M-PESA",
+      }
     );
 
-  payment.phoneNumber =
-    normalizedPhone;
+  const resolvedFullName =
+    fullName ||
+    [
+      member?.firstName,
+      member?.middleName,
+      member?.lastName,
+    ]
+      .filter(Boolean)
+      .join(" ") ||
+    payment.metadata
+      ?.customerName ||
+    "JVP Customer";
 
-  payment.status = "pending";
+  const resolvedEmail =
+    email ||
+    member?.user?.email ||
+    payment.metadata
+      ?.customerEmail ||
+    "";
+
+  payment.provider =
+    "intasend";
+
+  payment.paymentMethod =
+    method === "M-PESA"
+      ? "mpesa"
+      : method ===
+          "CARD-PAYMENT"
+        ? "card"
+        : "unknown";
+
+  payment.phoneNumber =
+    resolvedPhone ||
+    payment.phoneNumber ||
+    null;
+
+  payment.status =
+    "pending";
+
+  payment.statusMessage =
+    "Preparing IntaSend checkout.";
+
+  payment.failureReason =
+    null;
+
+  payment.failedAt =
+    null;
+
+  payment.cancelledAt =
+    null;
 
   await payment.save();
 
+  /* ========================================
+     CREATE CHECKOUT
+  ======================================== */
+
   try {
-    const response =
-      await initiateMpesaStkPush({
-        phoneNumber:
-          normalizedPhone,
+    const result =
+      await createIntaSendCheckout(
+        {
+          paymentId:
+            payment._id,
 
-        amount: payment.amount,
+          customer: {
+            fullName:
+              resolvedFullName,
 
-        accountReference:
-          payment.accountReference,
+            email:
+              resolvedEmail,
 
-        transactionDescription:
-          payment.description,
-      });
+            phoneNumber:
+              resolvedPhone,
+          },
 
-    await payment.markAsProcessing({
-      merchantRequestId:
-        response.merchantRequestId,
+          method,
 
-      checkoutRequestId:
-        response.checkoutRequestId,
-
-      responseCode:
-        response.responseCode,
-
-      responseDescription:
-        response.responseDescription,
-
-      customerMessage:
-        response.customerMessage,
-
-      gatewayResponse:
-        response.rawResponse,
-    });
-
-    payment.phoneNumber =
-      response.phoneNumber;
-
-    payment.mpesa.transactionType =
-      mpesaConfig.transactionType;
-
-    payment.mpesa.businessShortCode =
-      mpesaConfig.shortCode;
-
-    payment.gatewayReference =
-      response.checkoutRequestId;
-
-    await payment.save();
+          redirectUrl:
+            redirectUrl ||
+            `${String(
+              process.env
+                .FRONTEND_URL ||
+                "http://localhost:5173"
+            ).replace(
+              /\/+$/,
+              ""
+            )}/payment/success?reference=${encodeURIComponent(
+              payment.reference
+            )}`,
+        }
+      );
 
     await createActivityLog({
       user:
         getMemberUserId(
-          payment.member
+          member
         ) ||
         payment.user,
 
       action:
-        "M-Pesa STK Push initiated",
+        "IntaSend checkout created",
 
       description:
-        "M-Pesa payment prompt sent to the customer.",
+        "IntaSend payment checkout created successfully.",
 
-      targetId: payment._id,
+      targetId:
+        payment._id,
 
       metadata: {
         reference:
           payment.reference,
 
-        checkoutRequestId:
-          response.checkoutRequestId,
+        invoiceId:
+          result.invoiceId,
 
         amount:
           payment.amount,
 
-        phoneNumber:
-          payment.phoneNumber,
+        paymentMethod:
+          payment.paymentMethod,
+
+        provider:
+          "intasend",
+
+        reused:
+          Boolean(
+            result.reused
+          ),
       },
     });
 
@@ -891,55 +1042,73 @@ export const initiatePayment = async ({
       success: true,
 
       message:
-        response.customerMessage ||
-        "M-Pesa payment prompt sent successfully.",
+        result.reused
+          ? "Existing IntaSend checkout retrieved successfully."
+          : "IntaSend checkout created successfully.",
 
-      payment,
+      payment:
+        result.payment,
 
       reference:
         payment.reference,
 
-      merchantRequestId:
-        response.merchantRequestId,
+      checkoutUrl:
+        result.checkoutUrl,
 
-      checkoutRequestId:
-        response.checkoutRequestId,
+      invoiceId:
+        result.invoiceId,
 
-      customerMessage:
-        response.customerMessage,
+      reused:
+        Boolean(
+          result.reused
+        ),
     };
   } catch (error) {
-    payment.status = "failed";
+    /*
+     * Do not convert the payment to failed when
+     * IntaSend has already created an invoice.
+     * The provider may still send a webhook.
+     */
 
-    payment.failureReason =
-      error.message ||
-      "Unable to initiate M-Pesa payment.";
+    if (
+      !payment.intasend
+        ?.invoiceId
+    ) {
+      payment.status =
+        "failed";
 
-    payment.statusMessage =
-      payment.failureReason;
+      payment.failureReason =
+        error.message ||
+        "Unable to create the IntaSend checkout.";
 
-    payment.failedAt =
-      new Date();
+      payment.statusMessage =
+        payment.failureReason;
 
-    payment.gatewayResponse =
-      error.details || null;
+      payment.failedAt =
+        new Date();
 
-    await payment.save();
+      payment.gatewayResponse =
+        error.details ||
+        null;
+
+      await payment.save();
+    }
 
     await createActivityLog({
       user:
         getMemberUserId(
-          payment.member
+          member
         ) ||
         payment.user,
 
       action:
-        "M-Pesa STK Push failed",
+        "IntaSend checkout failed",
 
       description:
-        "M-Pesa payment prompt could not be initiated.",
+        "IntaSend payment checkout could not be created.",
 
-      targetId: payment._id,
+      targetId:
+        payment._id,
 
       metadata: {
         reference:
@@ -949,20 +1118,21 @@ export const initiatePayment = async ({
           error.message,
 
         code:
-          error.code || null,
+          error.code ||
+          null,
       },
     });
 
-    if (
-      error instanceof MpesaServiceError
-    ) {
-      throw new AppError(
-        error.message,
-        error.statusCode || 502
-      );
-    }
+    throw new AppError(
+  Number.isInteger(
+    error.statusCode
+  )
+    ? error.statusCode
+    : 502,
 
-    throw error;
+  error.message ||
+    "Unable to create the IntaSend checkout."
+);
   }
 };
 
@@ -975,6 +1145,11 @@ export const initiateMembershipPayment =
     memberId,
     {
       phoneNumber = null,
+      email = null,
+      fullName = null,
+
+      method = "M-PESA",
+      redirectUrl = null,
     } = {}
   ) => {
     const {
@@ -989,17 +1164,49 @@ export const initiateMembershipPayment =
         }
       );
 
+    const resolvedFullName =
+      fullName ||
+      [
+        member.firstName,
+        member.middleName,
+        member.lastName,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+    const resolvedEmail =
+      email ||
+      member.user?.email ||
+      "";
+
     const result =
       await initiatePayment({
-        paymentId: payment._id,
+        paymentId:
+          payment._id,
 
         phoneNumber:
           phoneNumber ||
           member.phone,
+
+        email:
+          resolvedEmail,
+
+        fullName:
+          resolvedFullName,
+
+        method,
+
+        redirectUrl,
       });
 
     return {
       ...result,
+
+      member,
+
+      amount:
+        payment.amount,
+
       isExisting,
     };
   };
@@ -1013,6 +1220,11 @@ export const initiateRenewalPayment =
     memberId,
     {
       phoneNumber = null,
+      email = null,
+      fullName = null,
+
+      method = "M-PESA",
+      redirectUrl = null,
     } = {}
   ) => {
     const {
@@ -1027,17 +1239,49 @@ export const initiateRenewalPayment =
         }
       );
 
+    const resolvedFullName =
+      fullName ||
+      [
+        member.firstName,
+        member.middleName,
+        member.lastName,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+    const resolvedEmail =
+      email ||
+      member.user?.email ||
+      "";
+
     const result =
       await initiatePayment({
-        paymentId: payment._id,
+        paymentId:
+          payment._id,
 
         phoneNumber:
           phoneNumber ||
           member.phone,
+
+        email:
+          resolvedEmail,
+
+        fullName:
+          resolvedFullName,
+
+        method,
+
+        redirectUrl,
       });
 
     return {
       ...result,
+
+      member,
+
+      amount:
+        payment.amount,
+
       isExisting,
     };
   };
@@ -1080,7 +1324,7 @@ export const activateMembership =
       module: "members",
 
       description:
-        "Membership activated after successful M-Pesa payment.",
+        "Membership activated after successful payment verification.",
 
       targetId: member._id,
     });
@@ -1117,7 +1361,7 @@ export const renewMembership =
       module: "members",
 
       description:
-        "Membership renewed after successful M-Pesa payment.",
+        "Membership renewed after successful payment verification.",
 
       targetId: member._id,
 
@@ -1134,79 +1378,226 @@ export const renewMembership =
    PROCESS SUCCESSFUL PAYMENT
 ========================================================== */
 
-async function processSuccessfulPayment(
+export async function processSuccessfulPayment(
   payment
 ) {
-  const memberId =
-    payment.member?._id ||
-    payment.member;
-
-  if (
-    ["membership", "renewal"].includes(
-      payment.paymentFor
-    ) &&
-    !memberId
-  ) {
+  if (!payment) {
     throw new AppError(
-      "Payment is not linked to a member.",
+      "Payment record is required for post-payment processing.",
       400
     );
   }
 
-  /* ----------------------------------------
+  if (
+    payment.status !==
+      "successful" ||
+    !payment.isVerified
+  ) {
+    throw new AppError(
+      "Only a verified successful payment can be processed.",
+      400
+    );
+  }
+
+  const memberId =
+    payment.member?._id ||
+    payment.member ||
+    null;
+
+  /* ========================================================
      MEMBERSHIP ACTIVATION
-  ---------------------------------------- */
+  ======================================================== */
 
   if (
-    payment.paymentFor === "membership"
+    payment.paymentFor ===
+    "membership"
   ) {
-    if (!payment.membershipProcessed) {
-      await activateMembership(memberId);
+    if (!memberId) {
+      throw new AppError(
+        "Membership payment is not linked to a member.",
+        400
+      );
+    }
 
-      payment.membershipProcessed =
-        true;
+    if (
+      !payment.membershipProcessed
+    ) {
+      try {
+        await activateMembership(
+          memberId
+        );
 
-      payment.membershipProcessedAt =
-        new Date();
+        payment.membershipProcessed =
+          true;
 
-      payment.membershipProcessingError =
-        null;
+        payment.membershipProcessedAt =
+          new Date();
 
-      await payment.save();
+        payment.membershipProcessingError =
+          null;
+
+        await payment.save();
+      } catch (error) {
+        payment.membershipProcessingError =
+          error.message;
+
+        await payment.save();
+
+        throw error;
+      }
     }
 
     return payment;
   }
 
-  /* ----------------------------------------
+  /* ========================================================
      MEMBERSHIP RENEWAL
-  ---------------------------------------- */
+  ======================================================== */
 
   if (
-    payment.paymentFor === "renewal"
+    payment.paymentFor ===
+    "renewal"
   ) {
-    if (!payment.membershipProcessed) {
-      await renewMembership(memberId);
+    if (!memberId) {
+      throw new AppError(
+        "Renewal payment is not linked to a member.",
+        400
+      );
+    }
 
-      payment.membershipProcessed =
-        true;
+    if (
+      !payment.membershipProcessed
+    ) {
+      try {
+        await renewMembership(
+          memberId
+        );
 
-      payment.membershipProcessedAt =
-        new Date();
+        payment.membershipProcessed =
+          true;
 
-      payment.membershipProcessingError =
-        null;
+        payment.membershipProcessedAt =
+          new Date();
 
-      await payment.save();
+        payment.membershipProcessingError =
+          null;
+
+        await payment.save();
+      } catch (error) {
+        payment.membershipProcessingError =
+          error.message;
+
+        await payment.save();
+
+        throw error;
+      }
     }
 
     return payment;
   }
 
-  /*
-   * Event and summit processing will be
-   * connected to their registration services.
-   */
+  /* ========================================================
+     SUMMIT EXHIBITOR PAYMENT
+  ======================================================== */
+
+  if (
+    payment.paymentFor ===
+    "summit_exhibitor"
+  ) {
+    const summitExhibitorId =
+      payment.summitExhibitor
+        ?._id ||
+      payment.summitExhibitor ||
+      null;
+
+    if (!summitExhibitorId) {
+      throw new AppError(
+        "Exhibitor payment is not linked to an exhibitor registration.",
+        400
+      );
+    }
+
+    if (
+      !payment.registrationProcessed
+    ) {
+      const exhibitor =
+        await SummitExhibitor.findById(
+          summitExhibitorId
+        );
+
+      if (!exhibitor) {
+        throw new AppError(
+          "The summit exhibitor registration could not be found.",
+          404
+        );
+      }
+
+      exhibitor.paymentStatus =
+        "paid";
+
+      exhibitor.status =
+        "confirmed";
+
+      exhibitor.reviewedAt =
+        exhibitor.reviewedAt ||
+        new Date();
+
+      await exhibitor.save();
+
+      payment.registrationProcessed =
+        true;
+
+      payment.registrationProcessedAt =
+        new Date();
+
+      await payment.save();
+
+      await createActivityLog({
+        user:
+          payment.user ||
+          payment.createdBy ||
+          null,
+
+        action:
+          "Exhibitor payment confirmed",
+
+        module:
+          "summit_exhibitors",
+
+        description:
+          "Summit exhibitor payment completed and the booking was confirmed.",
+
+        targetId:
+          exhibitor._id,
+
+        metadata: {
+          paymentReference:
+            payment.reference,
+
+          provider:
+            payment.provider,
+
+          amount:
+            payment.amount,
+
+          packageId:
+            exhibitor.packageId,
+
+          packageName:
+            exhibitor.packageName,
+        },
+      });
+    }
+
+    return payment;
+  }
+
+  /* ========================================================
+     EVENT / SUMMIT / DONATION
+
+     Their specific fulfillment can be connected later.
+  ======================================================== */
+
   return payment;
 }
 
@@ -1540,26 +1931,279 @@ export const processMpesaCallback =
   };
 
 /* ==========================================================
-   QUERY M-PESA PAYMENT STATUS
+   QUERY INTASEND PAYMENT STATUS
 ========================================================== */
 
 export const queryPaymentStatus =
   async ({
     paymentId = null,
     reference = null,
+    invoiceId = null,
+  }) => {
+    if (
+      !paymentId &&
+      !reference &&
+      !invoiceId
+    ) {
+      throw new AppError(
+        "Payment ID, reference or IntaSend invoice ID is required.",
+        400
+      );
+    }
+
+    let existingPayment =
+      null;
+
+    if (paymentId) {
+      existingPayment =
+        await findPaymentById(
+          paymentId,
+          {
+            includeGatewayData:
+              true,
+          }
+        );
+    } else if (reference) {
+      existingPayment =
+        await findPaymentByReference(
+          reference,
+          {
+            includeGatewayData:
+              true,
+          }
+        );
+    } else {
+      existingPayment =
+        await Payment
+          .findByIntaSendInvoiceId(
+            invoiceId
+          )
+          .select(
+            "+gatewayResponse +callbackPayload"
+          )
+          .populate({
+            path: "member",
+
+            populate: {
+              path: "user",
+
+              select:
+                "email role isActive",
+            },
+          });
+    }
+
+    if (!existingPayment) {
+      throw new AppError(
+        "Payment not found.",
+        404
+      );
+    }
+
+    /*
+     * A successful payment can still need
+     * fulfillment if a previous processing
+     * attempt failed.
+     */
+    if (
+      existingPayment.status ===
+        "successful" &&
+      existingPayment.isVerified
+    ) {
+      await processSuccessfulPayment(
+        existingPayment
+      );
+
+      const refreshedPayment =
+        await Payment.findById(
+          existingPayment._id
+        )
+          .populate({
+            path: "member",
+
+            populate: {
+              path: "user",
+
+              select:
+                "email role isActive",
+            },
+          })
+          .populate(
+            "summitExhibitor"
+          );
+
+      return {
+        success: true,
+        completed: true,
+        payment:
+          refreshedPayment,
+        invoice:
+          null,
+      };
+    }
+
+    if (
+      existingPayment.provider !==
+      "intasend"
+    ) {
+      throw new AppError(
+        "This payment was not created through IntaSend.",
+        400
+      );
+    }
+
+    const resolvedInvoiceId =
+      invoiceId ||
+      existingPayment.intasend
+        ?.invoiceId ||
+      null;
+
+    if (!resolvedInvoiceId) {
+      throw new AppError(
+        "This payment does not have an IntaSend invoice ID.",
+        400
+      );
+    }
+
+    const result =
+      await queryIntaSendPaymentStatus(
+        {
+          paymentId:
+            existingPayment._id,
+
+          invoiceId:
+            resolvedInvoiceId,
+        }
+      );
+
+    const payment =
+      result.payment;
+
+    if (
+      payment.status ===
+        "successful" &&
+      payment.isVerified
+    ) {
+      try {
+        await processSuccessfulPayment(
+          payment
+        );
+      } catch (processingError) {
+        if (
+          [
+            "membership",
+            "renewal",
+          ].includes(
+            payment.paymentFor
+          )
+        ) {
+          payment.membershipProcessingError =
+            processingError.message;
+
+          await payment.save();
+        }
+
+        throw processingError;
+      }
+    }
+
+    const refreshedPayment =
+      await Payment.findById(
+        payment._id
+      )
+        .populate({
+          path: "member",
+
+          populate: {
+            path: "user",
+
+            select:
+              "email role isActive",
+          },
+        })
+        .populate(
+          "summitExhibitor"
+        );
+
+    await createActivityLog({
+      user:
+        getMemberUserId(
+          refreshedPayment?.member
+        ) ||
+        refreshedPayment?.user,
+
+      action:
+        "IntaSend status queried",
+
+      description:
+        "The latest payment status was retrieved from IntaSend.",
+
+      targetId:
+        refreshedPayment?._id,
+
+      metadata: {
+        reference:
+          refreshedPayment
+            ?.reference,
+
+        invoiceId:
+          refreshedPayment
+            ?.intasend
+            ?.invoiceId,
+
+        status:
+          refreshedPayment
+            ?.status,
+
+        state:
+          refreshedPayment
+            ?.intasend
+            ?.state,
+      },
+    });
+
+    return {
+      success: true,
+
+      completed:
+        refreshedPayment
+          ?.status ===
+        "successful",
+
+      payment:
+        refreshedPayment,
+
+      invoice:
+        result.invoice ||
+        null,
+    };
+  };
+
+/* ==========================================================
+   RETRY INTASEND PAYMENT
+========================================================== */
+
+export const retryPayment =
+  async ({
+    paymentId = null,
+    reference = null,
+
+    phoneNumber = null,
+    email = null,
+    fullName = null,
+
+    method = "M-PESA",
+    redirectUrl = null,
   }) => {
     let payment;
-
-    /* ----------------------------------------
-       FIND PAYMENT
-    ---------------------------------------- */
 
     if (paymentId) {
       payment =
         await findPaymentById(
           paymentId,
           {
-            includeGatewayData: true,
+            includeGatewayData:
+              true,
           }
         );
     } else if (reference) {
@@ -1567,337 +2211,9 @@ export const queryPaymentStatus =
         await findPaymentByReference(
           reference,
           {
-            includeGatewayData: true,
+            includeGatewayData:
+              true,
           }
-        );
-    } else {
-      throw new AppError(
-        "Payment ID or reference is required.",
-        400
-      );
-    }
-
-   /* ----------------------------------------
-   ALREADY SUCCESSFUL
----------------------------------------- */
-
-if (
-  payment.status === "successful"
-) {
-  /*
-   * The payment may be successful while
-   * membership processing previously failed.
-   * Retry membership activation before returning.
-   */
-
-  try {
-  await processSuccessfulPayment(
-    payment
-  );
-} catch (processingError) {
-  payment.membershipProcessingError =
-    processingError.message;
-
-  await payment.save();
-
-  throw processingError;
-}
-
-
-  const refreshedPayment =
-    await Payment.findById(
-      payment._id
-    ).populate({
-      path: "member",
-      populate: {
-        path: "user",
-        select:
-          "email role isActive",
-      },
-    });
-
-  return {
-    success: true,
-    completed: true,
-    payment:
-      refreshedPayment,
-  };
-}
-    /* ----------------------------------------
-       CHECKOUT REQUEST ID
-    ---------------------------------------- */
-
-    const checkoutRequestId =
-      payment.mpesa
-        ?.checkoutRequestId;
-
-    if (!checkoutRequestId) {
-      throw new AppError(
-        "This payment does not have an M-Pesa CheckoutRequestID.",
-        400
-      );
-    }
-
-    /* ----------------------------------------
-       QUERY SAFARICOM
-    ---------------------------------------- */
-
-    const result =
-      await queryMpesaStkPushStatus({
-        checkoutRequestId,
-      });
-
-    const resultCode =
-      result?.resultCode !== null &&
-      result?.resultCode !== undefined
-        ? Number(
-            result.resultCode
-          )
-        : null;
-
-    payment.mpesa.queryAttempts =
-      Number(
-        payment.mpesa
-          .queryAttempts || 0
-      ) + 1;
-
-    payment.mpesa.lastQueryAt =
-      new Date();
-
-    payment.mpesa.resultCode =
-      resultCode;
-
-    payment.mpesa.resultDescription =
-      result.resultDescription ||
-      payment.mpesa
-        .resultDescription;
-
-    payment.mpesa.merchantRequestId =
-      result.merchantRequestId ||
-      payment.mpesa
-        .merchantRequestId;
-
-    payment.mpesa.checkoutRequestId =
-      result.checkoutRequestId ||
-      payment.mpesa
-        .checkoutRequestId;
-
-    payment.gatewayResponse = {
-      ...(payment.gatewayResponse ||
-        {}),
-      lastQuery:
-        result.rawResponse,
-    };
-
-    /* ----------------------------------------
-       SUCCESSFUL PAYMENT
-    ---------------------------------------- */
-
-    if (resultCode === 0) {
-      payment.status =
-        "successful";
-
-      payment.statusMessage =
-        result.resultDescription ||
-        "Payment completed successfully.";
-
-      payment.failureReason =
-        null;
-
-      payment.isVerified =
-        true;
-
-      payment.verificationMethod =
-        "stk_query";
-
-      payment.verifiedAt =
-        payment.verifiedAt ||
-        new Date();
-
-      payment.paidAt =
-        payment.paidAt ||
-        new Date();
-
-      payment.gatewayReference =
-        payment.mpesa
-          ?.receiptNumber ||
-        payment.mpesa
-          ?.checkoutRequestId ||
-        payment.gatewayReference;
-
-      await payment.save();
-
-      /* --------------------------------------
-         PROCESS MEMBERSHIP
-      -------------------------------------- */
-
-      try {
-  await processSuccessfulPayment(
-    payment
-  );
-} catch (processingError) {
-  payment.membershipProcessingError =
-    processingError.message;
-
-  await payment.save();
-
-  throw processingError;
-}
-
-      await payment.save();
-
-      /* --------------------------------------
-         REFRESH PAYMENT AND MEMBER
-      -------------------------------------- */
-
-      const refreshedPayment =
-        await Payment.findById(
-          payment._id
-        ).populate({
-          path: "member",
-          populate: {
-            path: "user",
-            select:
-              "email role isActive",
-          },
-        });
-
-      return {
-        success: true,
-        completed: true,
-        payment:
-          refreshedPayment,
-        query: result,
-      };
-    }
-
-    /* ----------------------------------------
-   PAYMENT CANCELLED
----------------------------------------- */
-
-if (resultCode === 1032) {
-  payment.status = "cancelled";
-
-  payment.cancelledAt =
-    payment.cancelledAt ||
-    new Date();
-
-  payment.failedAt = null;
-
-  payment.statusMessage =
-    result.resultDescription ||
-    "The payment request was cancelled.";
-
-  payment.failureReason =
-    payment.statusMessage;
-}
-
-/* ----------------------------------------
-   PAYMENT EXPIRED / TIMEOUT
----------------------------------------- */
-
-else if (resultCode === 1037) {
-  payment.status = "expired";
-
-  payment.failedAt =
-    payment.failedAt ||
-    new Date();
-
-  payment.cancelledAt = null;
-
-  payment.statusMessage =
-    result.resultDescription ||
-    "The payment request expired.";
-
-  payment.failureReason =
-    payment.statusMessage;
-}
-
-/* ----------------------------------------
-   STILL PROCESSING
----------------------------------------- */
-
-else if (
-  resultCode === 4999 ||
-  resultCode === null
-) {
-  payment.status = "processing";
-
-  payment.statusMessage =
-    result.resultDescription ||
-    "The transaction is still under processing.";
-
-  payment.failureReason = null;
-  payment.failedAt = null;
-  payment.cancelledAt = null;
-}
-
-/* ----------------------------------------
-   OTHER FAILED PAYMENT
----------------------------------------- */
-
-else {
-  payment.status =
-    getMpesaResultStatus(
-      resultCode
-    );
-
-  /*
-   * Protect against an unknown result code
-   * being mapped back to processing.
-   */
-  if (
-    payment.status === "pending" ||
-    payment.status === "processing"
-  ) {
-    payment.status = "failed";
-  }
-
-  payment.failedAt =
-    payment.failedAt ||
-    new Date();
-
-  payment.cancelledAt = null;
-
-  payment.statusMessage =
-    result.resultDescription ||
-    "The payment was unsuccessful.";
-
-  payment.failureReason =
-    payment.statusMessage;
-}
-
-    await payment.save();
-
-    return {
-      success: true,
-      completed: false,
-      payment,
-      query: result,
-    };
-  };
-
-/* ==========================================================
-   RETRY FAILED PAYMENT
-========================================================== */
-
-export const retryPayment =
-  async ({
-    paymentId = null,
-    reference = null,
-    phoneNumber = null,
-  }) => {
-    let payment;
-
-    if (paymentId) {
-      payment =
-        await findPaymentById(
-          paymentId
-        );
-    } else if (reference) {
-      payment =
-        await findPaymentByReference(
-          reference
         );
     } else {
       throw new AppError(
@@ -1922,7 +2238,10 @@ export const retryPayment =
         "cancelled",
         "expired",
         "pending",
-      ].includes(payment.status)
+        "processing",
+      ].includes(
+        payment.status
+      )
     ) {
       throw new AppError(
         `A ${payment.status} payment cannot be retried.`,
@@ -1931,10 +2250,14 @@ export const retryPayment =
     }
 
     /*
-     * Reopen the payment record and clear old
-     * STK identifiers before creating a new prompt.
+     * Reset the existing IntaSend invoice so
+     * createIntaSendCheckout generates a new one.
      */
-    payment.status = "pending";
+    payment.provider =
+      "intasend";
+
+    payment.status =
+      "pending";
 
     payment.statusMessage =
       "Payment retry requested.";
@@ -1942,47 +2265,146 @@ export const retryPayment =
     payment.failureReason =
       null;
 
-    payment.failedAt = null;
-    payment.cancelledAt = null;
+    payment.failedAt =
+      null;
+
+    payment.cancelledAt =
+      null;
+
+    payment.verifiedAt =
+      null;
+
+    payment.paidAt =
+      null;
+
+    payment.isVerified =
+      false;
+
+    payment.verificationMethod =
+      null;
 
     payment.expiresAt =
       calculatePaymentExpiry();
 
-    payment.mpesa.merchantRequestId =
+    payment.gatewayReference =
       null;
 
-    payment.mpesa.checkoutRequestId =
+    payment.gatewayResponse =
       null;
 
-    payment.mpesa.resultCode =
+    payment.callbackPayload =
       null;
 
-    payment.mpesa.resultDescription =
+    payment.intasend.invoiceId =
       null;
 
-    payment.mpesa.callbackReceived =
+    payment.intasend.checkoutUrl =
+      null;
+
+    payment.intasend.state =
+      null;
+
+    payment.intasend.provider =
+      null;
+
+    payment.intasend.providerReference =
+      null;
+
+    payment.intasend.charges =
+      0;
+
+    payment.intasend.netAmount =
+      null;
+
+    payment.intasend.failedReason =
+      null;
+
+    payment.intasend.failedCode =
+      null;
+
+    payment.intasend.webhookReceived =
       false;
 
-    payment.mpesa.callbackReceivedAt =
+    payment.intasend.webhookReceivedAt =
+      null;
+
+    payment.intasend.statusQueryAttempts =
+      0;
+
+    payment.intasend.lastStatusQueryAt =
       null;
 
     if (phoneNumber) {
       payment.phoneNumber =
         getMemberPhone(
           payment.member,
-          phoneNumber
+          phoneNumber,
+          {
+            required:
+              method ===
+              "M-PESA",
+          }
         );
     }
 
+    payment.paymentMethod =
+      method === "M-PESA"
+        ? "mpesa"
+        : method ===
+            "CARD-PAYMENT"
+          ? "card"
+          : "unknown";
+
     await payment.save();
 
-    return initiatePayment({
-      paymentId:
+    const result =
+      await initiatePayment({
+        paymentId:
+          payment._id,
+
+        phoneNumber:
+          payment.phoneNumber,
+
+        email,
+
+        fullName,
+
+        method,
+
+        redirectUrl,
+      });
+
+    await createActivityLog({
+      user:
+        getMemberUserId(
+          payment.member
+        ) ||
+        payment.user,
+
+      action:
+        "IntaSend payment retried",
+
+      description:
+        "A new IntaSend checkout was created for an incomplete payment.",
+
+      targetId:
         payment._id,
 
-      phoneNumber:
-        payment.phoneNumber,
+      metadata: {
+        reference:
+          payment.reference,
+
+        invoiceId:
+          result.invoiceId,
+
+        method,
+
+        provider:
+          "intasend",
+      },
     });
+
+    return result;
   };
 
 /* ==========================================================
@@ -2534,6 +2956,8 @@ export default {
   initiatePayment,
   initiateMembershipPayment,
   initiateRenewalPayment,
+
+  processSuccessfulPayment,
 
   processMpesaCallback,
   queryPaymentStatus,

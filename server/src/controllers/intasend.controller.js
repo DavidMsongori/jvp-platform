@@ -5,6 +5,10 @@ import {
   queryIntaSendPaymentStatus,
 } from "../services/intasend.service.js";
 
+import {
+  processSuccessfulPayment,
+} from "../services/payment.service.js";
+
 /* ==========================================================
    RESPONSE HELPERS
 ========================================================== */
@@ -337,6 +341,16 @@ export const queryPaymentStatus =
           }
         );
 
+      if (
+  result.payment?.status ===
+    "successful" &&
+  result.payment?.isVerified
+) {
+  await processSuccessfulPayment(
+    result.payment
+  );
+}  
+
       return sendSuccess(
         res,
         {
@@ -502,6 +516,39 @@ export const handleWebhook =
         await processIntaSendWebhook(
           webhookPayload
         );
+
+ if (
+  result.payment?.status ===
+    "successful" &&
+  result.payment?.isVerified
+) {
+  try {
+    await processSuccessfulPayment(
+      result.payment
+    );
+  } catch (processingError) {
+    console.error(
+      "IntaSend payment completed but post-payment processing failed:",
+      processingError
+    );
+
+    if (
+      [
+        "membership",
+        "renewal",
+      ].includes(
+        result.payment.paymentFor
+      )
+    ) {
+      result.payment.membershipProcessingError =
+        processingError.message;
+
+      await result.payment.save();
+    }
+
+    throw processingError;
+  }
+}
 
       /*
        * Respond quickly so IntaSend does not

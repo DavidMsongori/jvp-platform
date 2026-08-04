@@ -5,19 +5,24 @@ import api from "./api";
 ========================================== */
 
 /**
- * Initiate a new membership M-Pesa STK Push.
- *
- * @param {string} phoneNumber
- * @returns {Promise<object>}
+ * Create an IntaSend checkout for membership registration.
  */
-export const initiateMembershipPayment = async (
-  phoneNumber
-) => {
+export const initiateMembershipPayment = async ({
+  phoneNumber = null,
+  email = null,
+  fullName = null,
+  method = "M-PESA",
+  redirectUrl = `${window.location.origin}/payment/success`,
+} = {}) => {
   try {
     const response = await api.post(
       "/payments/membership",
       {
         phoneNumber,
+        email,
+        fullName,
+        method,
+        redirectUrl,
       }
     );
 
@@ -37,20 +42,22 @@ export const initiateMembershipPayment = async (
    MEMBERSHIP RENEWAL
 ========================================== */
 
-/**
- * Initiate an M-Pesa membership-renewal payment.
- *
- * @param {string} phoneNumber
- * @returns {Promise<object>}
- */
-export const initiateRenewalPayment = async (
-  phoneNumber
-) => {
+export const initiateRenewalPayment = async ({
+  phoneNumber = null,
+  email = null,
+  fullName = null,
+  method = "M-PESA",
+  redirectUrl = `${window.location.origin}/payment/success`,
+} = {}) => {
   try {
     const response = await api.post(
       "/payments/renewal",
       {
         phoneNumber,
+        email,
+        fullName,
+        method,
+        redirectUrl,
       }
     );
 
@@ -67,23 +74,62 @@ export const initiateRenewalPayment = async (
 };
 
 /* ==========================================
+   INITIATE EXISTING PAYMENT
+========================================== */
+
+export const initiatePayment = async ({
+  paymentId = null,
+  reference = null,
+  phoneNumber = null,
+  email = null,
+  fullName = null,
+  method = "M-PESA",
+  redirectUrl = `${window.location.origin}/payment/success`,
+}) => {
+  try {
+    const response = await api.post(
+      "/payments/initiate",
+      {
+        paymentId,
+        reference,
+        phoneNumber,
+        email,
+        fullName,
+        method,
+        redirectUrl,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        success: false,
+        message:
+          "Unable to initiate payment.",
+      }
+    );
+  }
+};
+
+/* ==========================================
    PAYMENT STATUS
 ========================================== */
 
-/**
- * Retrieve or query a payment's current status.
- *
- * @param {string} reference
- * @returns {Promise<object>}
- */
-export const checkPaymentStatus = async (
-  reference
-) => {
+export const checkPaymentStatus = async ({
+  paymentId = null,
+  reference = null,
+  paymentReference = null,
+  invoiceId = null,
+}) => {
   try {
     const response = await api.post(
       "/payments/status",
       {
+        paymentId,
         reference,
+        paymentReference,
+        invoiceId,
       }
     );
 
@@ -103,23 +149,26 @@ export const checkPaymentStatus = async (
    RETRY PAYMENT
 ========================================== */
 
-/**
- * Retry an existing failed, cancelled or expired payment.
- *
- * @param {string} reference
- * @param {string} phoneNumber
- * @returns {Promise<object>}
- */
-export const retryPayment = async (
-  reference,
-  phoneNumber
-) => {
+export const retryPayment = async ({
+  paymentId = null,
+  reference = null,
+  phoneNumber = null,
+  email = null,
+  fullName = null,
+  method = "M-PESA",
+  redirectUrl = `${window.location.origin}/payment/success`,
+}) => {
   try {
     const response = await api.post(
       "/payments/retry",
       {
+        paymentId,
         reference,
         phoneNumber,
+        email,
+        fullName,
+        method,
+        redirectUrl,
       }
     );
 
@@ -129,7 +178,7 @@ export const retryPayment = async (
       error.response?.data || {
         success: false,
         message:
-          "Unable to retry the payment.",
+          "Unable to retry payment.",
       }
     );
   }
@@ -139,12 +188,6 @@ export const retryPayment = async (
    PAYMENT HISTORY
 ========================================== */
 
-/**
- * Retrieve the signed-in member's payment history.
- *
- * @param {object} params
- * @returns {Promise<object>}
- */
 export const getPaymentHistory = async (
   params = {}
 ) => {
@@ -172,12 +215,6 @@ export const getPaymentHistory = async (
    PAYMENT BY REFERENCE
 ========================================== */
 
-/**
- * Retrieve a payment using its internal reference.
- *
- * @param {string} reference
- * @returns {Promise<object>}
- */
 export const getPaymentByReference = async (
   reference
 ) => {
@@ -192,7 +229,7 @@ export const getPaymentByReference = async (
       error.response?.data || {
         success: false,
         message:
-          "Unable to retrieve the payment.",
+          "Unable to retrieve payment.",
       }
     );
   }
@@ -202,12 +239,6 @@ export const getPaymentByReference = async (
    PAYMENT BY ID
 ========================================== */
 
-/**
- * Retrieve a payment using its MongoDB ID.
- *
- * @param {string} paymentId
- * @returns {Promise<object>}
- */
 export const getPaymentById = async (
   paymentId
 ) => {
@@ -222,10 +253,26 @@ export const getPaymentById = async (
       error.response?.data || {
         success: false,
         message:
-          "Unable to retrieve the payment.",
+          "Unable to retrieve payment.",
       }
     );
   }
+};
+
+/* ==========================================
+   REDIRECT TO INTASEND
+========================================== */
+
+export const redirectToCheckout = (
+  checkoutUrl
+) => {
+  if (!checkoutUrl) {
+    throw new Error(
+      "Checkout URL not found."
+    );
+  }
+
+  window.location.href = checkoutUrl;
 };
 
 /* ==========================================
@@ -235,11 +282,13 @@ export const getPaymentById = async (
 const paymentService = {
   initiateMembershipPayment,
   initiateRenewalPayment,
-  checkPaymentStatus,
+  initiatePayment,
   retryPayment,
+  checkPaymentStatus,
   getPaymentHistory,
   getPaymentByReference,
   getPaymentById,
+  redirectToCheckout,
 };
 
 export default paymentService;

@@ -32,51 +32,65 @@ import {
 
 const router = express.Router();
 
-router.get("/test", (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Payment routes are working.",
-  });
-});
+/* ==========================================================
+   HEALTH TEST
+========================================================== */
+
+router.get(
+  "/test",
+  (req, res) => {
+    return res.status(200).json({
+      success: true,
+      message:
+        "Payment routes are working.",
+    });
+  }
+);
 
 /* ==========================================================
-   MEMBER PAYMENTS
+   PUBLIC LEGACY CALLBACK
 ========================================================== */
 
 /**
- * Membership Registration Payment
+ * Historical direct M-Pesa callback.
+ *
+ * This remains public so any outstanding direct-Daraja
+ * transactions can still send their callbacks.
+ *
+ * New IntaSend webhooks are handled separately at:
+ *
+ * POST /api/payments/intasend/webhook
+ */
+
+router.post(
+  "/mpesa/callback",
+  mpesaCallbackValidator,
+  validate,
+  mpesaCallback
+);
+
+/* ==========================================================
+   MEMBERSHIP PAYMENTS
+========================================================== */
+
+/**
+ * Create an IntaSend checkout for membership registration.
+ *
+ * POST /api/payments/membership
  */
 
 router.post(
   "/membership",
-
-  (req, res, next) => {
-    console.log("1. Membership route reached");
-    next();
-  },
-
   auth,
-
-  (req, res, next) => {
-    console.log("2. Authentication passed");
-    console.log("User:", req.user);
-    next();
-  },
-
   membershipPaymentValidator,
-
   validate,
-
-  (req, res, next) => {
-    console.log("3. Validation passed");
-    next();
-  },
-
   initiateMembershipPayment
 );
 
 /**
- * Membership Renewal Payment
+ * Create an IntaSend checkout for membership renewal.
+ *
+ * POST /api/payments/renewal
  */
 
 router.post(
@@ -87,8 +101,14 @@ router.post(
   initiateRenewalPayment
 );
 
+/* ==========================================================
+   EXISTING PAYMENTS
+========================================================== */
+
 /**
- * Re-initiate Existing Payment
+ * Initiate an existing pending payment through IntaSend.
+ *
+ * POST /api/payments/initiate
  */
 
 router.post(
@@ -100,7 +120,10 @@ router.post(
 );
 
 /**
- * Retry Failed / Expired Payment
+ * Retry an incomplete payment by generating a new
+ * IntaSend checkout.
+ *
+ * POST /api/payments/retry
  */
 
 router.post(
@@ -116,7 +139,15 @@ router.post(
 ========================================================== */
 
 /**
- * Query Payment Status
+ * Query the latest payment status from IntaSend.
+ *
+ * The request may contain:
+ * - paymentId
+ * - reference
+ * - paymentReference
+ * - invoiceId
+ *
+ * POST /api/payments/status
  */
 
 router.post(
@@ -127,26 +158,14 @@ router.post(
   queryPaymentStatus
 );
 
-/**
- * M-Pesa Callback
- *
- * IMPORTANT:
- * This route MUST remain public.
- */
-
-router.post(
-  "/mpesa/callback",
-  mpesaCallbackValidator,
-  validate,
-  mpesaCallback
-);
-
 /* ==========================================================
-   MEMBER PAYMENTS
+   MEMBER PAYMENT RECORDS
 ========================================================== */
 
 /**
- * Payment History
+ * Logged-in member payment history.
+ *
+ * GET /api/payments/history
  */
 
 router.get(
@@ -156,7 +175,9 @@ router.get(
 );
 
 /**
- * Payment by Reference
+ * Retrieve a payment using its local reference.
+ *
+ * GET /api/payments/reference/:reference
  */
 
 router.get(
@@ -168,7 +189,9 @@ router.get(
 );
 
 /**
- * Payment by ID
+ * Retrieve a payment using its MongoDB ID.
+ *
+ * GET /api/payments/id/:paymentId
  */
 
 router.get(
@@ -180,11 +203,13 @@ router.get(
 );
 
 /* ==========================================================
-   ADMIN
+   ADMINISTRATION
 ========================================================== */
 
 /**
- * All Payments
+ * Retrieve all payments.
+ *
+ * GET /api/payments/admin/all
  */
 
 router.get(
@@ -194,7 +219,9 @@ router.get(
 );
 
 /**
- * Payment Statistics
+ * Retrieve payment statistics.
+ *
+ * GET /api/payments/admin/statistics
  */
 
 router.get(
@@ -204,7 +231,9 @@ router.get(
 );
 
 /**
- * Mark Payment Failed
+ * Manually mark an incomplete payment as failed.
+ *
+ * PATCH /api/payments/admin/fail/:reference
  */
 
 router.patch(
@@ -216,7 +245,9 @@ router.patch(
 );
 
 /**
- * Delete Pending Payment
+ * Delete an incomplete payment record.
+ *
+ * DELETE /api/payments/admin/:reference
  */
 
 router.delete(

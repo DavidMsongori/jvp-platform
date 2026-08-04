@@ -13,6 +13,8 @@ import {
   hasPermission as checkPermission,
 } from "../utils/permissions";
 
+import { getMyProfile } from "../services/member.service";
+
 const AuthContext = createContext(null);
 
 /* ==========================================================
@@ -208,37 +210,20 @@ export function AuthProvider({ children }) {
       const response =
         await getMyProfile();
 
-      /*
-       * getMyProfile may already return
-       * response.data from Axios.
-       *
-       * Supported response shapes:
-       * 1. { success, data: member }
-       * 2. Axios response:
-       *    { data: { success, data: member } }
-       */
-      const updatedMember =
-        response?.data?.data ||
-        response?.data?.member ||
+      const payload =
         response?.data ||
-        response?.member ||
-        null;
+        response ||
+        {};
 
-      if (
-        updatedMember &&
-        updatedMember._id
-      ) {
-        setMember(updatedMember);
+      const refreshedMember =
+        payload.member ||
+        payload;
 
-        localStorage.setItem(
-          "member",
-          JSON.stringify(
-            updatedMember
-          )
-        );
-      }
+      setMember(
+        refreshedMember
+      );
 
-      return updatedMember;
+      return refreshedMember;
     } catch (error) {
       console.error(
         "Unable to refresh member profile:",
