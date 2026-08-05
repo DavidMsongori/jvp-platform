@@ -32,6 +32,8 @@ import Footer from "../../components/layout/Footer";
 
 import "./SummitPage.css";
 
+import PosterGeneratorCTA from "../../components/summit/PosterGeneratorCTA";
+
 /* ==========================================
    CONFIGURATION
 ========================================== */
@@ -885,6 +887,7 @@ const registrationOpen =
         </div>
       </section>
 
+     
       {/* ======================================
           ABOUT
       ====================================== */}
@@ -1018,6 +1021,11 @@ const registrationOpen =
             )}
           </div>
         </div>
+      </section>
+
+
+ <section>
+        <PosterGeneratorCTA />
       </section>
 
       

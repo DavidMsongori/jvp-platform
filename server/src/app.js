@@ -22,6 +22,7 @@ import publicSummitRoutes from "./routes/publicSummit.routes.js";
 import adminSummitRoutes from "./routes/adminSummit.routes.js";
 import summitExhibitorRoutes from "./routes/summitExhibitor.routes.js";
 import intasendRoutes from "./routes/intasend.routes.js";
+import summitPosterRoutes from "./routes/summitPoster.routes.js";
 
 const app = express();
 
@@ -192,8 +193,13 @@ app.use(
 );
 
 app.use(
-  "/api/summit/exhibitors",
+  "/api/summit-exhibitors",
   summitExhibitorRoutes
+);
+
+app.use(
+  "/api/summit/posters",
+  summitPosterRoutes
 );
 
 /* ==========================================================

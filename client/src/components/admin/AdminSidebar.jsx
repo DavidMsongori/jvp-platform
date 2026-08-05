@@ -16,6 +16,10 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
+import {
+  FileImage,
+} from "lucide-react";
+
 import { PERMISSIONS } from "../../utils/permissions";
 
 import "./Sidebar.css";
@@ -81,6 +85,13 @@ function AdminSidebar({
   name: "Summit",
   icon: <FaTicketAlt />,
   path: "/admin/summit",
+  permission: PERMISSIONS.VIEW_EVENTS,
+},
+
+{
+  name: "Summit Posters",
+  icon: <FaTicketAlt />,
+  path: "/admin/summit/posters",
   permission: PERMISSIONS.VIEW_EVENTS,
 },
 

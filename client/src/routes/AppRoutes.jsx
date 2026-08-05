@@ -27,6 +27,8 @@ import SummitVerifyTicket from "../pages/summit/SummitVerifyTicket";
 import SummitPlanningCommittee from "../pages/summit/SummitPlanningCommittee";
 import ExhibitorRegistration from "../pages/summit/ExhibitorRegistration";
 import SummitGuests from "../pages/summit/SummitGuests";
+import SummitPosterForm from "../pages/summit-poster/SummitPosterForm";
+import SummitPosterStatus from "../pages/summit-poster/SummitPosterStatus";
 import Contact from "../pages/contact/Contact";
 import Leadership from "../pages/leadership/Leadership";
 
@@ -117,6 +119,7 @@ import SummitRegistrations from "../pages/admin/summit/SummitRegistrations";
 import SummitRegistrationDetails from "../pages/admin/summit/SummitRegistrationDetails";
 import SummitCheckIn from "../pages/admin/summit/SummitCheckIn";
 import AdminExhibitors from "../pages/admin/summit/AdminExhibitors";
+import AdminSummitPosters from "../pages/admin/AdminSummitPosters";
 
 /* ==========================================
    OTHER
@@ -166,6 +169,20 @@ function AppRoutes() {
 <Route
   path="/summit/guests"
   element={<SummitGuests />}
+/>
+
+<Route
+  path="/summit/poster"
+  element={
+    <SummitPosterForm />
+  }
+/>
+
+<Route
+  path="/summit/poster/status"
+  element={
+    <SummitPosterStatus />
+  }
 />
 
 <Route
@@ -540,6 +557,13 @@ function AppRoutes() {
 <Route
   path="summit/exhibitors"
   element={<AdminExhibitors />}
+/>
+
+<Route
+  path="/admin/summit/posters"
+  element={
+    <AdminSummitPosters />
+  }
 />
 
         </Route>

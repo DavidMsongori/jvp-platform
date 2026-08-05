@@ -1,0 +1,1124 @@
+/* ==========================================================
+   ROOT
+========================================================== */
+
+.summit-poster-page {
+  min-height: 100vh;
+
+  color: #10233f;
+  background: #f4f8fb;
+
+  font-family:
+    Inter,
+    Arial,
+    sans-serif;
+}
+
+.summit-poster-container {
+  width: min(
+    1160px,
+    calc(100% - 40px)
+  );
+
+  margin: 0 auto;
+}
+
+/* ==========================================================
+   HERO
+========================================================== */
+
+.summit-poster-hero {
+  padding: 92px 20px 88px;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(244, 165, 28, 0.24),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 12% 80%,
+      rgba(0, 155, 175, 0.27),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      #062e65,
+      #075c77 58%,
+      #087744
+    );
+}
+
+.summit-poster-hero-content {
+  width: min(
+    880px,
+    100%
+  );
+
+  margin: 0 auto;
+
+  text-align: center;
+}
+
+.summit-poster-return-link {
+  width: fit-content;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 34px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.8
+    );
+
+  font-size: 0.84rem;
+  font-weight: 750;
+
+  text-decoration: none;
+}
+
+.summit-poster-return-link:hover {
+  color: #ffffff;
+}
+
+.summit-poster-eyebrow {
+  display: block;
+
+  color: #fbbf24;
+
+  font-size: 0.78rem;
+  font-weight: 850;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-hero h1 {
+  max-width: 800px;
+
+  margin:
+    16px auto 18px;
+
+  font-size:
+    clamp(
+      2.4rem,
+      6vw,
+      4.8rem
+    );
+
+  line-height: 1.03;
+}
+
+.summit-poster-hero p {
+  max-width: 720px;
+
+  margin: 0 auto;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  font-size: 1.03rem;
+  line-height: 1.8;
+}
+
+.summit-poster-benefits {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 30px;
+}
+
+.summit-poster-benefits span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 9px 13px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.9
+    );
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.1
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.16
+    );
+
+  border-radius: 999px;
+
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+/* ==========================================================
+   FORM LAYOUT
+========================================================== */
+
+.summit-poster-form-section {
+  padding: 74px 0 90px;
+}
+
+.summit-poster-form-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(300px, 0.78fr)
+    minmax(0, 1.22fr);
+
+  align-items: start;
+
+  gap: 28px;
+}
+
+.summit-poster-preview-card,
+.summit-poster-form-card,
+.summit-poster-payment-card,
+.summit-poster-code-form {
+  background: #ffffff;
+
+  border:
+    1px solid #dae5eb;
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 22px 55px
+    rgba(15, 23, 42, 0.08);
+}
+
+/* ==========================================================
+   PHOTO CARD
+========================================================== */
+
+.summit-poster-preview-card {
+  position: sticky;
+  top: 24px;
+
+  padding: 28px;
+}
+
+.summit-poster-preview-heading span,
+.summit-poster-form-heading span,
+.summit-poster-payment-heading span,
+.summit-poster-code-form
+  > div:first-child
+  > span {
+  color: #087744;
+
+  font-size: 0.73rem;
+  font-weight: 850;
+
+  letter-spacing: 0.09em;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-preview-heading h2,
+.summit-poster-form-heading h2 {
+  margin:
+    9px 0 8px;
+
+  color: #10233f;
+
+  font-size: 1.55rem;
+}
+
+.summit-poster-preview-heading p,
+.summit-poster-form-heading p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 0.87rem;
+  line-height: 1.65;
+}
+
+.summit-poster-photo-picker {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+
+  display: block;
+
+  margin-top: 24px;
+  padding: 0;
+
+  overflow: hidden;
+
+  color: #64748b;
+  background:
+    linear-gradient(
+      145deg,
+      #f7fafc,
+      #eaf4f4
+    );
+
+  border:
+    2px dashed #bfd1da;
+
+  border-radius: 18px;
+
+  cursor: pointer;
+}
+
+.summit-poster-photo-picker:hover {
+  border-color: #087744;
+}
+
+.summit-poster-photo-picker > div {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 11px;
+
+  padding: 28px;
+}
+
+.summit-poster-photo-picker svg {
+  color: #087744;
+}
+
+.summit-poster-photo-picker strong {
+  color: #10233f;
+
+  font-size: 1rem;
+}
+
+.summit-poster-photo-picker span {
+  max-width: 220px;
+
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.summit-poster-photo-picker.has-photo {
+  border-style: solid;
+}
+
+.summit-poster-photo-picker img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.summit-poster-photo-actions {
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 16px;
+}
+
+.summit-poster-photo-actions button {
+  flex: 1;
+
+  min-height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 10px 13px;
+
+  color: #ffffff;
+  background: #087744;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 0.78rem;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.summit-poster-photo-actions
+  button.secondary {
+  color: #334155;
+  background: #eef3f6;
+}
+
+/* ==========================================================
+   PARTICIPANT FORM
+========================================================== */
+
+.summit-poster-form-card {
+  padding: 34px;
+}
+
+.summit-poster-form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 19px;
+
+  margin-top: 28px;
+}
+
+.summit-poster-form-grid
+  label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.summit-poster-form-grid
+  label.full-width {
+  grid-column: 1 / -1;
+}
+
+.summit-poster-form-grid
+  label
+  > span {
+  color: #334155;
+
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.summit-poster-form-grid
+  input,
+.summit-poster-form-grid
+  select,
+.summit-poster-code-form
+  input {
+  width: 100%;
+  min-height: 48px;
+
+  padding: 0 14px;
+
+  color: #0f172a;
+  background: #ffffff;
+
+  border:
+    1px solid #cedae1;
+
+  border-radius: 10px;
+
+  outline: none;
+
+  font: inherit;
+  font-size: 0.88rem;
+
+  box-sizing: border-box;
+}
+
+.summit-poster-form-grid
+  input:focus,
+.summit-poster-form-grid
+  select:focus,
+.summit-poster-code-form
+  input:focus {
+  border-color: #087744;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(8, 119, 68, 0.11);
+}
+
+.summit-poster-consent {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 11px;
+
+  margin-top: 24px;
+  padding: 15px;
+
+  background: #f2f8f5;
+
+  border:
+    1px solid #d7ebe0;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+}
+
+.summit-poster-consent
+  input {
+  width: 17px;
+  height: 17px;
+
+  flex: 0 0 auto;
+
+  margin-top: 2px;
+
+  accent-color: #087744;
+}
+
+.summit-poster-consent
+  span {
+  color: #475569;
+
+  font-size: 0.79rem;
+  line-height: 1.55;
+}
+
+.summit-poster-form-error {
+  margin-top: 18px;
+  padding: 12px 14px;
+
+  color: #9f1239;
+  background: #fff1f2;
+
+  border:
+    1px solid #fecdd3;
+
+  border-radius: 10px;
+
+  font-size: 0.81rem;
+  font-weight: 650;
+}
+
+.summit-poster-primary-button {
+  width: 100%;
+  min-height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  margin-top: 22px;
+  padding: 12px 18px;
+
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #075d78,
+      #087744
+    );
+
+  border: none;
+  border-radius: 11px;
+
+  font-size: 0.87rem;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.summit-poster-primary-button:hover {
+  filter: brightness(1.05);
+}
+
+.summit-poster-primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.summit-poster-security-note {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  margin-top: 15px;
+
+  color: #64748b;
+}
+
+.summit-poster-security-note
+  svg {
+  flex: 0 0 auto;
+
+  color: #087744;
+}
+
+.summit-poster-security-note
+  p {
+  margin: 0;
+
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+/* ==========================================================
+   PAYMENT
+========================================================== */
+
+.summit-poster-payment-shell {
+  width: min(
+    1080px,
+    calc(100% - 40px)
+  );
+
+  margin: 0 auto;
+  padding: 54px 0 90px;
+}
+
+.summit-poster-back-button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 0;
+
+  color: #475569;
+  background: transparent;
+
+  border: none;
+
+  font-size: 0.82rem;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.summit-poster-payment-heading {
+  max-width: 680px;
+
+  margin:
+    34px auto 38px;
+
+  text-align: center;
+}
+
+.summit-poster-payment-heading h1 {
+  margin:
+    12px 0 12px;
+
+  color: #10233f;
+
+  font-size:
+    clamp(
+      2rem,
+      5vw,
+      3.4rem
+    );
+
+  line-height: 1.08;
+}
+
+.summit-poster-payment-heading p {
+  margin: 0;
+
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.summit-poster-payment-layout {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 26px;
+
+  align-items: start;
+}
+
+.summit-poster-payment-card,
+.summit-poster-code-form {
+  padding: 32px;
+}
+
+.summit-poster-payment-card-icon {
+  width: 54px;
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 18px;
+
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #075d78,
+      #087744
+    );
+
+  border-radius: 16px;
+}
+
+.summit-poster-payment-card
+  > small {
+  color: #087744;
+
+  font-size: 0.72rem;
+  font-weight: 850;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-payment-card
+  h2,
+.summit-poster-code-form
+  h2 {
+  margin:
+    8px 0 22px;
+
+  color: #10233f;
+
+  font-size: 1.65rem;
+}
+
+.summit-poster-payment-detail {
+  padding: 16px 0;
+
+  border-top:
+    1px solid #e6edf1;
+}
+
+.summit-poster-payment-detail
+  > span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #64748b;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-payment-detail
+  > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.summit-poster-payment-detail
+  strong {
+  min-width: 0;
+
+  color: #10233f;
+
+  font-size: 1.05rem;
+
+  overflow-wrap: anywhere;
+}
+
+.summit-poster-payment-detail
+  button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 7px 10px;
+
+  color: #075d78;
+  background: #eaf5f5;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 0.72rem;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.summit-poster-payment-steps {
+  margin:
+    20px 0 0;
+  padding:
+    18px 18px 18px 38px;
+
+  color: #475569;
+  background: #f7fafc;
+
+  border-radius: 12px;
+
+  font-size: 0.79rem;
+  line-height: 1.8;
+}
+
+.summit-poster-code-form
+  > div:first-child
+  p {
+  margin:
+    -12px 0 24px;
+
+  color: #64748b;
+
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
+.summit-poster-code-form
+  label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.summit-poster-code-form
+  label
+  > span {
+  color: #334155;
+
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.summit-poster-code-form
+  input {
+  text-transform: uppercase;
+
+  letter-spacing: 0.16em;
+
+  font-weight: 800;
+}
+
+.summit-poster-payment-note {
+  display: block;
+
+  margin-top: 15px;
+
+  color: #64748b;
+
+  font-size: 0.73rem;
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+/* ==========================================================
+   SUCCESS
+========================================================== */
+
+.summit-poster-success {
+  width: min(
+    650px,
+    calc(100% - 32px)
+  );
+
+  margin: 70px auto;
+  padding: 48px 38px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border:
+    1px solid #dbe6eb;
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 24px 65px
+    rgba(15, 23, 42, 0.1);
+}
+
+.summit-poster-success-icon {
+  width: 82px;
+  height: 82px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 22px;
+
+  color: #087744;
+  background: #e7f6ed;
+
+  border-radius: 50%;
+}
+
+.summit-poster-success
+  > span {
+  color: #087744;
+
+  font-size: 0.75rem;
+  font-weight: 850;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-success
+  h1 {
+  margin:
+    12px 0 14px;
+
+  color: #10233f;
+
+  font-size:
+    clamp(
+      2rem,
+      5vw,
+      3rem
+    );
+
+  line-height: 1.1;
+}
+
+.summit-poster-success
+  > p {
+  margin: 0;
+
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.summit-poster-success-reference {
+  margin-top: 25px;
+  padding: 17px;
+
+  background: #f3f8fa;
+
+  border-radius: 12px;
+}
+
+.summit-poster-success-reference
+  small {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #64748b;
+
+  font-size: 0.7rem;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-success-reference
+  strong {
+  color: #10233f;
+
+  overflow-wrap: anywhere;
+}
+
+.summit-poster-success-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  gap: 11px;
+
+  margin-top: 26px;
+}
+
+.summit-poster-success-actions
+  a,
+.summit-poster-success-actions
+  button {
+  min-height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 11px 16px;
+
+  border-radius: 10px;
+
+  font-size: 0.79rem;
+  font-weight: 780;
+
+  text-decoration: none;
+
+  cursor: pointer;
+}
+
+.summit-poster-success-actions
+  a {
+  color: #ffffff;
+  background: #087744;
+}
+
+.summit-poster-success-actions
+  button {
+  color: #334155;
+  background: #edf2f5;
+
+  border: none;
+}
+
+/* ==========================================================
+   UTILITIES
+========================================================== */
+
+.summit-poster-spin {
+  animation:
+    summit-poster-spin
+    0.8s linear
+    infinite;
+}
+
+@keyframes summit-poster-spin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (
+  max-width: 900px
+) {
+  .summit-poster-form-layout,
+  .summit-poster-payment-layout {
+    grid-template-columns:
+      1fr;
+  }
+
+  .summit-poster-preview-card {
+    position: static;
+  }
+
+  .summit-poster-photo-picker {
+    max-height: 520px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (
+  max-width: 620px
+) {
+  .summit-poster-container,
+  .summit-poster-payment-shell {
+    width:
+      min(
+        100% - 24px,
+        1160px
+      );
+  }
+
+  .summit-poster-hero {
+    padding:
+      64px 16px 68px;
+  }
+
+  .summit-poster-benefits {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .summit-poster-benefits
+    span {
+    justify-content: center;
+  }
+
+  .summit-poster-form-section {
+    padding:
+      46px 0 65px;
+  }
+
+  .summit-poster-preview-card,
+  .summit-poster-form-card,
+  .summit-poster-payment-card,
+  .summit-poster-code-form {
+    padding: 22px;
+
+    border-radius: 17px;
+  }
+
+  .summit-poster-form-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .summit-poster-form-grid
+    label.full-width {
+    grid-column: auto;
+  }
+
+  .summit-poster-payment-shell {
+    padding:
+      30px 0 65px;
+  }
+
+  .summit-poster-payment-detail
+    > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .summit-poster-success {
+    margin: 28px auto;
+    padding: 35px 22px;
+  }
+
+  .summit-poster-success-actions {
+    flex-direction: column;
+  }
+
+  .summit-poster-success-actions
+    a,
+  .summit-poster-success-actions
+    button {
+    width: 100%;
+
+    box-sizing: border-box;
+  }
+}

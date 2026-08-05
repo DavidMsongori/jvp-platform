@@ -1,0 +1,926 @@
+/* ==========================================================
+   ROOT
+========================================================== */
+
+.summit-poster-status-page {
+  min-height: 100vh;
+
+  color: #10233f;
+  background: #f3f7fa;
+
+  font-family:
+    Inter,
+    Arial,
+    sans-serif;
+}
+
+.summit-poster-status-container {
+  width: min(
+    1160px,
+    calc(100% - 40px)
+  );
+
+  margin: 0 auto;
+}
+
+/* ==========================================================
+   HERO
+========================================================== */
+
+.summit-poster-status-hero {
+  padding: 86px 20px 82px;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 80% 10%,
+      rgba(244, 165, 28, 0.24),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 10% 82%,
+      rgba(0, 158, 174, 0.28),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      #062e65,
+      #075b76 58%,
+      #087744
+    );
+}
+
+.summit-poster-status-hero-content {
+  width: min(
+    820px,
+    100%
+  );
+
+  margin: 0 auto;
+
+  text-align: center;
+}
+
+.summit-poster-status-back-link {
+  width: fit-content;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 30px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  font-size: 0.84rem;
+  font-weight: 760;
+
+  text-decoration: none;
+}
+
+.summit-poster-status-back-link:hover {
+  color: #ffffff;
+}
+
+.summit-poster-status-hero-content
+  > span {
+  display: block;
+
+  color: #fbbf24;
+
+  font-size: 0.76rem;
+  font-weight: 850;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-status-hero h1 {
+  margin:
+    14px 0 15px;
+
+  font-size:
+    clamp(
+      2.4rem,
+      6vw,
+      4.5rem
+    );
+
+  line-height: 1.03;
+}
+
+.summit-poster-status-hero p {
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.summit-poster-status-content {
+  padding: 70px 0 90px;
+}
+
+.summit-poster-status-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(300px, 0.8fr)
+    minmax(0, 1.2fr);
+
+  align-items: start;
+
+  gap: 28px;
+}
+
+/* ==========================================================
+   SEARCH CARD
+========================================================== */
+
+.summit-poster-status-search-card,
+.summit-poster-status-result-card {
+  background: #ffffff;
+
+  border:
+    1px solid #d9e4ea;
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 22px 55px
+    rgba(15, 23, 42, 0.08);
+}
+
+.summit-poster-status-search-card {
+  position: sticky;
+  top: 24px;
+
+  padding: 30px;
+}
+
+.summit-poster-status-search-heading
+  > span,
+.summit-poster-status-result-header
+  span,
+.summit-poster-status-preview-heading
+  span {
+  color: #087744;
+
+  font-size: 0.72rem;
+  font-weight: 850;
+
+  letter-spacing: 0.09em;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-status-search-heading
+  h2 {
+  margin:
+    9px 0 8px;
+
+  color: #10233f;
+
+  font-size: 1.55rem;
+}
+
+.summit-poster-status-search-heading
+  p {
+  margin:
+    0 0 24px;
+
+  color: #64748b;
+
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.summit-poster-status-search-card
+  label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 17px;
+}
+
+.summit-poster-status-search-card
+  label
+  > span {
+  color: #334155;
+
+  font-size: 0.77rem;
+  font-weight: 750;
+}
+
+.summit-poster-status-search-card
+  input {
+  width: 100%;
+  min-height: 48px;
+
+  padding: 0 14px;
+
+  color: #0f172a;
+  background: #ffffff;
+
+  border:
+    1px solid #ccd9e0;
+
+  border-radius: 10px;
+
+  outline: none;
+
+  box-sizing: border-box;
+
+  font: inherit;
+  font-size: 0.87rem;
+}
+
+.summit-poster-status-search-card
+  input:focus {
+  border-color: #087744;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(8, 119, 68, 0.11);
+}
+
+.summit-poster-status-divider {
+  position: relative;
+
+  height: 24px;
+
+  margin-top: 17px;
+
+  text-align: center;
+}
+
+.summit-poster-status-divider::before {
+  content: "";
+
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+
+  height: 1px;
+
+  background: #e3ebef;
+}
+
+.summit-poster-status-divider
+  span {
+  position: relative;
+  z-index: 1;
+
+  display: inline-block;
+
+  padding: 2px 10px;
+
+  color: #94a3b8;
+  background: #ffffff;
+
+  font-size: 0.7rem;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-status-or {
+  margin:
+    13px 0 -3px;
+
+  color: #94a3b8;
+
+  font-size: 0.72rem;
+  font-weight: 750;
+
+  text-align: center;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-status-error {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin-top: 18px;
+  padding: 12px 14px;
+
+  color: #9f1239;
+  background: #fff1f2;
+
+  border:
+    1px solid #fecdd3;
+
+  border-radius: 10px;
+
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.summit-poster-status-error
+  svg {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+}
+
+.summit-poster-status-search-card
+  > button {
+  width: 100%;
+  min-height: 49px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  margin-top: 21px;
+  padding: 12px 16px;
+
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #075c77,
+      #087744
+    );
+
+  border: none;
+  border-radius: 11px;
+
+  font-size: 0.86rem;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.summit-poster-status-search-card
+  > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.summit-poster-status-search-card
+  > small {
+  display: block;
+
+  margin-top: 14px;
+
+  color: #64748b;
+
+  font-size: 0.7rem;
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+/* ==========================================================
+   RESULT CARD
+========================================================== */
+
+.summit-poster-status-result-card {
+  min-height: 520px;
+
+  padding: 30px;
+}
+
+.summit-poster-status-placeholder {
+  min-height: 460px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.summit-poster-status-placeholder
+  > div {
+  width: 84px;
+  height: 84px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 20px;
+
+  color: #087744;
+  background: #eaf6ef;
+
+  border-radius: 50%;
+}
+
+.summit-poster-status-placeholder
+  h2 {
+  max-width: 420px;
+
+  margin:
+    0 0 10px;
+
+  color: #10233f;
+
+  font-size: 1.6rem;
+}
+
+.summit-poster-status-placeholder
+  p {
+  max-width: 470px;
+
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.summit-poster-status-result-header {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 16px;
+
+  padding-bottom: 24px;
+
+  border-bottom:
+    1px solid #e4ebef;
+}
+
+.summit-poster-status-icon {
+  width: 58px;
+  height: 58px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 17px;
+}
+
+.summit-poster-status-icon.tone-success {
+  color: #087744;
+  background: #e7f6ed;
+}
+
+.summit-poster-status-icon.tone-warning {
+  color: #a16207;
+  background: #fef3c7;
+}
+
+.summit-poster-status-icon.tone-info {
+  color: #075c77;
+  background: #e6f4f7;
+}
+
+.summit-poster-status-icon.tone-danger {
+  color: #be123c;
+  background: #ffe4e6;
+}
+
+.summit-poster-status-icon.tone-neutral {
+  color: #475569;
+  background: #eef2f6;
+}
+
+.summit-poster-status-result-header
+  h2 {
+  margin:
+    6px 0 7px;
+
+  color: #10233f;
+
+  font-size: 1.7rem;
+}
+
+.summit-poster-status-result-header
+  p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================
+   DETAILS
+========================================================== */
+
+.summit-poster-status-details {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 14px;
+
+  margin-top: 24px;
+}
+
+.summit-poster-status-details
+  > div {
+  min-width: 0;
+
+  padding: 15px;
+
+  background: #f7fafc;
+
+  border:
+    1px solid #e5edf1;
+
+  border-radius: 12px;
+}
+
+.summit-poster-status-details
+  small {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #64748b;
+
+  font-size: 0.68rem;
+  font-weight: 720;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-status-details
+  strong {
+  color: #10233f;
+
+  font-size: 0.86rem;
+
+  overflow-wrap: anywhere;
+}
+
+.summit-poster-status-copy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+.summit-poster-status-copy-row
+  button {
+  flex: 0 0 auto;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 9px;
+
+  color: #075c77;
+  background: #e6f4f6;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 0.68rem;
+  font-weight: 760;
+
+  cursor: pointer;
+}
+
+/* ==========================================================
+   REJECTION
+========================================================== */
+
+.summit-poster-status-rejection {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 11px;
+
+  margin-top: 22px;
+  padding: 15px;
+
+  color: #9f1239;
+  background: #fff1f2;
+
+  border:
+    1px solid #fecdd3;
+
+  border-radius: 12px;
+}
+
+.summit-poster-status-rejection
+  svg {
+  flex: 0 0 auto;
+
+  margin-top: 2px;
+}
+
+.summit-poster-status-rejection
+  strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-size: 0.82rem;
+}
+
+.summit-poster-status-rejection
+  p {
+  margin: 0;
+
+  font-size: 0.79rem;
+  line-height: 1.55;
+}
+
+/* ==========================================================
+   PREVIEW
+========================================================== */
+
+.summit-poster-status-preview {
+  margin-top: 25px;
+  padding-top: 24px;
+
+  border-top:
+    1px solid #e4ebef;
+}
+
+.summit-poster-status-preview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 16px;
+}
+
+.summit-poster-status-preview-heading
+  h3 {
+  margin:
+    7px 0 0;
+
+  color: #10233f;
+
+  font-size: 1.15rem;
+}
+
+.summit-poster-status-preview-heading
+  a {
+  flex: 0 0 auto;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 8px 11px;
+
+  color: #075c77;
+  background: #e9f4f6;
+
+  border-radius: 9px;
+
+  font-size: 0.72rem;
+  font-weight: 760;
+
+  text-decoration: none;
+}
+
+.summit-poster-status-preview-image {
+  max-width: 430px;
+
+  margin: 0 auto;
+
+  overflow: hidden;
+
+  background: #e2e8f0;
+
+  border:
+    1px solid #d7e1e6;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 16px 40px
+    rgba(15, 23, 42, 0.1);
+}
+
+.summit-poster-status-preview-image
+  img {
+  width: 100%;
+
+  display: block;
+}
+
+/* ==========================================================
+   ACTIONS
+========================================================== */
+
+.summit-poster-status-actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 24px;
+}
+
+.summit-poster-status-actions
+  a,
+.summit-poster-status-actions
+  button {
+  min-height: 43px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  color: #334155;
+  background: #edf2f5;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 0.75rem;
+  font-weight: 780;
+
+  text-decoration: none;
+
+  cursor: pointer;
+}
+
+.summit-poster-status-actions
+  a.primary {
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #075c77,
+      #087744
+    );
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.summit-poster-status-result-footer {
+  margin-top: 28px;
+  padding-top: 19px;
+
+  border-top:
+    1px solid #e4ebef;
+
+  text-align: right;
+}
+
+.summit-poster-status-result-footer
+  button {
+  padding: 0;
+
+  color: #075c77;
+  background: transparent;
+
+  border: none;
+
+  font-size: 0.75rem;
+  font-weight: 760;
+
+  cursor: pointer;
+}
+
+/* ==========================================================
+   UTILITIES
+========================================================== */
+
+.summit-poster-status-spin {
+  animation:
+    summit-poster-status-spin
+    0.8s linear
+    infinite;
+}
+
+@keyframes summit-poster-status-spin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (
+  max-width: 900px
+) {
+  .summit-poster-status-layout {
+    grid-template-columns:
+      1fr;
+  }
+
+  .summit-poster-status-search-card {
+    position: static;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (
+  max-width: 620px
+) {
+  .summit-poster-status-container {
+    width:
+      min(
+        100% - 24px,
+        1160px
+      );
+  }
+
+  .summit-poster-status-hero {
+    padding:
+      62px 16px 66px;
+  }
+
+  .summit-poster-status-content {
+    padding:
+      44px 0 65px;
+  }
+
+  .summit-poster-status-search-card,
+  .summit-poster-status-result-card {
+    padding: 22px;
+
+    border-radius: 17px;
+  }
+
+  .summit-poster-status-details {
+    grid-template-columns:
+      1fr;
+  }
+
+  .summit-poster-status-result-header {
+    flex-direction: column;
+  }
+
+  .summit-poster-status-preview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .summit-poster-status-actions {
+    flex-direction: column;
+  }
+
+  .summit-poster-status-actions
+    a,
+  .summit-poster-status-actions
+    button {
+    width: 100%;
+
+    box-sizing: border-box;
+  }
+
+  .summit-poster-status-result-footer {
+    text-align: center;
+  }
+}

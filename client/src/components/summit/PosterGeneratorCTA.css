@@ -1,0 +1,532 @@
+/* ==========================================================
+   SECTION
+========================================================== */
+
+.summit-poster-cta {
+  padding: 86px 0;
+
+  background:
+    radial-gradient(
+      circle at 90% 15%,
+      rgba(244, 165, 28, 0.18),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 8% 88%,
+      rgba(0, 153, 173, 0.22),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      #062e65,
+      #075b76 57%,
+      #087744
+    );
+}
+
+.summit-poster-cta-container {
+  width: min(
+    1160px,
+    calc(100% - 40px)
+  );
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(320px, 0.9fr);
+
+  align-items: center;
+
+  gap: 70px;
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.summit-poster-cta-content {
+  color: #ffffff;
+}
+
+.summit-poster-cta-eyebrow {
+  display: inline-block;
+
+  color: #fbbf24;
+
+  font-size: 0.76rem;
+  font-weight: 850;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-cta-content h2 {
+  max-width: 720px;
+
+  margin:
+    15px 0 18px;
+
+  font-size:
+    clamp(
+      2.3rem,
+      5vw,
+      4.4rem
+    );
+
+  line-height: 1.04;
+}
+
+.summit-poster-cta-content > p {
+  max-width: 680px;
+
+  margin: 0;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+/* ==========================================================
+   BENEFITS
+========================================================== */
+
+.summit-poster-cta-benefits {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 11px;
+
+  margin-top: 28px;
+}
+
+.summit-poster-cta-benefits span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 9px 13px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.9
+    );
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.1
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.15
+    );
+
+  border-radius: 999px;
+
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+/* ==========================================================
+   ACTIONS
+========================================================== */
+
+.summit-poster-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 32px;
+}
+
+.summit-poster-cta-actions a {
+  min-height: 48px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 12px 18px;
+
+  border-radius: 11px;
+
+  font-size: 0.84rem;
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.summit-poster-cta-actions a:hover {
+  transform:
+    translateY(-2px);
+}
+
+.summit-poster-cta-primary {
+  color: #07563f;
+  background: #ffffff;
+}
+
+.summit-poster-cta-primary:hover {
+  filter: brightness(0.97);
+}
+
+.summit-poster-cta-secondary {
+  color: #ffffff;
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.1
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.22
+    );
+}
+
+/* ==========================================================
+   VISUAL
+========================================================== */
+
+.summit-poster-cta-visual {
+  position: relative;
+
+  min-height: 520px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summit-poster-cta-poster {
+  width: min(
+    360px,
+    100%
+  );
+
+  aspect-ratio: 4 / 5;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding:
+    26px 24px 28px;
+
+  overflow: hidden;
+
+  color: #10233f;
+
+  background:
+    radial-gradient(
+      circle at 88% 15%,
+      rgba(244, 165, 28, 0.2),
+      transparent 26%
+    ),
+    linear-gradient(
+      160deg,
+      #ffffff,
+      #f3fbff 58%,
+      #eef9f2
+    );
+
+  border:
+    8px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.7
+    );
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 32px 75px
+    rgba(0, 0, 0, 0.25);
+
+  transform:
+    rotate(3deg);
+}
+
+.summit-poster-cta-poster-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+.summit-poster-cta-poster-header small {
+  color: #075c77;
+
+  font-size: 0.75rem;
+  font-weight: 850;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-cta-poster-header strong {
+  margin-top: 3px;
+
+  color: #f59e0b;
+
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.summit-poster-cta-photo {
+  width: 180px;
+  height: 180px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 22px;
+
+  color: #087744;
+  background: #e9f4f7;
+
+  border:
+    10px solid #ffffff;
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 8px #087744,
+    0 16px 35px
+    rgba(8, 55, 90, 0.18);
+}
+
+.summit-poster-cta-banner {
+  width: calc(100% + 48px);
+
+  margin-top: 28px;
+  padding: 11px 12px;
+
+  color: #ffffff;
+  background:
+    linear-gradient(
+      90deg,
+      #082f66,
+      #075c77,
+      #087744
+    );
+
+  font-size: 1rem;
+  font-weight: 900;
+
+  letter-spacing: 0.06em;
+
+  text-align: center;
+}
+
+.summit-poster-cta-name {
+  margin-top: 22px;
+
+  color: #082f66;
+
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.summit-poster-cta-county {
+  margin-top: 8px;
+
+  color: #087744;
+
+  font-size: 0.78rem;
+  font-weight: 850;
+
+  letter-spacing: 0.16em;
+}
+
+.summit-poster-cta-date {
+  margin-top: auto;
+  padding-top: 20px;
+
+  color: #475569;
+
+  font-size: 0.76rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+}
+
+/* ==========================================================
+   PRICE BADGE
+========================================================== */
+
+.summit-poster-cta-price {
+  position: absolute;
+  right: 10px;
+  bottom: 48px;
+
+  min-width: 118px;
+
+  padding: 15px 18px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 18px 42px
+    rgba(0, 0, 0, 0.2);
+
+  transform:
+    rotate(-4deg);
+}
+
+.summit-poster-cta-price small {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #64748b;
+
+  font-size: 0.68rem;
+  font-weight: 750;
+
+  text-transform: uppercase;
+}
+
+.summit-poster-cta-price strong {
+  color: #087744;
+
+  font-size: 1.4rem;
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (
+  max-width: 960px
+) {
+  .summit-poster-cta-container {
+    grid-template-columns:
+      1fr;
+
+    gap: 45px;
+
+    text-align: center;
+  }
+
+  .summit-poster-cta-content h2,
+  .summit-poster-cta-content > p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .summit-poster-cta-benefits,
+  .summit-poster-cta-actions {
+    justify-content: center;
+  }
+
+  .summit-poster-cta-visual {
+    min-height: 500px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (
+  max-width: 620px
+) {
+  .summit-poster-cta {
+    padding:
+      62px 0;
+  }
+
+  .summit-poster-cta-container {
+    width:
+      min(
+        100% - 24px,
+        1160px
+      );
+  }
+
+  .summit-poster-cta-benefits {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .summit-poster-cta-benefits
+    span {
+    justify-content: center;
+  }
+
+  .summit-poster-cta-actions {
+    flex-direction: column;
+  }
+
+  .summit-poster-cta-actions a {
+    width: 100%;
+
+    box-sizing: border-box;
+  }
+
+  .summit-poster-cta-visual {
+    min-height: 440px;
+  }
+
+  .summit-poster-cta-poster {
+    width: min(
+      310px,
+      calc(100% - 20px)
+    );
+  }
+
+  .summit-poster-cta-photo {
+    width: 150px;
+    height: 150px;
+  }
+
+  .summit-poster-cta-price {
+    right: 0;
+    bottom: 32px;
+  }
+}

@@ -127,6 +127,15 @@ export const uploadNewsImage =
 export const uploadPublicationCover =
   uploadSingle("coverImage");
 
+
+
+/* ===========================================================
+   SUMMIT POSTER PHOTO
+=========================================================== */
+
+export const uploadSummitPosterPhoto =
+  uploadSingle("photo");  
+
 /* ===========================================================
    DEFAULT EXPORT
 =========================================================== */

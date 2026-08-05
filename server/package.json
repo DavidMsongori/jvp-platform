@@ -30,6 +30,7 @@
     "pdfkit": "^0.19.1",
     "qrcode": "^1.5.4",
     "resend": "^6.17.2",
+    "sharp": "^0.35.3",
     "slugify": "^1.6.9",
     "socket.io": "^4.8.3",
     "streamifier": "^0.1.1",
