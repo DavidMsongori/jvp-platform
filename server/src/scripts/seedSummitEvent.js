@@ -44,14 +44,14 @@ const summitEventData = {
   /*
    * Leave the date as null until it is officially confirmed.
    */
-  summitDate: null,
+  summitDate:  ISODate("2026-08-28T00:00:00.000Z"),
 
-  dateStatus: "to_be_communicated",
+  dateStatus: "confirmed",
 
   venue: {
-    name: "To be communicated",
+    name: "Uwanja wa Water",
     county: "Kilifi",
-    address: "To be communicated",
+    address: "Kilifi Town",
     mapUrl: null,
   },
 

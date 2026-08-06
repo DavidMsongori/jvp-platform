@@ -122,7 +122,7 @@ export default function PosterGeneratorCTA() {
             </div>
 
             <div className="summit-poster-cta-date">
-              6–8 AUGUST 2026
+              28 AUGUST 2026
             </div>
           </div>
 

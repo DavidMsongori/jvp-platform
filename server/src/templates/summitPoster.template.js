@@ -1,115 +1,177 @@
 /* ==========================================================
-   SUMMIT POSTER TEMPLATE
+   COAST YOUTH SUMMIT ATTENDANCE POSTER
+
+   Canvas:
+   1080 × 1080 pixels
+
+   Layout:
+   - patterned outer border;
+   - Coast Youth Summit header;
+   - attendance message and participant details on the left;
+   - background-removed participant photo on the right;
+   - date and venue cards;
+   - JVP branding and hashtag footer.
 ========================================================== */
+
+/* ==========================================================
+   DIMENSIONS
+========================================================== */
+
+export const POSTER_WIDTH = 1080;
+
+export const POSTER_HEIGHT = 1080;
 
 /*
- * Final poster dimensions:
- * 1080 × 1350 pixels
+ * The generator still imports PHOTO_FRAME.
  *
- * The participant photo is composited separately by Sharp.
+ * For this design, it represents the rectangular participant
+ * image area instead of a circular frame.
  */
-
-export const POSTER_WIDTH =
-  1080;
-
-export const POSTER_HEIGHT =
-  1350;
-
-/* ==========================================================
-   PARTICIPANT PHOTO POSITION
-========================================================== */
-
 export const PHOTO_FRAME = {
-  size: 530,
-  left: 275,
-  top: 255,
+   left: 450,
+  top: 1,
+  width: 560,
+  height: 1500,
+
+  /*
+   * Retained temporarily for compatibility with any generator
+   * code that still reads PHOTO_FRAME.size.
+   */
+  size: 535,
 };
 
 /* ==========================================================
-   HELPERS
+   TEXT HELPERS
 ========================================================== */
 
-const escapeXml = (
-  value = ""
-) => {
+const escapeXml = (value = "") => {
   return String(value)
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-    .replaceAll(
-      "'",
-      "&apos;"
-    );
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
 };
 
-const normalizeText = (
-  value = ""
-) => {
+const normalizeText = (value = "") => {
   return String(value)
     .trim()
-    .replace(
-      /\s+/g,
-      " "
-    );
+    .replace(/\s+/g, " ");
 };
 
-const getNameFontSize = (
-  fullName
-) => {
-  const length =
-    fullName.length;
+const getNameFontSize = (fullName) => {
+  const length = fullName.length;
 
   if (length <= 14) {
-    return 78;
+    return 47;
   }
 
   if (length <= 20) {
-    return 68;
+    return 42;
   }
 
   if (length <= 27) {
-    return 58;
+    return 36;
   }
 
   if (length <= 34) {
-    return 50;
+    return 31;
   }
 
-  return 43;
+  return 27;
 };
 
-const getCountyFontSize = (
-  county
+const getCountyFontSize = (county) => {
+  const length = county.length;
+
+  if (length <= 10) {
+    return 34;
+  }
+
+  if (length <= 16) {
+    return 29;
+  }
+
+  return 25;
+};
+
+const getVenueLines = (
+  venue
 ) => {
-  const length =
-    county.length;
+  const normalized =
+    normalizeText(
+      venue
+    ).toUpperCase();
 
-  if (length <= 12) {
-    return 40;
+  const parts =
+    normalized
+      .split(",")
+      .map((part) =>
+        part.trim()
+      )
+      .filter(Boolean);
+
+  if (
+    parts.length >= 2
+  ) {
+    return {
+      firstLine:
+        parts[0],
+
+      secondLine:
+        parts
+          .slice(1)
+          .join(", "),
+    };
   }
 
-  if (length <= 18) {
-    return 35;
+  if (
+    normalized.length <= 22
+  ) {
+    return {
+      firstLine:
+        normalized,
+
+      secondLine:
+        "",
+    };
   }
 
-  return 30;
+  const words =
+    normalized.split(" ");
+
+  let firstLine = "";
+  let secondLine = "";
+
+  for (
+    const word of words
+  ) {
+    const proposed =
+      firstLine
+        ? `${firstLine} ${word}`
+        : word;
+
+    if (
+      proposed.length <= 20
+    ) {
+      firstLine =
+        proposed;
+    } else {
+      secondLine =
+        secondLine
+          ? `${secondLine} ${word}`
+          : word;
+    }
+  }
+
+  return {
+    firstLine,
+    secondLine,
+  };
 };
 
 /* ==========================================================
-   DATA URI HELPER
+   IMAGE DATA URI
 ========================================================== */
 
 export const imageBufferToDataUri = (
@@ -126,750 +188,804 @@ export const imageBufferToDataUri = (
 };
 
 /* ==========================================================
-   TEMPLATE GENERATOR
+   TEMPLATE
 ========================================================== */
 
-export const createSummitPosterTemplate =
-  ({
-    fullName,
-    county,
+export const createSummitPosterTemplate = ({
+  fullName,
+  county,
 
-    summitLogoDataUri = "",
-    jvpLogoDataUri = "",
+  summitLogoDataUri = "",
+  jvpLogoDataUri = "",
+  backgroundPatternDataUri = "",
+  participantPhotoDataUri = "",
 
-    eventDate =
-      "6 – 8 AUGUST 2026",
+  eventDate = "28 AUGUST 2026",
 
-    eventVenue =
-      "MALINDI, KILIFI COUNTY",
+  eventVenue =
+    "UWANJA WA WATER, KILIFI TOWN",
 
-    hashtag =
-      "#CYS2026",
-  }) => {
-    const normalizedName =
-      normalizeText(
-        fullName
-      ).toUpperCase();
+  hashtag = "#CYS2026",
+}) => {
+  const normalizedName =
+    normalizeText(fullName).toUpperCase();
 
-    const normalizedCounty =
-      normalizeText(
-        county
-      ).toUpperCase();
+  const normalizedCounty =
+    normalizeText(county).toUpperCase();
 
-    const safeName =
-      escapeXml(
-        normalizedName
-      );
+  const normalizedDate =
+    normalizeText(eventDate).toUpperCase();
 
-    const safeCounty =
-      escapeXml(
-        normalizedCounty
-      );
+  const normalizedVenue =
+    normalizeText(eventVenue).toUpperCase();
 
-    const safeDate =
-      escapeXml(
-        eventDate
-      );
+  const normalizedHashtag =
+    normalizeText(hashtag).toUpperCase();
 
-    const safeVenue =
-      escapeXml(
-        eventVenue
-      );
+  const safeName =
+    escapeXml(normalizedName);
 
-    const safeHashtag =
-      escapeXml(
-        hashtag
-      );
+  const safeCounty =
+    escapeXml(normalizedCounty);
 
-    const nameFontSize =
-      getNameFontSize(
-        normalizedName
-      );
+  const safeDate =
+    escapeXml(normalizedDate);
 
-    const countyFontSize =
-      getCountyFontSize(
-        normalizedCounty
-      );
+  const safeHashtag =
+    escapeXml(normalizedHashtag);
 
-    const summitLogo =
-      summitLogoDataUri
-        ? `
-          <image
-            href="${summitLogoDataUri}"
-            x="315"
-            y="38"
-            width="450"
-            height="150"
-            preserveAspectRatio="xMidYMid meet"
-          />
-        `
-        : `
-          <text
-            x="540"
-            y="105"
-            text-anchor="middle"
-            font-family="Arial, Helvetica, sans-serif"
-            font-size="53"
-            font-weight="900"
-            fill="#082f66"
-          >
-            COAST YOUTH SUMMIT
-          </text>
+  const nameFontSize =
+    getNameFontSize(normalizedName);
 
-          <text
-            x="540"
-            y="157"
-            text-anchor="middle"
-            font-family="Arial, Helvetica, sans-serif"
-            font-size="41"
-            font-weight="900"
-            fill="#e86f16"
-          >
-            2026
-          </text>
-        `;
+  const countyFontSize =
+    getCountyFontSize(normalizedCounty);
 
-    const jvpLogo =
-      jvpLogoDataUri
-        ? `
-          <image
-            href="${jvpLogoDataUri}"
-            x="78"
-            y="1190"
-            width="230"
-            height="112"
-            preserveAspectRatio="xMidYMid meet"
-          />
-        `
-        : `
-          <text
-            x="185"
-            y="1255"
-            text-anchor="middle"
-            font-family="Arial, Helvetica, sans-serif"
-            font-size="52"
-            font-weight="900"
-            fill="#087a45"
-          >
-            JVP
-          </text>
-        `;
+  const venueLines =
+    getVenueLines(normalizedVenue);
 
-    return Buffer.from(`
-      <svg
+  const safeVenueLineOne =
+    escapeXml(venueLines.firstLine);
+
+  const safeVenueLineTwo =
+    escapeXml(venueLines.secondLine);
+
+  /* ========================================================
+     SUMMIT LOGO
+  ======================================================== */
+
+  const summitLogo = summitLogoDataUri
+    ? `
+      <image
+        href="${summitLogoDataUri}"
+        x="330"
+        y="35"
+        width="420"
+        height="135"
+        preserveAspectRatio="xMidYMid meet"
+      />
+    `
+    : `
+      <text
+        x="540"
+        y="92"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="48"
+        font-weight="900"
+        fill="#082f66"
+      >
+        COAST YOUTH SUMMIT
+      </text>
+
+      <text
+        x="540"
+        y="138"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="34"
+        font-weight="900"
+        fill="#ef1d24"
+      >
+        2026
+      </text>
+    `;
+
+  /* ========================================================
+     JVP LOGO
+  ======================================================== */
+
+  const jvpLogo = jvpLogoDataUri
+    ? `
+      <image
+        href="${jvpLogoDataUri}"
+        x="66"
+        y="927"
+        width="118"
+        height="95"
+        preserveAspectRatio="xMidYMid meet"
+      />
+    `
+    : `
+      <text
+        x="125"
+        y="985"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="43"
+        font-weight="900"
+        fill="#087744"
+      >
+        JVP
+      </text>
+    `;
+
+  /* ========================================================
+     PATTERN BACKGROUND
+  ======================================================== */
+
+  const background = backgroundPatternDataUri
+    ? `
+      <image
+        href="${backgroundPatternDataUri}"
+        x="0"
+        y="0"
         width="${POSTER_WIDTH}"
         height="${POSTER_HEIGHT}"
-        viewBox="0 0 ${POSTER_WIDTH} ${POSTER_HEIGHT}"
-        xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-      >
-        <defs>
-          <linearGradient
-            id="backgroundGradient"
-            x1="0"
-            y1="0"
-            x2="1"
-            y2="1"
-          >
-            <stop
-              offset="0%"
-              stop-color="#ffffff"
-            />
+        preserveAspectRatio="xMidYMid slice"
+      />
 
-            <stop
-              offset="52%"
-              stop-color="#f5fbff"
-            />
+      <rect
+        x="23"
+        y="23"
+        width="1034"
+        height="1034"
+        rx="4"
+        fill="#ffffff"
+        fill-opacity="0.91"
+      />
+    `
+    : `
+      <rect
+        width="${POSTER_WIDTH}"
+        height="${POSTER_HEIGHT}"
+        fill="#ffffff"
+      />
 
-            <stop
-              offset="100%"
-              stop-color="#edf9f4"
-            />
-          </linearGradient>
+      <rect
+        x="23"
+        y="23"
+        width="1034"
+        height="1034"
+        rx="4"
+        fill="#fdfefe"
+      />
+    `;
 
-          <linearGradient
-            id="bottomGradient"
-            x1="0"
-            y1="0"
-            x2="1"
-            y2="0"
-          >
-            <stop
-              offset="0%"
-              stop-color="#073b79"
-            />
-
-            <stop
-              offset="52%"
-              stop-color="#075d78"
-            />
-
-            <stop
-              offset="100%"
-              stop-color="#087744"
-            />
-          </linearGradient>
-
-          <linearGradient
-            id="photoRingGradient"
-            x1="0"
-            y1="0"
-            x2="1"
-            y2="1"
-          >
-            <stop
-              offset="0%"
-              stop-color="#0b4e9c"
-            />
-
-            <stop
-              offset="50%"
-              stop-color="#008db8"
-            />
-
-            <stop
-              offset="100%"
-              stop-color="#1f8f44"
-            />
-          </linearGradient>
-
-          <filter
-            id="softShadow"
-            x="-30%"
-            y="-30%"
-            width="160%"
-            height="160%"
-          >
-            <feDropShadow
-              dx="0"
-              dy="12"
-              stdDeviation="15"
-              flood-color="#082f66"
-              flood-opacity="0.18"
-            />
-          </filter>
-
-          <pattern
-            id="coastalPattern"
-            width="80"
-            height="80"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M0 42 C18 22 34 62 52 42 C65 28 72 34 80 42"
-              fill="none"
-              stroke="#0b6e8e"
-              stroke-width="2"
-              stroke-opacity="0.06"
-            />
-
-            <circle
-              cx="15"
-              cy="15"
-              r="3"
-              fill="#1f8f44"
-              fill-opacity="0.05"
-            />
-          </pattern>
-
-          <clipPath
-            id="photoClip"
-          >
-            <circle
-              cx="${
-                PHOTO_FRAME.left +
-                PHOTO_FRAME.size /
-                  2
-              }"
-              cy="${
-                PHOTO_FRAME.top +
-                PHOTO_FRAME.size /
-                  2
-              }"
-              r="${
-                PHOTO_FRAME.size /
-                  2
-              }"
-            />
-          </clipPath>
-        </defs>
-
-        <!-- ================================================
-             BACKGROUND
-        ================================================= -->
-
-        <rect
-          width="1080"
-          height="1350"
-          fill="url(#backgroundGradient)"
-        />
-
-        <rect
-          width="1080"
-          height="1350"
-          fill="url(#coastalPattern)"
-        />
-
-        <circle
-          cx="80"
-          cy="390"
-          r="270"
-          fill="#0b77bd"
-          fill-opacity="0.045"
-        />
-
-        <circle
-          cx="1010"
-          cy="470"
-          r="320"
-          fill="#16924a"
-          fill-opacity="0.05"
-        />
-
-        <!-- Decorative coastal sun -->
-
-        <circle
-          cx="950"
-          cy="175"
-          r="78"
-          fill="#f4a51c"
-          fill-opacity="0.10"
-        />
-
-        <circle
-          cx="950"
-          cy="175"
-          r="48"
-          fill="#f4a51c"
-          fill-opacity="0.10"
-        />
-
-        <!-- ================================================
-             SUMMIT HEADER
-        ================================================= -->
-
-        ${summitLogo}
-
-        <text
-          x="540"
-          y="210"
-          text-anchor="middle"
-          font-family="Arial, Helvetica, sans-serif"
-          font-size="19"
-          font-weight="600"
-          fill="#314d6b"
-          letter-spacing="0.6"
+  return Buffer.from(`
+    <svg
+      width="${POSTER_WIDTH}"
+      height="${POSTER_HEIGHT}"
+      viewBox="0 0 ${POSTER_WIDTH} ${POSTER_HEIGHT}"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+    >
+      <defs>
+        <linearGradient
+          id="venueGradient"
+          x1="0"
+          y1="0"
+          x2="1"
+          y2="1"
         >
-          EMPOWERED YOUTH · STRONGER COAST · SUSTAINABLE FUTURE
-        </text>
+          <stop
+            offset="0%"
+            stop-color="#073b79"
+          />
 
-        <line
-          x1="280"
-          y1="230"
-          x2="800"
-          y2="230"
-          stroke="#d9e7ef"
+          <stop
+            offset="100%"
+            stop-color="#087744"
+          />
+        </linearGradient>
+
+        <linearGradient
+          id="photoFade"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop
+            offset="72%"
+            stop-color="#ffffff"
+            stop-opacity="0"
+          />
+
+          <stop
+            offset="100%"
+            stop-color="#ffffff"
+            stop-opacity="1"
+          />
+        </linearGradient>
+
+        <filter
+          id="softShadow"
+          x="-30%"
+          y="-30%"
+          width="160%"
+          height="160%"
+        >
+          <feDropShadow
+            dx="0"
+            dy="9"
+            stdDeviation="12"
+            flood-color="#0f172a"
+            flood-opacity="0.14"
+          />
+        </filter>
+
+        <filter
+          id="photoShadow"
+          x="-30%"
+          y="-20%"
+          width="170%"
+          height="150%"
+        >
+          <feDropShadow
+            dx="-5"
+            dy="7"
+            stdDeviation="9"
+            flood-color="#082f66"
+            flood-opacity="0.12"
+          />
+        </filter>
+      </defs>
+
+      <!-- ================================================
+           BACKGROUND
+      ================================================= -->
+
+      ${background}
+
+      <rect
+        x="29"
+        y="29"
+        width="1022"
+        height="1022"
+        fill="none"
+        stroke="#e4ebef"
+        stroke-width="2"
+      />
+
+      <rect
+        x="25"
+        y="25"
+        width="1030"
+        height="6"
+        fill="#f4a51c"
+      />
+
+      <!-- ================================================
+           HEADER
+      ================================================= -->
+
+      ${summitLogo}
+
+      <text
+        x="540"
+        y="177"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="15"
+        font-weight="800"
+        fill="#173b65"
+        letter-spacing="0.8"
+      >
+        EMPOWERED YOUTH · STRONGER COAST · SUSTAINABLE FUTURE
+      </text>
+
+      <line
+        x1="315"
+        y1="197"
+        x2="765"
+        y2="197"
+        stroke="#cddce5"
+        stroke-width="2"
+      />
+
+      <circle
+        cx="540"
+        cy="197"
+        r="5"
+        fill="#082f66"
+      />
+
+      <!-- ================================================
+     PARTICIPANT PHOTO
+================================================= -->
+
+${
+  participantPhotoDataUri
+    ? `
+      <image
+        href="${participantPhotoDataUri}"
+        x="450"
+        y="35"
+        width="600"
+        height="1000"
+        preserveAspectRatio="xMaxYMax meet"
+        filter="url(#photoShadow)"
+      />
+    `
+    : ""
+}
+
+      <!-- Right-side visual accent behind participant -->
+
+      <path
+        d="
+          M820 225
+          C955 255 1028 360 1024 530
+          C1020 710 950 815 810 866
+          L1055 866
+          L1055 205
+          Z
+        "
+        fill="#087744"
+        fill-opacity="0.035"
+      />
+
+      <circle
+        cx="1015"
+        cy="275"
+        r="120"
+        fill="#f4a51c"
+        fill-opacity="0.04"
+      />
+
+      <!-- ================================================
+           ATTENDANCE MESSAGE
+      ================================================= -->
+
+      <text
+        x="76"
+        y="300"
+        font-family="Georgia, Times New Roman, serif"
+        font-size="46"
+        font-style="italic"
+        font-weight="700"
+        fill="#0f172a"
+      >
+        I will be
+      </text>
+
+      <!-- Coloured patterned strip -->
+
+      <rect
+        x="76"
+        y="326"
+        width="58"
+        height="127"
+        fill="#082f66"
+      />
+
+      <rect
+        x="76"
+        y="326"
+        width="58"
+        height="31"
+        fill="#f4a51c"
+      />
+
+      <rect
+        x="76"
+        y="368"
+        width="58"
+        height="30"
+        fill="#073b79"
+      />
+
+      <rect
+        x="76"
+        y="399"
+        width="58"
+        height="29"
+        fill="#ef1d24"
+      />
+
+      <rect
+        x="76"
+        y="429"
+        width="58"
+        height="24"
+        fill="#087744"
+      />
+
+      <!-- Attendance card -->
+
+      <rect
+        x="134"
+        y="326"
+        width="460"
+        height="127"
+        rx="2"
+        fill="#ef1d24"
+        filter="url(#softShadow)"
+      />
+
+      <text
+        x="364"
+        y="409"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="57"
+        font-weight="900"
+        fill="#ffffff"
+        letter-spacing="0.5"
+      >
+        ATTENDING
+      </text>
+
+      <!-- ================================================
+           PARTICIPANT DETAILS
+      ================================================= -->
+
+      <text
+        x="76"
+        y="510"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="15"
+        font-weight="900"
+        fill="#087744"
+        letter-spacing="2"
+      >
+        PARTICIPANT
+      </text>
+
+      <text
+        x="76"
+        y="565"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="${nameFontSize}"
+        font-weight="900"
+        fill="#082f66"
+        letter-spacing="-0.8"
+      >
+        ${safeName}
+      </text>
+
+      <line
+        x1="76"
+        y1="591"
+        x2="520"
+        y2="591"
+        stroke="#dbe5ea"
+        stroke-width="2"
+      />
+
+      <text
+        x="76"
+        y="637"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="15"
+        font-weight="800"
+        fill="#64748b"
+        letter-spacing="1.5"
+      >
+        REPRESENTING
+      </text>
+
+      <text
+        x="76"
+        y="687"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="${countyFontSize}"
+        font-weight="900"
+        fill="#087744"
+        letter-spacing="1.5"
+      >
+        ${safeCounty} COUNTY
+      </text>
+
+      <rect
+        x="76"
+        y="710"
+        width="105"
+        height="6"
+        rx="3"
+        fill="#f4a51c"
+      />
+
+      <!-- ================================================
+           EVENT CARDS
+      ================================================= -->
+
+      <!-- Date card -->
+
+      <g filter="url(#softShadow)">
+        <rect
+          x="76"
+          y="746"
+          width="356"
+          height="124"
+          rx="14"
+          fill="#ffffff"
+          stroke="#d4e0e6"
           stroke-width="2"
         />
 
-        <!-- ================================================
-             PHOTO FRAME
-        ================================================= -->
-
-        <circle
-          cx="540"
-          cy="520"
-          r="284"
-          fill="#ffffff"
-          filter="url(#softShadow)"
+        <rect
+          x="76"
+          y="746"
+          width="100"
+          height="124"
+          rx="14"
+          fill="#ef1d24"
         />
-
-        <circle
-          cx="540"
-          cy="520"
-          r="277"
-          fill="none"
-          stroke="url(#photoRingGradient)"
-          stroke-width="18"
-        />
-
-        <circle
-          cx="540"
-          cy="520"
-          r="261"
-          fill="#eaf3f6"
-        />
-
-        <!-- Participant photo is composited here separately -->
-
-        <!-- Decorative photo accents -->
-
-        <path
-          d="M268 460 C210 540 228 660 310 724"
-          fill="none"
-          stroke="#0b4e9c"
-          stroke-width="14"
-          stroke-linecap="round"
-          stroke-opacity="0.85"
-        />
-
-        <path
-          d="M812 390 C875 470 872 602 790 694"
-          fill="none"
-          stroke="#208d45"
-          stroke-width="14"
-          stroke-linecap="round"
-          stroke-opacity="0.85"
-        />
-
-        <!-- ================================================
-             ATTENDANCE BANNER
-        ================================================= -->
-
-        <g
-          filter="url(#softShadow)"
-        >
-          <path
-            d="
-              M120 775
-              L960 775
-              L928 835
-              L152 835
-              Z
-            "
-            fill="#082f66"
-          />
-
-          <path
-            d="
-              M120 775
-              L170 790
-              L120 804
-              Z
-            "
-            fill="#0b4e9c"
-          />
-
-          <path
-            d="
-              M960 775
-              L910 790
-              L960 804
-              Z
-            "
-            fill="#087744"
-          />
-        </g>
-
-        <text
-          x="540"
-          y="814"
-          text-anchor="middle"
-          font-family="Arial, Helvetica, sans-serif"
-          font-size="47"
-          font-weight="900"
-          fill="#ffffff"
-          letter-spacing="2.5"
-        >
-          I WILL BE ATTENDING
-        </text>
-
-        <!-- ================================================
-             PARTICIPANT DETAILS
-        ================================================= -->
 
         <rect
-          x="90"
-          y="860"
-          width="900"
-          height="115"
-          rx="18"
-          fill="#ffffff"
-          fill-opacity="0.94"
-        />
-
-        <text
-          x="540"
-          y="935"
-          text-anchor="middle"
-          font-family="Arial, Helvetica, sans-serif"
-          font-size="${nameFontSize}"
-          font-weight="900"
-          fill="#082f66"
-          letter-spacing="-1"
-        >
-          ${safeName}
-        </text>
-
-        <line
-          x1="230"
-          y1="1004"
-          x2="385"
-          y2="1004"
-          stroke="#0b4e9c"
-          stroke-width="4"
-        />
-
-        <circle
-          cx="540"
-          cy="1004"
-          r="9"
+          x="76"
+          y="746"
+          width="100"
+          height="15"
+          rx="14"
           fill="#f4a51c"
         />
 
-        <line
-          x1="695"
-          y1="1004"
-          x2="850"
-          y2="1004"
-          stroke="#087744"
-          stroke-width="4"
-        />
-
-        <text
-          x="540"
-          y="1060"
-          text-anchor="middle"
-          font-family="Arial, Helvetica, sans-serif"
-          font-size="${countyFontSize}"
-          font-weight="800"
-          fill="#087744"
-          letter-spacing="4"
-        >
-          ${safeCounty}
-        </text>
-
-        <!-- ================================================
-             EVENT INFORMATION
-        ================================================= -->
-
-        <path
-          d="
-            M0 1095
-            C200 1045 330 1140 540 1085
-            C760 1030 860 1118 1080 1072
-            L1080 1210
-            L0 1210
-            Z
-          "
-          fill="url(#bottomGradient)"
-        />
-
-        <path
-          d="
-            M0 1088
-            C200 1038 330 1133 540 1078
-            C760 1023 860 1111 1080 1065
-          "
-          fill="none"
-          stroke="#f4a51c"
-          stroke-width="7"
-        />
-
-        <!-- Calendar icon -->
-
-        <g
-          transform="translate(85 1120)"
-        >
+        <g transform="translate(100 778)">
           <rect
             x="0"
-            y="9"
-            width="46"
-            height="40"
+            y="10"
+            width="52"
+            height="47"
             rx="5"
             fill="none"
             stroke="#ffffff"
-            stroke-width="4"
+            stroke-width="5"
           />
 
           <line
             x1="0"
-            y1="22"
-            x2="46"
-            y2="22"
+            y1="24"
+            x2="52"
+            y2="24"
             stroke="#ffffff"
-            stroke-width="4"
+            stroke-width="5"
           />
 
           <line
-            x1="12"
+            x1="13"
             y1="0"
-            x2="12"
-            y2="14"
+            x2="13"
+            y2="17"
             stroke="#ffffff"
-            stroke-width="4"
+            stroke-width="5"
             stroke-linecap="round"
           />
 
           <line
-            x1="34"
+            x1="39"
             y1="0"
-            x2="34"
-            y2="14"
+            x2="39"
+            y2="17"
             stroke="#ffffff"
-            stroke-width="4"
+            stroke-width="5"
             stroke-linecap="round"
           />
         </g>
 
         <text
-          x="150"
-          y="1161"
+          x="198"
+          y="789"
           font-family="Arial, Helvetica, sans-serif"
-          font-size="30"
+          font-size="13"
           font-weight="800"
-          fill="#ffffff"
+          fill="#64748b"
+          letter-spacing="1"
+        >
+          SUMMIT DATE
+        </text>
+
+        <text
+          x="198"
+          y="834"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="24"
+          font-weight="900"
+          fill="#111827"
         >
           ${safeDate}
         </text>
+      </g>
 
-        <line
-          x1="500"
-          y1="1122"
-          x2="500"
-          y2="1172"
-          stroke="#ffffff"
+      <!-- Venue card -->
+
+      <g filter="url(#softShadow)">
+        <rect
+          x="452"
+          y="746"
+          width="370"
+          height="124"
+          rx="14"
+          fill="#ffffff"
+          stroke="#d4e0e6"
           stroke-width="2"
-          stroke-opacity="0.7"
         />
 
-        <!-- Location icon -->
+        <rect
+          x="452"
+          y="746"
+          width="101"
+          height="124"
+          rx="14"
+          fill="url(#venueGradient)"
+        />
 
-        <g
-          transform="translate(550 1116)"
-        >
+        <g transform="translate(478 774)">
           <path
             d="
-              M24 0
-              C10 0 0 10 0 24
-              C0 43 24 62 24 62
-              C24 62 48 43 48 24
-              C48 10 38 0 24 0
+              M25 0
+              C11 0 0 11 0 25
+              C0 45 25 69 25 69
+              C25 69 50 45 50 25
+              C50 11 39 0 25 0
               Z
             "
             fill="#ffffff"
           />
 
           <circle
-            cx="24"
-            cy="23"
+            cx="25"
+            cy="25"
             r="8"
             fill="#087744"
           />
         </g>
 
         <text
-          x="620"
-          y="1161"
+          x="575"
+          y="783"
           font-family="Arial, Helvetica, sans-serif"
-          font-size="28"
+          font-size="13"
           font-weight="800"
-          fill="#ffffff"
+          fill="#64748b"
+          letter-spacing="1"
         >
-          ${safeVenue}
+          VENUE
         </text>
 
-        <!-- ================================================
-             FOOTER BRANDING
-        ================================================= -->
-
-        <rect
-          x="0"
-          y="1210"
-          width="1080"
-          height="140"
-          fill="#ffffff"
-        />
-
-        ${jvpLogo}
-
-        <line
-          x1="345"
-          y1="1230"
-          x2="345"
-          y2="1325"
-          stroke="#dce7ec"
-          stroke-width="2"
-        />
-
         <text
-          x="382"
-          y="1255"
+          x="575"
+          y="823"
           font-family="Arial, Helvetica, sans-serif"
-          font-size="22"
+          font-size="21"
           font-weight="900"
-          fill="#082f66"
+          fill="#111827"
         >
-          JUMUIYA YA VIJANA
+          ${safeVenueLineOne}
         </text>
 
-        <text
-          x="382"
-          y="1285"
-          font-family="Arial, Helvetica, sans-serif"
-          font-size="22"
-          font-weight="900"
-          fill="#082f66"
-        >
-          WA PWANI
-        </text>
+        ${
+          safeVenueLineTwo
+            ? `
+              <text
+                x="575"
+                y="852"
+                font-family="Arial, Helvetica, sans-serif"
+                font-size="18"
+                font-weight="800"
+                fill="#087744"
+              >
+                ${safeVenueLineTwo}
+              </text>
+            `
+            : ""
+        }
+      </g>
 
-        <text
-          x="382"
-          y="1315"
-          font-family="Arial, Helvetica, sans-serif"
-          font-size="16"
-          font-weight="600"
-          fill="#5d7183"
-        >
-          Connecting · Empowering · Transforming
-        </text>
+      <!-- ================================================
+           FOOTER
+      ================================================= -->
 
-        <line
-          x1="635"
-          y1="1230"
-          x2="635"
-          y2="1325"
-          stroke="#dce7ec"
-          stroke-width="2"
-        />
+      <rect
+        x="48"
+        y="908"
+        width="984"
+        height="124"
+        rx="12"
+        fill="#ffffff"
+        fill-opacity="0.97"
+        filter="url(#softShadow)"
+      />
 
-        <text
-          x="835"
-          y="1264"
-          text-anchor="middle"
-          font-family="Arial, Helvetica, sans-serif"
-          font-size="44"
-          font-weight="900"
-          fill="#082f66"
-        >
-          ${safeHashtag}
-        </text>
+      ${jvpLogo}
 
-        <text
-          x="835"
-          y="1303"
-          text-anchor="middle"
-          font-family="Arial, Helvetica, sans-serif"
-          font-size="18"
-          font-weight="700"
-          fill="#087744"
-        >
-          COAST YOUTH SUMMIT 2026
-        </text>
+      <line
+        x1="198"
+        y1="931"
+        x2="198"
+        y2="1011"
+        stroke="#d6e0e6"
+        stroke-width="2"
+      />
 
-        <!-- Bottom accent -->
+      <text
+        x="228"
+        y="956"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="18"
+        font-weight="900"
+        fill="#082f66"
+      >
+        JUMUIYA YA VIJANA WA PWANI
+      </text>
 
-        <rect
-          x="0"
-          y="1342"
-          width="1080"
-          height="8"
-          fill="#f4a51c"
-        />
-      </svg>
-    `);
-  };
+      <text
+        x="228"
+        y="983"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="14"
+        font-weight="700"
+        fill="#087744"
+      >
+        Connecting · Empowering · Transforming
+      </text>
+
+      <text
+        x="228"
+        y="1009"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="14"
+        font-weight="600"
+        fill="#64748b"
+      >
+        www.jvp.co.ke
+      </text>
+
+      <line
+        x1="672"
+        y1="931"
+        x2="672"
+        y2="1011"
+        stroke="#d6e0e6"
+        stroke-width="2"
+      />
+
+      <text
+        x="850"
+        y="970"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="40"
+        font-weight="900"
+        fill="#082f66"
+      >
+        ${safeHashtag}
+      </text>
+
+      <text
+        x="850"
+        y="1003"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="14"
+        font-weight="800"
+        fill="#087744"
+        letter-spacing="0.7"
+      >
+        COAST YOUTH SUMMIT 2026
+      </text>
+
+      <rect
+        x="25"
+        y="1049"
+        width="1030"
+        height="6"
+        fill="#f4a51c"
+      />
+    </svg>
+  `);
+};
 
 /* ==========================================================
    DEFAULT EXPORT

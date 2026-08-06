@@ -479,10 +479,11 @@ const SummitPage = () => {
     summitEvent?.about ||
     "The Coast Youth Summit brings together young people, leaders, partners and institutions to discuss opportunities, innovation, leadership and sustainable development across Kenya's Coast Region.";
 
-  const startDate =
-    summitEvent?.startDate ||
-    summitEvent?.eventDate ||
-    summitEvent?.date;
+ const startDate =
+  summitEvent?.summitDate ||
+  summitEvent?.startDate ||
+  summitEvent?.eventDate ||
+  summitEvent?.date;
 
   const endDate =
     summitEvent?.endDate;

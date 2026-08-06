@@ -9,6 +9,9 @@ import sharp from "sharp";
 
 import SummitPoster from "../models/summitPoster.model.js";
 import AppError from "../utils/AppError.js";
+import {
+  removeImageBackground,
+} from "./backgroundRemoval.service.js";
 
 import {
   uploadImage,
@@ -49,6 +52,12 @@ const JVP_LOGO_PATH =
     "../assets/summit-posters/logos/jvp-logo.png"
   );
 
+const BACKGROUND_PATTERN_PATH =
+  path.resolve(
+    __dirname,
+    "../assets/summit-posters/backgrounds/african-pattern.png"
+  );  
+
 /* ==========================================================
    CLOUDINARY FOLDERS
 ========================================================== */
@@ -73,6 +82,9 @@ let cachedSummitLogoDataUri =
   null;
 
 let cachedJvpLogoDataUri =
+  null;
+
+let cachedBackgroundPatternDataUri =
   null;
 
 /* ==========================================================
@@ -102,6 +114,17 @@ const ensureRequiredAssetsExist =
         "The JVP logo could not be found."
       );
     }
+if (
+  !fs.existsSync(
+    BACKGROUND_PATTERN_PATH
+  )
+) {
+  throw new AppError(
+    500,
+    "The summit poster background pattern could not be found."
+  );
+}
+
   };
 
 /* ==========================================================
@@ -142,13 +165,31 @@ const getLogoDataUris =
         );
     }
 
-    return {
-      summitLogoDataUri:
-        cachedSummitLogoDataUri,
+  if (
+  !cachedBackgroundPatternDataUri
+) {
+  const backgroundPatternBuffer =
+    fs.readFileSync(
+      BACKGROUND_PATTERN_PATH
+    );
 
-      jvpLogoDataUri:
-        cachedJvpLogoDataUri,
-    };
+  cachedBackgroundPatternDataUri =
+    imageBufferToDataUri(
+      backgroundPatternBuffer,
+      "image/png"
+    );
+}  
+
+   return {
+  summitLogoDataUri:
+    cachedSummitLogoDataUri,
+
+  jvpLogoDataUri:
+    cachedJvpLogoDataUri,
+
+  backgroundPatternDataUri:
+    cachedBackgroundPatternDataUri,
+};
   };
 
 /* ==========================================================
@@ -316,92 +357,189 @@ const serializeCloudinaryImage =
    PARTICIPANT PHOTO
 ========================================================== */
 
-const createCircularPhoto =
+const createParticipantCutout =
   async (
     photoBuffer
   ) => {
-    if (!photoBuffer) {
+    if (
+      !Buffer.isBuffer(
+        photoBuffer
+      ) ||
+      !photoBuffer.length
+    ) {
       throw new AppError(
         400,
-        "A participant photo is required."
+        "A valid participant photo is required."
       );
     }
 
-    const photoSize =
-      PHOTO_FRAME.size;
-
-    const circularMask =
-      Buffer.from(`
-        <svg
-          width="${photoSize}"
-          height="${photoSize}"
-          viewBox="0 0 ${photoSize} ${photoSize}"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx="${photoSize / 2}"
-            cy="${photoSize / 2}"
-            r="${photoSize / 2}"
-            fill="#ffffff"
-          />
-        </svg>
-      `);
-
     try {
-      return await sharp(
-        photoBuffer
-      )
-        /*
-         * Corrects EXIF orientation from
-         * phone-camera images.
-         */
-        .rotate()
+      /* ========================================
+         NORMALIZE ORIGINAL IMAGE
+      ======================================== */
 
-        /*
-         * Covers the circular frame while
-         * prioritising faces and prominent areas.
-         */
-        .resize(
-          photoSize,
-          photoSize,
-          {
-            fit: "cover",
-            position:
-              "attention",
-
-            withoutEnlargement:
-              false,
-          }
+      const normalizedPhoto =
+        await sharp(
+          photoBuffer
         )
+          .rotate()
+          .resize(
+            1600,
+            1600,
+            {
+              fit: "inside",
+              withoutEnlargement:
+                true,
+            }
+          )
+          .jpeg({
+            quality: 92,
+            mozjpeg: true,
+          })
+          .toBuffer();
 
-        /*
-         * Cut the square photograph into a circle.
-         */
-        .composite([
+      /* ========================================
+         REMOVE ORIGINAL BACKGROUND
+      ======================================== */
+
+      const backgroundRemovedBuffer =
+        await removeImageBackground(
+          normalizedPhoto,
           {
-            input:
-              circularMask,
+            filename:
+              "summit-participant.jpg",
 
-            blend:
-              "dest-in",
-          },
-        ])
+            mimeType:
+              "image/jpeg",
 
-        .png({
-          compressionLevel: 9,
-          adaptiveFiltering: true,
-        })
+            timeoutMs:
+              120000,
+          }
+        );
 
-        .toBuffer();
+      /* ========================================
+         VALIDATE TRANSPARENT OUTPUT
+      ======================================== */
+
+      const outputMetadata =
+        await sharp(
+          backgroundRemovedBuffer
+        ).metadata();
+
+      if (
+        !outputMetadata.width ||
+        !outputMetadata.height
+      ) {
+        throw new AppError(
+          502,
+          "The background-removal service returned an invalid image."
+        );
+      }
+
+      /* ========================================
+         CLEAN TRANSPARENT EDGES
+      ======================================== */
+
+      const cleanedCutout =
+        await sharp(
+          backgroundRemovedBuffer
+        )
+          .rotate()
+          .ensureAlpha()
+          .trim({
+            background: {
+              r: 0,
+              g: 0,
+              b: 0,
+              alpha: 0,
+            },
+
+            threshold: 6,
+          })
+          .png({
+            compressionLevel: 9,
+            adaptiveFiltering:
+              true,
+          })
+          .toBuffer();
+
+      /* ========================================
+         FIT CUTOUT INTO RIGHT-SIDE FRAME
+      ======================================== */
+
+      const participantCutout =
+        await sharp(
+          cleanedCutout
+        )
+          .resize(
+            PHOTO_FRAME.width,
+            PHOTO_FRAME.height,
+            {
+              fit: "inside",
+
+              position:
+                "bottom",
+
+              background: {
+                r: 0,
+                g: 0,
+                b: 0,
+                alpha: 0,
+              },
+
+              withoutEnlargement:
+                false,
+            }
+          )
+          .extend({
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+
+            background: {
+              r: 0,
+              g: 0,
+              b: 0,
+              alpha: 0,
+            },
+          })
+          .png({
+            compressionLevel: 9,
+            adaptiveFiltering:
+              true,
+          })
+          .toBuffer();
+
+      return participantCutout;
     } catch (error) {
       console.error(
-        "Unable to process participant photo:",
-        error.message
+        "Unable to create participant cutout:",
+        {
+          message:
+            error.message,
+
+          statusCode:
+            error.statusCode,
+
+          stack:
+            process.env.NODE_ENV ===
+            "development"
+              ? error.stack
+              : undefined,
+        }
       );
+
+      if (
+        error instanceof
+        AppError
+      ) {
+        throw error;
+      }
 
       throw new AppError(
         400,
-        "The participant photo could not be processed. Upload a valid JPG, PNG or WebP image."
+        "The participant photo background could not be removed or processed."
       );
     }
   };
@@ -489,11 +627,11 @@ export const generatePosterBuffer =
     county,
     participantPhotoBuffer,
 
-    eventDate =
-      "6 – 8 AUGUST 2026",
+     eventDate =
+      "28 AUGUST 2026",
 
     eventVenue =
-      "MALINDI, KILIFI COUNTY",
+      "UWANJA WA WATER, KILIFI",
 
     hashtag =
       "#CYS2026",
@@ -510,12 +648,19 @@ export const generatePosterBuffer =
     const {
       summitLogoDataUri,
       jvpLogoDataUri,
+      backgroundPatternDataUri,
     } = getLogoDataUris();
 
-    const circularPhoto =
-      await createCircularPhoto(
-        participantPhotoBuffer
-      );
+    const participantCutout =
+  await createParticipantCutout(
+    participantPhotoBuffer
+  );
+
+  const participantPhotoDataUri =
+  imageBufferToDataUri(
+    participantCutout,
+    "image/png"
+  );
 
     const templateBuffer =
       createSummitPosterTemplate({
@@ -524,6 +669,8 @@ export const generatePosterBuffer =
 
         summitLogoDataUri,
         jvpLogoDataUri,
+        backgroundPatternDataUri,
+        participantPhotoDataUri,
 
         eventDate,
         eventVenue,
@@ -532,47 +679,23 @@ export const generatePosterBuffer =
 
     try {
       return await sharp(
-        templateBuffer,
-        {
-          density: 144,
-        }
-      )
-        /*
-         * Ensure the rendered SVG always uses
-         * the expected social-poster dimensions.
-         */
-        .resize(
-          POSTER_WIDTH,
-          POSTER_HEIGHT,
-          {
-            fit: "fill",
-          }
-        )
-
-        /*
-         * Participant image is the only separate
-         * overlay. All text and branding are part
-         * of summitPoster.template.js.
-         */
-        .composite([
-          {
-            input:
-              circularPhoto,
-
-            left:
-              PHOTO_FRAME.left,
-
-            top:
-              PHOTO_FRAME.top,
-          },
-        ])
-
-        .png({
-          compressionLevel: 9,
-          adaptiveFiltering: true,
-        })
-
-        .toBuffer();
+  templateBuffer,
+  {
+    density: 192,
+  }
+)
+  .resize(
+    POSTER_WIDTH,
+    POSTER_HEIGHT,
+    {
+      fit: "fill",
+    }
+  )
+  .png({
+    compressionLevel: 9,
+    adaptiveFiltering: true,
+  })
+  .toBuffer();
     } catch (error) {
       console.error(
         "Unable to render summit poster template:",
