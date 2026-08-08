@@ -24,7 +24,7 @@ ALLOWED_CONTENT_TYPES = {
 
 MODEL_NAME = os.getenv(
     "BACKGROUND_REMOVAL_MODEL",
-    "u2net_human_seg",
+    "u2netp",
 )
 
 
