@@ -413,7 +413,7 @@ const createParticipantCutout =
               "image/jpeg",
 
             timeoutMs:
-              120000,
+  240000,
           }
         );
 
