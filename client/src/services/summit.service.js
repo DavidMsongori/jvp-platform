@@ -432,6 +432,30 @@ export const getAdminSummitRegistrations =
 export const listSummitRegistrations =
   getAdminSummitRegistrations;
 
+
+/* ==========================================
+   ADMIN EXPORT REGISTRATIONS
+========================================== */
+
+export const exportAdminSummitRegistrations =
+  async (
+    summitEventId,
+    queryParams = {}
+  ) => {
+    const response = await api.get(
+      `/summit/admin/events/${encodePathValue(
+        summitEventId
+      )}/registrations/export`,
+      {
+        params: cleanQueryParams(
+          queryParams
+        ),
+      }
+    );
+
+    return response.data;
+  };
+
 /* ==========================================
    ADMIN GET ONE REGISTRATION
 ========================================== */
@@ -687,6 +711,7 @@ const summitService = {
   // Admin dashboard and registrations
   getAdminSummitDashboard,
   getAdminSummitRegistrations,
+  exportAdminSummitRegistrations,
   listSummitRegistrations,
   getAdminSummitRegistration,
 

@@ -3,6 +3,7 @@ import express from "express";
 import {
   getAdminSummitDashboard,
   listSummitRegistrations,
+  exportSummitRegistrations,
   getAdminSummitRegistration,
   updateSummitRegistrationStatus,
   updateSummitTicketStatus,
@@ -90,6 +91,35 @@ router.get(
   validateSummitRegistrationListQuery,
   validate,
   listSummitRegistrations
+);
+
+/* ==========================================
+   EXPORT SUMMIT REGISTRATIONS
+========================================== */
+
+/**
+ * @route   GET /api/summit/admin/events/:summitEventId/registrations/export
+ * @desc    Export all summit registrations matching the supplied filters
+ * @access  Admin, Events, Super Admin
+ *
+ * Supported query parameters:
+ * county
+ * countyCode
+ * participantType
+ * status
+ * ticketStatus
+ * checkedIn
+ * search
+ * sortBy
+ * sortOrder
+ */
+
+router.get(
+  "/events/:summitEventId/registrations/export",
+  validateSummitEventId,
+  validateSummitRegistrationListQuery,
+  validate,
+  exportSummitRegistrations
 );
 
 /* ==========================================

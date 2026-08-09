@@ -624,6 +624,319 @@ export const listSummitRegistrations =
   };
 
 /* ==========================================
+   EXPORT SUMMIT REGISTRATIONS
+========================================== */
+
+export const exportSummitRegistrations =
+  async (req, res, next) => {
+    try {
+      const {
+        summitEventId,
+      } = req.params;
+
+      /* ======================================
+         VALIDATE EVENT ID
+      ====================================== */
+
+      if (
+        !mongoose.isValidObjectId(
+          summitEventId
+        )
+      ) {
+        throw createControllerError(
+          "The summit event ID is invalid.",
+          400,
+          "INVALID_SUMMIT_EVENT_ID"
+        );
+      }
+
+      /* ======================================
+         CONFIRM EVENT EXISTS
+      ====================================== */
+
+      const summitEvent =
+        await SummitEvent.findById(
+          summitEventId
+        )
+          .select(
+            "_id title shortTitle year"
+          )
+          .lean();
+
+      if (!summitEvent) {
+        throw createControllerError(
+          "The summit event could not be found.",
+          404,
+          "SUMMIT_EVENT_NOT_FOUND"
+        );
+      }
+
+      /* ======================================
+         SORTING
+      ====================================== */
+
+      const sortBy =
+        ALLOWED_SORT_FIELDS.includes(
+          req.query.sortBy
+        )
+          ? req.query.sortBy
+          : "registeredAt";
+
+      const sortOrder =
+        req.query.sortOrder === "asc"
+          ? 1
+          : -1;
+
+      /* ======================================
+         BASE FILTER
+      ====================================== */
+
+      const filter = {
+        summitEvent:
+          new mongoose.Types.ObjectId(
+            summitEventId
+          ),
+      };
+
+      /* ======================================
+         COUNTY FILTER
+      ====================================== */
+
+      if (req.query.county) {
+        filter.county =
+          req.query.county;
+      }
+
+      if (req.query.countyCode) {
+        filter.countyCode =
+          req.query.countyCode;
+      }
+
+      /* ======================================
+         REGISTRATION STATUS
+      ====================================== */
+
+      if (req.query.status) {
+        filter.status =
+          req.query.status;
+      }
+
+      /* ======================================
+         PARTICIPANT TYPE
+      ====================================== */
+
+      if (
+        req.query.participantType
+      ) {
+        filter.participantType =
+          req.query.participantType;
+      }
+
+      /* ======================================
+         TICKET STATUS
+      ====================================== */
+
+      if (
+        req.query.ticketStatus
+      ) {
+        filter.ticketStatus =
+          req.query.ticketStatus;
+      }
+
+      /* ======================================
+         CHECK-IN FILTER
+      ====================================== */
+
+      if (
+        req.query.checkedIn !==
+        undefined &&
+        req.query.checkedIn !== ""
+      ) {
+        filter.checkedIn =
+          String(
+            req.query.checkedIn
+          ).toLowerCase() ===
+          "true";
+      }
+
+      /* ======================================
+         SEARCH FILTER
+      ====================================== */
+
+      if (req.query.search) {
+        const searchValue =
+          String(
+            req.query.search
+          ).trim();
+
+        if (searchValue) {
+          const searchPattern =
+            new RegExp(
+              escapeRegex(
+                searchValue
+              ),
+              "i"
+            );
+
+          filter.$or = [
+            {
+              fullName:
+                searchPattern,
+            },
+            {
+              email:
+                searchPattern,
+            },
+            {
+              phone:
+                searchPattern,
+            },
+            {
+              ticketNumber:
+                searchPattern,
+            },
+            {
+              constituency:
+                searchPattern,
+            },
+            {
+              ward:
+                searchPattern,
+            },
+          ];
+        }
+      }
+
+      /* ======================================
+         FETCH ALL MATCHING REGISTRATIONS
+      ====================================== */
+
+      const registrations =
+        await SummitRegistration.find(
+          filter
+        )
+          .populate({
+            path: "member",
+            select: [
+              "memberNumber",
+              "membershipType",
+              "membershipStatus",
+            ].join(" "),
+          })
+          .sort({
+            [sortBy]:
+              sortOrder,
+          })
+          .select(
+            [
+              "fullName",
+              "email",
+              "phone",
+              "nationalIdLastFour",
+              "county",
+              "countyCode",
+              "constituency",
+              "ward",
+              "participantType",
+              "membershipInterest",
+              "ticketNumber",
+              "ticketStatus",
+              "status",
+              "checkedIn",
+              "checkedInAt",
+              "confirmationEmailSent",
+              "confirmationEmailSentAt",
+              "registeredAt",
+              "member",
+            ].join(" ")
+          )
+          .limit(10000)
+          .lean();
+
+      /* ======================================
+         RESPONSE
+      ====================================== */
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            "Summit registrations prepared for export successfully.",
+
+          data: {
+            summitEvent: {
+              _id:
+                summitEvent._id,
+
+              title:
+                summitEvent.title,
+
+              shortTitle:
+                summitEvent.shortTitle,
+
+              year:
+                summitEvent.year,
+            },
+
+            registrations,
+
+            total:
+              registrations.length,
+
+            filters: {
+              county:
+                req.query.county ||
+                null,
+
+              countyCode:
+                req.query
+                  .countyCode ||
+                null,
+
+              participantType:
+                req.query
+                  .participantType ||
+                null,
+
+              status:
+                req.query.status ||
+                null,
+
+              ticketStatus:
+                req.query
+                  .ticketStatus ||
+                null,
+
+              checkedIn:
+                req.query.checkedIn ??
+                null,
+
+              search:
+                req.query.search ||
+                null,
+
+              sortBy,
+
+              sortOrder:
+                sortOrder === 1
+                  ? "asc"
+                  : "desc",
+            },
+          },
+        });
+    } catch (error) {
+      return handleControllerError(
+        error,
+        res,
+        next
+      );
+    }
+  };
+
+
+/* ==========================================
    GET ONE REGISTRATION
 ========================================== */
 

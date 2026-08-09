@@ -36,6 +36,10 @@ import {
   useSummit,
 } from "../../../context/SummitContext";
 
+import {
+  exportAdminSummitRegistrations,
+} from "../../../services/Summit.service";
+
 import "./SummitRegistrations.css";
 
 /* ==========================================
@@ -424,43 +428,77 @@ const buildExportRows = (
           registration
         );
 
+      const phone =
+        getRegistrationPhone(
+          registration
+        );
+
       return {
-        Name:
+        "Full Name":
           getParticipantName(
             registration
           ),
+
         Email:
           getRegistrationEmail(
             registration
           ),
+
+        // Force Excel to keep the phone
+        // number as text instead of
+        // scientific notation.
         Phone:
-          getRegistrationPhone(
-            registration
-          ),
-        County: county.name,
+          phone
+            ? `="${phone}"`
+            : "",
+
+        "National ID Last Four":
+          registration
+            ?.nationalIdLastFour ||
+          "",
+
+        County:
+          county.name,
+
         "County Code":
           county.code,
-        Status: formatStatus(
-          getRegistrationStatus(
-            registration
-          )
-        ),
+
+        Constituency:
+          registration
+            ?.constituency ||
+          "",
+
+        Ward:
+          registration
+            ?.ward ||
+          "",
+
+        "Registration Status":
+          formatStatus(
+            getRegistrationStatus(
+              registration
+            )
+          ),
+
         "Ticket Number":
           getTicketNumber(
             registration
           ),
+
         "Ticket Status":
           formatStatus(
             getTicketStatus(
               registration
             )
           ),
+
         "Checked In":
           isCheckedIn(
             registration
           )
             ? "Yes"
             : "No",
+
         "Registered At":
           formatDateTime(
             getRegisteredDate(
@@ -484,7 +522,9 @@ const escapeCsvValue = (value) => {
 };
 
 const exportToCsv = (
-  registrations
+  registrations,
+  filename =
+    "summit-registrations.csv"
 ) => {
   if (!registrations.length) {
     return;
@@ -528,8 +568,7 @@ const exportToCsv = (
     document.createElement("a");
 
   anchor.href = url;
-  anchor.download =
-    "summit-registrations.csv";
+ anchor.download = filename;
 
   document.body.appendChild(
     anchor
@@ -641,6 +680,11 @@ const SummitRegistrations = () => {
     selectedIds,
     setSelectedIds,
   ] = useState([]);
+
+  const [
+  exportingRegistrations,
+  setExportingRegistrations,
+] = useState(false);
 
   /* ========================================
      LOAD REGISTRATIONS
@@ -851,6 +895,62 @@ const SummitRegistrations = () => {
     });
   };
 
+const handleExportRegistrations = async () => {
+  try {
+    setExportingRegistrations(true);
+
+    const response =
+      await exportAdminSummitRegistrations(
+        SUMMIT_EVENT_ID,
+        {
+          county: registrationFilters?.county,
+          countyCode:
+            registrationFilters?.countyCode,
+          participantType:
+            registrationFilters?.participantType,
+          status:
+            registrationFilters?.status,
+          ticketStatus:
+            registrationFilters?.ticketStatus,
+          checkedIn:
+            registrationFilters?.checkedIn,
+          search:
+            registrationFilters?.search,
+          sortBy:
+            registrationFilters?.sortBy,
+          sortOrder:
+            registrationFilters?.sortOrder,
+        }
+      );
+
+    const registrations =
+      response?.data?.registrations || [];
+
+    if (!registrations.length) {
+      alert(
+        "No registrations found to export."
+      );
+      return;
+    }
+
+    exportToCsv(
+      registrations,
+      hasFilters
+        ? "summit-filtered-registrations.csv"
+        : "summit-all-registrations.csv"
+    );
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error?.response?.data?.message ||
+        "Unable to export registrations."
+    );
+  } finally {
+    setExportingRegistrations(false);
+  }
+};
+
   /* ========================================
      PAGINATION
   ======================================== */
@@ -1030,21 +1130,33 @@ const SummitRegistrations = () => {
 
         <div className="summit-registrations-header-actions">
           <button
-            type="button"
-            className="summit-registrations-secondary-button"
-            onClick={() =>
-              exportToCsv(
-                safeRegistrations
-              )
-            }
-            disabled={
-              safeRegistrations.length ===
-              0
-            }
-          >
-            <Download size={18} />
-            Export page
-          </button>
+  type="button"
+  className="summit-registrations-secondary-button"
+  onClick={handleExportRegistrations}
+  disabled={
+    exportingRegistrations ||
+    totalRecords === 0
+  }
+>
+  {exportingRegistrations ? (
+    <RefreshCw
+      size={18}
+      className="is-spinning"
+    />
+  ) : (
+    <Download size={18} />
+  )}
+
+  {exportingRegistrations
+    ? "Exporting..."
+    : hasFilters
+      ? `Export Filtered (${formatNumber(
+          totalRecords
+        )})`
+      : `Export All (${formatNumber(
+          totalRecords
+        )})`}
+</button>
 
           <button
             type="button"
@@ -1515,25 +1627,19 @@ const SummitRegistrations = () => {
 
           <div>
             <button
-              type="button"
-              onClick={() =>
-                exportToCsv(
-                  safeRegistrations.filter(
-                    (registration) =>
-                      selectedIds.includes(
-                        getRegistrationId(
-                          registration
-                        )
-                      )
-                  )
-                )
-              }
-            >
-              <Download
-                size={16}
-              />
-              Export selected
-            </button>
+    type="button"
+    className="summit-registrations-secondary-button"
+    onClick={handleExportRegistrations}
+    disabled={exportingRegistrations}
+>
+    <Download size={18} />
+
+    {exportingRegistrations
+        ? "Exporting..."
+        : hasFilters
+        ? "Export Filtered"
+        : "Export All"}
+</button>
 
             <button
               type="button"
