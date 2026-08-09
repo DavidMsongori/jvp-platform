@@ -38,7 +38,7 @@ import {
 
 import {
   exportAdminSummitRegistrations,
-} from "../../../services/Summit.service";
+} from "../../../services/summit.service";
 
 import "./SummitRegistrations.css";
 
