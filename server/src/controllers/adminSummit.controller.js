@@ -234,46 +234,155 @@ export const getAdminSummitDashboard =
           },
         ]),
 
-        SummitRegistration.aggregate([
-          {
-            $match: {
-              summitEvent:
-                summitEvent._id,
+       SummitRegistration.aggregate([
+  {
+    $match: {
+      summitEvent:
+        summitEvent._id,
 
-              status: {
-                $ne: "cancelled",
+      status: {
+        $ne: "cancelled",
+      },
+    },
+  },
+
+  /* ======================================
+     NORMALIZE LOCATION NAMES
+  ====================================== */
+
+  {
+    $addFields: {
+      normalizedConstituency: {
+        $cond: [
+          {
+            $and: [
+              {
+                $ne: [
+                  "$constituency",
+                  null,
+                ],
+              },
+              {
+                $ne: [
+                  {
+                    $trim: {
+                      input:
+                        "$constituency",
+                    },
+                  },
+                  "",
+                ],
+              },
+            ],
+          },
+
+          {
+            $toLower: {
+              $trim: {
+                input:
+                  "$constituency",
               },
             },
           },
-          {
-            $group: {
-              _id: {
-                county: "$county",
-                countyCode:
-                  "$countyCode",
-              },
 
-              registered: {
-                $sum: 1,
-              },
+          "not provided",
+        ],
+      },
+    },
+  },
 
-              checkedIn: {
-                $sum: {
-                  $cond: [
-                    "$checkedIn",
-                    1,
-                    0,
-                  ],
-                },
-              },
-            },
-          },
-          {
-            $sort: {
-              registered: -1,
-            },
-          },
-        ]),
+  /* ======================================
+     GROUP BY COUNTY + CONSTITUENCY
+  ====================================== */
+
+  {
+    $group: {
+      _id: {
+        county:
+          "$county",
+
+        countyCode:
+          "$countyCode",
+
+        constituency:
+          "$normalizedConstituency",
+      },
+
+      registered: {
+        $sum: 1,
+      },
+
+      checkedIn: {
+        $sum: {
+          $cond: [
+            "$checkedIn",
+            1,
+            0,
+          ],
+        },
+      },
+    },
+  },
+
+  /* ======================================
+     LARGEST CONSTITUENCIES FIRST
+  ====================================== */
+
+  {
+    $sort: {
+      registered: -1,
+    },
+  },
+
+  /* ======================================
+     GROUP CONSTITUENCIES UNDER COUNTY
+  ====================================== */
+
+  {
+    $group: {
+      _id: {
+        county:
+          "$_id.county",
+
+        countyCode:
+          "$_id.countyCode",
+      },
+
+      registered: {
+        $sum:
+          "$registered",
+      },
+
+      checkedIn: {
+        $sum:
+          "$checkedIn",
+      },
+
+      constituencies: {
+        $push: {
+          constituency:
+            "$_id.constituency",
+
+          registered:
+            "$registered",
+
+          checkedIn:
+            "$checkedIn",
+        },
+      },
+    },
+  },
+
+  /* ======================================
+     LARGEST COUNTIES FIRST
+  ====================================== */
+
+  {
+    $sort: {
+      registered: -1,
+    },
+  },
+]),
 
         SummitRegistration.find({
           summitEvent:

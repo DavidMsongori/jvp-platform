@@ -24,6 +24,9 @@ import summitExhibitorRoutes from "./routes/summitExhibitor.routes.js";
 import intasendRoutes from "./routes/intasend.routes.js";
 import summitPosterRoutes from "./routes/summitPoster.routes.js";
 
+import geographyRoutes
+  from "./routes/geography.routes.js";
+
 const app = express();
 
 /* ==========================================================
@@ -200,6 +203,11 @@ app.use(
 app.use(
   "/api/summit/posters",
   summitPosterRoutes
+);
+
+app.use(
+  "/api/geography",
+  geographyRoutes
 );
 
 /* ==========================================================

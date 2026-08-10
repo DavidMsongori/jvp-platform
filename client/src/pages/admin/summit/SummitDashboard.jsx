@@ -608,6 +608,11 @@ const SummitDashboard = () => {
     setExhibitorsError,
   ] = useState("");
 
+  const [
+    expandedCounty,
+    setExpandedCounty,
+  ] = useState(null);
+
   const loadDashboard =
     useCallback(async () => {
       if (!SUMMIT_EVENT_ID) {
@@ -1250,186 +1255,308 @@ const summitVenue = getVenueDetails(summitEvent);
         </div>
       </section>
 
-      {/* ======================================
-          COUNTY AND RECENT REGISTRATIONS
-      ====================================== */}
+     {/* ======================================
+    COUNTY AND RECENT REGISTRATIONS
+====================================== */}
 
-      <div className="summit-dashboard-grid">
-        {/* COUNTY DISTRIBUTION */}
+<div className="summit-dashboard-grid">
+  {/* COUNTY DISTRIBUTION */}
 
-        <section className="summit-dashboard-panel">
-          <div className="summit-panel-header">
-            <div>
-              <p className="summit-panel-eyebrow">
-                Distribution
-              </p>
+  <section className="summit-dashboard-panel">
+    <div className="summit-panel-header">
+      <div>
+        <p className="summit-panel-eyebrow">
+          Distribution
+        </p>
 
-              <h2>
-                County
-                registrations
-              </h2>
-            </div>
+        <h2>
+          County registrations
+        </h2>
+      </div>
 
-            <MapPinned
-              size={21}
-              aria-hidden="true"
-            />
-          </div>
+      <MapPinned
+        size={21}
+        aria-hidden="true"
+      />
+    </div>
 
-          {countyStatistics.length >
-          0 ? (
-            <div className="summit-county-list">
-              {countyStatistics.map(
-                (
-                  county,
-                  index
-                ) => {
-                  const countyName =
-                    getCountyName(
-                      county
-                    );
+    {countyStatistics.length > 0 ? (
+      <div className="summit-county-list">
+        {countyStatistics.map(
+          (county, index) => {
+            const countyName =
+              getCountyName(
+                county
+              );
 
-                  const countyCode =
-                    getCountyCode(
-                      county
-                    );
+            const countyCode =
+              getCountyCode(
+                county
+              );
 
-                  const registered =
-                    getCountyRegistered(
-                      county
-                    );
+            const registered =
+              getCountyRegistered(
+                county
+              );
 
-                  const capacity =
-                    getCountyCapacity(
-                      county
-                    );
+            const capacity =
+              getCountyCapacity(
+                county
+              );
 
-                  const progress =
-                    capacity > 0
-                      ? Math.min(
-                          (registered /
-                            capacity) *
-                            100,
-                          100
-                        )
-                      : 0;
+            const progress =
+              capacity > 0
+                ? Math.min(
+                    (registered /
+                      capacity) *
+                      100,
+                    100
+                  )
+                : 0;
 
-                  return (
-                    <article
-                      className="summit-county-row"
-                      key={
-                        countyCode ||
-                        countyName ||
-                        index
-                      }
-                    >
-                      <div className="summit-county-row-top">
-                        <div>
-                          <strong>
-                            {
-                              countyName
-                            }
-                          </strong>
+            /*
+             * Constituencies returned
+             * by the dashboard API.
+             */
+            const constituencies =
+              Array.isArray(
+                county.constituencies
+              )
+                ? county.constituencies
+                : [];
 
-                          {countyCode && (
-                            <span>
-                              {
-                                countyCode
-                              }
-                            </span>
-                          )}
-                        </div>
+            /*
+             * Use county code where
+             * available as the unique
+             * expandable key.
+             */
+            const countyKey =
+              countyCode ||
+              countyName ||
+              String(index);
 
-                        <p>
-                          <strong>
-                            {formatNumber(
-                              registered
-                            )}
-                          </strong>
+            const isExpanded =
+              expandedCounty ===
+              countyKey;
 
-                          {capacity >
-                            0 && (
-                            <>
-                              {" "}
-                              /{" "}
-                              {formatNumber(
-                                capacity
-                              )}
-                            </>
-                          )}
-                        </p>
-                      </div>
+            const toggleCounty =
+              () => {
+                setExpandedCounty(
+                  isExpanded
+                    ? null
+                    : countyKey
+                );
+              };
 
-                      {capacity >
-                        0 && (
-                        <div
-                          className="summit-county-progress"
-                          role="progressbar"
-                          aria-label={`${countyName} registration capacity`}
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          aria-valuenow={Math.round(
-                            progress
-                          )}
-                        >
-                          <span
-                            style={{
-                              width: `${progress}%`,
-                            }}
-                          />
-                        </div>
-                      )}
+            return (
+              <article
+                className={`summit-county-row ${
+                  isExpanded
+                    ? "is-expanded"
+                    : ""
+                }`}
+                key={countyKey}
+              >
+                {/* ======================
+                    COUNTY HEADER
+                ====================== */}
 
-                      <div className="summit-county-row-footer">
+                <button
+                  type="button"
+                  className="summit-county-toggle"
+                  onClick={
+                    toggleCounty
+                  }
+                  aria-expanded={
+                    isExpanded
+                  }
+                >
+                  <div className="summit-county-row-top">
+                    <div>
+                      <strong>
+                        {countyName}
+                      </strong>
+
+                      {countyCode && (
                         <span>
-                          {capacity >
-                          0
-                            ? `${Math.round(
-                                progress
-                              )}% filled`
-                            : "Registrations"}
+                          {
+                            countyCode
+                          }
                         </span>
+                      )}
+                    </div>
+
+                    <div className="summit-county-total">
+                      <p>
+                        <strong>
+                          {formatNumber(
+                            registered
+                          )}
+                        </strong>
 
                         {capacity >
                           0 && (
-                          <span>
+                          <>
+                            {" "}
+                            /{" "}
                             {formatNumber(
-                              Math.max(
-                                capacity -
-                                  registered,
-                                0
-                              )
-                            )}{" "}
-                            remaining
-                          </span>
+                              capacity
+                            )}
+                          </>
                         )}
+                      </p>
+
+                      <span
+                        className={`summit-county-chevron ${
+                          isExpanded
+                            ? "is-open"
+                            : ""
+                        }`}
+                        aria-hidden="true"
+                      >
+                        ▼
+                      </span>
+                    </div>
+                  </div>
+
+                  {capacity > 0 && (
+                    <div
+                      className="summit-county-progress"
+                      role="progressbar"
+                      aria-label={`${countyName} registration capacity`}
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      aria-valuenow={Math.round(
+                        progress
+                      )}
+                    >
+                      <span
+                        style={{
+                          width: `${progress}%`,
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="summit-county-row-footer">
+                    <span>
+                      {capacity > 0
+                        ? `${Math.round(
+                            progress
+                          )}% filled`
+                        : "Registrations"}
+                    </span>
+
+                    {capacity >
+                      0 && (
+                      <span>
+                        {formatNumber(
+                          Math.max(
+                            capacity -
+                              registered,
+                            0
+                          )
+                        )}{" "}
+                        remaining
+                      </span>
+                    )}
+
+                    {constituencies.length >
+                      0 && (
+                      <span className="summit-view-constituencies">
+                        {isExpanded
+                          ? "Hide constituencies"
+                          : "View constituencies"}
+                      </span>
+                    )}
+                  </div>
+                </button>
+
+                {/* ======================
+                    CONSTITUENCIES
+                ====================== */}
+
+                {isExpanded && (
+                  <div className="summit-constituency-list">
+                    <div className="summit-constituency-heading">
+                      <span>
+                        Constituency
+                      </span>
+
+                      <span>
+                        Registrations
+                      </span>
+                    </div>
+
+                    {constituencies.length >
+                    0 ? (
+                      constituencies.map(
+                        (
+                          constituency,
+                          constituencyIndex
+                        ) => {
+                          const name =
+                            constituency.constituency ||
+                            "Not provided";
+
+                          const total =
+                            Number(
+                              constituency.registered
+                            ) || 0;
+
+                          return (
+                            <div
+                              className="summit-constituency-row"
+                              key={`${countyKey}-${name}-${constituencyIndex}`}
+                            >
+                              <div>
+                                <strong>
+                                  {name}
+                                </strong>
+                              </div>
+
+                              <strong>
+                                {formatNumber(
+                                  total
+                                )}
+                              </strong>
+                            </div>
+                          );
+                        }
+                      )
+                    ) : (
+                      <div className="summit-constituency-empty">
+                        No constituency
+                        information
+                        available.
                       </div>
-                    </article>
-                  );
-                }
-              )}
-            </div>
-          ) : (
-            <div className="summit-panel-empty">
-              <MapPinned
-                size={30}
-                aria-hidden="true"
-              />
+                    )}
+                  </div>
+                )}
+              </article>
+            );
+          }
+        )}
+      </div>
+    ) : (
+      <div className="summit-panel-empty">
+        <MapPinned
+          size={30}
+          aria-hidden="true"
+        />
 
-              <h3>
-                No county
-                statistics
-              </h3>
+        <h3>
+          No county statistics
+        </h3>
 
-              <p>
-                County registration
-                data will appear
-                when participants
-                register.
-              </p>
-            </div>
-          )}
-        </section>
+        <p>
+          County registration data
+          will appear when
+          participants register.
+        </p>
+      </div>
+    )}
+  </section>
 
         {/* RECENT REGISTRATIONS */}
 

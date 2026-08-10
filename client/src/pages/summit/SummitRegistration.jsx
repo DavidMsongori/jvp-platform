@@ -37,6 +37,10 @@ import {
   useSummit,
 } from "../../context/SummitContext";
 
+import {
+  getCoastGeography,
+} from "../../services/geography.service";
+
 import "./SummitRegistration.css";
 
 /* ==========================================
@@ -514,6 +518,16 @@ const SummitRegistration = () => {
     setProfileMessage,
   ] = useState("");
 
+  const [
+  geography,
+  setGeography,
+] = useState({});
+
+const [
+  geographyLoading,
+  setGeographyLoading,
+] = useState(true);
+
 
   const summitEvent = useMemo(
     () =>
@@ -526,10 +540,11 @@ const SummitRegistration = () => {
     summitEvent?.name ||
     "Coast Youth Summit 2026";
 
-  const summitDate =
-    summitEvent?.startDate ||
-    summitEvent?.eventDate ||
-    summitEvent?.date;
+ const summitDate =
+  summitEvent?.summitDate ||
+  summitEvent?.startDate ||
+  summitEvent?.eventDate ||
+  summitEvent?.date;
 
   const venue = useMemo(
     () =>
@@ -584,41 +599,129 @@ const SummitRegistration = () => {
     clearRegistrationState,
   ]);
 
+useEffect(() => {
+  const loadGeography =
+    async () => {
+      try {
+        const response =
+          await getCoastGeography();
+
+        setGeography(
+          response?.data
+            ?.geography || {}
+        );
+      } catch (error) {
+        console.error(
+          "Unable to load geography:",
+          error
+        );
+      } finally {
+        setGeographyLoading(
+          false
+        );
+      }
+    };
+
+  loadGeography();
+}, []);
+
+
+const constituencyOptions =
+  Object.keys(
+    geography?.[
+      form.county
+    ]?.constituencies || {}
+  );
+
+const wardOptions =
+  geography?.[
+    form.county
+  ]?.constituencies?.[
+    form.constituency
+  ]?.wards || [];
+
+
   /* ========================================
      FORM CHANGE
   ======================================== */
 
-  const handleChange = (event) => {
-    const {
-      name,
-      value,
-      checked,
-      type,
-    } = event.target;
+ const handleChange = (event) => {
+  const {
+    name,
+    value,
+    checked,
+    type,
+  } = event.target;
 
-    setForm((current) => ({
+  setForm((current) => {
+    // County changed:
+    // reset constituency and ward
+    if (name === "county") {
+      return {
+        ...current,
+        county: value,
+        constituency: "",
+        ward: "",
+      };
+    }
+
+    // Constituency changed:
+    // reset ward
+    if (name === "constituency") {
+      return {
+        ...current,
+        constituency: value,
+        ward: "",
+      };
+    }
+
+    // All other fields
+    return {
       ...current,
 
       [name]:
         type === "checkbox"
           ? checked
           : value,
+    };
+  });
+
+  // Clear validation error
+  // for the field being changed
+  if (errors[name]) {
+    setErrors((current) => ({
+      ...current,
+      [name]: "",
     }));
+  }
 
-    if (errors[name]) {
-      setErrors((current) => ({
-        ...current,
-        [name]: "",
-      }));
-    }
+  // Also clear dependent errors
+  if (name === "county") {
+    setErrors((current) => ({
+      ...current,
+      county: "",
+      constituency: "",
+      ward: "",
+    }));
+  }
 
-    if (
-      registrationError ||
-      registrationSuccess
-    ) {
-      clearRegistrationState();
-    }
-  };
+  if (name === "constituency") {
+    setErrors((current) => ({
+      ...current,
+      constituency: "",
+      ward: "",
+    }));
+  }
+
+  // Clear previous registration
+  // success/error state
+  if (
+    registrationError ||
+    registrationSuccess
+  ) {
+    clearRegistrationState();
+  }
+};
 
   const focusFirstError = (
     validationErrors
@@ -1514,46 +1617,86 @@ memberId: undefined,
                     </FormField>
 
                     <FormField
-                      label="Constituency"
-                      required
-                      error={
-                        errors.constituency
-                      }
-                    >
-                      <input
-                        type="text"
-                        name="constituency"
-                        value={
-                          form.constituency
-                        }
-                        onChange={
-                          handleChange
-                        }
-                        maxLength="100"
-                        placeholder="Enter constituency"
-                      />
-                    </FormField>
+  label="Constituency"
+  required
+  error={
+    errors.constituency
+  }
+>
+  <select
+    name="constituency"
+    value={
+      form.constituency
+    }
+    onChange={
+      handleChange
+    }
+    disabled={
+      !form.county ||
+      geographyLoading
+    }
+  >
+    <option value="">
+      {form.county
+        ? "Select constituency"
+        : "Select county first"}
+    </option>
 
-                    <FormField
-                      label="Ward"
-                      required
-                      error={
-                        errors.ward
-                      }
-                    >
-                      <input
-                        type="text"
-                        name="ward"
-                        value={
-                          form.ward
-                        }
-                        onChange={
-                          handleChange
-                        }
-                        maxLength="100"
-                        placeholder="Enter ward"
-                      />
-                    </FormField>
+    {constituencyOptions.map(
+      (constituency) => (
+        <option
+          key={
+            constituency
+          }
+          value={
+            constituency
+          }
+        >
+          {constituency}
+        </option>
+      )
+    )}
+  </select>
+</FormField>
+
+                   <FormField
+  label="Ward"
+  required
+  error={
+    errors.ward
+  }
+>
+  <select
+    name="ward"
+    value={
+      form.ward
+    }
+    onChange={
+      handleChange
+    }
+    disabled={
+      !form.constituency ||
+      geographyLoading
+    }
+  >
+    <option value="">
+      {form.constituency
+        ? "Select ward"
+        : "Select constituency first"}
+    </option>
+
+    {wardOptions.map(
+      (ward) => (
+        <option
+          key={ward}
+          value={ward}
+        >
+          {ward}
+        </option>
+      )
+    )}
+  </select>
+</FormField>
                   </div>
                 </section>
 
