@@ -23,6 +23,7 @@ const PAYMENT_METHODS = [
 
 const PAYMENT_STATUSES = [
   "pending",
+  "submitted",
   "processing",
   "successful",
   "failed",
@@ -294,6 +295,44 @@ const paymentSchema = new mongoose.Schema(
         default: null,
       },
     },
+
+
+/* ==========================================
+   MANUAL M-PESA DETAILS
+========================================== */
+
+manualMpesa: {
+  transactionCode: {
+    type: String,
+    default: null,
+    uppercase: true,
+    trim: true,
+  },
+
+  submittedAt: {
+    type: Date,
+    default: null,
+  },
+
+  reviewedAt: {
+    type: Date,
+    default: null,
+  },
+
+  reviewedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
+
+  rejectionReason: {
+    type: String,
+    default: null,
+    trim: true,
+    maxlength: 500,
+  },
+},
+    
 
     /* ==========================================
    INTASEND DETAILS
@@ -641,6 +680,21 @@ paymentSchema.index({
   summitExhibitor: 1,
   status: 1,
 });
+
+
+paymentSchema.index(
+  {
+    "manualMpesa.transactionCode": 1,
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      "manualMpesa.transactionCode": {
+        $type: "string",
+      },
+    },
+  }
+);
 
 /* ==========================================
    VIRTUALS

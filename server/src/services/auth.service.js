@@ -1113,16 +1113,6 @@ export const createPassword = async (data) => {
 
     member.accountActivated = true;
 
-    if (!member.memberNumber) {
-
-      member.memberNumber =
-        await generateMembershipNumber(
-          member.county,
-          session
-        );
-
-    }
-
     if (!member.joinedAt) {
 
       member.joinedAt = new Date();

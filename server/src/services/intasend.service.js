@@ -1123,18 +1123,24 @@ export const createIntaSendCheckout =
         reused: false,
       };
     } catch (error) {
-      if (
-        error instanceof
-        IntaSendServiceError
-      ) {
-        throw error;
-      }
+  console.error("========== INTASEND CHECKOUT ERROR ==========");
+  console.error("Error name:", error?.name);
+  console.error("Error message:", error?.message);
+  console.error("HTTP status:", error?.response?.status);
+  console.error("Response data:", error?.response?.data);
+  console.error("Response:", error?.response);
+  console.error("Raw error:", error);
+  console.error("==============================================");
 
-      throw createGatewayError(
-        error,
-        "Unable to create the IntaSend checkout."
-      );
-    }
+  if (error instanceof IntaSendServiceError) {
+    throw error;
+  }
+
+  throw createGatewayError(
+    error,
+    "Unable to create the IntaSend checkout."
+  );
+}
   };
 
 /* ==========================================================
