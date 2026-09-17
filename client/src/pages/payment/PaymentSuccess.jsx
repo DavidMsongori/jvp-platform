@@ -211,50 +211,65 @@ export default function PaymentSuccess() {
         false;
     }, []);
 
-  /* ========================================================
-     SUCCESS
-  ======================================================== */
+ /* ========================================================
+   SUCCESS
+======================================================== */
 
-  const handleSuccessfulPayment =
-    useCallback(
-      async (
+const handleSuccessfulPayment =
+  useCallback(
+    async (
+      confirmedPayment
+    ) => {
+      stopPolling();
+
+      setPayment(
         confirmedPayment
-      ) => {
-        stopPolling();
+      );
 
-        setPayment(
-          confirmedPayment
-        );
+      setState(
+        "successful"
+      );
 
-        setState(
-          "successful"
-        );
+      setError("");
 
-        setError("");
+      setMessage(
+        "Your payment has been confirmed successfully. Redirecting to your dashboard..."
+      );
 
-        setMessage(
-          "Your payment has been confirmed successfully."
-        );
+      clearStoredPayment();
 
-        clearStoredPayment();
-
-        try {
-          await refreshProfile();
-        } catch (
+      try {
+        await refreshProfile();
+      } catch (
+        refreshError
+      ) {
+        console.error(
+          "Unable to refresh profile after payment:",
           refreshError
-        ) {
-          console.error(
-            "Unable to refresh profile after payment:",
-            refreshError
-          );
-        }
-      },
-      [
-        stopPolling,
-        clearStoredPayment,
-        refreshProfile,
-      ]
-    );
+        );
+      }
+
+      /*
+       * Give the profile a moment to refresh,
+       * then automatically redirect the member
+       * to the dashboard.
+       */
+      window.setTimeout(() => {
+        navigate(
+          "/dashboard",
+          {
+            replace: true,
+          }
+        );
+      }, 1500);
+    },
+    [
+      stopPolling,
+      clearStoredPayment,
+      refreshProfile,
+      navigate,
+    ]
+  );
 
   /* ========================================================
      CHECK STATUS
