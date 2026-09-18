@@ -12,7 +12,7 @@ export const initiateMembershipPayment = async ({
   email = null,
   fullName = null,
   method = "M-PESA",
-  redirectUrl = `${window.location.origin}/payment/success`,
+  redirectUrl = null,
 } = {}) => {
   try {
     const response = await api.post(
@@ -47,7 +47,7 @@ export const initiateRenewalPayment = async ({
   email = null,
   fullName = null,
   method = "M-PESA",
-  redirectUrl = `${window.location.origin}/payment/success`,
+ redirectUrl = null,
 } = {}) => {
   try {
     const response = await api.post(
@@ -84,7 +84,7 @@ export const initiatePayment = async ({
   email = null,
   fullName = null,
   method = "M-PESA",
-  redirectUrl = `${window.location.origin}/payment/success`,
+  redirectUrl = null,
 }) => {
   try {
     const response = await api.post(
@@ -156,7 +156,7 @@ export const retryPayment = async ({
   email = null,
   fullName = null,
   method = "M-PESA",
-  redirectUrl = `${window.location.origin}/payment/success`,
+  redirectUrl = null,
 }) => {
   try {
     const response = await api.post(

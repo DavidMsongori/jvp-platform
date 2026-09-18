@@ -88,7 +88,7 @@ const isTestMode = () => {
     String(
       process.env
         .INTASEND_TEST_MODE ??
-        "true"
+        "false"
     )
       .trim()
       .toLowerCase();
@@ -103,7 +103,7 @@ const isTestMode = () => {
 const getFrontendUrl = () => {
   return String(
     process.env.FRONTEND_URL ||
-      "http://localhost:5173"
+      "https://jvp-platform.vercel.app"
   ).replace(/\/+$/, "");
 };
 
