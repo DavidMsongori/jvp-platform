@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -16,36 +17,92 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-import {
-  FileImage,
-} from "lucide-react";
-
 import { PERMISSIONS } from "../../utils/permissions";
+
+import {
+  getManualMpesaQueue,
+} from "../../services/admin.service";
 
 import "./Sidebar.css";
 
 function AdminSidebar({
-
   isOpen,
-
   onClose,
-
 }) {
-
   const {
-
     hasPermission,
-
     logout,
-
   } = useAuth();
+
+  const [pendingMpesaCount, setPendingMpesaCount] = useState(0);
+
+  /* ==========================================
+     LOAD MANUAL M-PESA QUEUE COUNT
+  ========================================== */
+
+  const loadPendingMpesaCount = async () => {
+    try {
+      const response = await getManualMpesaQueue();
+
+      const data = response?.data || response;
+
+      let queue = [];
+
+      if (Array.isArray(data)) {
+        queue = data;
+      } else if (Array.isArray(data?.payments)) {
+        queue = data.payments;
+      } else if (Array.isArray(data?.queue)) {
+        queue = data.queue;
+      } else if (Array.isArray(data?.results)) {
+        queue = data.results;
+      }
+
+      setPendingMpesaCount(queue.length);
+    } catch (error) {
+      console.error(
+        "Unable to load pending M-Pesa count:",
+        error
+      );
+
+      // Do not disturb the sidebar if the queue request fails.
+      setPendingMpesaCount(0);
+    }
+  };
+
+  /* ==========================================
+     INITIAL LOAD + AUTO REFRESH
+  ========================================== */
+
+  useEffect(() => {
+    if (!hasPermission(PERMISSIONS.VIEW_PAYMENTS)) {
+      return;
+    }
+
+    loadPendingMpesaCount();
+
+    const interval = setInterval(() => {
+      loadPendingMpesaCount();
+    }, 30000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isOpen]);
+
+  /* ==========================================
+     LOGOUT
+  ========================================== */
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   /* ==========================================
      MENU
   ========================================== */
 
   const menuItems = [
-
     {
       name: "Dashboard",
       icon: <FaChartPie />,
@@ -72,6 +129,7 @@ function AdminSidebar({
       icon: <FaMoneyBillWave />,
       path: "/admin/payments",
       permission: PERMISSIONS.VIEW_PAYMENTS,
+      badge: pendingMpesaCount,
     },
 
     {
@@ -81,19 +139,19 @@ function AdminSidebar({
       permission: PERMISSIONS.VIEW_EVENTS,
     },
 
-   {
-  name: "Summit",
-  icon: <FaTicketAlt />,
-  path: "/admin/summit",
-  permission: PERMISSIONS.VIEW_EVENTS,
-},
+    {
+      name: "Summit",
+      icon: <FaTicketAlt />,
+      path: "/admin/summit",
+      permission: PERMISSIONS.VIEW_EVENTS,
+    },
 
-{
-  name: "Summit Posters",
-  icon: <FaTicketAlt />,
-  path: "/admin/summit/posters",
-  permission: PERMISSIONS.VIEW_EVENTS,
-},
+    {
+      name: "Summit Posters",
+      icon: <FaTicketAlt />,
+      path: "/admin/summit/posters",
+      permission: PERMISSIONS.VIEW_EVENTS,
+    },
 
     {
       name: "Reports",
@@ -122,50 +180,31 @@ function AdminSidebar({
       path: "/admin/profile",
       permission: null,
     },
-
   ];
 
-  /* ==========================================
-     LOGOUT
-  ========================================== */
-
-  const handleLogout = async () => {
-
-    await logout();
-
-  };
-
   return (
-
     <aside
       className={`sidebar ${
         isOpen ? "open" : ""
       }`}
     >
-
       {/* ======================================
           HEADER
       ======================================= */}
 
       <div className="sidebar-header">
-
         <div>
-
           <h2>JVP Connect</h2>
-
           <span>Admin Panel</span>
-
         </div>
 
         <button
           className="close-btn"
           onClick={onClose}
+          aria-label="Close sidebar"
         >
-
           <FaTimes />
-
         </button>
-
       </div>
 
       {/* ======================================
@@ -173,25 +212,15 @@ function AdminSidebar({
       ======================================= */}
 
       <nav className="sidebar-nav">
-
         {menuItems
-
           .filter((item) => {
-
             if (!item.permission) {
-
               return true;
-
             }
 
-            return hasPermission(
-              item.permission
-            );
-
+            return hasPermission(item.permission);
           })
-
           .map((item) => (
-
             <NavLink
               key={item.path}
               to={item.path}
@@ -203,23 +232,23 @@ function AdminSidebar({
               }
               onClick={onClose}
             >
-
               <span className="sidebar-icon">
-
                 {item.icon}
-
               </span>
 
-              <span>
+              <span className="sidebar-link-content">
+                <span>{item.name}</span>
 
-                {item.name}
-
+                {item.badge > 0 && (
+                  <span className="sidebar-badge">
+                    {item.badge > 99
+                      ? "99+"
+                      : item.badge}
+                  </span>
+                )}
               </span>
-
             </NavLink>
-
           ))}
-
       </nav>
 
       {/* ======================================
@@ -227,28 +256,19 @@ function AdminSidebar({
       ======================================= */}
 
       <div className="sidebar-footer">
-
         <button
           className="logout-btn"
           onClick={handleLogout}
         >
-
           <FaSignOutAlt />
 
           <span>
-
             Logout
-
           </span>
-
         </button>
-
       </div>
-
     </aside>
-
   );
-
 }
 
 export default AdminSidebar;

@@ -1,274 +1,647 @@
-/* ==========================================================
-   PAYMENT PAGE
-========================================================== */
+/* =========================================================
+   JVP CONNECT - MEMBERSHIP PAYMENT PAGE
+   ========================================================= */
+
+/* =========================================================
+   PAGE
+   ========================================================= */
 
 .payment-page {
   min-height: 100vh;
-  background: #f5f7fb;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 60px 20px;
+  width: 100%;
+  padding: 40px 20px 60px;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(16, 185, 129, 0.08),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(234, 179, 8, 0.07),
+      transparent 30%
+    ),
+    #f5f7f6;
+  box-sizing: border-box;
+  color: #17221d;
 }
+
+.payment-page * {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
 
 .payment-card {
   width: 100%;
-  max-width: 850px;
+  max-width: 980px;
+  margin: 0 auto;
   background: #ffffff;
-  border-radius: 18px;
-  padding: 40px;
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e4e9e6;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow:
+    0 20px 60px rgba(16, 24, 20, 0.08),
+    0 4px 14px rgba(16, 24, 20, 0.04);
 }
 
-/* ==========================================================
+/* =========================================================
    HEADER
-========================================================== */
+   ========================================================= */
 
 .payment-header {
+  position: relative;
+  padding: 42px 40px 36px;
   text-align: center;
-  margin-bottom: 40px;
+  background:
+    linear-gradient(
+      135deg,
+      #064e3b 0%,
+      #047857 55%,
+      #059669 100%
+    );
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.payment-header::before {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  top: -160px;
+  right: -80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.payment-header::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  bottom: -110px;
+  left: -50px;
+  border-radius: 50%;
+  background: rgba(234, 179, 8, 0.08);
 }
 
 .payment-header svg {
-  color: #008037;
-  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 12px;
+  stroke-width: 1.8;
 }
 
 .payment-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #14213d;
-  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .payment-header p {
-  max-width: 650px;
-  margin: auto;
-  color: #666;
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  margin: 12px auto 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 15px;
   line-height: 1.7;
 }
 
-/* ==========================================================
+/* =========================================================
    ACTIVATION STEPS
-========================================================== */
+   ========================================================= */
 
 .activation-steps {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
+  gap: 8px;
+  padding: 24px 34px;
+  background: #fbfcfb;
+  border-bottom: 1px solid #e9eeeb;
 }
 
 .step {
+  position: relative;
   flex: 1;
-  min-width: 120px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 18px;
-  border-radius: 12px;
-  background: #f3f4f6;
-  color: #777;
-  font-size: .9rem;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  color: #9aa69f;
+  font-size: 12px;
   font-weight: 600;
   text-align: center;
 }
 
 .step.complete {
-  background: #e7f8ee;
-  color: #008037;
-}
-
-.step.complete svg {
-  color: #008037;
+  color: #047857;
 }
 
 .step.active {
-  background: #fff8e6;
-  color: #d97706;
-  border: 2px solid #fbbf24;
+  color: #064e3b;
+  font-weight: 800;
+}
+
+.step svg {
+  flex-shrink: 0;
 }
 
 .step.active svg {
-  color: #d97706;
+  fill: rgba(4, 120, 87, 0.08);
 }
 
-/* ==========================================================
-   MEMBERSHIP SUMMARY
-========================================================== */
+/* =========================================================
+   CONTENT AREA
+   ========================================================= */
+
+.membership-summary,
+.payment-method {
+  margin: 28px 34px 0;
+}
 
 .membership-summary {
-  margin-bottom: 35px;
+  padding: 24px;
+  border: 1px solid #e4ebe7;
+  border-radius: 18px;
+  background: #fbfdfc;
 }
 
 .membership-summary h2 {
-  margin-bottom: 20px;
-  color: #14213d;
-  font-size: 1.3rem;
+  margin: 0 0 18px;
+  color: #16352a;
+  font-size: 18px;
+  font-weight: 800;
 }
+
+/* =========================================================
+   SUMMARY GRID
+   ========================================================= */
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
-  gap: 18px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
 }
 
-.summary-grid div {
-  background: #f8fafc;
-  border: 1px solid #e6e9ef;
-  border-radius: 12px;
-  padding: 18px;
+.summary-grid > div {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid #e8eeeb;
+  border-radius: 13px;
+  background: #ffffff;
 }
 
 .summary-grid small {
   display: block;
-  color: #777;
-  margin-bottom: 8px;
+  margin-bottom: 7px;
+  color: #7a8881;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .summary-grid strong {
-  color: #14213d;
-  font-size: 1rem;
-  font-weight: 700;
+  display: block;
+  color: #16352a;
+  font-size: 15px;
+  line-height: 1.35;
+  text-transform: capitalize;
+  overflow-wrap: anywhere;
 }
 
-/* ==========================================================
+/* =========================================================
    PAYMENT METHOD
-========================================================== */
+   ========================================================= */
 
 .payment-method {
-  border-top: 1px solid #ececec;
-  padding-top: 35px;
+  padding-bottom: 36px;
 }
 
-.payment-method h2 {
-  color: #14213d;
-  margin-bottom: 10px;
+.payment-method > h2 {
+  margin: 0;
+  color: #16352a;
+  font-size: 24px;
+  font-weight: 800;
 }
 
-.payment-method p {
-  color: #666;
-  line-height: 1.7;
-  margin-bottom: 24px;
+.payment-method > p {
+  margin: 7px 0 22px;
+  color: #6d7973;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
-.payment-method label {
+/* =========================================================
+   M-PESA TILL CARD
+   ========================================================= */
+
+.mpesa-till-card {
+  position: relative;
+  padding: 26px 24px;
+  margin: 20px 0;
+  border: 1px solid #b7dfcf;
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      135deg,
+      #ecfdf5 0%,
+      #f7fffb 100%
+    );
+  text-align: center;
+  overflow: hidden;
+}
+
+.mpesa-till-card::after {
+  content: "M-PESA";
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  color: rgba(4, 120, 87, 0.08);
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.mpesa-till-card small {
+  position: relative;
+  z-index: 1;
   display: block;
-  font-weight: 600;
-  color: #14213d;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  color: #527064;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
 }
 
-.payment-method input {
-  width: 100%;
-  padding: 15px 18px;
-  border: 2px solid #d9dde3;
-  border-radius: 12px;
-  font-size: 1rem;
-  transition: .25s;
-  margin-bottom: 18px;
+.mpesa-till-card strong {
+  position: relative;
+  z-index: 1;
+  display: block;
+  color: #047857;
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
-.payment-method input:focus {
-  outline: none;
-  border-color: #008037;
-  box-shadow: 0 0 0 4px rgba(0,128,55,.12);
+/* =========================================================
+   M-PESA INSTRUCTIONS
+   ========================================================= */
+
+.mpesa-instructions {
+  margin: 22px 0;
+  padding: 22px 24px;
+  border: 1px solid #e6ebe8;
+  border-radius: 17px;
+  background: #ffffff;
 }
 
-.payment-method input:disabled {
-  background: #f2f2f2;
-  cursor: not-allowed;
+.mpesa-instructions h3 {
+  margin: 0 0 16px;
+  color: #16352a;
+  font-size: 16px;
+  font-weight: 800;
 }
 
-/* ==========================================================
-   BUTTON
-========================================================== */
+.mpesa-instructions ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.mpesa-instructions li {
+  margin: 0 0 11px;
+  padding-left: 5px;
+  color: #5f6c66;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.mpesa-instructions li:last-child {
+  margin-bottom: 0;
+}
+
+.mpesa-instructions strong {
+  color: #263b32;
+  font-weight: 750;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 
 .pay-btn {
   width: 100%;
-  display: flex;
-  justify-content: center;
+  min-height: 52px;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  border: none;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 13px 20px;
+  border: 0;
   border-radius: 12px;
-  padding: 16px;
   background: linear-gradient(
-      135deg,
-      #008037,
-      #00a347
+    135deg,
+    #047857,
+    #059669
   );
-  color: white;
-  font-size: 1rem;
-  font-weight: 700;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
   cursor: pointer;
-  transition: .25s;
+  box-shadow: 0 7px 18px rgba(4, 120, 87, 0.18);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
 }
 
 .pay-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(0,128,55,.25);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(4, 120, 87, 0.24);
+}
+
+.pay-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .pay-btn:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
-  opacity: .75;
+  box-shadow: none;
 }
 
-/* ==========================================================
-   STATUS MESSAGES
-========================================================== */
+/* =========================================================
+   PAYMENT REFERENCE
+   ========================================================= */
 
-.payment-success,
-.payment-error,
-.payment-processing {
-  margin-bottom: 18px;
-  padding: 14px 18px;
-  border-radius: 10px;
-  font-size: .95rem;
+.payment-reference-card {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 22px 0;
+  padding: 17px 18px;
+  border: 1px dashed #aebdb5;
+  border-radius: 14px;
+  background: #f8faf9;
 }
+
+.payment-reference-card > div {
+  min-width: 0;
+}
+
+.payment-reference-card small {
+  display: block;
+  margin-bottom: 5px;
+  color: #7a8881;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.payment-reference-card strong {
+  display: block;
+  color: #17382b;
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: break-all;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+}
+
+.payment-reference-card button {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d8e1dc;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #047857;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.payment-reference-card button:hover {
+  background: #ecfdf5;
+  border-color: #9ed2bd;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   CONFIRMATION FORM
+   ========================================================= */
+
+.mpesa-confirmation {
+  margin: 22px 0;
+  padding: 23px;
+  border: 1px solid #dce5e0;
+  border-radius: 17px;
+  background: #fbfcfb;
+}
+
+.mpesa-confirmation label {
+  display: block;
+  margin-bottom: 8px;
+  color: #263d33;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.mpesa-confirmation input {
+  width: 100%;
+  height: 50px;
+  padding: 0 15px;
+  border: 1px solid #cfdad4;
+  border-radius: 11px;
+  outline: none;
+  background: #ffffff;
+  color: #17382b;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.mpesa-confirmation input::placeholder {
+  color: #a2ada7;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.mpesa-confirmation input:focus {
+  border-color: #059669;
+  box-shadow:
+    0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.mpesa-confirmation input:disabled {
+  background: #f1f4f2;
+  cursor: not-allowed;
+}
+
+.mpesa-confirmation small {
+  display: block;
+  margin-top: 8px;
+  color: #7a8881;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SUCCESS STATE
+   ========================================================= */
 
 .payment-success {
-  background: #e7f8ee;
-  color: #008037;
-  border: 1px solid #b7e4c7;
+  margin: 20px 0;
+  padding: 25px 22px;
+  border: 1px solid #b9e1cf;
+  border-radius: 17px;
+  background:
+    linear-gradient(
+      135deg,
+      #ecfdf5,
+      #f8fffb
+    );
+  color: #047857;
+  text-align: center;
 }
+
+.payment-success svg {
+  margin-bottom: 7px;
+}
+
+.payment-success h2 {
+  margin: 0 0 8px;
+  color: #065f46;
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.payment-success p {
+  max-width: 620px;
+  margin: 7px auto;
+  color: #527064;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.payment-success small {
+  display: block;
+  margin-top: 13px;
+  color: #5c7569;
+  font-size: 12px;
+}
+
+.payment-success small strong {
+  color: #065f46;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+}
+
+/* =========================================================
+   ERROR STATE
+   ========================================================= */
 
 .payment-error {
-  background: #fdecec;
-  color: #c62828;
-  border: 1px solid #f5b5b5;
+  margin: 18px 0;
+  padding: 15px 17px;
+  border: 1px solid #fecaca;
+  border-radius: 13px;
+  background: #fff7f7;
+  color: #b42318;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
-.payment-processing {
-  background: #fff8e5;
-  color: #b45309;
-  border: 1px solid #f8d675;
-}
-
-.payment-reference {
+.payment-error strong {
   display: block;
-  margin-bottom: 20px;
-  color: #666;
-  font-size: .85rem;
-  word-break: break-word;
+  margin-bottom: 4px;
+  color: #991b1b;
+  font-weight: 800;
 }
 
-/* ==========================================================
+.payment-error p {
+  margin: 5px 0 0;
+}
+
+/* =========================================================
+   INLINE MESSAGE
+   ========================================================= */
+
+.payment-method > .payment-success[role="status"] {
+  margin-top: 18px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  text-align: left;
+}
+
+/* =========================================================
+   SECURITY NOTE
+   ========================================================= */
+
+.payment-security-note {
+  display: block;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #e7ece9;
+  color: #7c8882;
+  font-size: 11px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* =========================================================
    LOADING SPINNER
-========================================================== */
+   ========================================================= */
 
 .spin {
-  animation: spin .9s linear infinite;
+  animation: payment-spin 0.9s linear infinite;
 }
 
-@keyframes spin {
-
+@keyframes payment-spin {
   from {
     transform: rotate(0deg);
   }
@@ -276,73 +649,222 @@
   to {
     transform: rotate(360deg);
   }
-
 }
 
-/* ==========================================================
-   RESPONSIVE
-========================================================== */
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
 
-@media (max-width: 768px) {
+.pay-btn:focus-visible,
+.payment-reference-card button:focus-visible,
+.mpesa-confirmation input:focus-visible {
+  outline: 3px solid rgba(5, 150, 105, 0.25);
+  outline-offset: 2px;
+}
 
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 800px) {
   .payment-page {
-    padding: 30px 15px;
+    padding: 24px 14px 40px;
   }
 
-  .payment-card {
-    padding: 25px;
+  .payment-header {
+    padding: 34px 24px 30px;
   }
 
   .payment-header h1 {
-    font-size: 1.6rem;
+    font-size: 26px;
   }
 
   .activation-steps {
-    flex-direction: column;
+    padding: 20px 18px;
   }
 
   .step {
-    flex-direction: row;
-    justify-content: flex-start;
-    text-align: left;
+    font-size: 11px;
   }
 
+  .membership-summary,
+  .payment-method {
+    margin-left: 22px;
+    margin-right: 22px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .payment-page {
+    min-height: 100vh;
+    padding: 0;
+    background: #f5f7f6;
+  }
+
+  .payment-card {
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .payment-header {
+    padding: 32px 20px 28px;
+    border-radius: 0;
+  }
+
+  .payment-header svg {
+    width: 42px;
+    height: 42px;
+  }
+
+  .payment-header h1 {
+    font-size: 24px;
+  }
+
+  .payment-header p {
+    font-size: 13px;
+  }
+
+  .activation-steps {
+    gap: 3px;
+    padding: 17px 10px;
+    overflow-x: auto;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 5px;
+    min-width: 72px;
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .step svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .membership-summary,
+  .payment-method {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+
+  .membership-summary {
+    margin-top: 20px;
+    padding: 18px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+
+  .summary-grid > div {
+    padding: 12px;
+  }
+
+  .summary-grid small {
+    font-size: 9px;
+  }
+
+  .summary-grid strong {
+    font-size: 13px;
+  }
+
+  .payment-method {
+    padding-bottom: 28px;
+  }
+
+  .payment-method > h2 {
+    font-size: 21px;
+  }
+
+  .payment-method > p {
+    font-size: 13px;
+  }
+
+  .mpesa-till-card {
+    padding: 23px 15px;
+  }
+
+  .mpesa-till-card strong {
+    font-size: 28px;
+  }
+
+  .mpesa-instructions {
+    padding: 18px 17px;
+  }
+
+  .mpesa-instructions li {
+    font-size: 13px;
+  }
+
+  .payment-reference-card {
+    padding: 14px;
+  }
+
+  .payment-reference-card strong {
+    font-size: 12px;
+  }
+
+  .mpesa-confirmation {
+    padding: 18px;
+  }
+
+  .payment-success {
+    padding: 22px 17px;
+  }
+
+  .payment-success h2 {
+    font-size: 18px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
   .summary-grid {
     grid-template-columns: 1fr;
   }
 
-}
-
-@media (max-width: 480px) {
-
-  .payment-card {
-    padding: 20px;
+  .mpesa-till-card strong {
+    font-size: 25px;
   }
 
-  .payment-header h1 {
-    font-size: 1.4rem;
+  .activation-steps {
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
-  .pay-btn {
-    font-size: .95rem;
-    padding: 15px;
+  .step {
+    min-width: 65px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .pay-btn,
+  .payment-reference-card button,
+  .mpesa-confirmation input {
+    transition: none;
   }
 
-}
-
-.payment-security-note {
-  display: block;
-
-  margin-top: 14px;
-
-  color: #64748b;
-
-  font-size: 0.78rem;
-  line-height: 1.6;
-
-  text-align: center;
-}
-
-.pay-btn svg:last-child {
-  flex-shrink: 0;
+  .spin {
+    animation: none;
+  }
 }

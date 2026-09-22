@@ -13,82 +13,88 @@ import { logActivity } from "../utils/activity.js";
 ========================================================== */
 
 export const getDashboard = async () => {
+  const now = new Date();
 
-  /* ----------------------------------------
-     MEMBER STATISTICS
-  ---------------------------------------- */
-
-  const [
-
-  totalMembers,
-
-  activatedMembers,
-
-  importedMembers,
-
-  newMembers,
-
-  expiredMembers,
-
-] = await Promise.all([
-
-  // Everyone
-  Member.countDocuments(),
-
-  // Members who have actually activated their accounts
-  Member.countDocuments({
-    accountActivated: true,
-  }),
-
-  // Imported members still waiting to activate
-  Member.countDocuments({
-    source: "imported",
-    accountActivated: false,
-  }),
-
-  // Members who registered through JVP Connect
-  Member.countDocuments({
-    source: "new",
-    accountActivated: true,
-  }),
-
-  // Expired memberships
-  Member.countDocuments({
-    membershipStatus: "expired",
-  }),
-
-]);
-
-  /* ----------------------------------------
-     PAYMENT STATISTICS
-  ---------------------------------------- */
+  /*
+   * ==========================================
+   * MEMBER STATISTICS
+   * ==========================================
+   */
 
   const [
-
-    totalPayments,
-
-    revenue,
-
+    activatedImportedMembers,
+    importedMembers,
+    newMembers,
+    expiredMembers,
   ] = await Promise.all([
+    // Old/imported members who have activated their JVP Connect accounts
+    Member.countDocuments({
+      source: "imported",
+      accountActivated: true,
+    }),
 
-    Payment.countDocuments(),
+    // Imported members who have NOT activated their accounts
+    Member.countDocuments({
+      source: "imported",
+      accountActivated: false,
+    }),
+
+    // New members who have successfully completed payment
+    // and whose membership is active
+    Member.countDocuments({
+      source: "new",
+      membershipStatus: "active",
+      membershipFeePaid: true,
+    }),
+
+    // Expired memberships
+    Member.countDocuments({
+      membershipStatus: "expired",
+    }),
+  ]);
+
+  /*
+   * Total Members
+   *
+   * Only count:
+   * 1. Imported members who activated their accounts
+   * 2. New members who completed payment and are active
+   */
+  const totalMembers =
+    activatedImportedMembers + newMembers;
+
+  /*
+   * ==========================================
+   * PAYMENT STATISTICS
+   * ==========================================
+   *
+   * IMPORTANT:
+   * Your Payment documents use status: "successful"
+   * for completed/verified payments.
+   */
+
+  const [totalPayments, revenue] = await Promise.all([
+    Payment.countDocuments({
+      status: "successful",
+    }),
 
     Payment.aggregate([
       {
         $match: {
-          status: "completed",
+          status: "successful",
         },
       },
       {
         $group: {
           _id: null,
           total: {
-            $sum: "$amount",
+            $sum: {
+              $ifNull: ["$amount", 0],
+            },
           },
         },
       },
     ]),
-
   ]);
 
   const totalRevenue =
@@ -96,128 +102,93 @@ export const getDashboard = async () => {
       ? revenue[0].total
       : 0;
 
-  /* ----------------------------------------
-     EVENTS
-  ---------------------------------------- */
+  /*
+   * ==========================================
+   * EVENT STATISTICS
+   * ==========================================
+   *
+   * Count upcoming/current events.
+   */
 
-  const totalEvents =
-    await Event.countDocuments();
+  const totalEvents = await Event.countDocuments({
+    startDate: {
+      $gte: now,
+    },
+  });
 
-  /* ----------------------------------------
-     RECENT MEMBERS
-  ---------------------------------------- */
+  /*
+   * ==========================================
+   * RECENT MEMBERS
+   * ==========================================
+   */
 
-  const recentMembers =
-    await Member.find()
+  const recentMembers = await Member.find()
+    .populate("user", "email role")
+    .sort({ createdAt: -1 })
+    .limit(5);
 
-      .populate(
-        "user",
-        "email role"
-      )
+  /*
+   * ==========================================
+   * RECENT PAYMENTS
+   * ==========================================
+   */
 
-      .sort({
-        createdAt: -1,
-      })
+  const recentPayments = await Payment.find()
+    .populate(
+      "member",
+      "firstName lastName memberNumber"
+    )
+    .sort({ createdAt: -1 })
+    .limit(5);
 
-      .limit(5);
+  /*
+   * ==========================================
+   * UPCOMING EVENTS
+   * ==========================================
+   */
 
-  /* ----------------------------------------
-     RECENT PAYMENTS
-  ---------------------------------------- */
+  const upcomingEvents = await Event.find({
+    startDate: {
+      $gte: now,
+    },
+  })
+    .sort({ startDate: 1 })
+    .limit(5);
 
-  const recentPayments =
-    await Payment.find()
+  /*
+   * ==========================================
+   * RECENT ACTIVITY
+   * ==========================================
+   */
 
-      .populate(
-        "member",
-        "firstName lastName memberNumber"
-      )
+  const recentActivity = await ActivityLog.find()
+    .populate("user", "email role")
+    .sort({ createdAt: -1 })
+    .limit(10);
 
-      .sort({
-        createdAt: -1,
-      })
-
-      .limit(5);
-
-  /* ----------------------------------------
-     UPCOMING EVENTS
-  ---------------------------------------- */
-
-  const upcomingEvents =
-    await Event.find({
-
-      startDate: {
-
-        $gte: new Date(),
-
-      },
-
-    })
-
-      .sort({
-
-        startDate: 1,
-
-      })
-
-      .limit(5);
-
-  /* ----------------------------------------
-     RECENT ACTIVITY
-  ---------------------------------------- */
-
-  const recentActivity =
-    await ActivityLog.find()
-
-      .populate(
-        "user",
-        "email role"
-      )
-
-      .sort({
-
-        createdAt: -1,
-
-      })
-
-      .limit(10);
-
-  /* ----------------------------------------
-     RETURN
-  ---------------------------------------- */
+  /*
+   * ==========================================
+   * RETURN DASHBOARD
+   * ==========================================
+   */
 
   return {
-
     statistics: {
-
-  totalMembers,
-
-  activatedMembers,
-
-  importedMembers,
-
-  newMembers,
-
-  expiredMembers,
-
-  totalPayments,
-
-  totalRevenue,
-
-  totalEvents,
-
-},
+      totalMembers,
+      activatedMembers: activatedImportedMembers,
+      importedMembers,
+      newMembers,
+      expiredMembers,
+      totalPayments,
+      totalRevenue,
+      totalEvents,
+    },
 
     recentMembers,
-
     recentPayments,
-
     upcomingEvents,
-
     recentActivity,
-
   };
-
 };
 
 
@@ -417,33 +388,53 @@ export const getMembers = async (query = {}) => {
   const total =
     filteredMembers.length;
 
-  /* ----------------------------------------
+   /* ----------------------------------------
      SUMMARY
   ---------------------------------------- */
 
+  const [
+    activatedMembers,
+    importedMembers,
+    newMembers,
+  ] = await Promise.all([
+
+    Member.countDocuments({
+      source: "imported",
+      accountActivated: true,
+    }),
+
+    Member.countDocuments({
+      source: "imported",
+      accountActivated: {
+        $ne: true,
+      },
+    }),
+
+    Member.countDocuments({
+      source: "new",
+      membershipStatus: "active",
+      membershipFeePaid: true,
+    }),
+
+  ]);
+
   const summary = {
 
-  totalMembers: await Member.countDocuments(),
+    totalMembers:
+      activatedMembers + newMembers,
 
-  activatedMembers: await Member.countDocuments({
-    accountActivated: true,
-  }),
+    activatedMembers,
 
-  importedMembers: await Member.countDocuments({
-    source: "imported",
-    accountActivated: false,
-  }),
+    importedMembers,
 
-  newMembers: await Member.countDocuments({
-    source: "new",
-    accountActivated: true,
-  }),
+    newMembers,
 
-  expiredMembers: await Member.countDocuments({
-    membershipStatus: "expired",
-  }),
+    expiredMembers:
+      await Member.countDocuments({
+        membershipStatus: "expired",
+      }),
 
-};
+  };
 
   /* ----------------------------------------
      RETURN
@@ -768,74 +759,93 @@ export const deleteMember = async (
    PAYMENT MANAGEMENT
 ========================================================== */
 
+/* ==========================================================
+   PAYMENT MANAGEMENT
+========================================================== */
+
 /**
  * Get all payments.
+ *
+ * IMPORTANT:
+ * Successful payments use:
+ *
+ *   status: "successful"
+ *
+ * Old records with statuses such as:
+ * - pending
+ * - completed
+ * - expired
+ * - failed
+ *
+ * are NOT counted as successful payments.
  */
-
 export const getPayments = async (query = {}) => {
-
   const {
-
     page = 1,
-
     limit = 10,
-
     search = "",
-
     status,
-
     paymentMethod,
-
     startDate,
-
     endDate,
-
     sortBy = "createdAt",
-
     order = "desc",
-
   } = query;
 
   const pageNumber = Math.max(Number(page), 1);
-
   const pageSize = Math.max(Number(limit), 1);
 
   /* ----------------------------------------
-     FILTERS
+     BASE FILTERS
   ---------------------------------------- */
 
   const filters = {};
 
+  /*
+   * If the admin specifically selects a status,
+   * respect that filter.
+   *
+   * Otherwise, the Payments page should default
+   * to successful payments only.
+   */
   if (status) {
-
     filters.status = status;
-
+  } else {
+    filters.status = "successful";
   }
 
   if (paymentMethod) {
-
     filters.paymentMethod = paymentMethod;
-
   }
 
-  if (startDate || endDate) {
+  /* ----------------------------------------
+     DATE FILTER
+  ---------------------------------------- */
 
+  if (startDate || endDate) {
     filters.createdAt = {};
 
     if (startDate) {
-
-      filters.createdAt.$gte =
-        new Date(startDate);
-
+      filters.createdAt.$gte = new Date(startDate);
     }
 
     if (endDate) {
+      const end = new Date(endDate);
 
-      filters.createdAt.$lte =
-        new Date(endDate);
+      /*
+       * If the supplied date is midnight, include
+       * the complete day.
+       */
+      if (
+        end.getHours() === 0 &&
+        end.getMinutes() === 0 &&
+        end.getSeconds() === 0
+      ) {
+        end.setHours(23, 59, 59, 999);
+      }
 
+      filters.createdAt.$lte = end;
     }
-
   }
 
   /* ----------------------------------------
@@ -843,51 +853,37 @@ export const getPayments = async (query = {}) => {
   ---------------------------------------- */
 
   const sort = {
-
-    [sortBy]:
-      order === "asc"
-        ? 1
-        : -1,
-
+    [sortBy]: order === "asc" ? 1 : -1,
   };
-
-  /* ----------------------------------------
-     QUERY
-  ---------------------------------------- */
-
-  let payments = await Payment.find(filters)
-
-    .populate({
-
-      path: "member",
-
-      select:
-        "firstName lastName memberNumber phone",
-
-    })
-
-    .sort(sort)
-
-    .skip((pageNumber - 1) * pageSize)
-
-    .limit(pageSize);
 
   /* ----------------------------------------
      SEARCH
   ---------------------------------------- */
 
-  if (search.trim()) {
+  /*
+   * We search member information after population.
+   *
+   * To keep the existing behavior intact, the
+   * database query is performed first and the
+   * populated results are then filtered.
+   */
+  let payments = await Payment.find(filters)
+    .populate({
+      path: "member",
+      select:
+        "firstName lastName memberNumber phone",
+    })
+    .sort(sort)
+    .skip((pageNumber - 1) * pageSize)
+    .limit(pageSize);
 
-    const keyword =
-      search.toLowerCase();
+  if (search.trim()) {
+    const keyword = search.trim().toLowerCase();
 
     payments = payments.filter((payment) => {
-
-      const member =
-        payment.member || {};
+      const member = payment.member || {};
 
       return (
-
         member.firstName
           ?.toLowerCase()
           .includes(keyword) ||
@@ -900,164 +896,235 @@ export const getPayments = async (query = {}) => {
           ?.toLowerCase()
           .includes(keyword) ||
 
+        member.phone
+          ?.toLowerCase()
+          .includes(keyword) ||
+
         payment.transactionReference
           ?.toLowerCase()
+          .includes(keyword) ||
+
+        payment.mpesaCode
+          ?.toLowerCase()
+          .includes(keyword) ||
+
+        payment.confirmationCode
+          ?.toLowerCase()
           .includes(keyword)
-
       );
-
     });
-
   }
 
   /* ----------------------------------------
-     TOTALS
+     SUCCESSFUL PAYMENTS
   ---------------------------------------- */
 
-  const totalPayments =
-    await Payment.countDocuments(filters);
+  const successfulFilter = {
+    status: "successful",
+  };
 
-  const revenue =
-    await Payment.aggregate([
+  const successfulPayments =
+    await Payment.countDocuments(
+      successfulFilter
+    );
 
-      {
+  /* ----------------------------------------
+     COMPLETED
+  ---------------------------------------- */
 
-        $match: {
+  /*
+   * "Completed" and "Total Payments" now refer
+   * to the same canonical successful payment status.
+   */
+  const completedPayments =
+    successfulPayments;
 
-          status: "completed",
+  /* ----------------------------------------
+     PENDING
+  ---------------------------------------- */
 
-        },
+  /*
+   * IMPORTANT:
+   *
+   * Manual M-Pesa payments awaiting admin
+   * verification are NOT counted here.
+   *
+   * They are handled separately by:
+   *
+   * GET /payments/admin/manual-mpesa
+   *
+   * and displayed in the Manual M-Pesa Queue.
+   *
+   * This prevents an old provider "pending"
+   * record from appearing as a payment awaiting
+   * JVP Finance/Admin verification.
+   */
+  const pendingPayments = 0;
 
-      },
-
-      {
-
-        $group: {
-
-          _id: null,
-
-          total: {
-
-            $sum: "$amount",
-
-          },
-
-        },
-
-      },
-
-    ]);
-
-  const totalRevenue =
-    revenue.length
-      ? revenue[0].total
-      : 0;
-
-  const pendingPayments =
-    await Payment.countDocuments({
-
-      status: "pending",
-
-    });
+  /* ----------------------------------------
+     FAILED
+  ---------------------------------------- */
 
   const failedPayments =
     await Payment.countDocuments({
-
       status: "failed",
-
     });
+
+  /* ----------------------------------------
+     REVENUE
+  ---------------------------------------- */
+
+  /*
+   * Revenue is calculated ONLY from successful
+   * payments.
+   */
+  const revenue =
+    await Payment.aggregate([
+      {
+        $match: {
+          status: "successful",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: {
+              $ifNull: ["$amount", 0],
+            },
+          },
+        },
+      },
+    ]);
+
+  const totalRevenue =
+    revenue.length > 0
+      ? revenue[0].total
+      : 0;
+
+  /* ----------------------------------------
+     PAGINATION TOTAL
+  ---------------------------------------- */
+
+  /*
+   * When no status filter is supplied, this is
+   * the number of successful payments.
+   *
+   * When a specific status is selected, the
+   * result reflects that status.
+   */
+  const totalPayments =
+    await Payment.countDocuments(filters);
+
+  const totalPages =
+    Math.ceil(totalPayments / pageSize);
 
   /* ----------------------------------------
      RETURN
   ---------------------------------------- */
 
   return {
-
     summary: {
+      totalPayments:
+        status
+          ? totalPayments
+          : successfulPayments,
 
-      totalPayments,
-
-      totalRevenue,
+      completedPayments,
 
       pendingPayments,
 
       failedPayments,
 
+      totalRevenue,
     },
 
     payments,
 
     pagination: {
-
       page: pageNumber,
-
       limit: pageSize,
-
       total: totalPayments,
-
-      totalPages: Math.ceil(
-        totalPayments / pageSize
-      ),
+      totalPages,
 
       hasNextPage:
-        pageNumber <
-        Math.ceil(totalPayments / pageSize),
+        pageNumber < totalPages,
 
       hasPreviousPage:
         pageNumber > 1,
-
     },
-
   };
-
 };
+
 
 /**
  * Verify payment.
+ *
+ * All verified payments must use:
+ *
+ *   status: "successful"
+ *
+ * This keeps the payment system consistent with:
+ *
+ * - Dashboard
+ * - Payments page
+ * - Revenue
+ * - Manual M-Pesa approval
+ * - Reports
  */
-
 export const verifyPayment = async (
-
   paymentId,
-
   adminId
-
 ) => {
-
   const session =
     await mongoose.startSession();
 
   session.startTransaction();
 
   try {
-
     const payment =
       await Payment.findById(paymentId)
         .session(session);
 
     if (!payment) {
-
       throw new AppError(
         "Payment not found.",
         404
       );
-
     }
 
-    if (payment.status === "completed") {
+    /* ----------------------------------------
+       ALREADY VERIFIED
+    ---------------------------------------- */
 
+    if (payment.status === "successful") {
       throw new AppError(
         "Payment has already been verified.",
         400
       );
-
     }
 
-    payment.status = "completed";
+    /* ----------------------------------------
+       MARK PAYMENT SUCCESSFUL
+    ---------------------------------------- */
+
+    payment.status = "successful";
+
+    payment.isVerified = true;
 
     payment.verifiedBy = adminId;
 
     payment.verifiedAt = new Date();
+
+    /*
+     * If the payment model supports these fields,
+     * maintain the same verification metadata used
+     * by the manual M-Pesa approval flow.
+     */
+    payment.verificationMethod =
+      payment.verificationMethod || "manual";
+
+    payment.membershipProcessed = true;
 
     await payment.save({
       session,
@@ -1073,72 +1140,67 @@ export const verifyPayment = async (
       ).session(session);
 
     if (member) {
+      /*
+       * Activate / renew membership.
+       */
 
-      /* ----------------------------------------
-   ACTIVATE / RENEW MEMBERSHIP
----------------------------------------- */
+      const today = new Date();
 
-const today = new Date();
+      let baseDate = today;
 
-let baseDate = today;
+      /*
+       * If the existing membership is still valid,
+       * extend from its current expiry date.
+       */
 
-/*
- * If the current membership is still valid,
- * extend from the existing expiry date.
- */
+      if (
+        member.membershipExpiry &&
+        member.membershipExpiry > today
+      ) {
+        baseDate = new Date(
+          member.membershipExpiry
+        );
+      }
 
-if (
+      /*
+       * Add one year.
+       */
 
-  member.membershipExpiry &&
+      const newExpiry =
+        new Date(baseDate);
 
-  member.membershipExpiry > today
+      newExpiry.setFullYear(
+        newExpiry.getFullYear() + 1
+      );
 
-) {
+      member.membershipFeePaid = true;
 
-  baseDate = new Date(
-    member.membershipExpiry
-  );
+      member.membershipStatus = "active";
 
-}
+      member.membershipExpiry =
+        newExpiry;
 
-/*
- * Add one year.
- */
-
-const newExpiry = new Date(baseDate);
-
-newExpiry.setFullYear(
-  newExpiry.getFullYear() + 1
-);
-
-member.membershipFeePaid = true;
-
-member.membershipStatus = "active";
-
-member.membershipExpiry = newExpiry;
-
-await member.save({
-  session,
-});
-
+      await member.save({
+        session,
+      });
     }
+
+    /* ----------------------------------------
+       COMMIT
+    ---------------------------------------- */
 
     await session.commitTransaction();
 
     return payment;
 
   } catch (error) {
-
     await session.abortTransaction();
 
     throw error;
 
   } finally {
-
     session.endSession();
-
   }
-
 };
 
 

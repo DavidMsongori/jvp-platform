@@ -10,6 +10,7 @@ import {
 
 const paymentStatuses = [
   "pending",
+  "submitted",
   "processing",
   "successful",
   "failed",
@@ -44,111 +45,103 @@ const intasendMethods = [
    SHARED FIELD VALIDATORS
 ========================================================== */
 
-const phoneNumberValidator =
-  body("phoneNumber")
-    .optional({
-      nullable: true,
-      checkFalsy: true,
-    })
-    .trim()
-    .matches(
-      /^(\+254|254|0)(7\d{8}|1\d{8})$/
-    )
-    .withMessage(
-      "Enter a valid Kenyan mobile phone number."
-    );
+const phoneNumberValidator = body("phoneNumber")
+  .optional({
+    nullable: true,
+    checkFalsy: true,
+  })
+  .trim()
+  .matches(
+    /^(\+254|254|0)(7\d{8}|1\d{8})$/
+  )
+  .withMessage(
+    "Enter a valid Kenyan mobile phone number."
+  );
 
-const paymentMethodValidator =
-  body("method")
-    .optional({
-      nullable: true,
-      checkFalsy: true,
-    })
-    .trim()
-    .toUpperCase()
-    .isIn(intasendMethods)
-    .withMessage(
-      "Payment method must be M-PESA or CARD-PAYMENT."
-    );
+const paymentMethodValidator = body("method")
+  .optional({
+    nullable: true,
+    checkFalsy: true,
+  })
+  .trim()
+  .toUpperCase()
+  .isIn(intasendMethods)
+  .withMessage(
+    "Payment method must be M-PESA or CARD-PAYMENT."
+  );
 
-const customerEmailValidator =
-  body("email")
-    .optional({
-      nullable: true,
-      checkFalsy: true,
-    })
-    .trim()
-    .isEmail()
-    .withMessage(
-      "Enter a valid email address."
-    )
-    .normalizeEmail();
+const customerEmailValidator = body("email")
+  .optional({
+    nullable: true,
+    checkFalsy: true,
+  })
+  .trim()
+  .isEmail()
+  .withMessage(
+    "Enter a valid email address."
+  )
+  .normalizeEmail();
 
-const customerNameValidator =
-  body("fullName")
-    .optional({
-      nullable: true,
-      checkFalsy: true,
-    })
-    .trim()
-    .isLength({
-      min: 2,
-      max: 150,
-    })
-    .withMessage(
-      "Full name must be between 2 and 150 characters."
-    );
+const customerNameValidator = body("fullName")
+  .optional({
+    nullable: true,
+    checkFalsy: true,
+  })
+  .trim()
+  .isLength({
+    min: 2,
+    max: 150,
+  })
+  .withMessage(
+    "Full name must be between 2 and 150 characters."
+  );
 
-const redirectUrlValidator =
-  body("redirectUrl")
-    .optional({
-      nullable: true,
-      checkFalsy: true,
-    })
-    .trim()
-    .custom((value) => {
-      let url;
+const redirectUrlValidator = body("redirectUrl")
+  .optional({
+    nullable: true,
+    checkFalsy: true,
+  })
+  .trim()
+  .custom((value) => {
+    let url;
 
-      try {
-        url = new URL(value);
-      } catch {
-        throw new Error(
-          "Redirect URL must be a valid HTTP or HTTPS URL."
-        );
-      }
+    try {
+      url = new URL(value);
+    } catch {
+      throw new Error(
+        "Redirect URL must be a valid HTTP or HTTPS URL."
+      );
+    }
 
-      if (
-        ![
-          "http:",
-          "https:",
-        ].includes(
-          url.protocol
-        )
-      ) {
-        throw new Error(
-          "Redirect URL must use HTTP or HTTPS."
-        );
-      }
+    if (
+      !["http:", "https:"].includes(
+        url.protocol
+      )
+    ) {
+      throw new Error(
+        "Redirect URL must use HTTP or HTTPS."
+      );
+    }
 
-      const allowedOrigins = [
-        "http://localhost:5173",
-        "https://jvp-platform.vercel.app",
-        process.env.CLIENT_URL,
-        process.env.FRONTEND_URL,
-      ].filter(Boolean);
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://jvp-platform.vercel.app",
+      process.env.CLIENT_URL,
+      process.env.FRONTEND_URL,
+    ].filter(Boolean);
 
-      if (
-        !allowedOrigins.includes(
-          url.origin
-        )
-      ) {
-        throw new Error(
-          "Redirect URL is not allowed."
-        );
-      }
+    if (
+      !allowedOrigins.includes(
+        url.origin
+      )
+    ) {
+      throw new Error(
+        "Redirect URL is not allowed."
+      );
+    }
 
-      return true;
-    });
+    return true;
+  });
 
 /* ==========================================================
    CHECKOUT VALIDATION
@@ -162,22 +155,21 @@ const checkoutValidators = [
   redirectUrlValidator,
 
   body().custom((value) => {
-    const method =
-      String(
-        value?.method || ""
-      )
-        .trim()
-        .toUpperCase();
+    const method = String(
+      value?.method || ""
+    )
+      .trim()
+      .toUpperCase();
 
+    /*
+     * The service may obtain the phone number
+     * from the member profile, so an empty
+     * phoneNumber is allowed here.
+     */
     if (
       method === "M-PESA" &&
       !value?.phoneNumber
     ) {
-      /*
-       * The controller and service may obtain
-       * the phone number from the member profile.
-       * Therefore, do not reject an empty value here.
-       */
       return true;
     }
 
@@ -422,20 +414,19 @@ export const eventPaymentValidator = [
    SUMMIT EXHIBITOR PAYMENT
 ========================================================== */
 
-export const summitExhibitorPaymentValidator =
-  [
-    body("summitExhibitorId")
-      .notEmpty()
-      .withMessage(
-        "Summit exhibitor registration ID is required."
-      )
-      .isMongoId()
-      .withMessage(
-        "Invalid summit exhibitor registration ID."
-      ),
+export const summitExhibitorPaymentValidator = [
+  body("summitExhibitorId")
+    .notEmpty()
+    .withMessage(
+      "Summit exhibitor registration ID is required."
+    )
+    .isMongoId()
+    .withMessage(
+      "Invalid summit exhibitor registration ID."
+    ),
 
-    ...checkoutValidators,
-  ];
+  ...checkoutValidators,
+];
 
 /* ==========================================================
    LEGACY M-PESA CALLBACK
@@ -443,7 +434,10 @@ export const summitExhibitorPaymentValidator =
 
 /**
  * Retained temporarily for historical direct-Daraja
- * transactions. New payments use the IntaSend webhook.
+ * transactions.
+ *
+ * New IntaSend payments use the IntaSend webhook/status
+ * query flow.
  */
 
 export const mpesaCallbackValidator = [
@@ -597,5 +591,51 @@ export const markPaymentFailedValidator = [
     })
     .withMessage(
       "Reason must be between 3 and 250 characters."
+    ),
+];
+
+/* ==========================================================
+   MANUAL M-PESA CONFIRMATION
+========================================================== */
+
+/**
+ * Used when a member has paid through M-Pesa but the
+ * IntaSend browser redirect/callback was missed.
+ *
+ * Example:
+ *
+ * {
+ *   "reference": "JVP-XXXXXXXX",
+ *   "confirmationCode": "ABC123XYZ"
+ * }
+ */
+
+export const manualMpesaConfirmationValidator = [
+  body("reference")
+    .trim()
+    .notEmpty()
+    .withMessage(
+      "Payment reference is required."
+    )
+    .isLength({
+      min: 5,
+      max: 100,
+    })
+    .withMessage(
+      "Invalid payment reference."
+    ),
+
+  body("confirmationCode")
+    .trim()
+    .toUpperCase()
+    .notEmpty()
+    .withMessage(
+      "M-Pesa confirmation code is required."
+    )
+    .matches(
+      /^[A-Z0-9]{8,20}$/
+    )
+    .withMessage(
+      "Enter a valid M-Pesa confirmation code."
     ),
 ];

@@ -1,19 +1,24 @@
 import express from "express";
 
 import auth from "../middleware/auth.js";
+import authorize from "../middleware/authorize.js";
 import validate from "../middleware/validate.js";
 
 import {
   initiateMembershipPayment,
+  initiateManualMembershipPayment,
   initiateRenewalPayment,
   initiatePayment,
   mpesaCallback,
+  confirmMpesaPayment,
+  approveManualMpesaPayment,
   queryPaymentStatus,
   retryPayment,
   getPaymentHistory,
   getPayment,
   getPaymentById,
   getAllPayments,
+  getManualMpesaQueue,
   getPaymentStatistics,
   markPaymentFailed,
   deletePendingPayment,
@@ -28,6 +33,7 @@ import {
   retryPaymentValidator,
   paymentQueryValidator,
   mpesaCallbackValidator,
+  manualMpesaConfirmationValidator,
 } from "../utils/payment.validators.js";
 
 const router = express.Router();
@@ -41,25 +47,23 @@ router.get(
   (req, res) => {
     return res.status(200).json({
       success: true,
-      message:
-        "Payment routes are working.",
+      message: "Payment routes are working.",
     });
   }
 );
 
 /* ==========================================================
-   PUBLIC LEGACY CALLBACK
+   PUBLIC LEGACY M-PESA CALLBACK
 ========================================================== */
 
 /**
  * Historical direct M-Pesa callback.
  *
- * This remains public so any outstanding direct-Daraja
- * transactions can still send their callbacks.
+ * This endpoint remains public because M-Pesa/Daraja
+ * callbacks are sent by the payment provider and do not
+ * carry the member's normal authentication token.
  *
- * New IntaSend webhooks are handled separately at:
- *
- * POST /api/payments/intasend/webhook
+ * POST /api/payments/mpesa/callback
  */
 
 router.post(
@@ -67,6 +71,41 @@ router.post(
   mpesaCallbackValidator,
   validate,
   mpesaCallback
+);
+
+/* ==========================================================
+   MANUAL M-PESA CONFIRMATION
+========================================================== */
+
+/**
+ * Payment recovery endpoint.
+ *
+ * Used when:
+ *
+ * 1. The member completed an M-Pesa payment.
+ * 2. The browser was closed.
+ * 3. The IntaSend redirect was missed.
+ * 4. The frontend did not receive the final payment state.
+ *
+ * The member submits:
+ *
+ * {
+ *   reference: "JVP-XXXXXXXX",
+ *   confirmationCode: "ABC123XYZ"
+ * }
+ *
+ * The payment service then queries IntaSend before marking
+ * the payment as successful.
+ *
+ * POST /api/payments/mpesa/confirm
+ */
+
+router.post(
+  "/mpesa/confirm",
+  auth,
+  manualMpesaConfirmationValidator,
+  validate,
+  confirmMpesaPayment
 );
 
 /* ==========================================================
@@ -85,6 +124,20 @@ router.post(
   membershipPaymentValidator,
   validate,
   initiateMembershipPayment
+);
+
+/**
+ * Create a manual M-Pesa Till payment for membership.
+ *
+ * This does NOT use IntaSend.
+ *
+ * POST /api/payments/membership/manual
+ */
+
+router.post(
+  "/membership/manual",
+  auth,
+  initiateManualMembershipPayment
 );
 
 /**
@@ -141,7 +194,8 @@ router.post(
 /**
  * Query the latest payment status from IntaSend.
  *
- * The request may contain:
+ * Supported identifiers:
+ *
  * - paymentId
  * - reference
  * - paymentReference
@@ -207,6 +261,28 @@ router.get(
 ========================================================== */
 
 /**
+ * Approve a manually submitted M-Pesa payment.
+ *
+ * Only admin, finance and super_admin users are allowed
+ * to approve manual M-Pesa payments.
+ *
+ * PATCH /api/payments/admin/approve/:reference
+ */
+
+router.patch(
+  "/admin/approve/:reference",
+  auth,
+  authorize(
+    "admin",
+    "finance",
+    "super_admin"
+  ),
+  paymentReferenceValidator,
+  validate,
+  approveManualMpesaPayment
+);
+
+/**
  * Retrieve all payments.
  *
  * GET /api/payments/admin/all
@@ -216,6 +292,17 @@ router.get(
   "/admin/all",
   auth,
   getAllPayments
+);
+
+router.get(
+  "/admin/manual-mpesa",
+  auth,
+  authorize(
+    "admin",
+    "finance",
+    "super_admin"
+  ),
+  getManualMpesaQueue
 );
 
 /**

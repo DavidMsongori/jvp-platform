@@ -8,27 +8,24 @@ import Payment from "../models/Payment.js";
    CONSTANTS
 ========================================================== */
 
-const INTASEND_STATES =
-  Object.freeze({
-    PENDING: "PENDING",
-    PROCESSING: "PROCESSING",
-    COMPLETE: "COMPLETE",
-    FAILED: "FAILED",
-  });
+const INTASEND_STATES = Object.freeze({
+  PENDING: "PENDING",
+  PROCESSING: "PROCESSING",
+  COMPLETE: "COMPLETE",
+  FAILED: "FAILED",
+});
 
-const INTASEND_METHODS =
-  Object.freeze({
-    MPESA: "M-PESA",
-    CARD: "CARD-PAYMENT",
-    ALL: null,
-  });
+const INTASEND_METHODS = Object.freeze({
+  MPESA: "M-PESA",
+  CARD: "CARD-PAYMENT",
+  ALL: null,
+});
 
-const ALLOWED_METHODS =
-  new Set([
-    INTASEND_METHODS.MPESA,
-    INTASEND_METHODS.CARD,
-    INTASEND_METHODS.ALL,
-  ]);
+const ALLOWED_METHODS = new Set([
+  INTASEND_METHODS.MPESA,
+  INTASEND_METHODS.CARD,
+  INTASEND_METHODS.ALL,
+]);
 
 /* ==========================================================
    SERVICE ERROR
@@ -43,17 +40,10 @@ export class IntaSendServiceError extends Error {
   ) {
     super(message);
 
-    this.name =
-      "IntaSendServiceError";
-
-    this.statusCode =
-      statusCode;
-
-    this.code =
-      code;
-
-    this.details =
-      details;
+    this.name = "IntaSendServiceError";
+    this.statusCode = statusCode;
+    this.code = code;
+    this.details = details;
 
     Error.captureStackTrace?.(
       this,
@@ -66,11 +56,8 @@ export class IntaSendServiceError extends Error {
    ENVIRONMENT HELPERS
 ========================================================== */
 
-const getRequiredEnvironmentValue = (
-  name
-) => {
-  const value =
-    process.env[name]?.trim();
+const getRequiredEnvironmentValue = (name) => {
+  const value = process.env[name]?.trim();
 
   if (!value) {
     throw new IntaSendServiceError(
@@ -84,20 +71,13 @@ const getRequiredEnvironmentValue = (
 };
 
 const isTestMode = () => {
-  const value =
-    String(
-      process.env
-        .INTASEND_TEST_MODE ??
-        "false"
-    )
-      .trim()
-      .toLowerCase();
+  const value = String(
+    process.env.INTASEND_TEST_MODE ?? "false"
+  )
+    .trim()
+    .toLowerCase();
 
-  return [
-    "true",
-    "1",
-    "yes",
-  ].includes(value);
+  return ["true", "1", "yes"].includes(value);
 };
 
 const getFrontendUrl = () => {
@@ -128,12 +108,11 @@ const getIntaSendClient = () => {
       "INTASEND_SECRET_KEY"
     );
 
-  cachedClient =
-    new IntaSend(
-      publishableKey,
-      secretKey,
-      isTestMode()
-    );
+  cachedClient = new IntaSend(
+    publishableKey,
+    secretKey,
+    isTestMode()
+  );
 
   return cachedClient;
 };
@@ -142,58 +121,37 @@ const getIntaSendClient = () => {
    NORMALIZATION
 ========================================================== */
 
-const normalizeText = (
-  value = ""
-) => {
+const normalizeText = (value = "") => {
   return String(value)
     .trim()
     .replace(/\s+/g, " ");
 };
 
-const normalizeEmail = (
-  value = ""
-) => {
+const normalizeEmail = (value = "") => {
   return String(value)
     .trim()
     .toLowerCase();
 };
 
-const normalizePhone = (
-  value = ""
-) => {
+const normalizePhone = (value = "") => {
   if (!value) {
     return "";
   }
 
-  const phone =
-    String(value)
-      .trim()
-      .replace(/[\s()-]/g, "");
+  const phone = String(value)
+    .trim()
+    .replace(/[\s()-]/g, "");
 
-  if (
-    /^254[17]\d{8}$/.test(
-      phone
-    )
-  ) {
+  if (/^254[17]\d{8}$/.test(phone)) {
     return phone;
   }
 
-  if (
-    /^\+254[17]\d{8}$/.test(
-      phone
-    )
-  ) {
+  if (/^\+254[17]\d{8}$/.test(phone)) {
     return phone.slice(1);
   }
 
-  if (
-    /^0[17]\d{8}$/.test(
-      phone
-    )
-  ) {
-    return `254${phone.slice(
-      1
-    )}`;
+  if (/^0[17]\d{8}$/.test(phone)) {
+    return `254${phone.slice(1)}`;
   }
 
   throw new IntaSendServiceError(
@@ -203,18 +161,15 @@ const normalizePhone = (
   );
 };
 
-const normalizeState = (
-  value
-) => {
-  const state =
-    String(value || "")
-      .trim()
-      .toUpperCase();
+const normalizeState = (value) => {
+  const state = String(value || "")
+    .trim()
+    .toUpperCase();
 
   if (
-    Object.values(
-      INTASEND_STATES
-    ).includes(state)
+    Object.values(INTASEND_STATES).includes(
+      state
+    )
   ) {
     return state;
   }
@@ -222,9 +177,7 @@ const normalizeState = (
   return null;
 };
 
-const normalizeMethod = (
-  method
-) => {
+const normalizeMethod = (method) => {
   if (
     method === undefined ||
     method === null ||
@@ -233,16 +186,11 @@ const normalizeMethod = (
     return null;
   }
 
-  const normalizedMethod =
-    String(method)
-      .trim()
-      .toUpperCase();
+  const normalizedMethod = String(method)
+    .trim()
+    .toUpperCase();
 
-  if (
-    !ALLOWED_METHODS.has(
-      normalizedMethod
-    )
-  ) {
+  if (!ALLOWED_METHODS.has(normalizedMethod)) {
     throw new IntaSendServiceError(
       "The selected payment method is not supported.",
       400,
@@ -253,11 +201,8 @@ const normalizeMethod = (
   return normalizedMethod;
 };
 
-const normalizeAmount = (
-  value
-) => {
-  const amount =
-    Number(value);
+const normalizeAmount = (value) => {
+  const amount = Number(value);
 
   if (
     !Number.isFinite(amount) ||
@@ -277,13 +222,10 @@ const normalizeAmount = (
    CUSTOMER HELPERS
 ========================================================== */
 
-const splitCustomerName = (
-  fullName = ""
-) => {
-  const parts =
-    normalizeText(fullName)
-      .split(" ")
-      .filter(Boolean);
+const splitCustomerName = (fullName = "") => {
+  const parts = normalizeText(fullName)
+    .split(" ")
+    .filter(Boolean);
 
   if (!parts.length) {
     return {
@@ -293,9 +235,7 @@ const splitCustomerName = (
   }
 
   return {
-    firstName:
-      parts[0],
-
+    firstName: parts[0],
     lastName:
       parts.slice(1).join(" ") ||
       "Customer",
@@ -309,52 +249,39 @@ const resolveCustomerDetails = ({
   const fullName =
     customer.fullName ||
     customer.name ||
-    payment?.metadata
-      ?.customerName ||
+    payment?.metadata?.customerName ||
     "";
 
   const {
     firstName,
     lastName,
-  } = splitCustomerName(
-    fullName
-  );
+  } = splitCustomerName(fullName);
 
-  const email =
-    normalizeEmail(
-      customer.email ||
-        payment?.metadata
-          ?.customerEmail ||
-        ""
-    );
+  const email = normalizeEmail(
+    customer.email ||
+      payment?.metadata?.customerEmail ||
+      ""
+  );
 
   const rawPhone =
     customer.phoneNumber ||
     customer.phone ||
     payment?.phoneNumber ||
-    payment?.metadata
-      ?.customerPhone ||
+    payment?.metadata?.customerPhone ||
     "";
 
-  const phoneNumber =
-    rawPhone
-      ? normalizePhone(
-          rawPhone
-        )
-      : "";
+  const phoneNumber = rawPhone
+    ? normalizePhone(rawPhone)
+    : "";
 
   return {
-    firstName:
-      normalizeText(
-        customer.firstName ||
-          firstName
-      ),
+    firstName: normalizeText(
+      customer.firstName || firstName
+    ),
 
-    lastName:
-      normalizeText(
-        customer.lastName ||
-          lastName
-      ),
+    lastName: normalizeText(
+      customer.lastName || lastName
+    ),
 
     email,
     phoneNumber,
@@ -365,9 +292,7 @@ const resolveCustomerDetails = ({
    RESPONSE HELPERS
 ========================================================== */
 
-const extractInvoice = (
-  response
-) => {
+const extractInvoice = (response) => {
   return (
     response?.invoice ||
     response?.data?.invoice ||
@@ -377,11 +302,8 @@ const extractInvoice = (
   );
 };
 
-const extractInvoiceId = (
-  response
-) => {
-  const invoice =
-    extractInvoice(response);
+const extractInvoiceId = (response) => {
+  const invoice = extractInvoice(response);
 
   return (
     invoice?.invoice_id ||
@@ -392,23 +314,18 @@ const extractInvoiceId = (
   );
 };
 
-const extractCheckoutUrl = (
-  response
-) => {
+const extractCheckoutUrl = (response) => {
   return (
     response?.url ||
     response?.checkout_url ||
     response?.payment_url ||
     response?.data?.url ||
-    response?.data
-      ?.checkout_url ||
+    response?.data?.checkout_url ||
     null
   );
 };
 
-const extractProviderReference = (
-  payload
-) => {
+const extractProviderReference = (payload) => {
   return (
     payload?.provider_reference ||
     payload?.mpesa_reference ||
@@ -418,9 +335,7 @@ const extractProviderReference = (
   );
 };
 
-const extractErrorDetails = (
-  error
-) => {
+const extractErrorDetails = (error) => {
   return (
     error?.response?.data ||
     error?.response ||
@@ -464,36 +379,26 @@ const findPayment = async ({
   let payment = null;
 
   if (paymentId) {
+    payment = await Payment.findById(
+      paymentId
+    );
+  }
+
+  if (!payment && paymentReference) {
+    payment = await Payment.findOne({
+      reference: String(
+        paymentReference
+      )
+        .trim()
+        .toUpperCase(),
+    });
+  }
+
+  if (!payment && invoiceId) {
     payment =
-      await Payment.findById(
-        paymentId
+      await Payment.findByIntaSendInvoiceId(
+        invoiceId
       );
-  }
-
-  if (
-    !payment &&
-    paymentReference
-  ) {
-    payment =
-      await Payment.findOne({
-        reference:
-          String(
-            paymentReference
-          )
-            .trim()
-            .toUpperCase(),
-      });
-  }
-
-  if (
-    !payment &&
-    invoiceId
-  ) {
-    payment =
-      await Payment
-        .findByIntaSendInvoiceId(
-          invoiceId
-        );
   }
 
   if (!payment) {
@@ -555,14 +460,12 @@ const buildCheckoutPayload = ({
 
     country: "KE",
 
-    amount:
-      normalizeAmount(
-        payment.amount
-      ),
+    amount: normalizeAmount(
+      payment.amount
+    ),
 
     currency:
-      payment.currency ||
-      "KES",
+      payment.currency || "KES",
 
     api_ref:
       payment.reference,
@@ -586,30 +489,23 @@ const buildCheckoutPayload = ({
       undefined,
 
     mobile_tarrif:
-      process.env
-        .INTASEND_MOBILE_TARIFF ||
+      process.env.INTASEND_MOBILE_TARIFF ||
       "BUSINESS-PAYS",
 
     card_tarrif:
-      process.env
-        .INTASEND_CARD_TARIFF ||
+      process.env.INTASEND_CARD_TARIFF ||
       "BUSINESS-PAYS",
   };
 
   const walletId =
-    process.env
-      .INTASEND_WALLET_ID
-      ?.trim();
+    process.env.INTASEND_WALLET_ID?.trim();
 
   if (walletId) {
-    payload.wallet_id =
-      walletId;
+    payload.wallet_id = walletId;
   }
 
   return Object.fromEntries(
-    Object.entries(
-      payload
-    ).filter(
+    Object.entries(payload).filter(
       ([, value]) =>
         value !== undefined &&
         value !== null &&
@@ -680,15 +576,12 @@ export const validateIntaSendWebhookChallenge =
         "INTASEND_WEBHOOK_CHALLENGE"
       );
 
-    const received =
-      String(
-        receivedChallenge || ""
-      );
+    const received = String(
+      receivedChallenge || ""
+    );
 
     const expectedBuffer =
-      Buffer.from(
-        expectedChallenge
-      );
+      Buffer.from(expectedChallenge);
 
     const receivedBuffer =
       Buffer.from(received);
@@ -710,259 +603,303 @@ export const validateIntaSendWebhookChallenge =
    APPLY INTASEND STATE
 ========================================================== */
 
-const applyIntaSendState =
-  async ({
-    payment,
-    invoice,
-    rawPayload,
-    verificationMethod,
-  }) => {
-    const state =
-      normalizeState(
-        invoice?.state
+const applyIntaSendState = async ({
+  payment,
+  invoice,
+  rawPayload,
+  verificationMethod,
+}) => {
+  const state = normalizeState(
+    invoice?.state
+  );
+
+  if (!state) {
+    throw new IntaSendServiceError(
+      "IntaSend returned an unsupported payment state.",
+      502,
+      "INVALID_INTASEND_STATE",
+      rawPayload
+    );
+  }
+
+  const invoiceId =
+    invoice?.invoice_id ||
+    invoice?.id ||
+    payment.intasend?.invoiceId ||
+    null;
+
+  const provider =
+    invoice?.provider || null;
+
+  if (!payment.intasend) {
+    payment.intasend = {};
+  }
+
+  payment.paymentMethod =
+    resolvePaymentMethod(provider);
+
+  if (
+    invoice?.account &&
+    !payment.phoneNumber &&
+    /^\+?254[17]\d{8}$/.test(
+      String(invoice.account)
+    )
+  ) {
+    payment.phoneNumber =
+      normalizePhone(
+        invoice.account
       );
+  }
 
-    if (!state) {
-      throw new IntaSendServiceError(
-        "IntaSend returned an unsupported payment state.",
-        502,
-        "INVALID_INTASEND_STATE",
-        rawPayload
-      );
-    }
+  /* ========================================================
+     PENDING / PROCESSING
+  ======================================================== */
 
-    const invoiceId =
-      invoice?.invoice_id ||
-      invoice?.id ||
-      payment.intasend
-        ?.invoiceId ||
-      null;
+  if (
+    state ===
+      INTASEND_STATES.PENDING ||
+    state ===
+      INTASEND_STATES.PROCESSING
+  ) {
+    payment.provider = "intasend";
 
-    const provider =
-      invoice?.provider ||
-      null;
+    payment.status =
+      state ===
+      INTASEND_STATES.PENDING
+        ? "pending"
+        : "processing";
 
-    payment.paymentMethod =
-      resolvePaymentMethod(
-        provider
-      );
+    payment.statusMessage =
+      state ===
+      INTASEND_STATES.PENDING
+        ? "Payment is awaiting customer action."
+        : "Payment is being processed.";
+
+    payment.initiatedAt =
+      payment.initiatedAt ||
+      new Date();
+
+    payment.intasend.invoiceId =
+      invoiceId;
+
+    payment.intasend.apiReference =
+      invoice?.api_ref ||
+      payment.reference;
+
+    payment.intasend.state =
+      state;
+
+    payment.intasend.provider =
+      provider;
+
+    payment.intasend.charges =
+      Number(invoice?.charges) || 0;
+
+    payment.intasend.netAmount =
+      invoice?.net_amount !==
+        undefined &&
+      invoice?.net_amount !== null
+        ? Number(invoice.net_amount)
+        : null;
+
+    payment.gatewayReference =
+      invoiceId ||
+      payment.gatewayReference;
+
+    payment.gatewayResponse =
+      rawPayload;
 
     if (
-      invoice?.account &&
-      !payment.phoneNumber &&
-      /^\+?254[17]\d{8}$/.test(
-        String(invoice.account)
-      )
+      verificationMethod ===
+      "webhook"
     ) {
-      payment.phoneNumber =
-        normalizePhone(
-          invoice.account
-        );
-    }
+      payment.intasend.webhookReceived =
+        true;
 
-    if (
-      state ===
-        INTASEND_STATES.PENDING ||
-      state ===
-        INTASEND_STATES.PROCESSING
-    ) {
-      payment.provider =
-        "intasend";
-
-      payment.status =
-        state ===
-        INTASEND_STATES.PENDING
-          ? "pending"
-          : "processing";
-
-      payment.statusMessage =
-        state ===
-        INTASEND_STATES.PENDING
-          ? "Payment is awaiting customer action."
-          : "Payment is being processed.";
-
-      payment.initiatedAt =
-        payment.initiatedAt ||
+      payment.intasend.webhookReceivedAt =
         new Date();
 
-      payment.intasend.invoiceId =
-        invoiceId;
-
-      payment.intasend.apiReference =
-        invoice?.api_ref ||
-        payment.reference;
-
-      payment.intasend.state =
-        state;
-
-      payment.intasend.provider =
-        provider;
-
-      payment.intasend.charges =
-        Number(
-          invoice?.charges
-        ) || 0;
-
-      payment.intasend.netAmount =
-        invoice?.net_amount !==
-          undefined &&
-        invoice?.net_amount !==
-          null
-          ? Number(
-              invoice.net_amount
-            )
-          : null;
-
-      payment.gatewayReference =
-        invoiceId ||
-        payment.gatewayReference;
-
-      payment.gatewayResponse =
+      payment.callbackPayload =
         rawPayload;
+    }
 
-      if (
-        verificationMethod ===
-        "webhook"
-      ) {
-        payment.intasend.webhookReceived =
-          true;
+    await payment.save();
 
-        payment.intasend.webhookReceivedAt =
-          new Date();
+    return payment;
+  }
 
-        payment.callbackPayload =
-          rawPayload;
-      }
+  /* ========================================================
+     COMPLETE
+  ======================================================== */
 
-      await payment.save();
+  if (
+    state ===
+    INTASEND_STATES.COMPLETE
+  ) {
+    const gatewayAmount =
+      Number(
+        invoice?.value ??
+          invoice?.amount
+      );
 
+    if (
+      Number.isFinite(
+        gatewayAmount
+      ) &&
+      gatewayAmount !==
+        Number(payment.amount)
+    ) {
+      throw new IntaSendServiceError(
+        "The IntaSend payment amount does not match the expected amount.",
+        409,
+        "PAYMENT_AMOUNT_MISMATCH",
+        {
+          expectedAmount:
+            payment.amount,
+
+          receivedAmount:
+            gatewayAmount,
+
+          invoiceId,
+        }
+      );
+    }
+
+    const gatewayCurrency =
+      String(
+        invoice?.currency ||
+          payment.currency
+      ).toUpperCase();
+
+    if (
+      gatewayCurrency !==
+      String(
+        payment.currency
+      ).toUpperCase()
+    ) {
+      throw new IntaSendServiceError(
+        "The IntaSend payment currency does not match the expected currency.",
+        409,
+        "PAYMENT_CURRENCY_MISMATCH"
+      );
+    }
+
+    /*
+     * Preserve an already verified payment.
+     * Fulfillment is handled by payment.service.js.
+     */
+    if (
+      payment.status ===
+        "successful" &&
+      payment.isVerified
+    ) {
       return payment;
     }
 
+    const updatedPayment =
+      await payment.markIntaSendSuccessful({
+        invoiceId,
+
+        providerReference:
+          extractProviderReference(
+            invoice
+          ),
+
+        provider,
+
+        charges:
+          invoice?.charges,
+
+        netAmount:
+          invoice?.net_amount,
+
+        callbackPayload:
+          rawPayload,
+
+        paidAt:
+          invoice?.updated_at
+            ? new Date(
+                invoice.updated_at
+              )
+            : new Date(),
+
+        verificationMethod:
+          verificationMethod ||
+          "status_query",
+      });
+
+    /*
+     * Keep the manually entered M-Pesa
+     * confirmation code separate from the
+     * provider receipt/reference.
+     */
     if (
-      state ===
-      INTASEND_STATES.COMPLETE
+      payment.manualMpesa?.transactionCode
     ) {
-      const gatewayAmount =
-        Number(
-          invoice?.value ??
-            invoice?.amount
-        );
+      updatedPayment.manualMpesa =
+        updatedPayment.manualMpesa ||
+        {};
 
-      if (
-        Number.isFinite(
-          gatewayAmount
-        ) &&
-        gatewayAmount !==
-          Number(payment.amount)
-      ) {
-        throw new IntaSendServiceError(
-          "The IntaSend payment amount does not match the expected amount.",
-          409,
-          "PAYMENT_AMOUNT_MISMATCH",
-          {
-            expectedAmount:
-              payment.amount,
+      updatedPayment.manualMpesa.transactionCode =
+        payment.manualMpesa.transactionCode;
 
-            receivedAmount:
-              gatewayAmount,
+      updatedPayment.manualMpesa.submittedAt =
+        payment.manualMpesa.submittedAt;
 
-            invoiceId,
-          }
-        );
-      }
+      updatedPayment.manualMpesa.reviewedAt =
+        payment.manualMpesa.reviewedAt;
 
-      const gatewayCurrency =
-        String(
-          invoice?.currency ||
-            payment.currency
-        ).toUpperCase();
+      updatedPayment.manualMpesa.reviewedBy =
+        payment.manualMpesa.reviewedBy;
 
-      if (
-        gatewayCurrency !==
-        String(
-          payment.currency
-        ).toUpperCase()
-      ) {
-        throw new IntaSendServiceError(
-          "The IntaSend payment currency does not match the expected currency.",
-          409,
-          "PAYMENT_CURRENCY_MISMATCH"
-        );
-      }
-
-      if (
-        payment.status ===
-          "successful" &&
-        payment.isVerified
-      ) {
-        return payment;
-      }
-
-      return payment
-        .markIntaSendSuccessful({
-          invoiceId,
-
-          providerReference:
-            extractProviderReference(
-              invoice
-            ),
-
-          provider,
-
-          charges:
-            invoice?.charges,
-
-          netAmount:
-            invoice?.net_amount,
-
-          callbackPayload:
-            rawPayload,
-
-          paidAt:
-            invoice?.updated_at
-              ? new Date(
-                  invoice.updated_at
-                )
-              : new Date(),
-
-          verificationMethod,
-        });
+      updatedPayment.manualMpesa.rejectionReason =
+        null;
     }
 
+    await updatedPayment.save();
+
+    return updatedPayment;
+  }
+
+  /* ========================================================
+     FAILED
+  ======================================================== */
+
+  if (
+    state ===
+    INTASEND_STATES.FAILED
+  ) {
+    /*
+     * Never downgrade a previously verified
+     * successful payment because of a later
+     * status response.
+     */
     if (
-      state ===
-      INTASEND_STATES.FAILED
+      payment.status ===
+        "successful" &&
+      payment.isVerified
     ) {
-      if (
-        payment.status ===
-          "successful" &&
-        payment.isVerified
-      ) {
-        return payment;
-      }
-
-      return payment
-        .markIntaSendFailed({
-          invoiceId,
-
-          failedReason:
-            invoice
-              ?.failed_reason ||
-            "The IntaSend payment was not completed.",
-
-          failedCode:
-            invoice
-              ?.failed_code ||
-            null,
-
-          callbackPayload:
-            rawPayload,
-        });
+      return payment;
     }
 
-    return payment;
-  };
+    return payment.markIntaSendFailed({
+      invoiceId,
+
+      failedReason:
+        invoice?.failed_reason ||
+        "The IntaSend payment was not completed.",
+
+      failedCode:
+        invoice?.failed_code ||
+        null,
+
+      callbackPayload:
+        rawPayload,
+    });
+  }
+
+  return payment;
+};
 
 /* ==========================================================
    CREATE CHECKOUT
@@ -994,29 +931,26 @@ export const createIntaSendCheckout =
     }
 
     /*
-     * Reuse the existing checkout URL when
-     * one has already been created.
+     * Reuse the existing checkout URL
+     * for an active checkout.
      */
     if (
-      payment.intasend
-        ?.checkoutUrl &&
-      payment.intasend
-        ?.invoiceId &&
+      payment.intasend?.checkoutUrl &&
+      payment.intasend?.invoiceId &&
       [
         "pending",
         "processing",
-      ].includes(
-        payment.status
-      )
+      ].includes(payment.status)
     ) {
       return {
         payment,
+
         checkoutUrl:
-          payment.intasend
-            .checkoutUrl,
+          payment.intasend.checkoutUrl,
+
         invoiceId:
-          payment.intasend
-            .invoiceId,
+          payment.intasend.invoiceId,
+
         reused: true,
       };
     }
@@ -1042,14 +976,10 @@ export const createIntaSendCheckout =
         );
 
       const invoiceId =
-        extractInvoiceId(
-          response
-        );
+        extractInvoiceId(response);
 
       const checkoutUrl =
-        extractCheckoutUrl(
-          response
-        );
+        extractCheckoutUrl(response);
 
       if (
         !invoiceId ||
@@ -1064,9 +994,7 @@ export const createIntaSendCheckout =
       }
 
       const invoice =
-        extractInvoice(
-          response
-        );
+        extractInvoice(response);
 
       const responseState =
         normalizeState(
@@ -1074,25 +1002,24 @@ export const createIntaSendCheckout =
         ) ||
         INTASEND_STATES.PENDING;
 
-      await payment
-        .markIntaSendProcessing({
-          invoiceId,
+      await payment.markIntaSendProcessing({
+        invoiceId,
 
-          apiReference:
-            payment.reference,
+        apiReference:
+          payment.reference,
 
-          checkoutUrl,
+        checkoutUrl,
 
-          state:
-            responseState,
+        state:
+          responseState,
 
-          provider:
-            invoice?.provider ||
-            null,
+        provider:
+          invoice?.provider ||
+          null,
 
-          gatewayResponse:
-            response,
-        });
+        gatewayResponse:
+          response,
+      });
 
       payment.status =
         responseState ===
@@ -1101,8 +1028,7 @@ export const createIntaSendCheckout =
           : "processing";
 
       payment.phoneNumber =
-        checkoutPayload
-          .phone_number ||
+        checkoutPayload.phone_number ||
         payment.phoneNumber;
 
       payment.paymentMethod =
@@ -1118,29 +1044,64 @@ export const createIntaSendCheckout =
 
       return {
         payment,
+
         checkoutUrl,
+
         invoiceId,
+
         reused: false,
       };
     } catch (error) {
-  console.error("========== INTASEND CHECKOUT ERROR ==========");
-  console.error("Error name:", error?.name);
-  console.error("Error message:", error?.message);
-  console.error("HTTP status:", error?.response?.status);
-  console.error("Response data:", error?.response?.data);
-  console.error("Response:", error?.response);
-  console.error("Raw error:", error);
-  console.error("==============================================");
+      console.error(
+        "========== INTASEND CHECKOUT ERROR =========="
+      );
 
-  if (error instanceof IntaSendServiceError) {
-    throw error;
-  }
+      console.error(
+        "Error name:",
+        error?.name
+      );
 
-  throw createGatewayError(
-    error,
-    "Unable to create the IntaSend checkout."
-  );
-}
+      console.error(
+        "Error message:",
+        error?.message
+      );
+
+      console.error(
+        "HTTP status:",
+        error?.response?.status
+      );
+
+      console.error(
+        "Response data:",
+        error?.response?.data
+      );
+
+      console.error(
+        "Response:",
+        error?.response
+      );
+
+      console.error(
+        "Raw error:",
+        error
+      );
+
+      console.error(
+        "=============================================="
+      );
+
+      if (
+        error instanceof
+        IntaSendServiceError
+      ) {
+        throw error;
+      }
+
+      throw createGatewayError(
+        error,
+        "Unable to create the IntaSend checkout."
+      );
+    }
   };
 
 /* ==========================================================
@@ -1162,8 +1123,7 @@ export const queryIntaSendPaymentStatus =
 
     const resolvedInvoiceId =
       invoiceId ||
-      payment.intasend
-        ?.invoiceId;
+      payment.intasend?.invoiceId;
 
     if (!resolvedInvoiceId) {
       throw new IntaSendServiceError(
@@ -1180,16 +1140,24 @@ export const queryIntaSendPaymentStatus =
       const collection =
         intasend.collection();
 
+      /*
+       * IntaSend status() is the source of
+       * truth when the browser callback/redirect
+       * was missed.
+       */
       const response =
         await collection.status(
           resolvedInvoiceId
         );
 
+      if (!payment.intasend) {
+        payment.intasend = {};
+      }
+
       payment.intasend.statusQueryAttempts =
         Number(
           payment.intasend
-            .statusQueryAttempts ||
-            0
+            .statusQueryAttempts || 0
         ) + 1;
 
       payment.intasend.lastStatusQueryAt =
@@ -1198,16 +1166,17 @@ export const queryIntaSendPaymentStatus =
       await payment.save();
 
       const invoice =
-        extractInvoice(
-          response
-        );
+        extractInvoice(response);
 
       const updatedPayment =
         await applyIntaSendState({
           payment,
+
           invoice,
+
           rawPayload:
             response,
+
           verificationMethod:
             "status_query",
         });
@@ -1254,9 +1223,7 @@ export const processIntaSendWebhook =
     }
 
     const invoice =
-      extractInvoice(
-        payload
-      );
+      extractInvoice(payload);
 
     const invoiceId =
       invoice?.invoice_id ||
@@ -1283,10 +1250,9 @@ export const processIntaSendWebhook =
 
     if (apiReference) {
       payment =
-        await Payment
-          .findByIntaSendApiReference(
-            apiReference
-          );
+        await Payment.findByIntaSendApiReference(
+          apiReference
+        );
 
       if (!payment) {
         payment =
@@ -1306,10 +1272,9 @@ export const processIntaSendWebhook =
       invoiceId
     ) {
       payment =
-        await Payment
-          .findByIntaSendInvoiceId(
-            invoiceId
-          );
+        await Payment.findByIntaSendInvoiceId(
+          invoiceId
+        );
     }
 
     if (!payment) {
@@ -1325,17 +1290,15 @@ export const processIntaSendWebhook =
     }
 
     /*
-     * Prevent a webhook for one reference from
-     * completing another payment.
+     * Prevent a webhook for one reference
+     * from completing another payment.
      */
     if (
       apiReference &&
-      String(
-        payment.reference
-      ).toUpperCase() !==
-        String(
-          apiReference
-        ).toUpperCase()
+      String(payment.reference)
+        .toUpperCase() !==
+        String(apiReference)
+          .toUpperCase()
     ) {
       throw new IntaSendServiceError(
         "The IntaSend API reference does not match the local payment reference.",
@@ -1350,9 +1313,12 @@ export const processIntaSendWebhook =
     const updatedPayment =
       await applyIntaSendState({
         payment,
+
         invoice,
+
         rawPayload:
           payload,
+
         verificationMethod:
           "webhook",
       });

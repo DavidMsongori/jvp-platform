@@ -1,11 +1,14 @@
 import api from "./api";
 
 /* ==========================================
-   MEMBERSHIP PAYMENT
+   MEMBERSHIP PAYMENT — INTASEND
 ========================================== */
 
 /**
  * Create an IntaSend checkout for membership registration.
+ *
+ * Kept for compatibility with any existing
+ * IntaSend-based flows.
  */
 export const initiateMembershipPayment = async ({
   phoneNumber = null,
@@ -31,12 +34,68 @@ export const initiateMembershipPayment = async ({
     throw (
       error.response?.data || {
         success: false,
-        message:
-          "Unable to initiate membership payment.",
+        message: "Unable to initiate membership payment.",
       }
     );
   }
 };
+
+/* ==========================================
+   MEMBERSHIP PAYMENT — MANUAL M-PESA TILL
+========================================== */
+
+/**
+ * Create or retrieve the member's manual
+ * M-Pesa Till membership payment.
+ */
+export const initiateManualMembershipPayment =
+  async () => {
+    try {
+      const response = await api.post(
+        "/payments/membership/manual"
+      );
+
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data || {
+          success: false,
+          message:
+            "Unable to create the manual M-Pesa payment.",
+        }
+      );
+    }
+  };
+
+/**
+ * Submit an M-Pesa confirmation code for
+ * manual verification.
+ */
+export const confirmManualMpesaPayment =
+  async ({
+    reference,
+    confirmationCode,
+  }) => {
+    try {
+      const response = await api.post(
+        "/payments/mpesa/confirm",
+        {
+          reference,
+          confirmationCode,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data || {
+          success: false,
+          message:
+            "Unable to submit the M-Pesa confirmation code.",
+        }
+      );
+    }
+  };
 
 /* ==========================================
    MEMBERSHIP RENEWAL
@@ -47,7 +106,7 @@ export const initiateRenewalPayment = async ({
   email = null,
   fullName = null,
   method = "M-PESA",
- redirectUrl = null,
+  redirectUrl = null,
 } = {}) => {
   try {
     const response = await api.post(
@@ -105,15 +164,14 @@ export const initiatePayment = async ({
     throw (
       error.response?.data || {
         success: false,
-        message:
-          "Unable to initiate payment.",
+        message: "Unable to initiate payment.",
       }
     );
   }
 };
 
 /* ==========================================
-   PAYMENT STATUS
+   PAYMENT STATUS — INTASEND
 ========================================== */
 
 export const checkPaymentStatus = async ({
@@ -146,7 +204,7 @@ export const checkPaymentStatus = async ({
 };
 
 /* ==========================================
-   RETRY PAYMENT
+   PAYMENT RETRY
 ========================================== */
 
 export const retryPayment = async ({
@@ -177,8 +235,7 @@ export const retryPayment = async ({
     throw (
       error.response?.data || {
         success: false,
-        message:
-          "Unable to retry payment.",
+        message: "Unable to retry payment.",
       }
     );
   }
@@ -228,8 +285,7 @@ export const getPaymentByReference = async (
     throw (
       error.response?.data || {
         success: false,
-        message:
-          "Unable to retrieve payment.",
+        message: "Unable to retrieve payment.",
       }
     );
   }
@@ -252,8 +308,7 @@ export const getPaymentById = async (
     throw (
       error.response?.data || {
         success: false,
-        message:
-          "Unable to retrieve payment.",
+        message: "Unable to retrieve payment.",
       }
     );
   }
@@ -267,9 +322,7 @@ export const redirectToCheckout = (
   checkoutUrl
 ) => {
   if (!checkoutUrl) {
-    throw new Error(
-      "Checkout URL not found."
-    );
+    throw new Error("Checkout URL not found.");
   }
 
   window.location.href = checkoutUrl;
@@ -281,6 +334,8 @@ export const redirectToCheckout = (
 
 const paymentService = {
   initiateMembershipPayment,
+  initiateManualMembershipPayment,
+  confirmManualMpesaPayment,
   initiateRenewalPayment,
   initiatePayment,
   retryPayment,

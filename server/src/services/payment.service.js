@@ -30,6 +30,7 @@ import {
 
 const PENDING_PAYMENT_STATUSES = [
   "pending",
+  "submitted",
   "processing",
 ];
 
@@ -449,6 +450,9 @@ export const createPayment = async ({
   accountReference,
   description,
 
+  provider = "intasend",
+  paymentMethod = "unknown",
+
   metadata = {},
 }) => {
   let member = null;
@@ -458,9 +462,7 @@ export const createPayment = async ({
   }
 
   if (
-    ["membership", "renewal"].includes(
-      paymentFor
-    ) &&
+    ["membership", "renewal"].includes(paymentFor) &&
     !member
   ) {
     throw new AppError(
@@ -481,8 +483,7 @@ export const createPayment = async ({
     );
   }
 
- const normalizedPhone =
-  getMemberPhone(
+  const normalizedPhone = getMemberPhone(
     member,
     phoneNumber,
     {
@@ -498,8 +499,7 @@ export const createPayment = async ({
     donation: "DON",
   }[paymentFor] || "PAY";
 
-  const reference =
-    generateReference(referencePrefix);
+  const reference = generateReference(referencePrefix);
 
   const resolvedAccountReference =
     accountReference ||
@@ -510,9 +510,7 @@ export const createPayment = async ({
 
   const resolvedDescription =
     description ||
-    getTransactionDescription(
-      paymentFor
-    );
+    getTransactionDescription(paymentFor);
 
   const payment = await Payment.create({
     member: member?._id || null,
@@ -528,7 +526,7 @@ export const createPayment = async ({
       summitRegistrationId,
 
     summitExhibitor:
-  summitExhibitorId,
+      summitExhibitorId,
 
     reference,
 
@@ -540,20 +538,18 @@ export const createPayment = async ({
 
     paymentFor,
 
-    amount: Math.round(
-      normalizedAmount
-    ),
+    amount: Math.round(normalizedAmount),
 
     currency,
 
-    provider: "intasend",
+    provider,
 
-paymentMethod: "unknown",
+    paymentMethod,
 
-phoneNumber:
-  normalizedPhone,
+    phoneNumber:
+      normalizedPhone,
 
-status: "pending",
+    status: "pending",
 
     initiatedBy:
       userId ||
@@ -564,26 +560,29 @@ status: "pending",
       getMemberUserId(member),
 
     expiresAt:
-      calculatePaymentExpiry(),
+  provider === "manual"
+    ? null
+    : calculatePaymentExpiry(),
 
-   metadata: {
-  ...metadata,
+    metadata: {
+      ...metadata,
 
-  paymentProvider:
-    "intasend",
+      paymentProvider:
+        provider,
 
-  environment:
-    String(
-      process.env
-        .INTASEND_TEST_MODE ??
-        "true"
-    )
-      .trim()
-      .toLowerCase() ===
-    "true"
-      ? "sandbox"
-      : "production",
-},
+      environment:
+        provider === "intasend"
+          ? (
+              String(
+                process.env.INTASEND_TEST_MODE ?? "true"
+              )
+                .trim()
+                .toLowerCase() === "true"
+                ? "sandbox"
+                : "production"
+            )
+          : "manual",
+    },
   });
 
   await createActivityLog({
@@ -604,6 +603,8 @@ status: "pending",
       amount: payment.amount,
       currency: payment.currency,
       paymentFor,
+      provider,
+      paymentMethod,
     },
   });
 
@@ -692,6 +693,661 @@ export const createMembershipPayment =
         result.payment.reference,
     };
   };
+
+export const createManualMembershipPayment = async (memberId) => {
+  const member = await findMember(memberId);
+
+  if (
+    member.membershipStatus === MEMBERSHIP.status.ACTIVE &&
+    member.membershipFeePaid
+  ) {
+    throw new AppError(
+      "Membership is already active.",
+      400
+    );
+  }
+
+  // Reuse an existing pending/submitted manual payment
+  const existingManualPayment = await Payment.findOne({
+    member: member._id,
+    paymentFor: "membership",
+    paymentMethod: "mpesa",
+    provider: "manual",
+    status: {
+      $in: ["pending", "submitted"],
+    },
+  }).sort({ createdAt: -1 });
+
+  if (existingManualPayment) {
+    return {
+      member,
+      payment: existingManualPayment,
+      amount: existingManualPayment.amount,
+      reference: existingManualPayment.reference,
+      isExisting: true,
+    };
+  }
+
+  const amount = getMembershipFee(
+    member.membershipType
+  );
+
+  const result = await createPayment({
+    memberId: member._id,
+
+    paymentFor: "membership",
+
+    amount,
+
+    currency:
+      MEMBERSHIP.currency || "KES",
+
+    paymentMethod: "mpesa",
+
+    provider: "manual",
+
+    phoneNumber: member.phone,
+
+    metadata: {
+      membershipType:
+        member.membershipType,
+
+      paymentProvider:
+        "manual",
+
+      paymentChannel:
+        "JVP M-Pesa Till",
+    },
+  });
+
+  return {
+    ...result,
+
+    member,
+
+    amount:
+      result.payment.amount,
+
+    reference:
+      result.payment.reference,
+
+    isExisting: false,
+  };
+};
+
+/* ==========================================================
+   MANUAL M-PESA CONFIRMATION
+========================================================== */
+
+export const confirmManualMpesaPayment = async ({
+  memberId,
+  reference,
+  confirmationCode,
+}) => {
+  if (!memberId) {
+    throw new AppError(
+      "Member profile is required.",
+      404
+    );
+  }
+
+  const normalizedReference = String(
+    reference || ""
+  )
+    .trim()
+    .toUpperCase();
+
+  const normalizedConfirmationCode = String(
+    confirmationCode || ""
+  )
+    .trim()
+    .toUpperCase();
+
+  if (!normalizedReference) {
+    throw new AppError(
+      "Payment reference is required.",
+      400
+    );
+  }
+
+  if (
+    !/^[A-Z0-9]{8,20}$/.test(
+      normalizedConfirmationCode
+    )
+  ) {
+    throw new AppError(
+      "Enter a valid M-Pesa confirmation code.",
+      400
+    );
+  }
+
+  const payment = await Payment.findOne({
+    reference: normalizedReference,
+  })
+    .select(
+      "+gatewayResponse +callbackPayload"
+    )
+    .populate({
+      path: "member",
+      populate: {
+        path: "user",
+        select: "email role isActive",
+      },
+    });
+
+  if (!payment) {
+    throw new AppError(
+      "Payment record not found.",
+      404
+    );
+  }
+
+  /* ========================================================
+     OWNERSHIP CHECK
+  ======================================================== */
+
+  const paymentMemberId =
+    payment.member?._id?.toString?.() ||
+    payment.member?.toString?.() ||
+    null;
+
+  if (
+    !paymentMemberId ||
+    paymentMemberId !== memberId.toString()
+  ) {
+    throw new AppError(
+      "You are not authorized to verify this payment.",
+      403
+    );
+  }
+
+  /* ========================================================
+     ALREADY SUCCESSFUL
+  ======================================================== */
+
+  if (
+    payment.status === "successful" &&
+    payment.isVerified
+  ) {
+    /*
+     * A payment can be successfully verified while
+     * post-payment processing previously failed.
+     *
+     * Run fulfillment again when necessary.
+     */
+    if (
+      ["membership", "renewal"].includes(
+        payment.paymentFor
+      ) &&
+      !payment.membershipProcessed
+    ) {
+      await processSuccessfulPayment(payment);
+    }
+
+    const refreshedPayment =
+      await findPaymentById(payment._id);
+
+    return {
+      alreadyProcessed: true,
+      completed: true,
+      verificationStatus: "verified",
+      message:
+        "This payment has already been verified successfully.",
+      payment:
+        refreshedPayment || payment,
+    };
+  }
+
+  /* ========================================================
+     ONLY M-PESA PAYMENTS
+  ======================================================== */
+
+  if (payment.paymentMethod !== "mpesa") {
+    throw new AppError(
+      "Manual M-Pesa confirmation can only be used for an M-Pesa payment.",
+      400
+    );
+  }
+
+  /* ========================================================
+     FINAL NON-RETRYABLE STATES
+  ======================================================== */
+
+  if (
+    ["cancelled", "refunded"].includes(
+      payment.status
+    )
+  ) {
+    throw new AppError(
+      `This payment cannot be verified because it is ${payment.status}.`,
+      400
+    );
+  }
+
+  /*
+   * IMPORTANT:
+   *
+   * Do NOT reject an expired payment before checking
+   * IntaSend. A member may have completed the M-Pesa
+   * transaction before the checkout session expired,
+   * while the browser redirect/callback was missed.
+   *
+   * IntaSend remains the authority for the actual
+   * transaction status.
+   */
+
+  /* ========================================================
+     DUPLICATE MANUAL CODE PROTECTION
+  ======================================================== */
+
+  const duplicateManualCode =
+    await Payment.findOne({
+      "manualMpesa.transactionCode":
+        normalizedConfirmationCode,
+      _id: {
+        $ne: payment._id,
+      },
+    });
+
+  if (duplicateManualCode) {
+    throw new AppError(
+      "This M-Pesa confirmation code has already been submitted for another payment.",
+      409
+    );
+  }
+
+  /*
+   * Also prevent a manually submitted code from being
+   * confused with an actual provider-confirmed receipt.
+   */
+  const existingReceipt =
+    await Payment.findOne({
+      "mpesa.receiptNumber":
+        normalizedConfirmationCode,
+      _id: {
+        $ne: payment._id,
+      },
+    });
+
+  if (existingReceipt) {
+    throw new AppError(
+      "This M-Pesa confirmation code is already associated with another payment.",
+      409
+    );
+  }
+
+  /* ========================================================
+     SAVE MANUAL SUBMISSION
+  ======================================================== */
+
+  if (!payment.manualMpesa) {
+    payment.manualMpesa = {};
+  }
+
+  payment.manualMpesa.transactionCode =
+    normalizedConfirmationCode;
+
+  payment.manualMpesa.submittedAt =
+    new Date();
+
+  payment.manualMpesa.reviewedAt =
+    null;
+
+  payment.manualMpesa.reviewedBy =
+    null;
+
+  payment.manualMpesa.rejectionReason =
+    null;
+
+  payment.status = "submitted";
+
+  payment.statusMessage =
+    "M-Pesa confirmation code submitted. Verifying payment with IntaSend.";
+
+  await payment.save();
+
+  await createActivityLog({
+    user:
+      getMemberUserId(payment.member) ||
+      payment.user,
+
+    action:
+      "M-Pesa confirmation submitted",
+
+    description:
+      "A member submitted an M-Pesa confirmation code for payment verification.",
+
+    targetId:
+      payment._id,
+
+    metadata: {
+      reference:
+        payment.reference,
+
+      transactionCode:
+        normalizedConfirmationCode,
+
+      paymentFor:
+        payment.paymentFor,
+
+      amount:
+        payment.amount,
+    },
+  });
+
+    /* ========================================================
+     MANUAL TILL PAYMENT
+  ======================================================== */
+
+  if (payment.provider === "manual") {
+    payment.status = "submitted";
+
+    payment.statusMessage =
+      "M-Pesa confirmation code submitted and awaiting manual verification.";
+
+    await payment.save();
+
+    return {
+      completed: false,
+
+      verificationStatus:
+        "submitted_for_review",
+
+      message:
+        "Your M-Pesa confirmation code has been submitted successfully and is awaiting verification by JVP Finance/Admin.",
+
+      payment,
+    };
+  }
+
+  /* ========================================================
+     INTASEND INVOICE CHECK
+  ======================================================== */
+
+  if (!payment.intasend?.invoiceId) {
+    payment.status = "submitted";
+
+    payment.statusMessage =
+      "M-Pesa confirmation submitted, but the IntaSend invoice is not available for automatic verification.";
+
+    await payment.save();
+
+    return {
+      completed: false,
+
+      verificationStatus:
+        "submitted_for_verification",
+
+      message:
+        "Your M-Pesa confirmation code has been received, but the payment cannot be automatically verified yet.",
+
+      payment,
+    };
+  }
+
+  /* ========================================================
+     QUERY INTASEND
+  ======================================================== */
+
+  let queryResult;
+
+  try {
+    queryResult =
+      await queryIntaSendPaymentStatus({
+        paymentId:
+          payment._id.toString(),
+
+        invoiceId:
+          payment.intasend.invoiceId,
+      });
+  } catch (error) {
+    console.error(
+      "Manual M-Pesa IntaSend verification error:",
+      {
+        reference:
+          payment.reference,
+
+        invoiceId:
+          payment.intasend?.invoiceId,
+
+        message:
+          error.message,
+      }
+    );
+
+    /*
+     * Keep the manually submitted code.
+     *
+     * Do not mark the payment failed merely because
+     * IntaSend could not be reached at this moment.
+     */
+    payment.status = "submitted";
+
+    payment.statusMessage =
+      "M-Pesa confirmation submitted. Automatic verification is temporarily unavailable.";
+
+    await payment.save();
+
+    return {
+      completed: false,
+
+      verificationStatus:
+        "pending_verification",
+
+      message:
+        "Your M-Pesa confirmation code has been received, but automatic verification is temporarily unavailable. Please check again shortly.",
+
+      payment,
+    };
+  }
+
+  const verifiedPayment =
+    queryResult?.payment || payment;
+
+  /* ========================================================
+     INTASEND CONFIRMED SUCCESS
+  ======================================================== */
+
+  if (
+    verifiedPayment.status === "successful" &&
+    verifiedPayment.isVerified
+  ) {
+    /*
+     * IMPORTANT:
+     *
+     * Do NOT copy the customer-entered confirmation
+     * code into mpesa.receiptNumber.
+     *
+     * mpesa.receiptNumber is reserved for a receipt
+     * actually supplied by the M-Pesa/IntaSend provider.
+     *
+     * The customer-entered code remains here:
+     *
+     * manualMpesa.transactionCode
+     */
+
+    if (!verifiedPayment.manualMpesa) {
+      verifiedPayment.manualMpesa = {};
+    }
+
+    verifiedPayment.manualMpesa.transactionCode =
+      normalizedConfirmationCode;
+
+    verifiedPayment.manualMpesa.submittedAt =
+      verifiedPayment.manualMpesa.submittedAt ||
+      new Date();
+
+    verifiedPayment.manualMpesa.rejectionReason =
+      null;
+
+    /*
+     * This was independently verified by the
+     * IntaSend status query.
+     */
+    verifiedPayment.verificationMethod =
+      "status_query";
+
+    await verifiedPayment.save();
+
+    /* ======================================================
+       POST-PAYMENT FULFILLMENT
+    ====================================================== */
+
+    try {
+      await processSuccessfulPayment(
+        verifiedPayment
+      );
+    } catch (processingError) {
+      console.error(
+        "Payment verified but post-payment processing failed:",
+        processingError.message
+      );
+
+      if (
+        ["membership", "renewal"].includes(
+          verifiedPayment.paymentFor
+        )
+      ) {
+        verifiedPayment.membershipProcessingError =
+          processingError.message;
+
+        await verifiedPayment.save();
+      }
+
+      throw new AppError(
+        "Payment was verified successfully, but account activation could not be completed automatically.",
+        500
+      );
+    }
+
+    const refreshedPayment =
+      await findPaymentById(
+        verifiedPayment._id
+      );
+
+    await createActivityLog({
+      user:
+        getMemberUserId(
+          verifiedPayment.member
+        ) ||
+        verifiedPayment.user,
+
+      action:
+        "M-Pesa payment manually verified",
+
+      description:
+        "A manually submitted M-Pesa confirmation was successfully matched with an IntaSend completed payment.",
+
+      targetId:
+        verifiedPayment._id,
+
+      metadata: {
+        reference:
+          verifiedPayment.reference,
+
+        transactionCode:
+          normalizedConfirmationCode,
+
+        verificationMethod:
+          "status_query",
+
+        provider:
+          "intasend",
+
+        invoiceId:
+          verifiedPayment.intasend?.invoiceId ||
+          null,
+      },
+    });
+
+    return {
+      completed: true,
+
+      verificationStatus:
+        "verified",
+
+      message:
+        "M-Pesa payment verified successfully.",
+
+      payment:
+        refreshedPayment ||
+        verifiedPayment,
+    };
+  }
+
+  /* ========================================================
+     INTASEND STILL PROCESSING
+  ======================================================== */
+
+  if (
+    ["pending", "processing"].includes(
+      verifiedPayment.status
+    )
+  ) {
+    verifiedPayment.status =
+      "submitted";
+
+    verifiedPayment.statusMessage =
+      "M-Pesa confirmation code received. IntaSend has not confirmed the payment yet.";
+
+    await verifiedPayment.save();
+
+    return {
+      completed: false,
+
+      verificationStatus:
+        "pending_verification",
+
+      message:
+        "Your M-Pesa confirmation code was received, but IntaSend has not confirmed the payment yet. Please check again shortly.",
+
+      payment:
+        verifiedPayment,
+    };
+  }
+
+  /* ========================================================
+     INTASEND FAILED
+  ======================================================== */
+
+  if (
+    ["failed", "cancelled", "expired"].includes(
+      verifiedPayment.status
+    )
+  ) {
+    return {
+      completed: false,
+
+      verificationStatus:
+        "not_verified",
+
+      message:
+        verifiedPayment.status === "failed"
+          ? "IntaSend reports that this payment was not completed."
+          : `The payment could not be verified because its current status is ${verifiedPayment.status}.`,
+
+      payment:
+        verifiedPayment,
+    };
+  }
+
+  /* ========================================================
+     UNKNOWN STATE
+  ======================================================== */
+
+  return {
+    completed: false,
+
+    verificationStatus:
+      "pending_verification",
+
+    message:
+      "The confirmation code was received, but the payment status could not be conclusively verified yet.",
+
+    payment:
+      verifiedPayment,
+  };
+};
 
 /* ==========================================================
    CREATE RENEWAL PAYMENT
@@ -1714,16 +2370,36 @@ export const processMpesaCallback =
      * more than once.
      */
     if (
-      payment.status ===
-        "successful" &&
-      payment.isVerified
-    ) {
-      return {
-        success: true,
-        alreadyProcessed: true,
-        payment,
-      };
-    }
+  payment.status === "successful" &&
+  payment.isVerified
+) {
+  /*
+   * The payment may have been verified successfully
+   * while membership/exhibitor fulfillment failed.
+   *
+   * Retry fulfillment before declaring the callback
+   * completely processed.
+   */
+  try {
+    await processSuccessfulPayment(payment);
+  } catch (error) {
+    console.error(
+      "Previously successful payment still requires post-payment processing:",
+      error.message
+    );
+
+    throw new AppError(
+      "Payment is successful, but post-payment processing could not be completed.",
+      500
+    );
+  }
+
+  return {
+    success: true,
+    alreadyProcessed: true,
+    payment,
+  };
+}
 
     payment.callbackPayload =
       payload;
@@ -2238,6 +2914,7 @@ export const retryPayment =
         "cancelled",
         "expired",
         "pending",
+        "submitted",
         "processing",
       ].includes(
         payment.status
@@ -2406,6 +3083,166 @@ export const retryPayment =
 
     return result;
   };
+
+export const approveManualMpesaPayment = async (
+  reference,
+  reviewerId
+) => {
+  const payment = await findPaymentByReference(
+    reference,
+    {
+      includeGatewayData: true,
+    }
+  );
+
+  /* ========================================================
+     BASIC VALIDATION
+  ======================================================== */
+
+  if (!payment) {
+    throw new AppError(
+      "Payment not found.",
+      404
+    );
+  }
+
+  if (
+    payment.paymentMethod !==
+    "mpesa"
+  ) {
+    throw new AppError(
+      "Only M-Pesa payments can be manually approved.",
+      400
+    );
+  }
+
+  if (
+    !payment.manualMpesa?.transactionCode
+  ) {
+    throw new AppError(
+      "This payment does not have a submitted M-Pesa confirmation code.",
+      400
+    );
+  }
+
+  /* ========================================================
+     PREVENT INVALID APPROVALS
+  ======================================================== */
+
+  if (
+    payment.status ===
+      "successful" &&
+    payment.isVerified
+  ) {
+    return payment;
+  }
+
+  if (
+    payment.status ===
+    "failed"
+  ) {
+    throw new AppError(
+      "A failed payment cannot be approved. The member must submit a new payment.",
+      400
+    );
+  }
+
+  if (
+    payment.status ===
+    "refunded"
+  ) {
+    throw new AppError(
+      "A refunded payment cannot be approved.",
+      400
+    );
+  }
+
+  if (
+    payment.status ===
+    "cancelled"
+  ) {
+    throw new AppError(
+      "A cancelled payment cannot be approved.",
+      400
+    );
+  }
+
+  /* ========================================================
+     REQUIRE MANUAL SUBMISSION
+  ======================================================== */
+
+  if (
+    payment.status !==
+    "submitted"
+  ) {
+    throw new AppError(
+      "Only submitted M-Pesa payments can be manually approved.",
+      400
+    );
+  }
+
+  /* ========================================================
+     RECORD MANUAL REVIEW
+  ======================================================== */
+
+  payment.status =
+    "successful";
+
+  payment.statusMessage =
+    "M-Pesa payment manually verified and approved.";
+
+  payment.isVerified =
+    true;
+
+  payment.verificationMethod =
+    "manual";
+
+  payment.verifiedBy =
+    reviewerId;
+
+  payment.paidAt =
+    payment.paidAt ||
+    new Date();
+
+  payment.manualMpesa.reviewedAt =
+    new Date();
+
+  payment.manualMpesa.reviewedBy =
+    reviewerId;
+
+  payment.manualMpesa.rejectionReason =
+    null;
+
+  /* ========================================================
+     IMPORTANT:
+     DO NOT PUT THE MANUAL CODE INTO
+     mpesa.receiptNumber.
+  ======================================================== */
+
+  await payment.save();
+
+  /* ========================================================
+     PROCESS SUCCESSFUL PAYMENT
+     
+     This activates membership / renewal using
+     your existing payment-processing logic.
+  ======================================================== */
+
+  try {
+    await processSuccessfulPayment(
+      payment
+    );
+  } catch (error) {
+    payment.membershipProcessingError =
+      error.message;
+
+    await payment.save();
+
+    throw error;
+  }
+
+  return payment;
+};
 
 /* ==========================================================
    MARK PAYMENT FAILED
@@ -2681,6 +3518,74 @@ export const getAllPayments =
     };
   };
 
+export const getManualMpesaQueue = async ({
+  page = 1,
+  limit = 20,
+  search = "",
+} = {}) => {
+  const currentPage = Math.max(Number(page) || 1, 1);
+  const perPage = Math.min(Math.max(Number(limit) || 20, 1), 100);
+  const skip = (currentPage - 1) * perPage;
+
+  const query = {
+    provider: "manual",
+    paymentMethod: "mpesa",
+    status: "submitted",
+  };
+
+  if (search && String(search).trim()) {
+    const searchRegex = new RegExp(
+      String(search).trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      "i"
+    );
+
+    const matchingMembers = await Member.find({
+      $or: [
+        { firstName: searchRegex },
+        { middleName: searchRegex },
+        { lastName: searchRegex },
+        { memberNumber: searchRegex },
+        { phone: searchRegex },
+      ],
+    }).select("_id");
+
+    query.$or = [
+      { reference: searchRegex },
+      { accountReference: searchRegex },
+      { "manualMpesa.transactionCode": searchRegex },
+      {
+        member: {
+          $in: matchingMembers.map((member) => member._id),
+        },
+      },
+    ];
+  }
+
+  const [payments, total] = await Promise.all([
+    Payment.find(query)
+      .populate(
+        "member",
+        "memberNumber firstName middleName lastName phone county constituency ward membershipType membershipStatus"
+      )
+      .sort({ "manualMpesa.submittedAt": -1, createdAt: -1 })
+      .skip(skip)
+      .limit(perPage)
+      .lean(),
+
+    Payment.countDocuments(query),
+  ]);
+
+  return {
+    payments,
+    pagination: {
+      page: currentPage,
+      limit: perPage,
+      total,
+      pages: Math.ceil(total / perPage),
+    },
+  };
+};
+
 /* ==========================================================
    PAYMENT STATISTICS
 ========================================================== */
@@ -2951,6 +3856,8 @@ export default {
   createPayment,
 
   createMembershipPayment,
+  createManualMembershipPayment,
+  confirmManualMpesaPayment,
   createRenewalPayment,
 
   initiatePayment,

@@ -16,12 +16,12 @@ function PaymentSummary({ summary = {} }) {
       color: "blue",
     },
     {
-      title: "Completed",
-      value: summary.totalPayments - (summary.pendingPayments || 0) - (summary.failedPayments || 0) || 0,
-      subtitle: "Successfully verified",
-      icon: <FaCheckCircle />,
-      color: "green",
-    },
+  title: "Completed",
+  value: summary.totalPayments || 0,
+  subtitle: "Successfully verified",
+  icon: <FaCheckCircle />,
+  color: "green",
+},
     {
       title: "Pending",
       value: summary.pendingPayments || 0,

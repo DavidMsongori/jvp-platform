@@ -133,6 +133,37 @@ export const verifyPayment = async (
 };
 
 /* ==========================================
+   MANUAL M-PESA VERIFICATION QUEUE
+========================================== */
+
+export const getManualMpesaQueue = async (
+  params = {}
+) => {
+
+  const response = await api.get(
+    "/payments/admin/manual-mpesa",
+    {
+      params,
+    }
+  );
+
+  return response.data;
+
+};
+
+export const approveManualMpesaPayment = async (
+ reference
+) => {
+
+  const response = await api.patch(
+    `/payments/admin/approve/${reference}`
+  );
+
+  return response.data;
+
+};
+
+/* ==========================================
    EVENTS
 ========================================== */
 
@@ -258,6 +289,8 @@ export default {
 
   getPayments,
   verifyPayment,
+  getManualMpesaQueue,
+  approveManualMpesaPayment,
 
   /* Events */
 

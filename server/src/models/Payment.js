@@ -9,7 +9,7 @@ const PAYMENT_FOR = [
   "renewal",
   "event",
   "summit",
-   "summit_exhibitor",
+  "summit_exhibitor",
   "donation",
 ];
 
@@ -88,11 +88,11 @@ const paymentSchema = new mongoose.Schema(
     },
 
     summitExhibitor: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "SummitExhibitor",
-  default: null,
-  index: true,
-},
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SummitExhibitor",
+      default: null,
+      index: true,
+    },
 
     /* ==========================================
        INTERNAL REFERENCES
@@ -136,7 +136,10 @@ const paymentSchema = new mongoose.Schema(
     amount: {
       type: Number,
       required: true,
-      min: [1, "Payment amount must be at least KES 1."],
+      min: [
+        1,
+        "Payment amount must be at least KES 1.",
+      ],
     },
 
     currency: {
@@ -148,15 +151,16 @@ const paymentSchema = new mongoose.Schema(
     },
 
     /* ==========================================
-       PAYMENT METHOD
+       PAYMENT PROVIDER / METHOD
     ========================================== */
+
     provider: {
-  type: String,
-  enum: PAYMENT_PROVIDERS,
-  default: "intasend",
-  required: true,
-  index: true,
-},
+      type: String,
+      enum: PAYMENT_PROVIDERS,
+      default: "intasend",
+      required: true,
+      index: true,
+    },
 
     paymentMethod: {
       type: String,
@@ -213,15 +217,21 @@ const paymentSchema = new mongoose.Schema(
         type: String,
         default: null,
         trim: true,
-
       },
 
+      /*
+       * This field must contain the actual provider-
+       * confirmed M-Pesa receipt number.
+       *
+       * Do NOT store the customer-entered manual
+       * confirmation code here unless it has been
+       * independently confirmed by the provider.
+       */
       receiptNumber: {
         type: String,
         default: undefined,
         uppercase: true,
         trim: true,
-  
       },
 
       resultCode: {
@@ -296,138 +306,145 @@ const paymentSchema = new mongoose.Schema(
       },
     },
 
+    /* ==========================================
+       MANUAL M-PESA DETAILS
+    ========================================== */
 
-/* ==========================================
-   MANUAL M-PESA DETAILS
-========================================== */
+    /*
+     * This stores the M-Pesa confirmation code
+     * entered by the member when the browser
+     * redirect/callback was missed.
+     *
+     * It is intentionally separate from
+     * mpesa.receiptNumber.
+     */
 
-manualMpesa: {
-  transactionCode: {
-    type: String,
-    default: null,
-    uppercase: true,
-    trim: true,
-  },
+    manualMpesa: {
+      transactionCode: {
+        type: String,
+        default: null,
+        uppercase: true,
+        trim: true,
+      },
 
-  submittedAt: {
-    type: Date,
-    default: null,
-  },
+      submittedAt: {
+        type: Date,
+        default: null,
+      },
 
-  reviewedAt: {
-    type: Date,
-    default: null,
-  },
+      reviewedAt: {
+        type: Date,
+        default: null,
+      },
 
-  reviewedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null,
-  },
+      reviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
 
-  rejectionReason: {
-    type: String,
-    default: null,
-    trim: true,
-    maxlength: 500,
-  },
-},
-    
+      rejectionReason: {
+        type: String,
+        default: null,
+        trim: true,
+        maxlength: 500,
+      },
+    },
 
     /* ==========================================
-   INTASEND DETAILS
-========================================== */
+       INTASEND DETAILS
+    ========================================== */
 
-intasend: {
-  invoiceId: {
-    type: String,
-    default: null,
-    trim: true,
-  },
+    intasend: {
+      invoiceId: {
+        type: String,
+        default: null,
+        trim: true,
+      },
 
-  apiReference: {
-    type: String,
-    default: null,
-    uppercase: true,
-    trim: true,
-  },
+      apiReference: {
+        type: String,
+        default: null,
+        uppercase: true,
+        trim: true,
+      },
 
-  checkoutUrl: {
-    type: String,
-    default: null,
-    trim: true,
-  },
+      checkoutUrl: {
+        type: String,
+        default: null,
+        trim: true,
+      },
 
-  state: {
-    type: String,
-    enum: [
-      "PENDING",
-      "PROCESSING",
-      "COMPLETE",
-      "FAILED",
-      null,
-    ],
-    default: null,
-  },
+      state: {
+        type: String,
+        enum: [
+          "PENDING",
+          "PROCESSING",
+          "COMPLETE",
+          "FAILED",
+          null,
+        ],
+        default: null,
+      },
 
-  provider: {
-    type: String,
-    default: null,
-    trim: true,
-  },
+      provider: {
+        type: String,
+        default: null,
+        trim: true,
+      },
 
-  providerReference: {
-    type: String,
-    default: null,
-    trim: true,
-    index: true,
-  },
+      providerReference: {
+        type: String,
+        default: null,
+        trim: true,
+        index: true,
+      },
 
-  charges: {
-    type: Number,
-    default: 0,
-    min: 0,
-  },
+      charges: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
 
-  netAmount: {
-    type: Number,
-    default: null,
-    min: 0,
-  },
+      netAmount: {
+        type: Number,
+        default: null,
+        min: 0,
+      },
 
-  failedReason: {
-    type: String,
-    default: null,
-    trim: true,
-  },
+      failedReason: {
+        type: String,
+        default: null,
+        trim: true,
+      },
 
-  failedCode: {
-    type: String,
-    default: null,
-    trim: true,
-  },
+      failedCode: {
+        type: String,
+        default: null,
+        trim: true,
+      },
 
-  webhookReceived: {
-    type: Boolean,
-    default: false,
-  },
+      webhookReceived: {
+        type: Boolean,
+        default: false,
+      },
 
-  webhookReceivedAt: {
-    type: Date,
-    default: null,
-  },
+      webhookReceivedAt: {
+        type: Date,
+        default: null,
+      },
 
-  statusQueryAttempts: {
-    type: Number,
-    default: 0,
-    min: 0,
-  },
+      statusQueryAttempts: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
 
-  lastStatusQueryAt: {
-    type: Date,
-    default: null,
-  },
-},
+      lastStatusQueryAt: {
+        type: Date,
+        default: null,
+      },
+    },
 
     /* ==========================================
        GATEWAY DETAILS
@@ -499,17 +516,17 @@ intasend: {
     },
 
     verificationMethod: {
-  type: String,
-  enum: [
-    "webhook",
-    "status_query",
-    "callback",
-    "stk_query",
-    "manual",
-    null,
-  ],
-  default: null,
-},
+      type: String,
+      enum: [
+        "webhook",
+        "status_query",
+        "callback",
+        "stk_query",
+        "manual",
+        null,
+      ],
+      default: null,
+    },
 
     verifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -566,6 +583,7 @@ intasend: {
     /* ==========================================
        RECEIPT
     ========================================== */
+
     receiptSent: {
       type: Boolean,
       default: false,
@@ -607,14 +625,18 @@ intasend: {
     timestamps: true,
     versionKey: false,
     minimize: false,
+
     toJSON: {
       virtuals: true,
+
       transform(_document, returnedObject) {
         delete returnedObject.gatewayResponse;
         delete returnedObject.callbackPayload;
+
         return returnedObject;
       },
     },
+
     toObject: {
       virtuals: true,
     },
@@ -681,7 +703,11 @@ paymentSchema.index({
   status: 1,
 });
 
-
+/*
+ * Prevent the same manually submitted M-Pesa
+ * confirmation code from being attached to
+ * multiple payment records.
+ */
 paymentSchema.index(
   {
     "manualMpesa.transactionCode": 1,
@@ -700,11 +726,19 @@ paymentSchema.index(
    VIRTUALS
 ========================================== */
 
+/*
+ * "submitted" is deliberately considered pending.
+ *
+ * It means the member has supplied a confirmation
+ * code and the payment is awaiting provider
+ * verification.
+ */
 paymentSchema.virtual("isPending").get(function () {
-  return (
-    this.status === "pending" ||
-    this.status === "processing"
-  );
+  return [
+    "pending",
+    "submitted",
+    "processing",
+  ].includes(this.status);
 });
 
 paymentSchema.virtual("isSuccessful").get(function () {
@@ -723,27 +757,23 @@ paymentSchema.virtual("isFailed").get(function () {
    VALIDATION
 ========================================== */
 
-paymentSchema.pre("validate", function (next) {
+paymentSchema.pre("validate", function () {
   if (
-  this.paymentMethod === "mpesa" &&
-  !this.phoneNumber
-) {
-  return next(
-    new Error(
+    this.paymentMethod === "mpesa" &&
+    !this.phoneNumber
+  ) {
+    throw new Error(
       "Phone number is required for M-Pesa payments."
-    )
-  );
-}
+    );
+  }
 
   if (
     this.paymentFor === "event" &&
     !this.event &&
     !this.registration
   ) {
-    return next(
-      new Error(
-        "An event payment must be linked to an event or registration."
-      )
+    throw new Error(
+      "An event payment must be linked to an event or registration."
     );
   }
 
@@ -751,157 +781,161 @@ paymentSchema.pre("validate", function (next) {
     this.paymentFor === "summit" &&
     !this.summitRegistration
   ) {
-    return next(
-      new Error(
-        "A summit payment must be linked to a summit registration."
-      )
+    throw new Error(
+      "A summit payment must be linked to a summit registration."
     );
   }
-
-if (
-  this.paymentFor ===
-    "summit_exhibitor" &&
-  !this.summitExhibitor
-) {
-  return next(
-    new Error(
-      "A summit exhibitor payment must be linked to an exhibitor registration."
-    )
-  );
-}
-
 
   if (
-    ["membership", "renewal"].includes(
-      this.paymentFor
-    ) &&
-    !this.member
+    this.paymentFor === "summit_exhibitor" &&
+    !this.summitExhibitor
   ) {
-    return next(
-      new Error(
-        "Membership payments must be linked to a member."
-      )
+    throw new Error(
+      "A summit exhibitor payment must be linked to an exhibitor registration."
     );
   }
 
+  if (
+    ["membership", "renewal"].includes(this.paymentFor) &&
+    !this.member
+  ) {
+    throw new Error(
+      "Membership payments must be linked to a member."
+    );
+  }
 });
 
 /* ==========================================
    INSTANCE METHODS
 ========================================== */
 
-paymentSchema.methods.markAsProcessing = function ({
-  merchantRequestId,
-  checkoutRequestId,
-  responseCode,
-  responseDescription,
-  customerMessage,
-  gatewayResponse,
-}) {
-  this.status = "processing";
-  this.initiatedAt = new Date();
+paymentSchema.methods.markAsProcessing =
+  function ({
+    merchantRequestId,
+    checkoutRequestId,
+    responseCode,
+    responseDescription,
+    customerMessage,
+    gatewayResponse,
+  }) {
+    this.status = "processing";
+    this.initiatedAt =
+      this.initiatedAt || new Date();
 
-  this.mpesa.merchantRequestId =
-    merchantRequestId || null;
+    this.mpesa.merchantRequestId =
+      merchantRequestId || null;
 
-  this.mpesa.checkoutRequestId =
-    checkoutRequestId || null;
+    this.mpesa.checkoutRequestId =
+      checkoutRequestId || null;
 
-  this.mpesa.responseCode =
-    responseCode || null;
+    this.mpesa.responseCode =
+      responseCode || null;
 
-  this.mpesa.responseDescription =
-    responseDescription || null;
+    this.mpesa.responseDescription =
+      responseDescription || null;
 
-  this.mpesa.customerMessage =
-    customerMessage || null;
+    this.mpesa.customerMessage =
+      customerMessage || null;
 
-  this.gatewayResponse =
-    gatewayResponse || null;
+    this.gatewayResponse =
+      gatewayResponse || null;
 
-  return this.save();
-};
+    return this.save();
+  };
 
-paymentSchema.methods.markAsSuccessful = function ({
-  receiptNumber,
-  transactionDate,
-  resultCode = 0,
-  resultDescription,
-  callbackPayload,
-  verificationMethod = "callback",
-}) {
-  const now = new Date();
+paymentSchema.methods.markAsSuccessful =
+  function ({
+    receiptNumber,
+    transactionDate,
+    resultCode = 0,
+    resultDescription,
+    callbackPayload,
+    verificationMethod = "callback",
+  }) {
+    const now = new Date();
 
-  this.status = "successful";
-  this.statusMessage =
-    resultDescription || "Payment completed successfully.";
+    this.status = "successful";
 
-  this.failureReason = null;
+    this.statusMessage =
+      resultDescription ||
+      "Payment completed successfully.";
 
- if (receiptNumber) {
-  this.mpesa.receiptNumber =
-    receiptNumber.toUpperCase();
+    this.failureReason = null;
 
-  this.gatewayReference =
-    receiptNumber.toUpperCase();
-}
+    if (receiptNumber) {
+      this.mpesa.receiptNumber =
+        receiptNumber.toUpperCase();
 
-this.mpesa.transactionDate =
-  transactionDate || now;
+      this.gatewayReference =
+        receiptNumber.toUpperCase();
+    }
 
-this.mpesa.resultCode = resultCode;
+    this.mpesa.transactionDate =
+      transactionDate || now;
 
-this.mpesa.resultDescription =
-  resultDescription || null;
+    this.mpesa.resultCode =
+      resultCode;
 
-if (verificationMethod === "callback") {
-  this.mpesa.callbackReceived = true;
-  this.mpesa.callbackReceivedAt = now;
+    this.mpesa.resultDescription =
+      resultDescription || null;
 
-  this.callbackPayload =
-    callbackPayload || this.callbackPayload;
-}
+    if (
+      verificationMethod === "callback"
+    ) {
+      this.mpesa.callbackReceived = true;
+      this.mpesa.callbackReceivedAt = now;
 
-  this.paidAt = transactionDate || now;
-  this.verifiedAt = now;
+      this.callbackPayload =
+        callbackPayload ||
+        this.callbackPayload;
+    }
 
-  this.isVerified = true;
-  this.verificationMethod = verificationMethod;
+    this.paidAt =
+      transactionDate || now;
 
-  return this.save();
-};
+    this.verifiedAt = now;
+    this.isVerified = true;
 
-paymentSchema.methods.markAsFailed = function ({
-  resultCode,
-  resultDescription,
-  callbackPayload,
-}) {
-  const now = new Date();
+    this.verificationMethod =
+      verificationMethod;
 
-  this.status = "failed";
+    return this.save();
+  };
 
-  this.failureReason =
-    resultDescription ||
-    "The M-Pesa payment was not completed.";
+paymentSchema.methods.markAsFailed =
+  function ({
+    resultCode,
+    resultDescription,
+    callbackPayload,
+  }) {
+    const now = new Date();
 
-  this.statusMessage = this.failureReason;
+    this.status = "failed";
 
-  this.mpesa.resultCode =
-    resultCode ?? null;
+    this.failureReason =
+      resultDescription ||
+      "The M-Pesa payment was not completed.";
 
-  this.mpesa.resultDescription =
-    resultDescription || null;
+    this.statusMessage =
+      this.failureReason;
 
-  this.mpesa.callbackReceived = true;
-  this.mpesa.callbackReceivedAt = now;
+    this.mpesa.resultCode =
+      resultCode ?? null;
 
-  this.callbackPayload =
-    callbackPayload || this.callbackPayload;
+    this.mpesa.resultDescription =
+      resultDescription || null;
 
-  this.failedAt = now;
+    this.mpesa.callbackReceived = true;
+    this.mpesa.callbackReceivedAt = now;
 
-  return this.save();
-};
+    this.callbackPayload =
+      callbackPayload ||
+      this.callbackPayload;
+
+    this.failedAt = now;
+
+    return this.save();
+  };
 
 paymentSchema.methods.markIntaSendProcessing =
   function ({
@@ -914,6 +948,7 @@ paymentSchema.methods.markIntaSendProcessing =
   }) {
     this.provider = "intasend";
     this.status = "processing";
+
     this.initiatedAt =
       this.initiatedAt || new Date();
 
@@ -921,13 +956,13 @@ paymentSchema.methods.markIntaSendProcessing =
       invoiceId || null;
 
     this.intasend.apiReference =
-      apiReference || this.reference;
+      apiReference ||
+      this.reference;
 
     this.intasend.checkoutUrl =
       checkoutUrl || null;
 
-    this.intasend.state =
-      state;
+    this.intasend.state = state;
 
     this.intasend.provider =
       provider || null;
@@ -941,7 +976,7 @@ paymentSchema.methods.markIntaSendProcessing =
     return this.save();
   };
 
-  paymentSchema.methods.markIntaSendSuccessful =
+paymentSchema.methods.markIntaSendSuccessful =
   function ({
     invoiceId,
     providerReference,
@@ -985,12 +1020,10 @@ paymentSchema.methods.markIntaSendProcessing =
         : null;
 
     this.intasend.webhookReceived =
-      verificationMethod ===
-      "webhook";
+      verificationMethod === "webhook";
 
     this.intasend.webhookReceivedAt =
-      verificationMethod ===
-      "webhook"
+      verificationMethod === "webhook"
         ? now
         : this.intasend
             .webhookReceivedAt;
@@ -1009,13 +1042,14 @@ paymentSchema.methods.markIntaSendProcessing =
 
     this.verifiedAt = now;
     this.isVerified = true;
+
     this.verificationMethod =
       verificationMethod;
 
     return this.save();
   };
 
-  paymentSchema.methods.markIntaSendFailed =
+paymentSchema.methods.markIntaSendFailed =
   function ({
     invoiceId,
     failedReason,
@@ -1069,7 +1103,8 @@ paymentSchema.methods.markIntaSendProcessing =
 paymentSchema.statics.findByCheckoutRequestId =
   function (checkoutRequestId) {
     return this.findOne({
-      "mpesa.checkoutRequestId": checkoutRequestId,
+      "mpesa.checkoutRequestId":
+        checkoutRequestId,
     });
   };
 
@@ -1081,12 +1116,10 @@ paymentSchema.statics.findByMpesaReceipt =
     });
   };
 
-
-  paymentSchema.statics.findByIntaSendInvoiceId =
+paymentSchema.statics.findByIntaSendInvoiceId =
   function (invoiceId) {
     return this.findOne({
-      "intasend.invoiceId":
-        invoiceId,
+      "intasend.invoiceId": invoiceId,
     });
   };
 

@@ -112,3 +112,91 @@
   }
 
 }
+
+/* ==========================================
+   SIDEBAR LINK CONTENT
+========================================== */
+
+.sidebar-link-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+
+/* ==========================================
+   PAYMENT NOTIFICATION BADGE
+========================================== */
+
+.sidebar-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 22px;
+
+  padding: 0 6px;
+
+  border-radius: 999px;
+
+  background: #dc2626;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+
+  flex-shrink: 0;
+}
+
+
+/* ==========================================
+   ACTIVE PAYMENT BADGE
+========================================== */
+
+.sidebar-link.active .sidebar-badge {
+  background: #ffffff;
+  color: #dc2626;
+}
+
+
+/* ==========================================
+   BADGE ATTENTION ANIMATION
+========================================== */
+
+.sidebar-badge {
+  animation: sidebarBadgePulse 2s infinite;
+}
+
+@keyframes sidebarBadgePulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+  .sidebar-badge {
+    min-width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+}
