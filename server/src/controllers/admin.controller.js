@@ -1,18 +1,24 @@
 import * as adminService from "../services/admin.service.js";
 import * as adminMemberService from "../services/adminMember.service.js";
+import * as authService from "../services/auth.service.js";
 
 /* ==========================================================
    ADMIN DASHBOARD
 ========================================================== */
 
-export const getDashboard = async (req, res, next) => {
+export const getDashboard = async (
+  req,
+  res,
+  next
+) => {
   try {
     const dashboard =
       await adminService.getDashboard();
 
     return res.status(200).json({
       success: true,
-      message: "Dashboard retrieved successfully.",
+      message:
+        "Dashboard retrieved successfully.",
       data: dashboard,
     });
   } catch (error) {
@@ -27,14 +33,21 @@ export const getDashboard = async (req, res, next) => {
 /**
  * GET /admin/members
  */
-export const getMembers = async (req, res, next) => {
+export const getMembers = async (
+  req,
+  res,
+  next
+) => {
   try {
     const result =
-      await adminMemberService.getMembers(req.query);
+      await adminMemberService.getMembers(
+        req.query
+      );
 
     return res.status(200).json({
       success: true,
-      message: "Members retrieved successfully.",
+      message:
+        "Members retrieved successfully.",
       data: result,
     });
   } catch (error) {
@@ -85,7 +98,8 @@ export const updateMember = async (
 
     return res.status(200).json({
       success: true,
-      message: "Member updated successfully.",
+      message:
+        "Member updated successfully.",
       data: result,
     });
   } catch (error) {
@@ -110,7 +124,8 @@ export const activateMember = async (
 
     return res.status(200).json({
       success: true,
-      message: "Member activated successfully.",
+      message:
+        "Member activated successfully.",
       data: result,
     });
   } catch (error) {
@@ -161,13 +176,50 @@ export const deleteMember = async (
 
     return res.status(200).json({
       success: true,
-      message: result.message,
+      message:
+        result.message,
       data: null,
     });
   } catch (error) {
     next(error);
   }
 };
+
+/* ==========================================================
+   REPAIR MISSING MEMBERSHIP NUMBERS
+========================================================== */
+
+/**
+ * POST /admin/members/repair-missing-membership-numbers
+ *
+ * Finds activated members without a membership number
+ * and assigns unique membership numbers using the existing
+ * county counters.
+ */
+export const repairMissingMembershipNumbers =
+  async (
+    req,
+    res,
+    next
+  ) => {
+    try {
+      const result =
+        await authService.repairMissingMembershipNumbers();
+
+      return res.status(200).json({
+        success: true,
+
+        message:
+          result.repairedCount > 0
+            ? `${result.repairedCount} missing membership number(s) repaired successfully.`
+            : "No missing membership numbers required repair.",
+
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
 /* ==========================================================
    PAYMENT MANAGEMENT
@@ -183,11 +235,14 @@ export const getPayments = async (
 ) => {
   try {
     const result =
-      await adminService.getPayments(req.query);
+      await adminService.getPayments(
+        req.query
+      );
 
     return res.status(200).json({
       success: true,
-      message: "Payments retrieved successfully.",
+      message:
+        "Payments retrieved successfully.",
       data: result,
     });
   } catch (error) {
@@ -212,7 +267,8 @@ export const verifyPayment = async (
 
     return res.status(200).json({
       success: true,
-      message: "Payment verified successfully.",
+      message:
+        "Payment verified successfully.",
       data: result,
     });
   } catch (error) {
@@ -234,11 +290,14 @@ export const getEvents = async (
 ) => {
   try {
     const result =
-      await adminService.getEvents(req.query);
+      await adminService.getEvents(
+        req.query
+      );
 
     return res.status(200).json({
       success: true,
-      message: "Events retrieved successfully.",
+      message:
+        "Events retrieved successfully.",
       data: result,
     });
   } catch (error) {
@@ -262,7 +321,8 @@ export const getEventById = async (
 
     return res.status(200).json({
       success: true,
-      message: "Event retrieved successfully.",
+      message:
+        "Event retrieved successfully.",
       data: result,
     });
   } catch (error) {
@@ -287,7 +347,8 @@ export const createEvent = async (
 
     return res.status(201).json({
       success: true,
-      message: "Event created successfully.",
+      message:
+        "Event created successfully.",
       data: result,
     });
   } catch (error) {
@@ -313,7 +374,8 @@ export const updateEvent = async (
 
     return res.status(200).json({
       success: true,
-      message: "Event updated successfully.",
+      message:
+        "Event updated successfully.",
       data: result,
     });
   } catch (error) {
@@ -338,7 +400,8 @@ export const deleteEvent = async (
 
     return res.status(200).json({
       success: true,
-      message: result.message,
+      message:
+        result.message,
       data: null,
     });
   } catch (error) {
@@ -364,7 +427,8 @@ export const getReports = async (
 
     return res.status(200).json({
       success: true,
-      message: "Reports generated successfully.",
+      message:
+        "Reports generated successfully.",
       data: result,
     });
   } catch (error) {

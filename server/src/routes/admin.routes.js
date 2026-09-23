@@ -15,6 +15,7 @@ import {
   activateMember,
   deactivateMember,
   deleteMember,
+  repairMissingMembershipNumbers,
 
   /* Payments */
   getPayments,
@@ -55,7 +56,10 @@ router.use(auth);
 
 router.get(
   "/dashboard",
-  authorize("admin", "super_admin"),
+  authorize(
+    "admin",
+    "super_admin"
+  ),
   getDashboard
 );
 
@@ -63,39 +67,95 @@ router.get(
    MEMBER MANAGEMENT
 ========================================================== */
 
+/*
+ * GET /admin/members
+ */
+
 router
   .route("/members")
   .get(
-    authorize("admin", "super_admin"),
+    authorize(
+      "admin",
+      "super_admin"
+    ),
     getMembers
   );
+
+/* ==========================================================
+   REPAIR MISSING MEMBERSHIP NUMBERS
+========================================================== */
+
+/*
+ * POST
+ * /admin/members/repair-missing-membership-numbers
+ *
+ * This MUST appear before the parameterized
+ * /members/:id routes for clarity and safety.
+ */
+
+router.post(
+  "/members/repair-missing-membership-numbers",
+  authorize(
+    "admin",
+    "super_admin"
+  ),
+  repairMissingMembershipNumbers
+);
+
+/* ==========================================================
+   MEMBER BY ID
+========================================================== */
 
 router
   .route("/members/:id")
   .get(
-    authorize("admin", "super_admin"),
+    authorize(
+      "admin",
+      "super_admin"
+    ),
     getMemberById
   )
+
   .put(
-    authorize("admin", "super_admin"),
+    authorize(
+      "admin",
+      "super_admin"
+    ),
     updateMemberValidator,
     validate,
     updateMember
   )
+
   .delete(
-    authorize("super_admin"),
+    authorize(
+      "super_admin"
+    ),
     deleteMember
   );
 
+/* ==========================================================
+   ACTIVATE MEMBER
+========================================================== */
+
 router.patch(
   "/members/:id/activate",
-  authorize("admin", "super_admin"),
+  authorize(
+    "admin",
+    "super_admin"
+  ),
   activateMember
 );
 
+/* ==========================================================
+   DEACTIVATE MEMBER
+========================================================== */
+
 router.patch(
   "/members/:id/deactivate",
-  authorize("admin", "super_admin"),
+  authorize(
+    "admin",
+    "super_admin"
+  ),
   deactivateMember
 );
 
@@ -140,6 +200,7 @@ router
     ),
     getEvents
   )
+
   .post(
     authorize(
       "events",
@@ -161,6 +222,7 @@ router
     ),
     getEventById
   )
+
   .put(
     authorize(
       "events",
@@ -171,8 +233,12 @@ router
     validate,
     updateEvent
   )
+
   .delete(
-    authorize("admin", "super_admin"),
+    authorize(
+      "admin",
+      "super_admin"
+    ),
     deleteEvent
   );
 
@@ -182,7 +248,10 @@ router
 
 router.get(
   "/reports",
-  authorize("admin", "super_admin"),
+  authorize(
+    "admin",
+    "super_admin"
+  ),
   getReports
 );
 
@@ -192,7 +261,10 @@ router.get(
 
 router.get(
   "/activity-logs",
-  authorize("admin", "super_admin"),
+  authorize(
+    "admin",
+    "super_admin"
+  ),
   getActivityLogs
 );
 

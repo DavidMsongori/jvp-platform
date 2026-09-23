@@ -20,23 +20,28 @@ const errorHandler = (
 
   let message = err.message || "Internal Server Error";
 
-  /* ==========================================
-     DUPLICATE KEY
-  ========================================== */
+ /* ==========================================
+   DUPLICATE KEY
+========================================== */
 
-  if (err.code === 11000) {
+if (err.code === 11000) {
+  statusCode = 409;
 
-    statusCode = 409;
+  const field =
+    Object.keys(err.keyPattern || {})[0] ||
+    Object.keys(err.keyValue || {})[0];
 
-    const field = Object.keys(
+  const duplicateMessages = {
+    email: "Email address is already registered.",
+    phone: "Phone number is already registered.",
+    nationalId: "National ID is already registered.",
+    memberNumber: "Membership number is already registered.",
+  };
 
-      err.keyValue
-
-    )[0];
-
-    message = `${field} already exists.`;
-
-  }
+  message =
+    duplicateMessages[field] ||
+    "Some of the information provided is already registered.";
+}
 
   /* ==========================================
      MONGOOSE VALIDATION

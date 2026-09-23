@@ -167,7 +167,6 @@ const buildAuthResponse = (
 
       joinedAt:
         member.joinedAt,
-
     },
   };
 };
@@ -200,11 +199,88 @@ export const register = async (
       email,
     } = data;
 
+    /* ----------------------------------------
+       REQUIRED INPUT CHECKS
+    ---------------------------------------- */
+
+    if (!firstName?.trim()) {
+      throw new AppError(
+        400,
+        "First name is required."
+      );
+    }
+
+    if (!lastName?.trim()) {
+      throw new AppError(
+        400,
+        "Last name is required."
+      );
+    }
+
+    if (!dateOfBirth) {
+      throw new AppError(
+        400,
+        "Date of birth is required."
+      );
+    }
+
+    if (!nationalId?.trim()) {
+      throw new AppError(
+        400,
+        "National ID is required."
+      );
+    }
+
+    if (!phone?.trim()) {
+      throw new AppError(
+        400,
+        "Phone number is required."
+      );
+    }
+
+    if (!county) {
+      throw new AppError(
+        400,
+        "County is required."
+      );
+    }
+
+    if (!constituency?.trim()) {
+      throw new AppError(
+        400,
+        "Constituency is required."
+      );
+    }
+
+    if (!ward?.trim()) {
+      throw new AppError(
+        400,
+        "Ward is required."
+      );
+    }
+
+    if (!membershipType) {
+      throw new AppError(
+        400,
+        "Membership type is required."
+      );
+    }
+
+    if (!email?.trim()) {
+      throw new AppError(
+        400,
+        "Email address is required."
+      );
+    }
+
     const normalizedEmail =
       email.toLowerCase().trim();
 
     const normalizedPhone =
       normalizePhone(phone);
+
+    const normalizedNationalId =
+      String(nationalId).trim();
 
     /* ----------------------------------------
        EMAIL EXISTS
@@ -217,8 +293,8 @@ export const register = async (
 
     if (existingUser) {
       throw new AppError(
-        "Email address is already registered.",
-        409
+        409,
+        "Email address is already registered."
       );
     }
 
@@ -228,13 +304,14 @@ export const register = async (
 
     const existingNationalId =
       await Member.findOne({
-        nationalId,
+        nationalId:
+          normalizedNationalId,
       }).session(session);
 
     if (existingNationalId) {
       throw new AppError(
-        "National ID already exists.",
-        409
+        409,
+        "National ID is already registered."
       );
     }
 
@@ -244,13 +321,14 @@ export const register = async (
 
     const existingPhone =
       await Member.findOne({
-        phone: normalizedPhone,
+        phone:
+          normalizedPhone,
       }).session(session);
 
     if (existingPhone) {
       throw new AppError(
-        "Phone number already exists.",
-        409
+        409,
+        "Phone number is already registered."
       );
     }
 
@@ -262,14 +340,25 @@ export const register = async (
       await User.create(
         [
           {
-            email: normalizedEmail,
-            password: null,
-            role: "member",
-            isActive: false,
-            emailVerified: false,
+            email:
+              normalizedEmail,
+
+            password:
+              null,
+
+            role:
+              "member",
+
+            isActive:
+              false,
+
+            emailVerified:
+              false,
           },
         ],
-        { session }
+        {
+          session,
+        }
       );
 
     /* ----------------------------------------
@@ -280,17 +369,21 @@ export const register = async (
       await Member.create(
         [
           {
-            user: user._id,
+            user:
+              user._id,
 
-            source: "new",
+            source:
+              "new",
 
-            accountActivated: false,
+            accountActivated:
+              false,
 
             /*
              * Membership number is assigned
              * after password creation.
              */
-            memberNumber: null,
+            memberNumber:
+              null,
 
             membershipType,
 
@@ -303,23 +396,42 @@ export const register = async (
             membershipExpiry:
               null,
 
-            firstName,
-            middleName,
-            lastName,
+            firstName:
+              firstName.trim(),
+
+            middleName:
+              middleName?.trim() || "",
+
+            lastName:
+              lastName.trim(),
+
             gender,
+
             dateOfBirth,
-            nationalId,
-            phone: normalizedPhone,
-            occupation,
+
+            nationalId:
+              normalizedNationalId,
+
+            phone:
+              normalizedPhone,
+
+            occupation:
+              occupation?.trim() || "",
 
             county,
-            constituency,
-            ward,
+
+            constituency:
+              constituency.trim(),
+
+            ward:
+              ward.trim(),
 
             disability,
           },
         ],
-        { session }
+        {
+          session,
+        }
       );
 
     /* ----------------------------------------
@@ -342,10 +454,8 @@ export const register = async (
     const otpResult =
       await otpService.createOTP({
         user,
-
         email:
           user.email,
-
         purpose:
           OTP_PURPOSE.ACCOUNT_ACTIVATION,
       });
@@ -355,7 +465,8 @@ export const register = async (
     ---------------------------------------- */
 
     await emailService.sendOTPEmail({
-      email: user.email,
+      email:
+        user.email,
 
       firstName:
         member.firstName,
@@ -369,7 +480,8 @@ export const register = async (
     ---------------------------------------- */
 
     await logActivity({
-      user: user._id,
+      user:
+        user._id,
 
       action:
         ACTIVITY.AUTH.REGISTER,
@@ -425,6 +537,68 @@ export const register = async (
       await session.abortTransaction();
     }
 
+    /* ========================================
+       MONGODB DUPLICATE KEY
+    ======================================== */
+
+    if (error?.code === 11000) {
+      const duplicateField =
+        Object.keys(
+          error.keyPattern || {}
+        )[0] ||
+        Object.keys(
+          error.keyValue || {}
+        )[0];
+
+      const duplicateMessages = {
+        email:
+          "Email address is already registered.",
+
+        phone:
+          "Phone number is already registered.",
+
+        nationalId:
+          "National ID is already registered.",
+
+        memberNumber:
+          "Membership number is already registered.",
+      };
+
+      throw new AppError(
+        409,
+        duplicateMessages[
+          duplicateField
+        ] ||
+          "Some of the information provided is already registered."
+      );
+    }
+
+    /* ========================================
+       MONGOOSE VALIDATION ERROR
+    ======================================== */
+
+    if (
+      error?.name ===
+      "ValidationError"
+    ) {
+      const messages =
+        Object.values(
+          error.errors
+        )
+          .map(
+            (validationError) =>
+              validationError.message
+          )
+          .filter(Boolean);
+
+      throw new AppError(
+        400,
+        messages.length
+          ? messages.join(", ")
+          : "Please check the information provided."
+      );
+    }
+
     throw error;
   } finally {
     await session.endSession();
@@ -433,7 +607,6 @@ export const register = async (
 
 /* ==========================================================
    ACTIVATE IMPORTED MEMBER
-   NEW FLOW:
    PHONE + DEFAULT PASSWORD
 ========================================================== */
 
@@ -449,15 +622,15 @@ export const activateExistingMember =
 
     if (!normalizedPhone) {
       throw new AppError(
-        "Phone number is required.",
-        400
+        400,
+        "Phone number is required."
       );
     }
 
     if (!password) {
       throw new AppError(
-        "Default password is required.",
-        400
+        400,
+        "Default password is required."
       );
     }
 
@@ -467,8 +640,8 @@ export const activateExistingMember =
 
     if (!defaultPassword) {
       throw new AppError(
-        "Imported member activation is not configured.",
-        500
+        500,
+        "Imported member activation is not configured."
       );
     }
 
@@ -478,14 +651,17 @@ export const activateExistingMember =
 
     const member =
       await Member.findOne({
-        phone: normalizedPhone,
-        source: "imported",
+        phone:
+          normalizedPhone,
+
+        source:
+          "imported",
       });
 
     if (!member) {
       throw new AppError(
-        "No imported member was found with the provided phone number.",
-        404
+        404,
+        "No imported member was found with the provided phone number."
       );
     }
 
@@ -498,8 +674,8 @@ export const activateExistingMember =
       member.user
     ) {
       throw new AppError(
-        "This membership has already been activated. Please log in using your account credentials.",
-        409
+        409,
+        "This membership has already been activated. Please log in using your account credentials."
       );
     }
 
@@ -512,8 +688,8 @@ export const activateExistingMember =
       defaultPassword
     ) {
       throw new AppError(
-        "Invalid phone number or default password.",
-        401
+        401,
+        "Invalid phone number or default password."
       );
     }
 
@@ -575,17 +751,17 @@ export const verifyOTP = async (
         OTP_PURPOSE.ACCOUNT_ACTIVATION,
     } = data;
 
-    if (!email) {
+    if (!email?.trim()) {
       throw new AppError(
-        "Email address is required.",
-        400
+        400,
+        "Email address is required."
       );
     }
 
     if (!code) {
       throw new AppError(
-        "Verification code is required.",
-        400
+        400,
+        "Verification code is required."
       );
     }
 
@@ -598,13 +774,14 @@ export const verifyOTP = async (
 
     const user =
       await User.findOne({
-        email: normalizedEmail,
+        email:
+          normalizedEmail,
       }).session(session);
 
     if (!user) {
       throw new AppError(
-        "Account not found.",
-        404
+        404,
+        "Account not found."
       );
     }
 
@@ -624,13 +801,14 @@ export const verifyOTP = async (
 
     const member =
       await Member.findOne({
-        user: user._id,
+        user:
+          user._id,
       }).session(session);
 
     if (!member) {
       throw new AppError(
-        "Member profile not found.",
-        404
+        404,
+        "Member profile not found."
       );
     }
 
@@ -650,16 +828,19 @@ export const verifyOTP = async (
 
       await user.save({
         session,
+
         validateBeforeSave:
           false,
       });
 
       /*
-       * For new members, OTP verification
-       * does not complete membership payment.
+       * OTP verification does not assign
+       * membership number or complete payment.
        */
+
       if (
-        member.source === "new" &&
+        member.source ===
+          "new" &&
         member.membershipStatus !==
           "active"
       ) {
@@ -680,7 +861,8 @@ export const verifyOTP = async (
     ---------------------------------------- */
 
     await logActivity({
-      user: user._id,
+      user:
+        user._id,
 
       action:
         ACTIVITY.AUTH.OTP_VERIFIED,
@@ -738,9 +920,11 @@ export const verifyOTP = async (
     }
 
     return {
-      success: true,
+      success:
+        true,
 
-      verified: true,
+      verified:
+        true,
 
       nextStep:
         purpose ===
@@ -802,24 +986,33 @@ export const resendOTP = async (
       OTP_PURPOSE.ACCOUNT_ACTIVATION,
   } = data;
 
+  if (!email?.trim()) {
+    throw new AppError(
+      400,
+      "Email address is required."
+    );
+  }
+
   const normalizedEmail =
     email.toLowerCase().trim();
 
   const user =
     await User.findOne({
-      email: normalizedEmail,
+      email:
+        normalizedEmail,
     });
 
   if (!user) {
     throw new AppError(
-      "Account not found.",
-      404
+      404,
+      "Account not found."
     );
   }
 
   const member =
     await Member.findOne({
-      user: user._id,
+      user:
+        user._id,
     });
 
   if (
@@ -828,8 +1021,8 @@ export const resendOTP = async (
     user.emailVerified
   ) {
     throw new AppError(
-      "Your email has already been verified.",
-      400
+      400,
+      "Your email has already been verified."
     );
   }
 
@@ -875,7 +1068,8 @@ export const resendOTP = async (
   }
 
   await logActivity({
-    user: user._id,
+    user:
+      user._id,
 
     action:
       ACTIVITY.AUTH.OTP_RESENT,
@@ -930,343 +1124,504 @@ export const resendOTP = async (
 
 export const createPassword =
   async (data) => {
-    const session =
-      await startTransaction();
+    const {
+      email,
+      password,
+      setupToken,
+    } = data;
 
-    try {
-      const {
-        email,
-        password,
-        setupToken,
-      } = data;
+    if (!email?.trim()) {
+      throw new AppError(
+        400,
+        "Email address is required."
+      );
+    }
 
-      const normalizedEmail =
-        email.toLowerCase().trim();
+    if (!password) {
+      throw new AppError(
+        400,
+        "Password is required."
+      );
+    }
 
-      let member = null;
-      let user = null;
-      let importedActivation =
-        false;
+    if (password.length < 8) {
+      throw new AppError(
+        400,
+        "Password must be at least 8 characters long."
+      );
+    }
 
-      /* ========================================
-         IMPORTED MEMBER FLOW
-      ======================================== */
+    const normalizedEmail =
+      email.toLowerCase().trim();
 
-      if (setupToken) {
-        let decoded;
+    /*
+     * We allow a small number of complete transaction
+     * retries if MongoDB reports a membership-number
+     * duplicate.
+     *
+     * This is important because the membership number
+     * is protected by a unique MongoDB index.
+     */
 
-        try {
-          decoded =
-            verifyPasswordSetupToken(
-              setupToken
+    const MAX_ATTEMPTS = 3;
+
+    for (
+      let attempt = 1;
+      attempt <= MAX_ATTEMPTS;
+      attempt++
+    ) {
+      const session =
+        await startTransaction();
+
+      try {
+        let member = null;
+        let user = null;
+
+        let importedActivation =
+          false;
+
+        /* ========================================
+           IMPORTED MEMBER FLOW
+        ======================================== */
+
+        if (setupToken) {
+          let decoded;
+
+          try {
+            decoded =
+              verifyPasswordSetupToken(
+                setupToken
+              );
+          } catch {
+            throw new AppError(
+              401,
+              "Your account setup session has expired or is invalid. Please start the activation process again."
             );
-        } catch {
-          throw new AppError(
-            "Your account setup session has expired or is invalid. Please start the activation process again.",
-            401
-          );
+          }
+
+          member =
+            await Member.findById(
+              decoded.memberId
+            ).session(session);
+
+          if (!member) {
+            throw new AppError(
+              404,
+              "Member profile not found."
+            );
+          }
+
+          if (
+            member.source !==
+            "imported"
+          ) {
+            throw new AppError(
+              400,
+              "Invalid imported member account."
+            );
+          }
+
+          if (
+            member.accountActivated ||
+            member.user
+          ) {
+            throw new AppError(
+              409,
+              "This membership has already been activated."
+            );
+          }
+
+          importedActivation =
+            true;
         }
 
-        member =
-          await Member.findById(
-            decoded.memberId
-          ).session(session);
+        /* ========================================
+           NEW MEMBER FLOW
+        ======================================== */
 
-        if (!member) {
-          throw new AppError(
-            "Member profile not found.",
-            404
-          );
+        if (!importedActivation) {
+          user =
+            await User.findOne({
+              email:
+                normalizedEmail,
+            }).session(session);
+
+          if (!user) {
+            throw new AppError(
+              404,
+              "Account not found."
+            );
+          }
+
+          if (!user.emailVerified) {
+            throw new AppError(
+              400,
+              "Please verify your email before creating a password."
+            );
+          }
+
+          if (user.password) {
+            throw new AppError(
+              409,
+              "Password has already been created."
+            );
+          }
+
+          member =
+            await Member.findOne({
+              user:
+                user._id,
+            }).session(session);
+
+          if (!member) {
+            throw new AppError(
+              404,
+              "Member profile not found."
+            );
+          }
         }
 
-        if (
-          member.source !==
-          "imported"
-        ) {
-          throw new AppError(
-            "Invalid imported member account.",
-            400
-          );
-        }
+        /* ========================================
+           EMAIL ALREADY IN USE
+        ======================================== */
 
-        if (
-          member.accountActivated ||
-          member.user
-        ) {
-          throw new AppError(
-            "This membership has already been activated.",
-            409
-          );
-        }
-
-        importedActivation =
-          true;
-      }
-
-      /* ========================================
-         NEW MEMBER FLOW
-      ======================================== */
-
-      if (!importedActivation) {
-        user =
+        const existingUser =
           await User.findOne({
             email:
               normalizedEmail,
           }).session(session);
 
-        if (!user) {
+        if (
+          existingUser &&
+          (
+            importedActivation ||
+            existingUser._id.toString() !==
+              user?._id.toString()
+          )
+        ) {
           throw new AppError(
-            "Account not found.",
-            404
+            409,
+            "Email address is already registered."
           );
         }
 
-        if (!user.emailVerified) {
-          throw new AppError(
-            "Please verify your email before creating a password.",
-            400
-          );
-        }
+        /* ========================================
+           IMPORTED MEMBER:
+           CREATE USER
+        ======================================== */
 
-        if (user.password) {
-          throw new AppError(
-            "Password has already been created.",
-            409
-          );
-        }
+        if (importedActivation) {
+          const [
+            createdUser,
+          ] =
+            await User.create(
+              [
+                {
+                  email:
+                    normalizedEmail,
 
-        member =
-          await Member.findOne({
-            user: user._id,
-          }).session(session);
+                  password:
+                    null,
 
-        if (!member) {
-          throw new AppError(
-            "Member profile not found.",
-            404
-          );
-        }
-      }
+                  role:
+                    "member",
 
-      /* ========================================
-         EMAIL ALREADY IN USE
-      ======================================== */
+                  isActive:
+                    true,
 
-      const existingUser =
-        await User.findOne({
-          email:
-            normalizedEmail,
-        }).session(session);
-
-      if (
-        existingUser &&
-        (
-          importedActivation ||
-          existingUser._id.toString() !==
-            user?._id.toString()
-        )
-      ) {
-        throw new AppError(
-          "Email address is already registered.",
-          409
-        );
-      }
-
-      /* ========================================
-         IMPORTED MEMBER:
-         CREATE USER
-      ======================================== */
-
-      if (importedActivation) {
-        const [
-          createdUser,
-        ] =
-          await User.create(
-            [
+                  emailVerified:
+                    true,
+                },
+              ],
               {
-                email:
-                  normalizedEmail,
+                session,
+              }
+            );
 
-                password: null,
+          user =
+            createdUser;
 
-                role:
-                  "member",
+          member.user =
+            user._id;
+        }
 
-                isActive:
-                  true,
+        /* ========================================
+           HASH PASSWORD
+        ======================================== */
 
-                /*
-                 * The email is being supplied
-                 * as part of account setup.
-                 *
-                 * Existing authentication requires
-                 * emailVerified=true for login.
-                 */
-                emailVerified:
-                  true,
-              },
-            ],
-            { session }
+        user.password =
+          await hashPassword(
+            password
           );
 
-        user =
-          createdUser;
+        user.isActive =
+          true;
 
-        member.user =
-          user._id;
-      }
+        user.emailVerified =
+          true;
 
-      /* ========================================
-         HASH PASSWORD
-      ======================================== */
+        /* ========================================
+           GENERATE MEMBERSHIP NUMBER
+        ======================================== */
 
-      user.password =
-        await hashPassword(
-          password
+        if (
+          !member.memberNumber
+        ) {
+          member.memberNumber =
+            await generateMembershipNumber(
+              member.county,
+              session
+            );
+        }
+
+        /*
+         * HARD SAFETY CHECK
+         *
+         * An activated account must NEVER be saved
+         * without a membership number.
+         */
+
+        if (
+          !member.memberNumber
+        ) {
+          throw new AppError(
+            500,
+            "Unable to assign a membership number. Your account has not been activated. Please try again."
+          );
+        }
+
+        /* ========================================
+           COMPLETE ACCOUNT SETUP
+        ======================================== */
+
+        member.accountActivated =
+          true;
+
+        if (!member.joinedAt) {
+          member.joinedAt =
+            new Date();
+        }
+
+        /* ========================================
+           SAVE USER + MEMBER
+        ======================================== */
+
+        await user.save({
+          session,
+        });
+
+        await member.save({
+          session,
+        });
+
+        /*
+         * Final invariant check before commit.
+         */
+
+        if (
+          !member.accountActivated ||
+          !member.memberNumber
+        ) {
+          throw new AppError(
+            500,
+            "Account activation could not be completed because a membership number was not assigned."
+          );
+        }
+
+        /* ========================================
+           LOG ACTIVITY
+        ======================================== */
+
+        await logActivity({
+          user:
+            user._id,
+
+          action:
+            ACTIVITY.AUTH
+              .ACCOUNT_ACTIVATED,
+
+          module:
+            ACTIVITY_MODULES.AUTH,
+
+          targetType:
+            TARGET_TYPES.MEMBER,
+
+          targetId:
+            member._id,
+
+          title:
+            importedActivation
+              ? "Imported Account Activated"
+              : "Account Activated",
+
+          description:
+            importedActivation
+              ? "Imported member completed account setup, created a password, and received a membership number."
+              : "Member completed account activation, created a password, and received a membership number.",
+
+          status:
+            "success",
+
+          session,
+        });
+
+        /* ========================================
+           COMMIT
+        ======================================== */
+
+        await session.commitTransaction();
+
+        /* ========================================
+           WELCOME EMAIL
+        ======================================== */
+
+        try {
+          await emailService.sendWelcomeEmail(
+            {
+              email:
+                user.email,
+
+              firstName:
+                member.firstName,
+            }
+          );
+        } catch (emailError) {
+          console.error(
+            "Welcome email failed:",
+            emailError
+          );
+        }
+
+        /* ========================================
+           AUTO LOGIN
+        ======================================== */
+
+        const token =
+          generateToken(
+            user._id
+          );
+
+        return buildAuthResponse(
+          user,
+          member,
+          token
         );
+      } catch (error) {
+        if (
+          session.inTransaction()
+        ) {
+          await session.abortTransaction();
+        }
 
-      user.isActive =
-        true;
+        /*
+         * If the membership-number unique index
+         * reports a collision, retry the complete
+         * transaction.
+         *
+         * The previous transaction has already been
+         * aborted, so the counter increment is also
+         * rolled back.
+         */
 
-      /*
-       * Existing new-member OTP flow has
-       * already verified the email.
-       *
-       * Imported flow marks the supplied
-       * account email as verified for the
-       * current authentication architecture.
-       */
-      user.emailVerified =
-        true;
+        if (
+          error?.code === 11000
+        ) {
+          const duplicateField =
+            Object.keys(
+              error.keyPattern || {}
+            )[0] ||
+            Object.keys(
+              error.keyValue || {}
+            )[0];
 
-      /* ========================================
-         GENERATE MEMBERSHIP NUMBER
-      ======================================== */
+          if (
+            duplicateField ===
+            "memberNumber"
+          ) {
+            if (
+              attempt <
+              MAX_ATTEMPTS
+            ) {
+              continue;
+            }
 
-      if (!member.memberNumber) {
-        member.memberNumber =
-          await generateMembershipNumber(
-            member.county,
-            session
-          );
-      }
-
-      /* ========================================
-         COMPLETE ACCOUNT SETUP
-      ======================================== */
-
-      member.accountActivated =
-        true;
-
-      if (!member.joinedAt) {
-        member.joinedAt =
-          new Date();
-      }
-
-      /*
-       * Imported members are not automatically
-       * marked as paid/active here.
-       *
-       * Their existing membership status is
-       * preserved.
-       */
-
-      await user.save({
-        session,
-      });
-
-      await member.save({
-        session,
-      });
-
-      /* ========================================
-         LOG ACTIVITY
-      ======================================== */
-
-      await logActivity({
-        user:
-          user._id,
-
-        action:
-          ACTIVITY.AUTH.ACCOUNT_ACTIVATED,
-
-        module:
-          ACTIVITY_MODULES.AUTH,
-
-        targetType:
-          TARGET_TYPES.MEMBER,
-
-        targetId:
-          member._id,
-
-        title:
-          importedActivation
-            ? "Imported Account Activated"
-            : "Account Activated",
-
-        description:
-          importedActivation
-            ? "Imported member completed account setup, created a password, and received a membership number."
-            : "Member completed account activation and created a password.",
-
-        status:
-          "success",
-
-        session,
-      });
-
-      /* ========================================
-         COMMIT
-      ======================================== */
-
-      await session.commitTransaction();
-
-      /* ========================================
-         WELCOME EMAIL
-      ======================================== */
-
-      try {
-        await emailService.sendWelcomeEmail(
-          {
-            email:
-              user.email,
-
-            firstName:
-              member.firstName,
+            throw new AppError(
+              409,
+              "We could not assign a unique membership number at this time. Please try again."
+            );
           }
-        );
-      } catch (emailError) {
-        console.error(
-          "Welcome email failed:",
-          emailError
-        );
+
+          if (
+            duplicateField ===
+            "email"
+          ) {
+            throw new AppError(
+              409,
+              "Email address is already registered."
+            );
+          }
+
+          if (
+            duplicateField ===
+            "phone"
+          ) {
+            throw new AppError(
+              409,
+              "Phone number is already registered."
+            );
+          }
+
+          if (
+            duplicateField ===
+            "nationalId"
+          ) {
+            throw new AppError(
+              409,
+              "National ID is already registered."
+            );
+          }
+
+          throw new AppError(
+            409,
+            "Some of the information provided is already registered."
+          );
+        }
+
+        if (
+          error?.name ===
+          "ValidationError"
+        ) {
+          const messages =
+            Object.values(
+              error.errors
+            )
+              .map(
+                (validationError) =>
+                  validationError.message
+              )
+              .filter(Boolean);
+
+          throw new AppError(
+            400,
+            messages.length
+              ? messages.join(", ")
+              : "Please check the information provided."
+          );
+        }
+
+        throw error;
+      } finally {
+        await session.endSession();
       }
-
-      /* ========================================
-         AUTO LOGIN
-      ======================================== */
-
-      const token =
-        generateToken(
-          user._id
-        );
-
-      return buildAuthResponse(
-        user,
-        member,
-        token
-      );
-    } catch (error) {
-      if (
-        session.inTransaction()
-      ) {
-        await session.abortTransaction();
-      }
-
-      throw error;
-    } finally {
-      await session.endSession();
     }
+
+    /*
+     * This point should never normally be reached.
+     */
+    throw new AppError(
+      500,
+      "Unable to complete account activation. Please try again."
+    );
   };
 
 /* ==========================================================
@@ -1283,15 +1638,15 @@ export const login = async (
 
   if (!identifier?.trim()) {
     throw new AppError(
-      "Email address or phone number is required.",
-      400
+      400,
+      "Email address or phone number is required."
     );
   }
 
   if (!password) {
     throw new AppError(
-      "Password is required.",
-      400
+      400,
+      "Password is required."
     );
   }
 
@@ -1317,7 +1672,6 @@ export const login = async (
   } else {
     /* ----------------------------------------
        PHONE LOGIN
-       NORMAL USER ACCOUNT
     ---------------------------------------- */
 
     const normalizedPhone =
@@ -1345,8 +1699,8 @@ export const login = async (
 
   if (!user) {
     throw new AppError(
-      "Invalid email/phone number or password.",
-      401
+      401,
+      "Invalid email/phone number or password."
     );
   }
 
@@ -1356,8 +1710,8 @@ export const login = async (
 
   if (!user.password) {
     throw new AppError(
-      "Please complete account activation first.",
-      400
+      400,
+      "Please complete account activation first."
     );
   }
 
@@ -1367,8 +1721,8 @@ export const login = async (
 
   if (!user.emailVerified) {
     throw new AppError(
-      "Please verify your email first.",
-      403
+      403,
+      "Please verify your email first."
     );
   }
 
@@ -1378,8 +1732,8 @@ export const login = async (
 
   if (!user.isActive) {
     throw new AppError(
-      "Your account has been deactivated.",
-      403
+      403,
+      "Your account has been deactivated."
     );
   }
 
@@ -1395,8 +1749,8 @@ export const login = async (
 
   if (!passwordMatches) {
     throw new AppError(
-      "Invalid email/phone number or password.",
-      401
+      401,
+      "Invalid email/phone number or password."
     );
   }
 
@@ -1412,8 +1766,8 @@ export const login = async (
 
   if (!member) {
     throw new AppError(
-      "Member profile not found.",
-      404
+      404,
+      "Member profile not found."
     );
   }
 
@@ -1465,10 +1819,6 @@ export const login = async (
       user._id
     );
 
-  /* ----------------------------------------
-     RESPONSE
-  ---------------------------------------- */
-
   return buildAuthResponse(
     user,
     member,
@@ -1486,6 +1836,13 @@ export const forgotPassword =
       email,
     } = data;
 
+    if (!email?.trim()) {
+      throw new AppError(
+        400,
+        "Email address is required."
+      );
+    }
+
     const normalizedEmail =
       email.toLowerCase().trim();
 
@@ -1497,13 +1854,13 @@ export const forgotPassword =
 
     /*
      * SECURITY:
-     * Never reveal whether an
-     * account exists.
+     * Never reveal whether an account exists.
      */
 
     if (!user) {
       return {
-        success: true,
+        success:
+          true,
 
         message:
           "If the account exists, a verification code has been sent.",
@@ -1518,15 +1875,15 @@ export const forgotPassword =
 
     if (!user.password) {
       throw new AppError(
-        "Please complete account activation first.",
-        400
+        400,
+        "Please complete account activation first."
       );
     }
 
     if (!user.emailVerified) {
       throw new AppError(
-        "Email address has not been verified.",
-        400
+        400,
+        "Email address has not been verified."
       );
     }
 
@@ -1617,6 +1974,34 @@ export const resetPassword =
         password,
       } = data;
 
+      if (!email?.trim()) {
+        throw new AppError(
+          400,
+          "Email address is required."
+        );
+      }
+
+      if (!otp) {
+        throw new AppError(
+          400,
+          "Verification code is required."
+        );
+      }
+
+      if (!password) {
+        throw new AppError(
+          400,
+          "Password is required."
+        );
+      }
+
+      if (password.length < 8) {
+        throw new AppError(
+          400,
+          "Password must be at least 8 characters long."
+        );
+      }
+
       const normalizedEmail =
         email.toLowerCase().trim();
 
@@ -1628,8 +2013,8 @@ export const resetPassword =
 
       if (!user) {
         throw new AppError(
-          "Account not found.",
-          404
+          404,
+          "Account not found."
         );
       }
 
@@ -1668,8 +2053,8 @@ export const resetPassword =
 
       if (!member) {
         throw new AppError(
-          "Member profile not found.",
-          404
+          404,
+          "Member profile not found."
         );
       }
 
@@ -1728,6 +2113,220 @@ export const resetPassword =
   };
 
 /* ==========================================================
+   REPAIR MISSING MEMBERSHIP NUMBERS
+   ADMIN / MAINTENANCE FUNCTION
+========================================================== */
+
+export const repairMissingMembershipNumbers =
+  async () => {
+    const members =
+      await Member.find({
+        accountActivated:
+          true,
+
+        $or: [
+          {
+            memberNumber: {
+              $exists: false,
+            },
+          },
+
+          {
+            memberNumber:
+              null,
+          },
+
+          {
+            memberNumber:
+              "",
+          },
+        ],
+      }).sort({
+        createdAt:
+          1,
+      });
+
+    const repaired = [];
+    const skipped = [];
+    const failed = [];
+
+    for (const member of members) {
+      const session =
+        await startTransaction();
+
+      try {
+        /*
+         * Re-read the member inside the transaction
+         * so that another admin process cannot cause
+         * us to overwrite a number that was just assigned.
+         */
+
+        const currentMember =
+          await Member.findById(
+            member._id
+          ).session(session);
+
+        if (!currentMember) {
+          skipped.push({
+            memberId:
+              member._id,
+
+            reason:
+              "Member no longer exists.",
+          });
+
+          await session.abortTransaction();
+
+          continue;
+        }
+
+        if (
+          currentMember.memberNumber
+        ) {
+          skipped.push({
+            memberId:
+              currentMember._id,
+
+            memberNumber:
+              currentMember.memberNumber,
+
+            reason:
+              "Membership number already assigned.",
+          });
+
+          await session.abortTransaction();
+
+          continue;
+        }
+
+        if (
+          !currentMember.accountActivated
+        ) {
+          skipped.push({
+            memberId:
+              currentMember._id,
+
+            reason:
+              "Member account is not activated.",
+          });
+
+          await session.abortTransaction();
+
+          continue;
+        }
+
+        /* ----------------------------------------
+           GENERATE NUMBER
+        ---------------------------------------- */
+
+        const memberNumber =
+          await generateMembershipNumber(
+            currentMember.county,
+            session
+          );
+
+        if (!memberNumber) {
+          throw new Error(
+            "Membership number generation failed."
+          );
+        }
+
+        /* ----------------------------------------
+           ASSIGN NUMBER
+        ---------------------------------------- */
+
+        currentMember.memberNumber =
+          memberNumber;
+
+        await currentMember.save({
+          session,
+        });
+
+        /*
+         * Final safety check.
+         */
+
+        if (
+          !currentMember.memberNumber
+        ) {
+          throw new Error(
+            "Membership number was not saved."
+          );
+        }
+
+        await session.commitTransaction();
+
+        repaired.push({
+          memberId:
+            currentMember._id,
+
+          name:
+            `${currentMember.firstName} ${currentMember.lastName}`,
+
+          county:
+            currentMember.county,
+
+          memberNumber,
+        });
+      } catch (error) {
+        if (
+          session.inTransaction()
+        ) {
+          await session.abortTransaction();
+        }
+
+        /*
+         * A duplicate memberNumber should normally
+         * be prevented by generateMembershipNumber().
+         *
+         * If it nevertheless happens, report it rather
+         * than overwriting an existing member number.
+         */
+
+        failed.push({
+          memberId:
+            member._id,
+
+          name:
+            `${member.firstName} ${member.lastName}`,
+
+          county:
+            member.county,
+
+          error:
+            error?.message ||
+            "Unable to assign membership number.",
+        });
+      } finally {
+        await session.endSession();
+      }
+    }
+
+    return {
+      success:
+        true,
+
+      totalFound:
+        members.length,
+
+      repairedCount:
+        repaired.length,
+
+      skippedCount:
+        skipped.length,
+
+      failedCount:
+        failed.length,
+
+      repaired,
+
+      skipped,
+
+      failed,
+    };
+  };
+
+/* ==========================================================
    LOGOUT
 ========================================================== */
 
@@ -1767,7 +2366,8 @@ export const logout = async (
   }
 
   return {
-    success: true,
+    success:
+      true,
 
     message:
       "Logged out successfully.",

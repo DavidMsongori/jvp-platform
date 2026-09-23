@@ -6,6 +6,9 @@ import Payment from "../models/Payment.js";
 import EventRegistration from "../models/eventRegistration.model.js";
 
 import AppError from "../utils/AppError.js";
+import {
+  generateMembershipNumber,
+} from "../utils/membershipNumber.js";
 
 import {
   logActivity,
@@ -92,10 +95,6 @@ export const getMembers = async (query = {}) => {
      MEMBER FILTERS
   ====================================================== */
 
-  /*
-   * Only genuine/current JVP Connect members appear
-   * in the main Members table.
-   */
   const memberFilters = {
     ...genuineMemberFilter,
   };
@@ -163,10 +162,6 @@ export const getMembers = async (query = {}) => {
       },
     ];
 
-    /*
-     * Remove the top-level $or because the $and now
-     * contains the complete membership definition.
-     */
     delete memberFilters.$or;
   }
 
@@ -215,10 +210,6 @@ export const getMembers = async (query = {}) => {
       .limit(pageSize)
       .lean();
 
-  /*
-   * When user filters are applied through populate(),
-   * members whose user does not match are removed.
-   */
   const filteredMembers =
     members.filter(
       (member) => member.user
@@ -234,56 +225,36 @@ export const getMembers = async (query = {}) => {
     newMembers,
     expiredMembers,
   ] = await Promise.all([
-    /*
-     * Imported members who activated their accounts.
-     */
     Member.countDocuments({
       source: "imported",
       accountActivated: true,
     }),
 
-    /*
-     * Imported members still awaiting activation.
-     */
     Member.countDocuments({
       source: "imported",
       accountActivated: false,
     }),
 
-    /*
-     * New members who actually paid and became active.
-     */
     Member.countDocuments({
       source: "new",
       membershipStatus: "active",
       membershipFeePaid: true,
     }),
 
-    /*
-     * Expired memberships.
-     */
     Member.countDocuments({
       membershipStatus: "expired",
     }),
   ]);
 
-  /*
-   * Total members follows the same definition as
-   * the Admin Dashboard.
-   */
   const totalMembers =
     activatedMembers +
     newMembers;
 
   const summary = {
     totalMembers,
-
     activatedMembers,
-
     importedMembers,
-
     newMembers,
-
     expiredMembers,
   };
 
@@ -298,9 +269,7 @@ export const getMembers = async (query = {}) => {
 
     pagination: {
       page: pageNumber,
-
       limit: pageSize,
-
       total,
 
       totalPages:
@@ -334,8 +303,8 @@ export const getMemberById = async (
     )
   ) {
     throw new AppError(
-      "Invalid member ID.",
-      400
+      400,
+      "Invalid member ID."
     );
   }
 
@@ -358,8 +327,8 @@ export const getMemberById = async (
 
   if (!member) {
     throw new AppError(
-      "Member not found.",
-      404
+      404,
+      "Member not found."
     );
   }
 
@@ -380,8 +349,8 @@ export const getMemberProfile = async (
     )
   ) {
     throw new AppError(
-      "Invalid member ID.",
-      400
+      400,
+      "Invalid member ID."
     );
   }
 
@@ -404,8 +373,8 @@ export const getMemberProfile = async (
 
   if (!member) {
     throw new AppError(
-      "Member not found.",
-      404
+      404,
+      "Member not found."
     );
   }
 
@@ -501,16 +470,11 @@ export const getMemberProfile = async (
   const paymentSummary =
     payments.reduce(
       (summary, payment) => {
-        /*
-         * Only successful payments are treated as
-         * completed payments.
-         */
         if (
           payment.status ===
           "successful"
         ) {
           summary.totalPayments++;
-
           summary.successfulPayments++;
 
           summary.totalAmountPaid +=
@@ -695,8 +659,8 @@ export const updateMember = async (
     )
   ) {
     throw new AppError(
-      "Invalid member ID.",
-      400
+      400,
+      "Invalid member ID."
     );
   }
 
@@ -713,8 +677,8 @@ export const updateMember = async (
 
         if (!member) {
           throw new AppError(
-            "Member not found.",
-            404
+            404,
+            "Member not found."
           );
         }
 
@@ -770,8 +734,8 @@ export const updateMember = async (
             .length === 0
         ) {
           throw new AppError(
-            "No changes were provided.",
-            400
+            400,
+            "No changes were provided."
           );
         }
 
@@ -790,7 +754,7 @@ export const updateMember = async (
           targetId:
             member._id,
           description:
-            `Updated member ${member.memberNumber}.`,
+            `Updated member ${member.memberNumber || "without membership number"}.`,
           changes,
           session,
         });
@@ -802,7 +766,7 @@ export const updateMember = async (
     );
 
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };
 
@@ -821,8 +785,8 @@ export const activateMember = async (
     )
   ) {
     throw new AppError(
-      "Invalid member ID.",
-      400
+      400,
+      "Invalid member ID."
     );
   }
 
@@ -839,8 +803,8 @@ export const activateMember = async (
 
         if (!member) {
           throw new AppError(
-            "Member not found.",
-            404
+            404,
+            "Member not found."
           );
         }
 
@@ -851,8 +815,8 @@ export const activateMember = async (
 
         if (!user) {
           throw new AppError(
-            "User account not found.",
-            404
+            404,
+            "User account not found."
           );
         }
 
@@ -861,11 +825,51 @@ export const activateMember = async (
           member.membershipStatus ===
             "active"
         ) {
-          throw new AppError(
-            "Member is already active.",
-            400
-          );
+          /*
+           * IMPORTANT:
+           * Even if the member is already active,
+           * repair a missing membership number instead
+           * of silently leaving the account incomplete.
+           */
+          if (!member.memberNumber) {
+            member.memberNumber =
+              await generateMembershipNumber(
+                member.county,
+                session
+              );
+
+            await member.save({
+              session,
+            });
+          }
+
+          return;
         }
+
+        /* ==================================================
+           ENSURE MEMBERSHIP NUMBER EXISTS
+        ================================================== */
+
+        /*
+         * This is the key fix.
+         *
+         * Admin activation must NEVER activate a member
+         * without a membership number.
+         *
+         * Existing numbers are preserved.
+         * A new number is generated only when missing.
+         */
+        if (!member.memberNumber) {
+          member.memberNumber =
+            await generateMembershipNumber(
+              member.county,
+              session
+            );
+        }
+
+        /* ==================================================
+           ACTIVATE MEMBER
+        ================================================== */
 
         member.accountActivated =
           true;
@@ -905,7 +909,7 @@ export const activateMember = async (
     );
 
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };
 
@@ -924,8 +928,8 @@ export const deactivateMember = async (
     )
   ) {
     throw new AppError(
-      "Invalid member ID.",
-      400
+      400,
+      "Invalid member ID."
     );
   }
 
@@ -942,8 +946,8 @@ export const deactivateMember = async (
 
         if (!member) {
           throw new AppError(
-            "Member not found.",
-            404
+            404,
+            "Member not found."
           );
         }
 
@@ -954,8 +958,8 @@ export const deactivateMember = async (
 
         if (!user) {
           throw new AppError(
-            "User account not found.",
-            404
+            404,
+            "User account not found."
           );
         }
 
@@ -964,8 +968,8 @@ export const deactivateMember = async (
           "inactive"
         ) {
           throw new AppError(
-            "Member is already inactive.",
-            400
+            400,
+            "Member is already inactive."
           );
         }
 
@@ -993,7 +997,7 @@ export const deactivateMember = async (
           targetId:
             member._id,
           description:
-            `Deactivated member ${member.memberNumber}.`,
+            `Deactivated member ${member.memberNumber || "without membership number"}.`,
           session,
         });
       }
@@ -1004,7 +1008,7 @@ export const deactivateMember = async (
     );
 
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };
 
@@ -1023,8 +1027,8 @@ export const deleteMember = async (
     )
   ) {
     throw new AppError(
-      "Invalid member ID.",
-      400
+      400,
+      "Invalid member ID."
     );
   }
 
@@ -1041,8 +1045,8 @@ export const deleteMember = async (
 
         if (!member) {
           throw new AppError(
-            "Member not found.",
-            404
+            404,
+            "Member not found."
           );
         }
 
@@ -1053,8 +1057,8 @@ export const deleteMember = async (
 
         if (!user) {
           throw new AppError(
-            "User account not found.",
-            404
+            404,
+            "User account not found."
           );
         }
 
@@ -1063,15 +1067,15 @@ export const deleteMember = async (
           "super_admin"
         ) {
           throw new AppError(
-            "Super Admin accounts cannot be deleted.",
-            403
+            403,
+            "Super Admin accounts cannot be deleted."
           );
         }
 
         if (member.isDeleted) {
           throw new AppError(
-            "Member has already been deleted.",
-            400
+            400,
+            "Member has already been deleted."
           );
         }
 
@@ -1101,7 +1105,7 @@ export const deleteMember = async (
           targetId:
             member._id,
           description:
-            `Deleted member ${member.memberNumber}.`,
+            `Deleted member ${member.memberNumber || "without membership number"}.`,
           session,
         });
       }
@@ -1114,6 +1118,6 @@ export const deleteMember = async (
     };
 
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };
