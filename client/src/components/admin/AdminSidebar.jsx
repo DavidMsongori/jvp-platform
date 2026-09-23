@@ -15,6 +15,7 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaTimes,
+  FaVoteYea,
 } from "react-icons/fa";
 
 import { PERMISSIONS } from "../../utils/permissions";
@@ -122,6 +123,17 @@ function AdminSidebar({
       icon: <FaUserTie />,
       path: "/admin/leadership",
       permission: PERMISSIONS.VIEW_MEMBERS,
+    },
+
+    /* ========================================
+       ELECTIONS
+    ======================================== */
+
+    {
+      name: "Elections",
+      icon: <FaVoteYea />,
+      path: "/admin/elections",
+      permission: PERMISSIONS.MANAGE_ELECTIONS,
     },
 
     {

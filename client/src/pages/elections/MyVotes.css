@@ -1,0 +1,655 @@
+/* =========================================================
+   MY VOTES PAGE
+========================================================= */
+
+.my-votes-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  padding: 32px 20px 70px;
+  color: #172033;
+}
+
+.my-votes-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.my-votes-header {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(
+    135deg,
+    #071d35 0%,
+    #0c3158 55%,
+    #10456f 100%
+  );
+  padding: 42px 46px;
+  margin-bottom: 24px;
+  box-shadow: 0 14px 35px rgba(7, 29, 53, 0.15);
+}
+
+.my-votes-header::before {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  right: -80px;
+  top: -120px;
+}
+
+.my-votes-header::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+  right: 70px;
+  bottom: -130px;
+}
+
+.my-votes-header-content {
+  position: relative;
+  z-index: 2;
+}
+
+.my-votes-back-btn {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  padding: 0;
+  margin-bottom: 32px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.my-votes-back-btn:hover {
+  color: #ffffff;
+}
+
+.my-votes-eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #7fd4ff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.my-votes-header h1 {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.my-votes-header p {
+  max-width: 680px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.my-votes-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  border-radius: 14px;
+  padding: 17px 20px;
+  margin-bottom: 24px;
+}
+
+.my-votes-alert-error {
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #991b1b;
+}
+
+.my-votes-alert-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.my-votes-alert strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.my-votes-alert p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.my-votes-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 42px;
+}
+
+.my-votes-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 110px;
+  padding: 22px;
+  border: 1px solid #e5e9f1;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 7px 22px rgba(15, 23, 42, 0.05);
+}
+
+.my-votes-summary-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  background: #edf6ff;
+  font-size: 24px;
+}
+
+.my-votes-summary-card span {
+  display: block;
+  margin-bottom: 5px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.my-votes-summary-card strong {
+  display: block;
+  color: #10243d;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.my-votes-content {
+  margin-bottom: 30px;
+}
+
+.my-votes-section-heading {
+  margin-bottom: 22px;
+}
+
+.my-votes-section-heading > div {
+  max-width: 700px;
+}
+
+.my-votes-section-heading span {
+  display: block;
+  margin-bottom: 7px;
+  color: #0d6ead;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.my-votes-section-heading h2 {
+  margin: 0 0 8px;
+  color: #142238;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.my-votes-section-heading p {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   VOTE LIST
+========================================================= */
+
+.my-votes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.my-vote-card {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid #e4e8ef;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.my-vote-card:hover {
+  transform: translateY(-2px);
+  border-color: #cfd8e6;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+}
+
+.my-vote-number {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 0 0 76px;
+  width: 76px;
+  padding-top: 29px;
+  background: #f7f9fc;
+  border-right: 1px solid #e8ebf0;
+  color: #9aa4b2;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.my-vote-main {
+  flex: 1;
+  min-width: 0;
+  padding: 27px 30px 24px;
+}
+
+/* =========================================================
+   VOTE TOP
+========================================================= */
+
+.my-vote-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.my-vote-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #8a94a4;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.my-vote-top h3 {
+  margin: 0;
+  color: #17243a;
+  font-size: 20px;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+.my-vote-confirmed {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #ecfdf3;
+  color: #087443;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   VOTE DETAILS
+========================================================= */
+
+.my-vote-details {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 20px 0;
+  border-top: 1px solid #edf0f4;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.my-vote-detail span {
+  display: block;
+  margin-bottom: 6px;
+  color: #8a94a4;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.my-vote-detail strong {
+  display: block;
+  color: #27354a;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+/* =========================================================
+   LOCATION
+========================================================= */
+
+.my-vote-location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.my-vote-location span:first-child {
+  font-size: 14px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.my-vote-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.my-vote-reference {
+  min-height: 32px;
+}
+
+.my-vote-reference span {
+  display: block;
+  margin-bottom: 3px;
+  color: #9aa3b1;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.my-vote-reference strong {
+  color: #596579;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.my-vote-view-btn {
+  border: none;
+  border-radius: 9px;
+  background: #0d6ead;
+  color: #ffffff;
+  padding: 10px 15px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.my-vote-view-btn:hover {
+  background: #095985;
+  transform: translateX(2px);
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.my-votes-empty {
+  padding: 65px 30px;
+  border: 1px dashed #ccd4df;
+  border-radius: 20px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.my-votes-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 18px;
+  border-radius: 20px;
+  background: #edf6ff;
+  font-size: 30px;
+}
+
+.my-votes-empty h3 {
+  margin: 0 0 8px;
+  color: #1c2a3d;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.my-votes-empty p {
+  max-width: 540px;
+  margin: 0 auto 24px;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.my-votes-primary-btn {
+  border: none;
+  border-radius: 10px;
+  background: #0d6ead;
+  color: #ffffff;
+  padding: 12px 19px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.my-votes-primary-btn:hover {
+  background: #095985;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   INFORMATION
+========================================================= */
+
+.my-votes-information {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 24px;
+  border: 1px solid #dce9f5;
+  border-radius: 17px;
+  background: #f5faff;
+}
+
+.my-votes-information-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #e3f1fc;
+  font-size: 19px;
+}
+
+.my-votes-information h3 {
+  margin: 1px 0 6px;
+  color: #19324c;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.my-votes-information p {
+  max-width: 850px;
+  margin: 0;
+  color: #607287;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.my-votes-loading {
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.my-votes-loading p {
+  margin-top: 15px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.my-votes-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid #dce4ed;
+  border-top-color: #0d6ead;
+  border-radius: 50%;
+  animation: myVotesSpin 0.8s linear infinite;
+}
+
+@keyframes myVotesSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+  .my-votes-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .my-vote-details {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .my-votes-page {
+    padding: 20px 14px 50px;
+  }
+
+  .my-votes-header {
+    padding: 30px 24px;
+    border-radius: 18px;
+  }
+
+  .my-votes-header h1 {
+    font-size: 34px;
+  }
+
+  .my-votes-main {
+    padding: 22px 20px;
+  }
+
+  .my-vote-number {
+    display: none;
+  }
+
+  .my-vote-top {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .my-vote-confirmed {
+    align-self: flex-start;
+  }
+
+  .my-vote-details {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .my-vote-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .my-vote-view-btn {
+    width: 100%;
+  }
+
+  .my-votes-information {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-votes-page {
+    padding: 14px 10px 40px;
+  }
+
+  .my-votes-header {
+    padding: 25px 20px;
+  }
+
+  .my-votes-header p {
+    font-size: 14px;
+  }
+
+  .my-votes-summary-card {
+    min-height: 90px;
+  }
+
+  .my-votes-section-heading h2 {
+    font-size: 24px;
+  }
+
+  .my-vote-main {
+    padding: 20px 17px;
+  }
+
+  .my-vote-top h3 {
+    font-size: 17px;
+  }
+}

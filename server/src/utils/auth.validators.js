@@ -37,11 +37,12 @@ const OTP_PURPOSES = [
 ========================================================== */
 
 export const registerValidator = [
-
   body("firstName")
     .trim()
     .notEmpty()
-    .withMessage("First name is required."),
+    .withMessage(
+      "First name is required."
+    ),
 
   body("middleName")
     .optional()
@@ -50,100 +51,150 @@ export const registerValidator = [
   body("lastName")
     .trim()
     .notEmpty()
-    .withMessage("Last name is required."),
+    .withMessage(
+      "Last name is required."
+    ),
 
   body("gender")
     .trim()
     .notEmpty()
-    .withMessage("Gender is required.")
+    .withMessage(
+      "Gender is required."
+    )
     .isIn(GENDERS)
-    .withMessage("Invalid gender."),
+    .withMessage(
+      "Invalid gender."
+    ),
 
   body("dateOfBirth")
     .notEmpty()
-    .withMessage("Date of birth is required.")
+    .withMessage(
+      "Date of birth is required."
+    )
     .isISO8601()
-    .withMessage("Invalid date of birth."),
+    .withMessage(
+      "Invalid date of birth."
+    ),
 
   body("nationalId")
     .trim()
     .notEmpty()
-    .withMessage("National ID is required.")
+    .withMessage(
+      "National ID is required."
+    )
     .isLength({
       min: 6,
       max: 20,
     }),
 
- body("phone")
-  .trim()
-  .notEmpty()
-  .withMessage("Phone number is required.")
-  .customSanitizer((value) => {
-    let phone = String(value)
-      .replace(/\s+/g, "")
-      .replace(/-/g, "")
-      .replace(/^\+/, "");
-
-    if (
-      phone.startsWith("07") ||
-      phone.startsWith("01")
-    ) {
-      phone = `254${phone.slice(1)}`;
-    }
-
-    return phone;
-  })
-  .matches(/^254(?:7|1)\d{8}$/)
-  .withMessage(
-    "Invalid Kenyan phone number. Use 07XXXXXXXX, 01XXXXXXXX, 2547XXXXXXXX, or 2541XXXXXXXX."
-  ),
-  
-  body("occupation")
-    .trim()
-    .notEmpty()
-    .withMessage("Occupation is required."),
-
-  body("county")
-    .notEmpty()
-    .withMessage("County is required.")
-    .isIn(COUNTIES)
-    .withMessage("Invalid county."),
-
-  body("membershipType")
-    .notEmpty()
-    .withMessage("Membership type is required.")
-    .isIn(MEMBERSHIP_TYPES)
-    .withMessage("Invalid membership type."),
-
-  body("email")
-    .trim()
-    .notEmpty()
-    .withMessage("Email is required.")
-    .isEmail()
-    .withMessage("Invalid email.")
-    .normalizeEmail(),
-
-];
-
-/* ==========================================
-   ACTIVATE EXISTING MEMBER
-========================================== */
-
-export const activateExistingMemberValidator = [
-
   body("phone")
     .trim()
     .notEmpty()
-    .withMessage("Phone number is required."),
+    .withMessage(
+      "Phone number is required."
+    )
+    .customSanitizer((value) => {
+      let phone = String(value)
+        .replace(/\s+/g, "")
+        .replace(/-/g, "")
+        .replace(/^\+/, "");
+
+      if (
+        phone.startsWith("07") ||
+        phone.startsWith("01")
+      ) {
+        phone =
+          `254${phone.slice(1)}`;
+      }
+
+      return phone;
+    })
+    .matches(
+      /^254(?:7|1)\d{8}$/
+    )
+    .withMessage(
+      "Invalid Kenyan phone number. Use 07XXXXXXXX, 01XXXXXXXX, 2547XXXXXXXX, or 2541XXXXXXXX."
+    ),
+
+  body("occupation")
+    .trim()
+    .notEmpty()
+    .withMessage(
+      "Occupation is required."
+    ),
+
+  body("county")
+    .notEmpty()
+    .withMessage(
+      "County is required."
+    )
+    .isIn(COUNTIES)
+    .withMessage(
+      "Invalid county."
+    ),
+
+  body("membershipType")
+    .notEmpty()
+    .withMessage(
+      "Membership type is required."
+    )
+    .isIn(MEMBERSHIP_TYPES)
+    .withMessage(
+      "Invalid membership type."
+    ),
 
   body("email")
     .trim()
     .notEmpty()
-    .withMessage("Email is required.")
+    .withMessage(
+      "Email is required."
+    )
     .isEmail()
-    .withMessage("Please provide a valid email.")
+    .withMessage(
+      "Invalid email."
+    )
     .normalizeEmail(),
+];
 
+/* ==========================================================
+   IMPORTED MEMBER ACTIVATION
+========================================================== */
+
+export const activateExistingMemberValidator = [
+  body("phone")
+    .trim()
+    .notEmpty()
+    .withMessage(
+      "Phone number is required."
+    )
+    .customSanitizer((value) => {
+      let phone = String(value)
+        .replace(/\s+/g, "")
+        .replace(/-/g, "")
+        .replace(/^\+/, "");
+
+      if (
+        phone.startsWith("07") ||
+        phone.startsWith("01")
+      ) {
+        phone =
+          `254${phone.slice(1)}`;
+      }
+
+      return phone;
+    })
+    .matches(
+      /^254(?:7|1)\d{8}$/
+    )
+    .withMessage(
+      "Invalid Kenyan phone number."
+    ),
+
+  body("password")
+    .notEmpty()
+    .withMessage(
+      "Default password is required."
+    ),
 ];
 
 /* ==========================================================
@@ -151,31 +202,45 @@ export const activateExistingMemberValidator = [
 ========================================================== */
 
 export const verifyOTPValidator = [
-
   body("email")
     .trim()
     .notEmpty()
-    .withMessage("Email is required.")
+    .withMessage(
+      "Email is required."
+    )
     .isEmail()
-    .withMessage("Invalid email.")
+    .withMessage(
+      "Invalid email."
+    )
     .normalizeEmail(),
 
   body("code")
     .trim()
     .notEmpty()
-    .withMessage("OTP code is required.")
+    .withMessage(
+      "OTP code is required."
+    )
     .isLength({
       min: 6,
       max: 6,
     })
-    .withMessage("OTP must contain 6 digits."),
+    .withMessage(
+      "OTP must contain 6 digits."
+    )
+    .isNumeric()
+    .withMessage(
+      "OTP must contain only numbers."
+    ),
 
   body("purpose")
     .notEmpty()
-    .withMessage("OTP purpose is required.")
+    .withMessage(
+      "OTP purpose is required."
+    )
     .isIn(OTP_PURPOSES)
-    .withMessage("Invalid OTP purpose."),
-
+    .withMessage(
+      "Invalid OTP purpose."
+    ),
 ];
 
 /* ==========================================================
@@ -183,21 +248,27 @@ export const verifyOTPValidator = [
 ========================================================== */
 
 export const resendOTPValidator = [
-
   body("email")
     .trim()
     .notEmpty()
-    .withMessage("Email is required.")
+    .withMessage(
+      "Email is required."
+    )
     .isEmail()
-    .withMessage("Invalid email.")
+    .withMessage(
+      "Invalid email."
+    )
     .normalizeEmail(),
 
   body("purpose")
     .notEmpty()
-    .withMessage("OTP purpose is required.")
+    .withMessage(
+      "OTP purpose is required."
+    )
     .isIn(OTP_PURPOSES)
-    .withMessage("Invalid OTP purpose."),
-
+    .withMessage(
+      "Invalid OTP purpose."
+    ),
 ];
 
 /* ==========================================================
@@ -205,14 +276,31 @@ export const resendOTPValidator = [
 ========================================================== */
 
 export const createPasswordValidator = [
+  body("setupToken")
+    .optional()
+    .trim()
+    .isString()
+    .withMessage(
+      "Invalid password setup token."
+    ),
 
   body("email")
     .trim()
+    .notEmpty()
+    .withMessage(
+      "Email is required."
+    )
     .isEmail()
-    .withMessage("Invalid email.")
+    .withMessage(
+      "Invalid email."
+    )
     .normalizeEmail(),
 
   body("password")
+    .notEmpty()
+    .withMessage(
+      "Password is required."
+    )
     .isLength({
       min: 8,
     })
@@ -221,20 +309,22 @@ export const createPasswordValidator = [
     ),
 
   body("confirmPassword")
+    .notEmpty()
+    .withMessage(
+      "Please confirm your password."
+    )
     .custom((value, { req }) => {
-
-      if (value !== req.body.password) {
-
+      if (
+        value !==
+        req.body.password
+      ) {
         throw new Error(
           "Passwords do not match."
         );
-
       }
 
       return true;
-
     }),
-
 ];
 
 /* ==========================================================
@@ -242,7 +332,6 @@ export const createPasswordValidator = [
 ========================================================== */
 
 export const loginValidator = [
-
   body("identifier")
     .trim()
     .notEmpty()
@@ -252,8 +341,9 @@ export const loginValidator = [
 
   body("password")
     .notEmpty()
-    .withMessage("Password is required."),
-
+    .withMessage(
+      "Password is required."
+    ),
 ];
 
 /* ==========================================================
@@ -261,15 +351,17 @@ export const loginValidator = [
 ========================================================== */
 
 export const forgotPasswordValidator = [
-
   body("email")
     .trim()
     .notEmpty()
-    .withMessage("Email is required.")
+    .withMessage(
+      "Email is required."
+    )
     .isEmail()
-    .withMessage("Invalid email.")
+    .withMessage(
+      "Invalid email."
+    )
     .normalizeEmail(),
-
 ];
 
 /* ==========================================================
@@ -277,45 +369,63 @@ export const forgotPasswordValidator = [
 ========================================================== */
 
 export const resetPasswordValidator = [
-
   body("email")
     .trim()
     .notEmpty()
-    .withMessage("Email is required.")
+    .withMessage(
+      "Email is required."
+    )
     .isEmail()
-    .withMessage("Please provide a valid email.")
+    .withMessage(
+      "Please provide a valid email."
+    )
     .normalizeEmail(),
 
   body("code")
     .trim()
     .notEmpty()
-    .withMessage("OTP code is required.")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("OTP must be exactly 6 digits.")
+    .withMessage(
+      "OTP code is required."
+    )
+    .isLength({
+      min: 6,
+      max: 6,
+    })
+    .withMessage(
+      "OTP must be exactly 6 digits."
+    )
     .isNumeric()
-    .withMessage("OTP must contain only numbers."),
+    .withMessage(
+      "OTP must contain only numbers."
+    ),
 
   body("password")
     .notEmpty()
-    .withMessage("Password is required.")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters."),
+    .withMessage(
+      "Password is required."
+    )
+    .isLength({
+      min: 8,
+    })
+    .withMessage(
+      "Password must be at least 8 characters."
+    ),
 
   body("confirmPassword")
     .notEmpty()
-    .withMessage("Please confirm your password.")
+    .withMessage(
+      "Please confirm your password."
+    )
     .custom((value, { req }) => {
-
-      if (value !== req.body.password) {
-
+      if (
+        value !==
+        req.body.password
+      ) {
         throw new Error(
           "Passwords do not match."
         );
-
       }
 
       return true;
-
     }),
-
 ];

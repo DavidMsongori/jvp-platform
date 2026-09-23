@@ -9,6 +9,7 @@ import {
   LogOut,
   Shield,
   X,
+  Vote,
 } from "lucide-react";
 
 import {
@@ -60,6 +61,11 @@ const Sidebar = ({
       name: "Events",
       icon: CalendarDays,
       path: "/dashboard/events",
+    },
+    {
+      name: "Elections",
+      icon: Vote,
+      path: "/dashboard/elections",
     },
     {
       name: "Programs",
@@ -164,9 +170,7 @@ const Sidebar = ({
                 "/dashboard"
               }
               onClick={onClose}
-              className={({
-                isActive,
-              }) =>
+              className={({ isActive }) =>
                 isActive
                   ? "sidebar-link active"
                   : "sidebar-link"

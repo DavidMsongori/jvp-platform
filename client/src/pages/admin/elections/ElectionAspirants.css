@@ -1,0 +1,1251 @@
+/* ==========================================================
+   ELECTION ASPIRANTS
+========================================================== */
+
+.election-aspirants-page {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 30px;
+  color: #17211b;
+}
+
+
+/* ==========================================================
+   PAGE HEADER
+========================================================== */
+
+.aspirants-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.aspirants-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.aspirants-back-button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  margin-top: 4px;
+  border: 1px solid #dfe7e1;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #164d31;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.aspirants-back-button:hover {
+  background: #f4f8f5;
+  border-color: #cbd9cf;
+  transform: translateX(-2px);
+}
+
+.aspirants-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: #b58a22;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.aspirants-page-header h1 {
+  margin: 0;
+  color: #123d28;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.aspirants-page-header p {
+  margin: 8px 0 0;
+  color: #68746d;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   ALERT
+========================================================== */
+
+.aspirants-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px solid #efcaca;
+  border-radius: 13px;
+  background: #fff8f8;
+  color: #8f2727;
+}
+
+.aspirants-alert-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #f9dddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aspirants-alert strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 13px;
+}
+
+.aspirants-alert p {
+  margin: 0;
+  color: #9b4b4b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.aspirants-alert > button {
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: #a25c5c;
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   STATISTICS
+========================================================== */
+
+.aspirants-stat-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.aspirant-stat-card {
+  min-height: 108px;
+  padding: 20px;
+  border: 1px solid #e3eae5;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow:
+    0 5px 20px rgba(17, 51, 31, 0.045);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.aspirant-stat-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.aspirant-stat-icon.total {
+  background: #edf5f0;
+  color: #17633b;
+}
+
+.aspirant-stat-icon.approved {
+  background: #edf8f0;
+  color: #287a43;
+}
+
+.aspirant-stat-icon.pending {
+  background: #fff7e5;
+  color: #a97608;
+}
+
+.aspirant-stat-icon.rejected {
+  background: #fff0f0;
+  color: #a93737;
+}
+
+.aspirant-stat-card span {
+  display: block;
+  margin-bottom: 5px;
+  color: #718078;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.aspirant-stat-card strong {
+  color: #153f29;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+
+/* ==========================================================
+   TOOLBAR
+========================================================== */
+
+.aspirants-toolbar {
+  padding: 18px;
+  margin-bottom: 20px;
+  border: 1px solid #e2e9e4;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow:
+    0 5px 20px rgba(17, 51, 31, 0.04);
+}
+
+.aspirants-search {
+  position: relative;
+  width: 100%;
+  margin-bottom: 17px;
+}
+
+.aspirants-search > svg {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  color: #87938c;
+  pointer-events: none;
+}
+
+.aspirants-search input {
+  width: 100%;
+  height: 46px;
+  padding: 0 16px 0 45px;
+  border: 1px solid #dbe4de;
+  border-radius: 11px;
+  background: #fbfcfb;
+  color: #1b2b21;
+  font-size: 13px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.aspirants-search input:focus {
+  border-color: #257448;
+  box-shadow:
+    0 0 0 3px rgba(37, 116, 72, 0.09);
+}
+
+.aspirants-filters {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.aspirant-filter label {
+  display: block;
+  margin-bottom: 7px;
+  color: #526058;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.aspirant-select-wrapper {
+  position: relative;
+}
+
+.aspirant-select-wrapper select {
+  width: 100%;
+  height: 44px;
+  padding: 0 38px 0 13px;
+  appearance: none;
+  border: 1px solid #dbe4de;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #29382f;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.aspirant-select-wrapper select:focus {
+  border-color: #257448;
+  box-shadow:
+    0 0 0 3px rgba(37, 116, 72, 0.09);
+}
+
+.aspirant-select-wrapper > svg {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: #718078;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+
+/* ==========================================================
+   MAIN CARD
+========================================================== */
+
+.aspirants-card {
+  overflow: hidden;
+  border: 1px solid #e1e8e3;
+  border-radius: 17px;
+  background: #ffffff;
+  box-shadow:
+    0 6px 24px rgba(17, 51, 31, 0.045);
+}
+
+.aspirants-card-header {
+  min-height: 76px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e8ede9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.aspirants-card-header h2 {
+  margin: 0 0 4px;
+  color: #163f29;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.aspirants-card-header p {
+  margin: 0;
+  color: #7a867f;
+  font-size: 12px;
+}
+
+.aspirants-card-header p strong {
+  color: #42534a;
+}
+
+.aspirants-refresh-button {
+  min-width: 82px;
+  height: 37px;
+  padding: 0 14px;
+  border: 1px solid #d7e2da;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #205e39;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.aspirants-refresh-button:hover:not(:disabled) {
+  background: #f3f8f5;
+}
+
+.aspirants-refresh-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.aspirants-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.aspirants-table {
+  width: 100%;
+  min-width: 930px;
+  border-collapse: collapse;
+}
+
+.aspirants-table th {
+  padding: 13px 17px;
+  border-bottom: 1px solid #e4ebe6;
+  background: #f9fbf9;
+  color: #68756d;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.aspirants-table td {
+  padding: 15px 17px;
+  border-bottom: 1px solid #edf1ee;
+  color: #334139;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.aspirants-table tbody tr {
+  transition:
+    background 0.15s ease;
+}
+
+.aspirants-table tbody tr:hover {
+  background: #fbfdfb;
+}
+
+.aspirants-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+
+/* ==========================================================
+   TABLE PROFILE
+========================================================== */
+
+.aspirant-table-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 235px;
+}
+
+.aspirant-expand-button {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #7b8880;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.aspirant-expand-button:hover {
+  background: #edf5f0;
+  color: #1d6540;
+}
+
+.aspirant-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #eaf3ed;
+  color: #24683f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.aspirant-table-info {
+  min-width: 0;
+}
+
+.aspirant-table-info strong {
+  display: block;
+  max-width: 230px;
+  overflow: hidden;
+  color: #1c3124;
+  font-size: 13px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aspirant-table-info span {
+  display: block;
+  max-width: 230px;
+  margin-top: 3px;
+  overflow: hidden;
+  color: #859089;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================
+   TABLE CONTENT
+========================================================== */
+
+.aspirant-election-name {
+  display: inline-block;
+  max-width: 220px;
+  color: #34473b;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.aspirant-position-badge {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #f1f6f2;
+  color: #286441;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.aspirant-date {
+  color: #68756d;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================
+   STATUS
+========================================================== */
+
+.aspirant-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.aspirant-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.aspirant-status-approved {
+  background: #edf8f0;
+  color: #27763f;
+}
+
+.aspirant-status-pending {
+  background: #fff7e5;
+  color: #a67308;
+}
+
+.aspirant-status-rejected {
+  background: #fff0f0;
+  color: #a23737;
+}
+
+.aspirant-status-withdrawn {
+  background: #f1f3f2;
+  color: #69746e;
+}
+
+.aspirant-status-active {
+  background: #edf8f0;
+  color: #27763f;
+}
+
+.aspirant-status-inactive {
+  background: #f1f3f2;
+  color: #69746e;
+}
+
+
+/* ==========================================================
+   ACTIONS
+========================================================== */
+
+.aspirants-action-header {
+  text-align: right !important;
+}
+
+.aspirant-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.aspirant-row-action {
+  width: 31px;
+  height: 31px;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #426152;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.aspirant-row-action:hover {
+  background: #f1f6f3;
+  border-color: #c9d9cf;
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================
+   LOADING
+========================================================== */
+
+.aspirants-loading {
+  min-height: 330px;
+  padding: 50px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.aspirants-large-spinner {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 18px;
+  border: 3px solid #dfe9e2;
+  border-top-color: #217044;
+  border-radius: 50%;
+  animation:
+    aspirant-spin 0.8s linear infinite;
+}
+
+.aspirants-loading h3 {
+  margin: 0 0 6px;
+  color: #254132;
+  font-size: 15px;
+}
+
+.aspirants-loading p {
+  margin: 0;
+  color: #7d8982;
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   EMPTY
+========================================================== */
+
+.aspirants-empty {
+  min-height: 330px;
+  padding: 50px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.aspirants-empty-icon {
+  width: 58px;
+  height: 58px;
+  margin-bottom: 17px;
+  border-radius: 16px;
+  background: #edf5f0;
+  color: #34734d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.aspirants-empty h3 {
+  margin: 0 0 7px;
+  color: #294233;
+  font-size: 16px;
+}
+
+.aspirants-empty p {
+  max-width: 440px;
+  margin: 0 0 18px;
+  color: #7a867f;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.aspirant-button {
+  min-height: 40px;
+  padding: 0 15px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.aspirant-button:hover {
+  transform: translateY(-1px);
+}
+
+.aspirant-button.secondary {
+  border: 1px solid #d9e3dc;
+  background: #ffffff;
+  color: #31523e;
+}
+
+.aspirant-button.secondary:hover {
+  background: #f5f8f6;
+}
+
+.aspirant-button.primary {
+  border: 0;
+  background: #17633b;
+  color: #ffffff;
+  box-shadow:
+    0 4px 12px rgba(23, 99, 59, 0.18);
+}
+
+.aspirant-button.primary:hover {
+  background: #12532a;
+}
+
+
+/* ==========================================================
+   DRAWER
+========================================================== */
+
+.aspirant-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(13, 29, 20, 0.38);
+  display: flex;
+  justify-content: flex-end;
+  animation:
+    aspirant-fade-in 0.18s ease;
+}
+
+.aspirant-drawer {
+  width: min(540px, 100%);
+  height: 100%;
+  background: #ffffff;
+  box-shadow:
+    -10px 0 40px rgba(10, 28, 17, 0.13);
+  display: flex;
+  flex-direction: column;
+  animation:
+    aspirant-slide-in 0.22s ease;
+}
+
+.aspirant-drawer-header {
+  min-height: 84px;
+  padding: 18px 21px;
+  border-bottom: 1px solid #e7ece8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aspirant-drawer-header h2 {
+  margin: 0;
+  color: #173e29;
+  font-size: 18px;
+}
+
+.aspirant-close-button {
+  width: 35px;
+  height: 35px;
+  border: 0;
+  border-radius: 9px;
+  background: #f3f6f4;
+  color: #65736b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.aspirant-close-button:hover {
+  background: #e9efeb;
+  color: #284837;
+}
+
+.aspirant-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 23px;
+}
+
+
+/* ==========================================================
+   PROFILE CARD
+========================================================== */
+
+.aspirant-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 28px;
+  padding: 18px;
+  border: 1px solid #e3ebe6;
+  border-radius: 15px;
+  background: #fafcfb;
+}
+
+.aspirant-large-avatar {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 17px;
+  background: #e6f2ea;
+  color: #20663d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.aspirant-profile-main {
+  min-width: 0;
+}
+
+.aspirant-profile-main h3 {
+  margin: 0 0 4px;
+  color: #20382a;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.aspirant-profile-main p {
+  margin: 0 0 9px;
+  color: #77847c;
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   DETAIL SECTIONS
+========================================================== */
+
+.aspirant-detail-section {
+  margin-bottom: 27px;
+}
+
+.aspirant-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 13px;
+}
+
+.aspirant-section-heading > svg {
+  color: #287146;
+  font-size: 13px;
+}
+
+.aspirant-section-heading h3 {
+  margin: 0;
+  color: #304238;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.aspirant-detail-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.aspirant-detail-item {
+  padding: 12px;
+  border: 1px solid #e8ede9;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.aspirant-detail-item.full {
+  grid-column: 1 / -1;
+}
+
+.aspirant-detail-item span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8a958e;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.aspirant-detail-item strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #304238;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.aspirant-id {
+  font-family: monospace;
+  font-size: 10px !important;
+}
+
+
+/* ==========================================================
+   CONTACT
+========================================================== */
+
+.aspirant-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.aspirant-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid #e8ede9;
+  border-radius: 10px;
+}
+
+.aspirant-contact-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: #edf5f0;
+  color: #2c7147;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.aspirant-contact-item span {
+  display: block;
+  margin-bottom: 3px;
+  color: #89948e;
+  font-size: 10px;
+}
+
+.aspirant-contact-item strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #35483c;
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   TIMELINE
+========================================================== */
+
+.aspirant-timeline {
+  position: relative;
+  padding-left: 8px;
+}
+
+.aspirant-timeline::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 12px;
+  width: 1px;
+  background: #dce6df;
+}
+
+.aspirant-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding-bottom: 18px;
+}
+
+.aspirant-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.aspirant-timeline-dot {
+  position: relative;
+  z-index: 1;
+  width: 9px;
+  height: 9px;
+  margin-top: 4px;
+  flex-shrink: 0;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #2c7548;
+  box-shadow:
+    0 0 0 1px #bcd3c3;
+}
+
+.aspirant-timeline-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.aspirant-timeline-item div > span {
+  color: #88948d;
+  font-size: 10px;
+}
+
+.aspirant-timeline-item strong {
+  color: #3d5045;
+  font-size: 11px;
+}
+
+
+/* ==========================================================
+   APPLICATION SUMMARY
+========================================================== */
+
+.aspirant-application-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.aspirant-application-summary > div {
+  padding: 13px;
+  border: 1px solid #e4ebe6;
+  border-radius: 11px;
+  background: #fafcfb;
+}
+
+.aspirant-application-summary span {
+  display: block;
+  margin-bottom: 6px;
+  color: #829087;
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.aspirant-application-summary p {
+  margin: 0;
+  color: #536259;
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+
+/* ==========================================================
+   DRAWER FOOTER
+========================================================== */
+
+.aspirant-drawer-footer {
+  padding: 16px 21px;
+  border-top: 1px solid #e5ebe7;
+  background: #ffffff;
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+
+/* ==========================================================
+   ANIMATIONS
+========================================================== */
+
+@keyframes aspirant-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes aspirant-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes aspirant-slide-in {
+  from {
+    transform: translateX(30px);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 1100px) {
+  .aspirants-stat-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+@media (max-width: 800px) {
+  .election-aspirants-page {
+    padding: 22px 18px;
+  }
+
+  .aspirants-page-header h1 {
+    font-size: 25px;
+  }
+
+  .aspirants-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .election-aspirants-page {
+    padding: 17px 13px;
+  }
+
+  .aspirants-header-left {
+    gap: 11px;
+  }
+
+  .aspirants-back-button {
+    width: 39px;
+    height: 39px;
+    border-radius: 10px;
+  }
+
+  .aspirants-eyebrow {
+    font-size: 9px;
+  }
+
+  .aspirants-page-header h1 {
+    font-size: 21px;
+  }
+
+  .aspirants-page-header p {
+    font-size: 12px;
+  }
+
+  .aspirants-stat-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .aspirant-stat-card {
+    min-height: 90px;
+    padding: 13px;
+    gap: 10px;
+  }
+
+  .aspirant-stat-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .aspirant-stat-card span {
+    font-size: 9px;
+  }
+
+  .aspirant-stat-card strong {
+    font-size: 20px;
+  }
+
+  .aspirants-toolbar {
+    padding: 13px;
+  }
+
+  .aspirants-card-header {
+    padding: 14px;
+  }
+
+  .aspirants-card-header h2 {
+    font-size: 15px;
+  }
+
+  .aspirants-card-header p {
+    font-size: 10px;
+  }
+
+  .aspirant-drawer-content {
+    padding: 17px;
+  }
+
+  .aspirant-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aspirant-detail-item.full {
+    grid-column: auto;
+  }
+
+  .aspirant-drawer-footer {
+    padding: 13px 17px;
+  }
+
+  .aspirant-drawer-footer .aspirant-button {
+    flex: 1;
+  }
+}
+
+
+@media (max-width: 390px) {
+  .aspirants-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aspirants-page-header h1 {
+    font-size: 19px;
+  }
+
+  .aspirant-profile-card {
+    padding: 14px;
+  }
+
+  .aspirant-large-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+  }
+
+  .aspirant-profile-main h3 {
+    font-size: 15px;
+  }
+}

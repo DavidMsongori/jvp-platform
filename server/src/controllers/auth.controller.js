@@ -34,7 +34,7 @@ export const activateExistingMember = async (
 
     return res.status(200).json({
       success: true,
-      message: "Membership verified. An OTP has been sent to your email.",
+      message: "Membership verified. Please provide your email and create a new password to activate your account.",
       data: result,
     });
   } catch (error) {

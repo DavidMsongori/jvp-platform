@@ -23,18 +23,56 @@ import adminSummitRoutes from "./routes/adminSummit.routes.js";
 import summitExhibitorRoutes from "./routes/summitExhibitor.routes.js";
 import intasendRoutes from "./routes/intasend.routes.js";
 import summitPosterRoutes from "./routes/summitPoster.routes.js";
-
-import geographyRoutes
-  from "./routes/geography.routes.js";
+import geographyRoutes from "./routes/geography.routes.js";
+import electionRoutes from "./routes/election.routes.js";
 
 const app = express();
 
-/* ==========================================================
-   PATHS
-========================================================== */
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+/* Security */
+app.use(helmet());
+
+/* CORS */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://jvp-platform.vercel.app",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
+/* Logging */
+if (process.env.NODE_ENV !== "test") {
+  app.use(morgan("dev"));
+}
+
+/* Body parsing */
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+/* Static uploads */
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 
 app.use(
   "/uploads/summit-tickets",
@@ -48,80 +86,7 @@ app.use(
   )
 );
 
-/* ==========================================================
-   SECURITY
-========================================================== */
-
-app.use(helmet());
-
-/* ==========================================================
-   CORS
-========================================================== */
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://jvp-platform.vercel.app",
-  process.env.CLIENT_URL,
-].filter(Boolean);
-
-app.use(
-  cors({
-    origin(origin, callback) {
-      console.log("Incoming Origin:", origin);
-
-      // Allow Postman and server-to-server requests
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      console.log("Blocked Origin:", origin);
-
-      return callback(new Error("Not allowed by CORS"));
-    },
-
-    credentials: true,
-  })
-);
-
-/* ==========================================================
-   LOGGING
-========================================================== */
-
-if (process.env.NODE_ENV !== "test") {
-  app.use(morgan("dev"));
-}
-
-/* ==========================================================
-   BODY PARSERS
-========================================================== */
-
-app.use(express.json());
-
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
-
-app.use(cookieParser());
-
-/* ==========================================================
-   STATIC FILES
-========================================================== */
-
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
-);
-
-/* ==========================================================
-   ROOT
-========================================================== */
-
+/* Root */
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -131,89 +96,37 @@ app.get("/", (req, res) => {
   });
 });
 
-/* ==========================================================
-   API ROUTES
-========================================================== */
-
-/* ---------- System ---------- */
+/* API routes */
 
 app.use("/api/health", healthRoutes);
 
-/* ---------- Authentication ---------- */
-
 app.use("/api/auth", authRoutes);
-
-/* ---------- Members ---------- */
 
 app.use("/api/member", memberRoutes);
 app.use("/api/users", userRoutes);
 
-/* ---------- Payments ---------- */
-
-app.use(
-  "/api/payments/intasend",
-  intasendRoutes
-);
-
+app.use("/api/payments/intasend", intasendRoutes);
 app.use("/api/payments", paymentRoutes);
-
-
-
-/* ---------- Administration ---------- */
 
 app.use("/api/admin", adminRoutes);
 
-/* ---------- Events ---------- */
+app.use("/api/elections", electionRoutes);
 
 app.use("/api/events", eventRoutes);
 
-/* ---------- Leadership ---------- */
-
 app.use("/api/leaders", leaderRoutes);
+app.use("/api/leadership-card", leadershipCardRoutes);
 
-app.use(
-  "/api/leadership-card",
-  leadershipCardRoutes
-);
+app.use("/api/meetings", meetingRoutes);
 
-/* ---------- Meetings ---------- */
+app.use("/api/summit/public", publicSummitRoutes);
+app.use("/api/summit/admin", adminSummitRoutes);
+app.use("/api/summit-exhibitors", summitExhibitorRoutes);
+app.use("/api/summit/posters", summitPosterRoutes);
 
-app.use(
-  "/api/meetings",
-  meetingRoutes
-);
+app.use("/api/geography", geographyRoutes);
 
-/* ---------- Summit ---------- */
-
-app.use(
-  "/api/summit/public",
-  publicSummitRoutes
-);
-
-app.use(
-  "/api/summit/admin",
-  adminSummitRoutes
-);
-
-app.use(
-  "/api/summit-exhibitors",
-  summitExhibitorRoutes
-);
-
-app.use(
-  "/api/summit/posters",
-  summitPosterRoutes
-);
-
-app.use(
-  "/api/geography",
-  geographyRoutes
-);
-
-/* ==========================================================
-   404
-========================================================== */
-
+/* 404 */
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -221,10 +134,7 @@ app.use((req, res) => {
   });
 });
 
-/* ==========================================================
-   ERROR HANDLER
-========================================================== */
-
+/* Error handler */
 app.use(errorHandler);
 
 export default app;

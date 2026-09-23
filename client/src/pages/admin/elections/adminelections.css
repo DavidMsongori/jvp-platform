@@ -1,0 +1,1331 @@
+/* ==========================================================
+   ADMIN ELECTIONS
+   JVP CONNECT ADMIN PANEL
+========================================================== */
+
+.admin-elections-page {
+  min-height: 100%;
+  background: #f5f7f6;
+  color: #18251f;
+}
+
+
+/* ==========================================================
+   PAGE HEADER
+========================================================== */
+
+.admin-elections-header {
+  background:
+    linear-gradient(
+      135deg,
+      #063c2c 0%,
+      #075c43 55%,
+      #0b7654 100%
+    );
+  color: #ffffff;
+  padding: 38px 0 42px;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-elections-header::after {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  right: -120px;
+  top: -170px;
+}
+
+.admin-elections-header::before {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  right: 100px;
+  bottom: -150px;
+}
+
+.admin-elections-header-content {
+  width: min(1400px, calc(100% - 48px));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-elections-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.78;
+  margin-bottom: 10px;
+}
+
+.admin-elections-header h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+}
+
+.admin-elections-header p {
+  max-width: 680px;
+  margin: 13px 0 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.admin-elections-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+
+/* ==========================================================
+   HEADER BUTTONS
+========================================================== */
+
+.admin-elections-refresh-btn,
+.admin-elections-create-btn {
+  min-height: 46px;
+  border-radius: 9px;
+  padding: 0 17px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.admin-elections-refresh-btn {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.admin-elections-refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.17);
+}
+
+.admin-elections-create-btn {
+  border: 1px solid #d6b35a;
+  background: #d6b35a;
+  color: #173426;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.admin-elections-create-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 24px rgba(0, 0, 0, 0.18);
+}
+
+.admin-elections-refresh-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.admin-elections-spin {
+  animation: admin-election-spin 0.9s linear infinite;
+}
+
+@keyframes admin-election-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ==========================================================
+   MAIN CONTAINER
+========================================================== */
+
+.admin-elections-container {
+  width: min(1400px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 30px 0 50px;
+}
+
+
+/* ==========================================================
+   STATISTICS
+========================================================== */
+
+.admin-elections-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 24px;
+}
+
+.admin-election-stat-card {
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #e2e9e5;
+  border-radius: 13px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  box-shadow: 0 4px 14px rgba(20, 50, 37, 0.035);
+}
+
+.admin-election-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.admin-election-stat-icon.total {
+  background: #e4f2ed;
+  color: #087052;
+}
+
+.admin-election-stat-icon.draft {
+  background: #f2eee2;
+  color: #8b6b24;
+}
+
+.admin-election-stat-icon.open {
+  background: #e7f1fb;
+  color: #28618c;
+}
+
+.admin-election-stat-icon.voting {
+  background: #e6f4ec;
+  color: #26734f;
+}
+
+.admin-election-stat-icon.results {
+  background: #eee9f8;
+  color: #684c92;
+}
+
+.admin-election-stat-card span {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6f7c75;
+  margin-bottom: 4px;
+}
+
+.admin-election-stat-card strong {
+  display: block;
+  font-size: 25px;
+  line-height: 1;
+  color: #183127;
+  margin-bottom: 5px;
+}
+
+.admin-election-stat-card small {
+  display: block;
+  font-size: 10px;
+  color: #8a9690;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================
+   SHORTCUTS
+========================================================== */
+
+.admin-election-shortcuts {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 34px;
+}
+
+.admin-election-shortcut {
+  width: 100%;
+  border: 1px solid #e0e8e3;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 17px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-election-shortcut:hover {
+  transform: translateY(-2px);
+  border-color: #a8cabe;
+  box-shadow: 0 9px 25px rgba(18, 57, 42, 0.07);
+}
+
+.shortcut-icon {
+  width: 43px;
+  height: 43px;
+  border-radius: 10px;
+  background: #e8f3ef;
+  color: #087052;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.shortcut-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.shortcut-content strong {
+  display: block;
+  font-size: 13px;
+  color: #20352b;
+  margin-bottom: 4px;
+}
+
+.shortcut-content small {
+  display: block;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #7c8982;
+}
+
+.admin-election-shortcut > svg {
+  color: #98a49e;
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   SECTION HEADER
+========================================================== */
+
+.admin-elections-list-section {
+  margin-top: 4px;
+}
+
+.admin-elections-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 19px;
+}
+
+.admin-elections-section-header > div:first-child > span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  font-weight: 800;
+  color: #087052;
+  margin-bottom: 7px;
+}
+
+.admin-elections-section-header h2 {
+  margin: 0;
+  color: #183127;
+  font-size: 23px;
+  letter-spacing: -0.3px;
+}
+
+.admin-elections-section-header p {
+  margin: 7px 0 0;
+  color: #77847d;
+  font-size: 13px;
+}
+
+.admin-elections-count {
+  background: #e8f3ef;
+  color: #087052;
+  border-radius: 20px;
+  padding: 8px 13px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================
+   FILTERS
+========================================================== */
+
+.admin-elections-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #e1e8e4;
+  border-radius: 12px;
+  padding: 11px;
+  margin-bottom: 18px;
+}
+
+.admin-election-search {
+  flex: 1;
+  min-width: 220px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid #dce5e0;
+  border-radius: 8px;
+  background: #fafcfb;
+}
+
+.admin-election-search svg {
+  color: #89968f;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.admin-election-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #21362c;
+  font: inherit;
+  font-size: 12px;
+}
+
+.admin-election-search input::placeholder {
+  color: #9ba6a0;
+}
+
+.admin-election-filter-control {
+  height: 42px;
+  min-width: 165px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+  border: 1px solid #dce5e0;
+  border-radius: 8px;
+  background: #fafcfb;
+}
+
+.admin-election-filter-control svg {
+  color: #7d8b84;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.admin-election-filter-control select {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #34463d;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   ELECTION GRID
+========================================================== */
+
+.admin-elections-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+
+/* ==========================================================
+   ELECTION CARD
+========================================================== */
+
+.admin-election-card {
+  background: #ffffff;
+  border: 1px solid #dfe7e2;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  box-shadow: 0 4px 16px rgba(22, 51, 38, 0.035);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.admin-election-card:hover {
+  transform: translateY(-2px);
+  border-color: #bfd6ca;
+  box-shadow: 0 12px 28px rgba(22, 51, 38, 0.08);
+}
+
+
+/* ==========================================================
+   CARD TOP
+========================================================== */
+
+.admin-election-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 13px;
+  border-bottom: 1px solid #edf1ee;
+}
+
+.admin-election-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin-election-status.status-draft {
+  background: #f4efdf;
+  color: #80631e;
+}
+
+.admin-election-status.status-open {
+  background: #e7f1fa;
+  color: #2c658d;
+}
+
+.admin-election-status.status-voting {
+  background: #e4f4eb;
+  color: #24724d;
+}
+
+.admin-election-status.status-closed {
+  background: #edf0ee;
+  color: #65726b;
+}
+
+.admin-election-status.status-results {
+  background: #eee9f7;
+  color: #674b90;
+}
+
+.admin-election-status.status-cancelled {
+  background: #f8e8e8;
+  color: #9a4a4a;
+}
+
+.admin-election-status.status-unknown {
+  background: #edf0ee;
+  color: #69766f;
+}
+
+.admin-election-scope {
+  font-size: 10px;
+  color: #77857d;
+  font-weight: 700;
+  text-align: right;
+}
+
+
+/* ==========================================================
+   CARD BODY
+========================================================== */
+
+.admin-election-card-body {
+  padding: 18px;
+  flex: 1;
+}
+
+.admin-election-card-body h3 {
+  margin: 0;
+  color: #173228;
+  font-size: 18px;
+  line-height: 1.35;
+  letter-spacing: -0.2px;
+}
+
+.admin-election-description {
+  margin: 8px 0 0;
+  color: #78867f;
+  font-size: 12px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+/* ==========================================================
+   LOCATION
+========================================================== */
+
+.admin-election-location {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #6c7a73;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.admin-election-location svg {
+  color: #087052;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+
+/* ==========================================================
+   METRICS
+========================================================== */
+
+.admin-election-metrics {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  margin-top: 18px;
+  border: 1px solid #e8eeeb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin-election-metrics > div {
+  min-width: 0;
+  padding: 11px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-right: 1px solid #e8eeeb;
+}
+
+.admin-election-metrics > div:last-child {
+  border-right: 0;
+}
+
+.admin-election-metrics svg {
+  color: #087052;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.admin-election-metrics span {
+  color: #89958f;
+  font-size: 9px;
+  line-height: 1.25;
+}
+
+.admin-election-metrics strong {
+  margin-top: 3px;
+  color: #233a30;
+  font-size: 14px;
+}
+
+
+/* ==========================================================
+   DATES
+========================================================== */
+
+.admin-election-dates {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.admin-election-dates > div {
+  background: #f7f9f8;
+  border-radius: 9px;
+  padding: 10px;
+  min-width: 0;
+}
+
+.admin-election-dates svg {
+  color: #087052;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.admin-election-dates span {
+  display: block;
+  color: #8a9690;
+  font-size: 9px;
+  margin-bottom: 3px;
+}
+
+.admin-election-dates strong {
+  display: block;
+  color: #44564d;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+
+/* ==========================================================
+   CARD FOOTER
+========================================================== */
+
+.admin-election-card-footer {
+  padding: 13px 18px;
+  border-top: 1px solid #edf1ee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-election-manage-btn {
+  flex: 1;
+  min-height: 39px;
+  border: 0;
+  border-radius: 8px;
+  background: #087052;
+  color: #ffffff;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-election-manage-btn:hover {
+  background: #075c43;
+  transform: translateY(-1px);
+}
+
+.admin-election-manage-btn svg:last-child {
+  font-size: 9px;
+  margin-left: auto;
+}
+
+.admin-election-secondary-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-election-secondary-actions button {
+  width: 37px;
+  height: 37px;
+  border: 1px solid #dce5e0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #63736a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.admin-election-secondary-actions button:hover {
+  border-color: #a9cbbb;
+  background: #f2f8f5;
+  color: #087052;
+}
+
+
+/* ==========================================================
+   EMPTY STATE
+========================================================== */
+
+.admin-elections-empty {
+  background: #ffffff;
+  border: 1px solid #e0e8e3;
+  border-radius: 14px;
+  padding: 60px 25px;
+  text-align: center;
+}
+
+.admin-elections-empty-icon {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 17px;
+  border-radius: 50%;
+  background: #e7f2ed;
+  color: #087052;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
+}
+
+.admin-elections-empty h3 {
+  margin: 0;
+  color: #233a30;
+  font-size: 19px;
+}
+
+.admin-elections-empty p {
+  max-width: 500px;
+  margin: 8px auto 20px;
+  color: #7d8a83;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   PRIMARY / OUTLINE BUTTONS
+========================================================== */
+
+.admin-elections-primary-btn,
+.admin-elections-outline-btn {
+  min-height: 42px;
+  border-radius: 8px;
+  padding: 0 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-elections-primary-btn {
+  border: 0;
+  background: #087052;
+  color: #ffffff;
+}
+
+.admin-elections-primary-btn:hover {
+  background: #075c43;
+}
+
+.admin-elections-outline-btn {
+  border: 1px solid #cfdcd5;
+  background: #ffffff;
+  color: #355047;
+}
+
+.admin-elections-outline-btn:hover {
+  border-color: #a9cbbb;
+  color: #087052;
+}
+
+
+/* ==========================================================
+   INFORMATION PANEL
+========================================================== */
+
+.admin-elections-info {
+  margin-top: 28px;
+  padding: 19px 21px;
+  border: 1px solid #dce8e1;
+  border-radius: 13px;
+  background: #eef7f3;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.admin-elections-info-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  background: #d9eee5;
+  color: #087052;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-elections-info > div:nth-child(2) {
+  flex: 1;
+}
+
+.admin-elections-info h3 {
+  margin: 0 0 4px;
+  color: #1e3a2f;
+  font-size: 14px;
+}
+
+.admin-elections-info p {
+  margin: 0;
+  color: #63766d;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.admin-elections-info > button {
+  min-height: 39px;
+  padding: 0 13px;
+  border: 1px solid #a9cbbb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #087052;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.admin-elections-info > button:hover {
+  background: #f4faf7;
+}
+
+
+/* ==========================================================
+   LOADING
+========================================================== */
+
+.admin-elections-loading {
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.admin-elections-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e5f2ed;
+  color: #087052;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  animation: admin-election-spin 1s linear infinite;
+}
+
+.admin-elections-loading h3 {
+  margin: 17px 0 5px;
+  color: #243a31;
+  font-size: 18px;
+}
+
+.admin-elections-loading p {
+  margin: 0;
+  color: #7e8b84;
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   ERROR
+========================================================== */
+
+.admin-elections-error {
+  width: min(560px, calc(100% - 40px));
+  margin: 80px auto;
+  background: #ffffff;
+  border: 1px solid #e4e9e6;
+  border-radius: 14px;
+  padding: 42px 30px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(22, 51, 38, 0.05);
+}
+
+.admin-elections-error-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: #f8e8e8;
+  color: #a04e4e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.admin-elections-error h2 {
+  margin: 0;
+  color: #263a32;
+  font-size: 20px;
+}
+
+.admin-elections-error p {
+  margin: 9px auto 20px;
+  color: #7b8881;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   RESPONSIVE — LARGE TABLETS
+========================================================== */
+
+@media (max-width: 1180px) {
+
+  .admin-elections-stats {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-election-shortcuts {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-elections-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE — TABLET
+========================================================== */
+
+@media (max-width: 900px) {
+
+  .admin-elections-header-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-elections-header-actions {
+    width: 100%;
+  }
+
+  .admin-elections-refresh-btn,
+  .admin-elections-create-btn {
+    flex: 1;
+  }
+
+  .admin-elections-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-election-shortcuts {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-elections-filters {
+    flex-wrap: wrap;
+  }
+
+  .admin-election-search {
+    flex-basis: 100%;
+  }
+
+  .admin-election-filter-control {
+    flex: 1;
+  }
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE — MOBILE
+========================================================== */
+
+@media (max-width: 640px) {
+
+  .admin-elections-header {
+    padding: 27px 0 30px;
+  }
+
+  .admin-elections-header-content,
+  .admin-elections-container {
+    width: min(100% - 28px, 1400px);
+  }
+
+  .admin-elections-header h1 {
+    font-size: 29px;
+  }
+
+  .admin-elections-header p {
+    font-size: 13px;
+  }
+
+  .admin-elections-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-elections-refresh-btn,
+  .admin-elections-create-btn {
+    width: 100%;
+    flex: none;
+  }
+
+  .admin-elections-container {
+    padding-top: 20px;
+  }
+
+  .admin-elections-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .admin-election-stat-card {
+    padding: 15px;
+  }
+
+  .admin-election-stat-card small {
+    white-space: normal;
+  }
+
+  .admin-elections-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .admin-elections-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-election-search {
+    min-width: 0;
+    flex-basis: auto;
+  }
+
+  .admin-election-filter-control {
+    width: 100%;
+    flex: none;
+  }
+
+  .admin-elections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-election-metrics {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-election-metrics > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .admin-election-metrics > div:nth-child(-n + 2) {
+    border-bottom: 1px solid #e8eeeb;
+  }
+
+  .admin-election-dates {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-election-card-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-election-secondary-actions {
+    width: 100%;
+  }
+
+  .admin-election-secondary-actions button {
+    flex: 1;
+  }
+
+  .admin-elections-info {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-elections-info > div:nth-child(2) {
+    min-width: calc(100% - 65px);
+  }
+
+  .admin-elections-info > button {
+    width: 100%;
+  }
+
+}
+
+
+/* ==========================================================
+   VERY SMALL DEVICES
+========================================================== */
+
+@media (max-width: 390px) {
+
+  .admin-election-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-election-scope {
+    text-align: left;
+  }
+
+  .admin-election-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+}
+
+/* ==========================================================
+   ELECTION WORKSPACE / TYPE ADDITIONS
+   Add to adminelections.css and AdminElectionDetails.css
+========================================================== */
+
+/* Admin Elections */
+.admin-election-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.admin-election-type.type-elective {
+  background: rgba(37, 99, 235, 0.10);
+  color: #1d4ed8;
+  border-color: rgba(37, 99, 235, 0.18);
+}
+
+.admin-election-type.type-nomination {
+  background: rgba(124, 58, 237, 0.10);
+  color: #6d28d9;
+  border-color: rgba(124, 58, 237, 0.18);
+}
+
+.admin-election-workspace-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.admin-election-workspace-links button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 11px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-election-workspace-links button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(15, 23, 42, 0.20);
+}
+
+.admin-election-workspace-links button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Admin Election Details */
+.election-workspace-card {
+  margin-bottom: 24px;
+}
+
+.election-workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.workspace-action-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  text-align: left;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.workspace-action-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(15, 23, 42, 0.18);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+}
+
+.workspace-action-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.workspace-action-content {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workspace-action-content strong {
+  font-size: 0.92rem;
+}
+
+.workspace-action-content small {
+  color: #64748b;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .election-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}

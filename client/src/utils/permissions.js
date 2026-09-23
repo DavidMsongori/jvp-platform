@@ -11,11 +11,13 @@ export const PERMISSIONS = {
   EDIT_MEMBER: "edit_member",
   DELETE_MEMBER: "delete_member",
 
+
   /* PAYMENTS */
 
   VIEW_PAYMENTS: "view_payments",
   RECORD_PAYMENT: "record_payment",
   REFUND_PAYMENT: "refund_payment",
+
 
   /* EVENTS */
 
@@ -24,18 +26,27 @@ export const PERMISSIONS = {
   EDIT_EVENT: "edit_event",
   DELETE_EVENT: "delete_event",
 
+
   /* PROGRAMS */
 
   VIEW_PROGRAMS: "view_programs",
   CREATE_PROGRAM: "create_program",
 
+
+  /* ELECTIONS */
+
+  MANAGE_ELECTIONS: "manage_elections",
+
+
   /* REPORTS */
 
   VIEW_REPORTS: "view_reports",
 
+
   /* SETTINGS */
 
   MANAGE_SETTINGS: "manage_settings",
+
 
   /* USERS */
 
@@ -50,31 +61,64 @@ export const PERMISSIONS = {
 
 export const ROLE_PERMISSIONS = {
 
+  /* ========================================================
+     SUPER ADMIN
+  ======================================================== */
+
   super_admin: [
 
     "*",
 
   ],
 
+
+  /* ========================================================
+     ADMIN
+  ======================================================== */
+
   admin: [
+
+    /* MEMBERS */
 
     PERMISSIONS.VIEW_MEMBERS,
     PERMISSIONS.CREATE_MEMBER,
     PERMISSIONS.EDIT_MEMBER,
 
+
+    /* PAYMENTS */
+
     PERMISSIONS.VIEW_PAYMENTS,
     PERMISSIONS.RECORD_PAYMENT,
+
+
+    /* EVENTS */
 
     PERMISSIONS.VIEW_EVENTS,
     PERMISSIONS.CREATE_EVENT,
     PERMISSIONS.EDIT_EVENT,
 
+
+    /* PROGRAMS */
+
     PERMISSIONS.VIEW_PROGRAMS,
     PERMISSIONS.CREATE_PROGRAM,
+
+
+    /* ELECTIONS */
+
+    PERMISSIONS.MANAGE_ELECTIONS,
+
+
+    /* REPORTS */
 
     PERMISSIONS.VIEW_REPORTS,
 
   ],
+
+
+  /* ========================================================
+     FINANCE
+  ======================================================== */
 
   finance: [
 
@@ -85,6 +129,11 @@ export const ROLE_PERMISSIONS = {
 
   ],
 
+
+  /* ========================================================
+     EVENTS
+  ======================================================== */
+
   events: [
 
     PERMISSIONS.VIEW_EVENTS,
@@ -93,6 +142,11 @@ export const ROLE_PERMISSIONS = {
     PERMISSIONS.DELETE_EVENT,
 
   ],
+
+
+  /* ========================================================
+     MEMBER
+  ======================================================== */
 
   member: [
 
@@ -125,4 +179,3 @@ export function hasPermission(
   );
 
 }
-

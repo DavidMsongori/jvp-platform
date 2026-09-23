@@ -1110,3 +1110,21 @@
   }
 
 }
+
+.elections-nav-link {
+  position: relative;
+}
+
+.elections-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 2px;
+  transition: width 0.25s ease;
+}
+
+.elections-nav-link:hover::after {
+  width: 100%;
+}

@@ -50,11 +50,20 @@ function Navbar() {
     setDesktopDropdown(false);
   };
 
+  const toggleDropdown = () => {
+    if (window.innerWidth <= 992) {
+      setMobileDropdown((prev) => !prev);
+    } else {
+      setDesktopDropdown((prev) => !prev);
+    }
+  };
+
   return (
     <header
       className={`navbar ${scrolled ? "scrolled" : ""}`}
     >
       <div className="navbar-container">
+
         {/* =====================================
             LOGO
         ====================================== */}
@@ -71,6 +80,7 @@ function Navbar() {
 
           <div>
             <h2>JVP Connect</h2>
+
             <span>
               Jumuiya ya Vijana wa Pwani
             </span>
@@ -78,133 +88,162 @@ function Navbar() {
         </Link>
 
         {/* =====================================
-    NAVIGATION
-===================================== */}
+            NAVIGATION
+        ====================================== */}
 
-<nav
-  className={
-    mobileMenu
-      ? "nav-links active"
-      : "nav-links"
-  }
->
-  <Link to="/" onClick={closeMenu}>
-    Home
-  </Link>
+        <nav
+          className={
+            mobileMenu
+              ? "nav-links active"
+              : "nav-links"
+          }
+        >
+          <Link
+            to="/"
+            onClick={closeMenu}
+          >
+            Home
+          </Link>
 
-  <Link to="/about" onClick={closeMenu}>
-    About Us
-  </Link>
+          <Link
+            to="/about"
+            onClick={closeMenu}
+          >
+            About Us
+          </Link>
 
-  <Link to="/events" onClick={closeMenu}>
-    Events
-  </Link>
+          <Link
+            to="/events"
+            onClick={closeMenu}
+          >
+            Events
+          </Link>
 
-  <Link to="/summit" onClick={closeMenu}>
-    Summit
-  </Link>
+          {/* =====================================
+              ELECTIONS
+          ====================================== */}
 
-  <Link to="/leadership" onClick={closeMenu}>
-    Leadership
-  </Link>
+          <Link
+            to="/elections"
+            className="elections-nav-link"
+            onClick={closeMenu}
+          >
+            Elections
+          </Link>
 
-  <Link to="/news" onClick={closeMenu}>
-    News
-  </Link>
+          <Link
+            to="/summit"
+            onClick={closeMenu}
+          >
+            Summit
+          </Link>
 
-  {/* Dropdown */}
+          <Link
+            to="/leadership"
+            onClick={closeMenu}
+          >
+            Leadership
+          </Link>
 
-  <div
-    className={`dropdown ${
-      mobileDropdown ? "open" : ""
-    }`}
-    ref={dropdownRef}
-  >
-    <button
-  type="button"
-  className="dropdown-toggle"
-  onClick={() => {
-    if (window.innerWidth <= 992) {
-      setMobileDropdown(!mobileDropdown);
-    } else {
-      setDesktopDropdown(!desktopDropdown);
-    }
-  }}
->
-      More
+          <Link
+            to="/news"
+            onClick={closeMenu}
+          >
+            News
+          </Link>
 
-      <FaChevronDown
-        className={`dropdown-icon ${
-          desktopDropdown ||
-          mobileDropdown
-            ? "rotate"
-            : ""
-        }`}
-      />
-    </button>
+          {/* =====================================
+              MORE DROPDOWN
+          ====================================== */}
 
-    <div
-      className={`dropdown-menu ${
-        desktopDropdown ||
-        mobileDropdown
-          ? "show"
-          : ""
-      }`}
-    >
-      <Link
-        to="/programs"
-        onClick={closeMenu}
-      >
-        Programs
-      </Link>
+          <div
+            className={`dropdown ${
+              mobileDropdown ? "open" : ""
+            }`}
+            ref={dropdownRef}
+          >
+            <button
+              type="button"
+              className="dropdown-toggle"
+              onClick={toggleDropdown}
+              aria-expanded={
+                desktopDropdown || mobileDropdown
+              }
+            >
+              More
 
-      <Link
-        to="/membership"
-        onClick={closeMenu}
-      >
-        Membership
-      </Link>
+              <FaChevronDown
+                className={`dropdown-icon ${
+                  desktopDropdown || mobileDropdown
+                    ? "rotate"
+                    : ""
+                }`}
+              />
+            </button>
 
-      <Link
-        to="/contact"
-        onClick={closeMenu}
-      >
-        Contact
-      </Link>
-    </div>
-  </div>
+            <div
+              className={`dropdown-menu ${
+                desktopDropdown || mobileDropdown
+                  ? "show"
+                  : ""
+              }`}
+            >
+              <Link
+                to="/programs"
+                onClick={closeMenu}
+              >
+                Programs
+              </Link>
 
-  {/* MOBILE ACTION BUTTONS */}
+              <Link
+                to="/membership"
+                onClick={closeMenu}
+              >
+                Membership
+              </Link>
 
-  <div className="mobile-actions">
+              <Link
+                to="/contact"
+                onClick={closeMenu}
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
 
-    <Link
-      to="/login"
-      className="mobile-login-btn"
-      onClick={closeMenu}
-    >
-      Login
-    </Link>
+          {/* =====================================
+              MOBILE ACTION BUTTONS
+          ====================================== */}
 
-    <Link
-      to="/register"
-      className="mobile-join-btn"
-      onClick={closeMenu}
-    >
-      Join JVP
+          <div className="mobile-actions">
 
-      <FaUserPlus />
-    </Link>
+            <Link
+              to="/login"
+              className="mobile-login-btn"
+              onClick={closeMenu}
+            >
+              Login
+            </Link>
 
-  </div>
+            <Link
+              to="/register"
+              className="mobile-join-btn"
+              onClick={closeMenu}
+            >
+              Join JVP
 
-</nav>
+              <FaUserPlus />
+            </Link>
+
+          </div>
+        </nav>
 
         {/* =====================================
-            ACTION BUTTONS
+            DESKTOP ACTION BUTTONS
         ====================================== */}
 
         <div className="navbar-actions">
+
           <Link
             to="/login"
             className="login-btn"
@@ -223,19 +262,30 @@ function Navbar() {
             <FaUserPlus />
           </Link>
 
+          {/* =====================================
+              MOBILE MENU BUTTON
+          ====================================== */}
+
           <button
-  type="button"
-  className="menu-btn"
-  onClick={() => setMobileMenu((prev) => !prev)}
-  aria-label={
-    mobileMenu
-      ? "Close navigation menu"
-      : "Open navigation menu"
-  }
-  aria-expanded={mobileMenu}
->
-  {mobileMenu ? <FaTimes /> : <FaBars />}
-</button>
+            type="button"
+            className="menu-btn"
+            onClick={() =>
+              setMobileMenu((prev) => !prev)
+            }
+            aria-label={
+              mobileMenu
+                ? "Close navigation menu"
+                : "Open navigation menu"
+            }
+            aria-expanded={mobileMenu}
+          >
+            {mobileMenu ? (
+              <FaTimes />
+            ) : (
+              <FaBars />
+            )}
+          </button>
+
         </div>
       </div>
     </header>

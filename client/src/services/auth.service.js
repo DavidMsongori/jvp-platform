@@ -5,11 +5,7 @@ import api from "./api";
 ========================================================== */
 
 export const register = async (payload) => {
-  const response = await api.post(
-    "/auth/register",
-    payload
-  );
-
+  const response = await api.post("/auth/register", payload);
   return response.data;
 };
 
@@ -18,11 +14,7 @@ export const register = async (payload) => {
 ========================================================== */
 
 export const activateMembership = async (payload) => {
-  const response = await api.post(
-    "/auth/activate",
-    payload
-  );
-
+  const response = await api.post("/auth/activate", payload);
   return response.data;
 };
 
@@ -31,11 +23,7 @@ export const activateMembership = async (payload) => {
 ========================================================== */
 
 export const verifyOTP = async (payload) => {
-  const response = await api.post(
-    "/auth/verify-otp",
-    payload
-  );
-
+  const response = await api.post("/auth/verify-otp", payload);
   return response.data;
 };
 
@@ -44,11 +32,7 @@ export const verifyOTP = async (payload) => {
 ========================================================== */
 
 export const resendOTP = async (payload) => {
-  const response = await api.post(
-    "/auth/resend-otp",
-    payload
-  );
-
+  const response = await api.post("/auth/resend-otp", payload);
   return response.data;
 };
 
@@ -57,11 +41,7 @@ export const resendOTP = async (payload) => {
 ========================================================== */
 
 export const createPassword = async (payload) => {
-  const response = await api.post(
-    "/auth/create-password",
-    payload
-  );
-
+  const response = await api.post("/auth/create-password", payload);
   return response.data;
 };
 
@@ -70,11 +50,7 @@ export const createPassword = async (payload) => {
 ========================================================== */
 
 export const login = async (payload) => {
-  const response = await api.post(
-    "/auth/login",
-    payload
-  );
-
+  const response = await api.post("/auth/login", payload);
   return response.data;
 };
 
@@ -118,10 +94,7 @@ export const resetPassword = async (payload) => {
 ========================================================== */
 
 export const logout = async () => {
-  const response = await api.post(
-    "/auth/logout"
-  );
-
+  const response = await api.post("/auth/logout");
   return response.data;
 };
 
@@ -130,12 +103,13 @@ export const logout = async () => {
 ========================================================== */
 
 export const refreshToken = async () => {
-  const response = await api.post(
-    "/auth/refresh-token"
-  );
-
+  const response = await api.post("/auth/refresh-token");
   return response.data;
 };
+
+/* ==========================================================
+   DEFAULT EXPORT
+========================================================== */
 
 export default {
   register,
