@@ -378,13 +378,6 @@ export const register = async (
             accountActivated:
               false,
 
-            /*
-             * Membership number is assigned
-             * after password creation.
-             */
-            memberNumber:
-              null,
-
             membershipType,
 
             membershipStatus:
