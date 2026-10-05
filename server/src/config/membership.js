@@ -10,10 +10,13 @@ export const MEMBERSHIP = {
 
   fees: {
 
+    /* Ordinary Membership */
     ordinary: 50,
 
-    leadership: 500,
+    /* Leadership Membership */
+    leadership: 100,
 
+    /* General Renewal Fee */
     renewal: 100,
 
   },
@@ -65,7 +68,13 @@ export const MEMBERSHIP = {
 ========================================================== */
 
 /**
- * Get membership fee by type.
+ * Get membership fee by membership type.
+ *
+ * ordinary    → KES 50
+ * leadership  → KES 100
+ *
+ * Falls back to the ordinary membership fee if
+ * an unknown membership type is supplied.
  */
 
 export function getMembershipFee(type) {
