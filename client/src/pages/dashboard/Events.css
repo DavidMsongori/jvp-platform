@@ -1,194 +1,817 @@
-.member-events-page{
-    display:flex;
-    flex-direction:column;
-    gap:2rem;
+/* =========================================================
+   JVP CONNECT
+   MEMBER DASHBOARD — EVENTS
+========================================================= */
+
+.member-events-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 24px 28px 45px;
+  background: #f6f8f7;
+  color: #18241d;
 }
 
-/* ========================================= */
+/* =========================================================
+   HERO
+========================================================= */
 
-.events-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:2rem;
+.member-events-hero {
+  position: relative;
+  min-height: 205px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  overflow: hidden;
+
+  padding: 30px 34px;
+  margin-bottom: 22px;
+
+  background:
+    linear-gradient(
+      115deg,
+      #126d35 0%,
+      #16803c 55%,
+      #20934c 100%
+    );
+
+  border-radius: 17px;
+
+  box-shadow:
+    0 8px 25px rgba(22, 128, 60, 0.12);
 }
 
-.events-header h1{
-    margin:0;
-    font-size:2rem;
-    color:#0f172a;
+.member-events-hero::before {
+  content: "";
+  position: absolute;
+
+  width: 270px;
+  height: 270px;
+
+  right: 15%;
+  top: -160px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
 }
 
-.events-header p{
-    margin-top:.6rem;
-    color:#64748b;
-    max-width:650px;
+.member-events-hero::after {
+  content: "";
+  position: absolute;
+
+  width: 210px;
+  height: 210px;
+
+  right: -45px;
+  bottom: -145px;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 50%;
 }
 
-/* ========================================= */
+.member-events-hero-content {
+  position: relative;
+  z-index: 2;
 
-.events-search{
-    display:flex;
-    align-items:center;
-    gap:1rem;
-
-    background:#fff;
-
-    border:1px solid #e2e8f0;
-
-    border-radius:14px;
-
-    padding:0 1rem;
-
-    height:58px;
+  max-width: 650px;
 }
 
-.events-search svg{
-    color:#64748b;
+.events-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 10px;
+
+  color: rgba(255, 255, 255, 0.84);
+
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
 }
 
-.events-search input{
-    flex:1;
+.member-events-hero h1 {
+  margin: 0;
 
-    border:none;
+  color: #ffffff;
 
-    outline:none;
-
-    font-size:1rem;
-
-    background:transparent;
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 760;
+  letter-spacing: -0.7px;
 }
 
-/* ========================================= */
+.member-events-hero p {
+  max-width: 570px;
 
-.events-section{
-    display:flex;
-    flex-direction:column;
-    gap:1.5rem;
+  margin: 10px 0 16px;
+
+  color: rgba(255, 255, 255, 0.82);
+
+  font-size: 13px;
+  line-height: 1.65;
 }
 
-.section-title{
-    display:flex;
-    align-items:center;
-    gap:.75rem;
+.events-hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.section-title h2{
-    margin:0;
-    font-size:1.45rem;
-    color:#0f172a;
+.events-hero-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  color: rgba(255, 255, 255, 0.9);
+
+  font-size: 11px;
+  font-weight: 600;
 }
 
-.section-title svg{
-    color:#2563eb;
+.hero-meta-divider {
+  opacity: 0.45;
 }
 
-/* ========================================= */
+.member-events-hero-art {
+  position: relative;
+  z-index: 2;
 
-.events-grid{
-    display:grid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
-
-    gap:2rem;
+  width: 230px;
+  height: 150px;
 }
 
-/* ========================================= */
+.hero-calendar-card {
+  width: 175px;
+  min-height: 125px;
 
-.registrations-list{
-    display:flex;
-    flex-direction:column;
-    gap:1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  color: rgba(255, 255, 255, 0.95);
+
+  background: rgba(255, 255, 255, 0.105);
+  border: 1px solid rgba(255, 255, 255, 0.17);
+
+  border-radius: 15px;
+
+  backdrop-filter: blur(8px);
 }
 
-/* ========================================= */
-
-.empty-state{
-    background:#fff;
-
-    border:2px dashed #cbd5e1;
-
-    border-radius:18px;
-
-    padding:4rem 2rem;
-
-    text-align:center;
-
-    color:#64748b;
-
-    font-size:1rem;
+.hero-calendar-card svg {
+  margin-bottom: 5px;
 }
 
-/* ========================================= */
-
-.events-loading{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-
-    gap:1rem;
-
-    min-height:65vh;
+.hero-calendar-card strong {
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.spinner{
-    width:55px;
-    height:55px;
-
-    border-radius:50%;
-
-    border:5px solid #e2e8f0;
-
-    border-top-color:#2563eb;
-
-    animation:spin 1s linear infinite;
+.hero-calendar-card span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 10px;
 }
 
-@keyframes spin{
+/* =========================================================
+   STATISTICS
+========================================================= */
 
-    to{
-        transform:rotate(360deg);
-    }
-
+.member-events-statistics {
+  margin-bottom: 24px;
 }
 
-/* ========================================= */
+/*
+  EventStatistics remains responsible for its own
+  statistic cards. These selectors help keep it
+  visually consistent with the member dashboard.
+*/
 
-@media(max-width:992px){
-
-    .events-grid{
-
-        grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-
-    }
-
+.member-events-statistics > * {
+  width: 100%;
 }
 
-@media(max-width:768px){
+/* =========================================================
+   DISCOVERY TOOLBAR
+========================================================= */
 
-    .events-header{
+.events-discovery-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-        flex-direction:column;
+  gap: 22px;
 
-        align-items:flex-start;
-
-    }
-
+  margin-bottom: 13px;
 }
 
-@media(max-width:576px){
+.events-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-    .events-grid{
+.events-heading-icon {
+  width: 38px;
+  height: 38px;
 
-        grid-template-columns:1fr;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    }
+  flex-shrink: 0;
 
-    .events-header h1{
+  color: #16803c;
+  background: #e9f5ed;
 
-        font-size:1.7rem;
+  border: 1px solid #d6eadd;
+  border-radius: 9px;
+}
 
-    }
+.events-section-heading h2 {
+  margin: 0;
 
+  color: #1d2922;
+
+  font-size: 17px;
+  font-weight: 720;
+}
+
+.events-section-heading p {
+  margin: 3px 0 0;
+
+  color: #87918b;
+
+  font-size: 11px;
+}
+
+.member-events-search {
+  width: min(390px, 100%);
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  color: #8b9690;
+
+  background: #ffffff;
+
+  border: 1px solid #dce5df;
+  border-radius: 9px;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.member-events-search:focus-within {
+  border-color: #8abf99;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 128, 60, 0.07);
+}
+
+.member-events-search > svg {
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.member-events-search input {
+  width: 100%;
+  height: 100%;
+
+  padding: 0 9px;
+
+  color: #27332c;
+  background: transparent;
+
+  border: 0;
+  outline: none;
+
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.member-events-search input::placeholder {
+  color: #a1aaa5;
+}
+
+.events-search-clear {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 5px;
+
+  color: #7c8780;
+  background: #f0f3f1;
+
+  border: 0;
+  border-radius: 6px;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   SEARCH RESULT
+========================================================= */
+
+.events-search-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+  padding: 9px 12px;
+
+  color: #727e77;
+  background: #ffffff;
+
+  border: 1px solid #e1e8e4;
+  border-radius: 8px;
+
+  font-size: 11px;
+}
+
+.events-search-result strong {
+  color: #344139;
+}
+
+.events-search-result button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  color: #16803c;
+  background: transparent;
+
+  border: 0;
+
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   FEATURED EVENT
+========================================================= */
+
+.member-featured-section {
+  margin-bottom: 28px;
+}
+
+.member-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 8px;
+
+  color: #16803c;
+
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   MAIN EVENT SECTION
+========================================================= */
+
+.member-events-section {
+  margin-bottom: 32px;
+}
+
+.member-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  margin-bottom: 14px;
+}
+
+.member-section-header .member-section-label {
+  margin-bottom: 5px;
+}
+
+.member-section-header h2 {
+  margin: 0;
+
+  color: #1c2821;
+
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 730;
+  letter-spacing: -0.2px;
+}
+
+.member-section-header p {
+  margin: 4px 0 0;
+
+  color: #87918b;
+
+  font-size: 11px;
+}
+
+.events-result-count {
+  flex-shrink: 0;
+
+  padding: 6px 9px;
+
+  color: #5d6962;
+  background: #ffffff;
+
+  border: 1px solid #e0e7e3;
+  border-radius: 7px;
+
+  font-size: 10px;
+  font-weight: 650;
+}
+
+/* =========================================================
+   EVENTS GRID
+========================================================= */
+
+.member-events-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 16px;
+}
+
+/*
+  EventCard is a separate component, so these rules
+  provide a consistent visual environment without
+  changing its functionality.
+*/
+
+.member-events-grid > * {
+  min-width: 0;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.member-events-empty {
+  min-height: 230px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 35px 20px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border: 1px dashed #d7e1db;
+  border-radius: 13px;
+}
+
+.member-events-empty-icon {
+  width: 54px;
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 12px;
+
+  color: #60916e;
+  background: #edf7f0;
+
+  border-radius: 12px;
+}
+
+.member-events-empty h3 {
+  margin: 0 0 5px;
+
+  color: #354139;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.member-events-empty p {
+  max-width: 390px;
+
+  margin: 0;
+
+  color: #929b96;
+
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.events-reset-btn {
+  height: 34px;
+
+  margin-top: 15px;
+  padding: 0 13px;
+
+  color: #ffffff;
+  background: #16803c;
+
+  border: 0;
+  border-radius: 7px;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+.events-reset-btn:hover {
+  background: #116c31;
+}
+
+/* =========================================================
+   REGISTRATIONS
+========================================================= */
+
+.registrations-section {
+  margin-top: 10px;
+}
+
+.registrations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.registrations-list > * {
+  width: 100%;
+}
+
+.registration-empty {
+  min-height: 200px;
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.events-loading {
+  min-height: 60vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 20px;
+
+  text-align: center;
+}
+
+.events-loading-spinner {
+  width: 54px;
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 14px;
+
+  color: #16803c;
+  background: #eaf6ee;
+
+  border-radius: 13px;
+
+  animation: events-pulse 1.4s ease-in-out infinite;
+}
+
+.events-loading h3 {
+  margin: 0 0 5px;
+
+  color: #354139;
+
+  font-size: 15px;
+}
+
+.events-loading p {
+  margin: 0;
+
+  color: #8b958f;
+
+  font-size: 11px;
+}
+
+@keyframes events-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(0.94);
+    opacity: 0.72;
+  }
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.events-error-state {
+  min-height: 55vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 20px;
+
+  text-align: center;
+}
+
+.events-error-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 13px;
+
+  color: #b14c4c;
+  background: #fff0f0;
+
+  border: 1px solid #f0d5d5;
+  border-radius: 12px;
+
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.events-error-state h3 {
+  margin: 0 0 6px;
+
+  color: #3c4740;
+  font-size: 15px;
+}
+
+.events-error-state p {
+  max-width: 420px;
+
+  margin: 0;
+
+  color: #8d9691;
+
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.events-retry-btn {
+  height: 36px;
+
+  margin-top: 16px;
+  padding: 0 15px;
+
+  color: #ffffff;
+  background: #16803c;
+
+  border: 0;
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+.events-retry-btn:hover {
+  background: #116c31;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1250px) {
+  .member-events-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .member-events-hero-art {
+    width: 190px;
+  }
+}
+
+@media (max-width: 900px) {
+  .member-events-page {
+    padding: 20px 20px 35px;
+  }
+
+  .member-events-hero {
+    padding: 26px;
+  }
+
+  .member-events-hero-art {
+    display: none;
+  }
+
+  .events-discovery-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .member-events-search {
+    width: 100%;
+  }
+}
+
+@media (max-width: 680px) {
+  .member-events-page {
+    padding: 15px 13px 30px;
+  }
+
+  .member-events-hero {
+    min-height: auto;
+
+    padding: 24px 20px;
+
+    border-radius: 13px;
+  }
+
+  .member-events-hero h1 {
+    font-size: 24px;
+  }
+
+  .member-events-hero p {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .events-hero-meta {
+    flex-wrap: wrap;
+  }
+
+  .member-events-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .member-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .events-result-count {
+    align-self: flex-start;
+  }
+
+  .events-search-result {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 430px) {
+  .member-events-hero {
+    padding: 20px 17px;
+  }
+
+  .member-events-hero h1 {
+    font-size: 21px;
+  }
+
+  .events-eyebrow {
+    font-size: 10px;
+  }
+
+  .member-section-header h2 {
+    font-size: 18px;
+  }
 }

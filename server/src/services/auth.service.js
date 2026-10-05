@@ -1823,10 +1823,142 @@ export const login = async (
    FORGOT PASSWORD
 ========================================================== */
 
-export const forgotPassword =
-  async (data) => {
+export const forgotPassword = async (data) => {
+  const {
+    email,
+  } = data;
+
+  if (!email?.trim()) {
+    throw new AppError(
+      400,
+      "Email address is required."
+    );
+  }
+
+  const normalizedEmail =
+    email.toLowerCase().trim();
+
+  /*
+   * IMPORTANT:
+   * Password is select:false in the User model.
+   * We explicitly include it here because we need
+   * to determine whether the account has completed
+   * password setup.
+   */
+  const user =
+    await User.findOne({
+      email: normalizedEmail,
+    }).select("+password");
+
+  /*
+   * SECURITY:
+   * Never reveal whether an account exists.
+   */
+  if (!user) {
+    return {
+      success: true,
+      message:
+        "If the account exists, a verification code has been sent.",
+    };
+  }
+
+  const member =
+    await Member.findOne({
+      user: user._id,
+    });
+
+  /*
+   * ACCOUNT ACTIVATION CHECK
+   */
+  if (!user.password) {
+    throw new AppError(
+      400,
+      "Please complete account activation first."
+    );
+  }
+
+  /*
+   * EMAIL VERIFICATION CHECK
+   */
+  if (!user.emailVerified) {
+    throw new AppError(
+      400,
+      "Email address has not been verified."
+    );
+  }
+
+  /*
+   * GENERATE PASSWORD RESET OTP
+   */
+  const otpResult =
+    await otpService.createOTP({
+      user,
+      email: user.email,
+      purpose:
+        OTP_PURPOSE.PASSWORD_RESET,
+    });
+
+  /*
+   * SEND PASSWORD RESET EMAIL
+   */
+  await emailService.sendPasswordResetEmail({
+    email: user.email,
+    firstName:
+      member?.firstName ||
+      "Member",
+    otp: otpResult.plainOtp,
+  });
+
+  /*
+   * LOG ACTIVITY
+   */
+  await logActivity({
+    user: user._id,
+    action:
+      ACTIVITY.AUTH
+        .PASSWORD_RESET_REQUESTED,
+    module:
+      ACTIVITY_MODULES.AUTH,
+    targetType:
+      TARGET_TYPES.USER,
+    targetId: user._id,
+    title:
+      "Password Reset Requested",
+    description:
+      "Password reset OTP was sent.",
+    status: "success",
+  });
+
+  return {
+    success: true,
+    email: user.email,
+    otpId:
+      otpResult
+        .otpRecord
+        ._id,
+    expiresAt:
+      otpResult
+        .otpRecord
+        .expiresAt,
+    nextStep:
+      "reset-password",
+  };
+};
+
+/* ==========================================================
+   RESET PASSWORD
+========================================================== */
+
+export const resetPassword = async (data) => {
+  const session =
+    await startTransaction();
+
+  try {
     const {
       email,
+      code,
+      password,
+      confirmPassword,
     } = data;
 
     if (!email?.trim()) {
@@ -1836,274 +1968,175 @@ export const forgotPassword =
       );
     }
 
+    if (!code) {
+      throw new AppError(
+        400,
+        "Verification code is required."
+      );
+    }
+
+    if (!/^\d{6}$/.test(String(code))) {
+      throw new AppError(
+        400,
+        "Verification code must contain exactly 6 digits."
+      );
+    }
+
+    if (!password) {
+      throw new AppError(
+        400,
+        "Password is required."
+      );
+    }
+
+    if (password.length < 8) {
+      throw new AppError(
+        400,
+        "Password must be at least 8 characters long."
+      );
+    }
+
+    if (
+      confirmPassword &&
+      password !== confirmPassword
+    ) {
+      throw new AppError(
+        400,
+        "Passwords do not match."
+      );
+    }
+
     const normalizedEmail =
       email.toLowerCase().trim();
 
+    /*
+     * Find the user.
+     *
+     * We do not need the existing password here,
+     * because it will be replaced.
+     */
     const user =
       await User.findOne({
         email:
           normalizedEmail,
-      });
-
-    /*
-     * SECURITY:
-     * Never reveal whether an account exists.
-     */
+      }).session(session);
 
     if (!user) {
-      return {
-        success:
-          true,
-
-        message:
-          "If the account exists, a verification code has been sent.",
-      };
+      throw new AppError(
+        404,
+        "Account not found."
+      );
     }
 
+    /*
+     * VERIFY PASSWORD RESET OTP
+     *
+     * Use "code" consistently with the rest
+     * of the authentication system.
+     */
+    await otpService.verifyOTP({
+      user,
+      email:
+        normalizedEmail,
+      code,
+      purpose:
+        OTP_PURPOSE.PASSWORD_RESET,
+    });
+
+    /*
+     * HASH NEW PASSWORD
+     */
+    user.password =
+      await hashPassword(
+        password
+      );
+
+    /*
+     * Password reset should leave the account
+     * active and verified.
+     */
+    user.isActive = true;
+    user.emailVerified = true;
+
+    await user.save({
+      session,
+    });
+
+    /*
+     * FIND MEMBER
+     */
     const member =
       await Member.findOne({
         user:
           user._id,
-      });
+      }).session(session);
 
-    if (!user.password) {
+    if (!member) {
       throw new AppError(
-        400,
-        "Please complete account activation first."
+        404,
+        "Member profile not found."
       );
     }
 
-    if (!user.emailVerified) {
-      throw new AppError(
-        400,
-        "Email address has not been verified."
-      );
-    }
-
-    const otpResult =
-      await otpService.createOTP({
-        user,
-
-        email:
-          user.email,
-
-        purpose:
-          OTP_PURPOSE.PASSWORD_RESET,
-      });
-
-    await emailService.sendPasswordResetEmail(
-      {
-        email:
-          user.email,
-
-        firstName:
-          member?.firstName ||
-          "Member",
-
-        otp:
-          otpResult.plainOtp,
-      }
-    );
-
+    /*
+     * LOG ACTIVITY
+     */
     await logActivity({
       user:
         user._id,
-
       action:
         ACTIVITY.AUTH
-          .PASSWORD_RESET_REQUESTED,
-
+          .PASSWORD_RESET,
       module:
         ACTIVITY_MODULES.AUTH,
-
       targetType:
         TARGET_TYPES.USER,
-
       targetId:
         user._id,
-
       title:
-        "Password Reset Requested",
-
+        "Password Reset",
       description:
-        "Password reset OTP was sent.",
-
+        "Password successfully changed.",
       status:
         "success",
+      session,
     });
 
-    return {
-      email:
-        user.email,
+    /*
+     * COMMIT
+     */
+    await session.commitTransaction();
 
-      otpId:
-        otpResult
-          .otpRecord
-          ._id,
-
-      expiresAt:
-        otpResult
-          .otpRecord
-          .expiresAt,
-
-      nextStep:
-        "reset-password",
-    };
-  };
-
-/* ==========================================================
-   RESET PASSWORD
-========================================================== */
-
-export const resetPassword =
-  async (data) => {
-    const session =
-      await startTransaction();
-
-    try {
-      const {
-        email,
-        otp,
-        password,
-      } = data;
-
-      if (!email?.trim()) {
-        throw new AppError(
-          400,
-          "Email address is required."
-        );
-      }
-
-      if (!otp) {
-        throw new AppError(
-          400,
-          "Verification code is required."
-        );
-      }
-
-      if (!password) {
-        throw new AppError(
-          400,
-          "Password is required."
-        );
-      }
-
-      if (password.length < 8) {
-        throw new AppError(
-          400,
-          "Password must be at least 8 characters long."
-        );
-      }
-
-      const normalizedEmail =
-        email.toLowerCase().trim();
-
-      const user =
-        await User.findOne({
-          email:
-            normalizedEmail,
-        }).session(session);
-
-      if (!user) {
-        throw new AppError(
-          404,
-          "Account not found."
-        );
-      }
-
-      await otpService.verifyOTP({
-        user,
-
-        email:
-          normalizedEmail,
-
-        otp,
-
-        purpose:
-          OTP_PURPOSE.PASSWORD_RESET,
-      });
-
-      user.password =
-        await hashPassword(
-          password
-        );
-
-      user.isActive =
-        true;
-
-      user.emailVerified =
-        true;
-
-      await user.save({
-        session,
-      });
-
-      const member =
-        await Member.findOne({
-          user:
-            user._id,
-        }).session(session);
-
-      if (!member) {
-        throw new AppError(
-          404,
-          "Member profile not found."
-        );
-      }
-
-      await logActivity({
-        user:
-          user._id,
-
-        action:
-          ACTIVITY.AUTH
-            .PASSWORD_RESET,
-
-        module:
-          ACTIVITY_MODULES.AUTH,
-
-        targetType:
-          TARGET_TYPES.USER,
-
-        targetId:
-          user._id,
-
-        title:
-          "Password Reset",
-
-        description:
-          "Password successfully changed.",
-
-        status:
-          "success",
-
-        session,
-      });
-
-      await session.commitTransaction();
-
-      const token =
-        generateToken(
-          user._id
-        );
-
-      return buildAuthResponse(
-        user,
-        member,
-        token
+    /*
+     * AUTO LOGIN
+     */
+    const token =
+      generateToken(
+        user._id
       );
-    } catch (error) {
-      if (
-        session.inTransaction()
-      ) {
-        await session.abortTransaction();
-      }
 
-      throw error;
-    } finally {
-      await session.endSession();
+    return buildAuthResponse(
+      user,
+      member,
+      token
+    );
+
+  } catch (error) {
+
+    if (
+      session.inTransaction()
+    ) {
+      await session.abortTransaction();
     }
-  };
+
+    throw error;
+
+  } finally {
+
+    await session.endSession();
+
+  }
+};
 
 /* ==========================================================
    REPAIR MISSING MEMBERSHIP NUMBERS

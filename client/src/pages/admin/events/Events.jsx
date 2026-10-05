@@ -16,6 +16,8 @@ import {
   Users,
   Star,
   Clock,
+  MapPin,
+  MoreHorizontal,
 } from "lucide-react";
 
 import { useEvent } from "../../../context/EventContext";
@@ -23,44 +25,28 @@ import { useEvent } from "../../../context/EventContext";
 import "./Events.css";
 
 const Events = () => {
-  /* =====================================================
-      EVENT CONTEXT
-  ===================================================== */
-
   const {
     events = [],
     loading = false,
     submitting = false,
-
     loadEvents,
-
     deleteEvent,
     publishEvent,
     archiveEvent,
   } = useEvent();
 
-  /* =====================================================
-      LOCAL UI STATE
-  ===================================================== */
-
   const [search, setSearch] = useState("");
-
   const [statusFilter, setStatusFilter] = useState("all");
-
   const [categoryFilter, setCategoryFilter] = useState("all");
-
-  /* =====================================================
-      INITIAL LOAD
-  ===================================================== */
 
   useEffect(() => {
     loadEvents();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
+  }, []);
 
   /* =====================================================
-      DASHBOARD STATISTICS
+     STATISTICS
   ===================================================== */
 
   const statistics = useMemo(() => {
@@ -84,7 +70,8 @@ const Events = () => {
       upcoming: events.filter(
         (event) =>
           event.startDate &&
-          new Date(event.startDate) > now
+          new Date(event.startDate) > now &&
+          !event.isArchived
       ).length,
 
       completed: events.filter(
@@ -96,7 +83,7 @@ const Events = () => {
   }, [events]);
 
   /* =====================================================
-      CATEGORY LIST
+     CATEGORIES
   ===================================================== */
 
   const categories = useMemo(() => {
@@ -108,7 +95,7 @@ const Events = () => {
   }, [events]);
 
   /* =====================================================
-      FILTERED EVENTS
+     FILTER EVENTS
   ===================================================== */
 
   const filteredEvents = useMemo(() => {
@@ -165,7 +152,7 @@ const Events = () => {
   ]);
 
   /* =====================================================
-      ACTIONS
+     ACTIONS
   ===================================================== */
 
   const handleRefresh = useCallback(async () => {
@@ -231,7 +218,7 @@ const Events = () => {
   );
 
   /* =====================================================
-      HELPERS
+     HELPERS
   ===================================================== */
 
   const formatDate = (date) => {
@@ -247,11 +234,23 @@ const Events = () => {
     );
   };
 
+  const formatTime = (date) => {
+    if (!date) return "";
+
+    return new Date(date).toLocaleTimeString(
+      "en-KE",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+      }
+    );
+  };
+
   const getCapacity = (event) =>
     event.registration?.capacity ?? null;
 
- const getRegistered = (event) =>
-  event.registeredParticipants ?? 0;
+  const getRegistered = (event) =>
+    event.registeredParticipants ?? 0;
 
   const getCapacityPercentage = (event) => {
     const capacity = getCapacity(event);
@@ -265,53 +264,69 @@ const Events = () => {
       )
     );
   };
-    return (
+
+  return (
     <div className="events-page">
 
       {/* =====================================================
-          PAGE HEADER
+          HEADER
       ===================================================== */}
 
-      <section className="page-header">
+      <section className="events-header">
 
-        <div className="page-header-content">
+        <div className="events-header-main">
 
-          <span className="page-tag">
-            Event Management
-          </span>
+          <div className="events-breadcrumb">
+            <span>Administration</span>
+            <span>/</span>
+            <strong>Events</strong>
+          </div>
 
-          <h1>Events</h1>
+          <div className="events-title-row">
 
-          <p>
-            Create, manage, publish, archive and monitor
-            all JVP Connect events from one place.
-          </p>
+            <div className="events-title-icon">
+              <CalendarDays size={25} />
+            </div>
+
+            <div>
+              <h1>Events</h1>
+
+              <p>
+                Create, manage, publish and monitor
+                JVP Connect events.
+              </p>
+            </div>
+
+          </div>
 
         </div>
 
-        <div className="page-header-actions">
+        <div className="events-header-actions">
 
           <button
             type="button"
-            className="btn btn-outline"
+            className="events-btn events-btn-secondary"
             onClick={handleRefresh}
             disabled={loading}
           >
-            <RefreshCw size={18} />
+            <RefreshCw
+              size={17}
+              className={loading ? "spin" : ""}
+            />
             Refresh
           </button>
 
           <button
             type="button"
-            className="btn btn-outline"
+            className="events-btn events-btn-secondary"
           >
-            <Download size={18} />
+            <Download size={17} />
             Export
           </button>
 
           <Link
             to="/admin/events/create"
-            className="btn btn-primary"
+            className="events-btn events-btn-primary"
           >
             <Plus size={18} />
             Create Event
@@ -325,112 +340,106 @@ const Events = () => {
           STATISTICS
       ===================================================== */}
 
-      <section className="stats-grid">
+      <section className="events-stat-grid">
 
-        <article className="stat-card">
+        <article className="events-stat-card">
 
-          <div className="stat-icon primary">
-
-            <CalendarDays size={22} />
-
+          <div className="events-stat-icon green">
+            <CalendarDays size={20} />
           </div>
 
-          <div className="stat-content">
-
-            <h2>{statistics.total}</h2>
-
-            <p>Total Events</p>
-
+          <div>
+            <span>Total Events</span>
+            <strong>{statistics.total}</strong>
           </div>
 
-        </article>
-
-        <article className="stat-card">
-
-          <div className="stat-icon success">
-
-            <CheckCircle size={22} />
-
-          </div>
-
-          <div className="stat-content">
-
-            <h2>{statistics.published}</h2>
-
-            <p>Published</p>
-
+          <div className="events-stat-trend">
+            All events
           </div>
 
         </article>
 
-        <article className="stat-card">
+        <article className="events-stat-card">
 
-          <div className="stat-icon warning">
-
-            <Clock size={22} />
-
+          <div className="events-stat-icon blue">
+            <CheckCircle size={20} />
           </div>
 
-          <div className="stat-content">
-
-            <h2>{statistics.drafts}</h2>
-
-            <p>Drafts</p>
-
+          <div>
+            <span>Published</span>
+            <strong>{statistics.published}</strong>
           </div>
 
-        </article>
-
-        <article className="stat-card">
-
-          <div className="stat-icon info">
-
-            <Star size={22} />
-
-          </div>
-
-          <div className="stat-content">
-
-            <h2>{statistics.featured}</h2>
-
-            <p>Featured</p>
-
+          <div className="events-stat-trend">
+            Live
           </div>
 
         </article>
 
-        <article className="stat-card">
+        <article className="events-stat-card">
 
-          <div className="stat-icon secondary">
-
-            <Users size={22} />
-
+          <div className="events-stat-icon amber">
+            <Clock size={20} />
           </div>
 
-          <div className="stat-content">
+          <div>
+            <span>Drafts</span>
+            <strong>{statistics.drafts}</strong>
+          </div>
 
-            <h2>{statistics.upcoming}</h2>
-
-            <p>Upcoming</p>
-
+          <div className="events-stat-trend">
+            Pending
           </div>
 
         </article>
 
-        <article className="stat-card">
+        <article className="events-stat-card">
 
-          <div className="stat-icon dark">
-
-            <Calendar size={22} />
-
+          <div className="events-stat-icon purple">
+            <Star size={20} />
           </div>
 
-          <div className="stat-content">
+          <div>
+            <span>Featured</span>
+            <strong>{statistics.featured}</strong>
+          </div>
 
-            <h2>{statistics.completed}</h2>
+          <div className="events-stat-trend">
+            Highlighted
+          </div>
 
-            <p>Completed</p>
+        </article>
 
+        <article className="events-stat-card">
+
+          <div className="events-stat-icon teal">
+            <Calendar size={20} />
+          </div>
+
+          <div>
+            <span>Upcoming</span>
+            <strong>{statistics.upcoming}</strong>
+          </div>
+
+          <div className="events-stat-trend">
+            Scheduled
+          </div>
+
+        </article>
+
+        <article className="events-stat-card">
+
+          <div className="events-stat-icon slate">
+            <Archive size={20} />
+          </div>
+
+          <div>
+            <span>Completed</span>
+            <strong>{statistics.completed}</strong>
+          </div>
+
+          <div className="events-stat-trend">
+            Finished
           </div>
 
         </article>
@@ -438,534 +447,541 @@ const Events = () => {
       </section>
 
       {/* =====================================================
-          TOOLBAR
+          MANAGEMENT CARD
       ===================================================== */}
 
-      <section className="events-toolbar">
+      <section className="events-management-card">
 
-        <div className="toolbar-left">
+        <div className="events-management-header">
 
-          <div className="search-box">
+          <div>
+            <h2>Event Management</h2>
+
+            <p>
+              Manage your organization's events,
+              registrations and publication status.
+            </p>
+          </div>
+
+          <div className="events-count">
+            <strong>{filteredEvents.length}</strong>
+            <span>events</span>
+          </div>
+
+        </div>
+
+        {/* =====================================================
+            TOOLBAR
+        ===================================================== */}
+
+        <div className="events-toolbar">
+
+          <div className="events-search">
 
             <Search size={18} />
 
             <input
               type="text"
-              placeholder="Search events..."
+              placeholder="Search events, categories or venues..."
               value={search}
               onChange={(e) =>
                 setSearch(e.target.value)
               }
             />
 
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="events-search-clear"
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+
+          </div>
+
+          <div className="events-filters">
+
+            <select
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value)
+              }
+            >
+              <option value="all">
+                All Status
+              </option>
+
+              <option value="published">
+                Published
+              </option>
+
+              <option value="draft">
+                Draft
+              </option>
+
+              <option value="featured">
+                Featured
+              </option>
+
+              <option value="archived">
+                Archived
+              </option>
+            </select>
+
+            <select
+              value={categoryFilter}
+              onChange={(e) =>
+                setCategoryFilter(e.target.value)
+              }
+            >
+              {categories.map((category) => (
+                <option
+                  key={category}
+                  value={category}
+                >
+                  {category === "all"
+                    ? "All Categories"
+                    : category}
+                </option>
+              ))}
+            </select>
+
           </div>
 
         </div>
 
-        <div className="toolbar-right">
+        {/* =====================================================
+            RESULTS META
+        ===================================================== */}
 
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value)
-            }
-          >
+        <div className="events-results-meta">
 
-            <option value="all">
-              All Status
-            </option>
+          <div>
+            Showing{" "}
+            <strong>
+              {filteredEvents.length}
+            </strong>{" "}
+            of{" "}
+            <strong>
+              {events.length}
+            </strong>{" "}
+            events
+          </div>
 
-            <option value="published">
-              Published
-            </option>
-
-            <option value="draft">
-              Draft
-            </option>
-
-            <option value="featured">
-              Featured
-            </option>
-
-            <option value="archived">
-              Archived
-            </option>
-
-          </select>
-
-          <select
-            value={categoryFilter}
-            onChange={(e) =>
-              setCategoryFilter(e.target.value)
-            }
-          >
-
-            {categories.map((category) => (
-
-              <option
-                key={category}
-                value={category}
-              >
-
-                {category === "all"
-                  ? "All Categories"
-                  : category}
-
-              </option>
-
-            ))}
-
-          </select>
+          {(search ||
+            statusFilter !== "all" ||
+            categoryFilter !== "all") && (
+            <button
+              type="button"
+              className="clear-filters"
+              onClick={() => {
+                setSearch("");
+                setStatusFilter("all");
+                setCategoryFilter("all");
+              }}
+            >
+              Clear filters
+            </button>
+          )}
 
         </div>
 
-      </section>
+        {/* =====================================================
+            TABLE
+        ===================================================== */}
 
-      {/* =====================================================
-          RESULTS
-      ===================================================== */}
+        <div className="events-table-wrapper">
 
-      <section className="results-bar">
+          <table className="events-table">
 
-        <p>
-
-          Showing
-
-          <strong>
-            {" "}
-            {filteredEvents.length}
-            {" "}
-          </strong>
-
-          of
-
-          <strong>
-            {" "}
-            {events.length}
-            {" "}
-          </strong>
-
-          events
-
-        </p>
-
-      </section>
-
-      {/* =====================================================
-          EVENTS TABLE
-      ===================================================== */}
-
-      <div className="table-container">
-
-        <table className="events-table">
-
-          <thead>
-
-            <tr>
-
-              <th>Event</th>
-
-              <th>Date</th>
-
-              <th>Venue</th>
-
-              <th>Registrations</th>
-
-              <th>Status</th>
-
-              <th className="actions-column">
-                Actions
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-                        {loading ? (
-
+            <thead>
               <tr>
-
-                <td
-                  colSpan={6}
-                  className="table-state"
-                >
-                  Loading events...
-                </td>
-
+                <th>Event</th>
+                <th>Date & Time</th>
+                <th>Venue</th>
+                <th>Registrations</th>
+                <th>Status</th>
+                <th className="actions-column">
+                  Actions
+                </th>
               </tr>
+            </thead>
 
-            ) : filteredEvents.length === 0 ? (
+            <tbody>
 
-              <tr>
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="events-table-state"
+                  >
+                    <div className="table-loading">
+                      <RefreshCw
+                        size={22}
+                        className="spin"
+                      />
+                      <span>
+                        Loading events...
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredEvents.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="events-table-state"
+                  >
+                    <div className="empty-events">
 
-                <td
-                  colSpan={6}
-                  className="table-state"
-                >
-                  No events found.
-                </td>
+                      <div className="empty-events-icon">
+                        <CalendarDays size={28} />
+                      </div>
 
-              </tr>
+                      <h3>
+                        No events found
+                      </h3>
 
-            ) : (
+                      <p>
+                        Try adjusting your filters
+                        or create a new event.
+                      </p>
 
-              filteredEvents.map((event) => {
-                const capacity = getCapacity(event);
+                      <Link
+                        to="/admin/events/create"
+                        className="events-btn events-btn-primary"
+                      >
+                        <Plus size={17} />
+                        Create Event
+                      </Link>
 
-                const registered =
-                  getRegistered(event);
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredEvents.map((event) => {
 
-                const percentage =
-                  getCapacityPercentage(event);
+                  const capacity =
+                    getCapacity(event);
 
-                const isArchived =
-                  Boolean(event.isArchived);
+                  const registered =
+                    getRegistered(event);
 
-                const isPublished =
-                  Boolean(event.isPublished);
+                  const percentage =
+                    getCapacityPercentage(event);
 
-                const isFeatured =
-                  Boolean(event.isFeatured);
+                  const isArchived =
+                    Boolean(event.isArchived);
 
-                return (
+                  const isPublished =
+                    Boolean(event.isPublished);
 
-                  <tr key={event._id}>
+                  const isFeatured =
+                    Boolean(event.isFeatured);
 
-                    {/* =====================================
-                        EVENT
-                    ===================================== */}
+                  return (
+                    <tr key={event._id}>
 
-                    <td>
+                      {/* EVENT */}
 
-                      <div className="event-cell">
+                      <td>
 
-                        <div className="event-cover">
+                        <div className="event-cell">
 
-                          {event.coverImage?.url ? (
+                          <div className="event-cover">
 
-                            <img
-                              src={event.coverImage.url}
-                              alt={event.title}
-                            />
-
-                          ) : (
-
-                            <div className="event-cover-placeholder">
-
-                              <Calendar size={20} />
-
-                            </div>
-
-                          )}
-
-                        </div>
-
-                        <div className="event-details">
-
-                          <div className="event-title">
-
-                            <h4>
-
-                              {event.title}
-
-                            </h4>
-
-                            {isFeatured && (
-
-                              <span className="badge info">
-
-                                <Star size={12} />
-
-                                Featured
-
-                              </span>
-
+                            {event.coverImage?.url ? (
+                              <img
+                                src={event.coverImage.url}
+                                alt={event.title}
+                              />
+                            ) : (
+                              <div className="event-cover-placeholder">
+                                <Calendar size={21} />
+                              </div>
                             )}
 
                           </div>
 
-                          <p>
+                          <div className="event-details">
 
-                            {event.summary ||
-                              "No event summary available."}
+                            <div className="event-title-row-small">
 
-                          </p>
+                              <h4>
+                                {event.title}
+                              </h4>
+
+                              {isFeatured && (
+                                <span className="event-featured-badge">
+                                  <Star size={11} />
+                                  Featured
+                                </span>
+                              )}
+
+                            </div>
+
+                            <p>
+                              {event.summary ||
+                                "No event summary available."}
+                            </p>
+
+                            <span className="event-category">
+                              {event.category ||
+                                "General"}
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                      </td>
+
+                      {/* DATE */}
+
+                      <td>
+
+                        <div className="event-date-cell">
+
+                          <strong>
+                            {formatDate(
+                              event.startDate
+                            )}
+                          </strong>
+
+                          <span>
+                            {formatTime(
+                              event.startDate
+                            )}
+                          </span>
+
+                          <div className="date-divider">
+                            →
+                          </div>
+
+                          <strong>
+                            {formatDate(
+                              event.endDate
+                            )}
+                          </strong>
+
+                          <span>
+                            {formatTime(
+                              event.endDate
+                            )}
+                          </span>
+
+                        </div>
+
+                      </td>
+
+                      {/* VENUE */}
+
+                      <td>
+
+                        <div className="event-venue">
+
+                          <div className="venue-icon">
+                            <MapPin size={15} />
+                          </div>
+
+                          <div>
+                            <strong>
+                              {event.eventType ===
+                              "virtual"
+                                ? "Virtual Event"
+                                : event.venue?.name ||
+                                  "Venue TBA"}
+                            </strong>
+
+                            <span>
+                              {event.eventType ===
+                              "virtual"
+                                ? event.virtualPlatform ||
+                                  "Online"
+                                : event.venue?.county ||
+                                  ""}
+                            </span>
+                          </div>
+
+                        </div>
+
+                      </td>
+
+                      {/* REGISTRATIONS */}
+
+                      <td>
+
+                        <div className="registration-cell">
+
+                          <div className="registration-top">
+
+                            <strong>
+                              {registered}
+                            </strong>
+
+                            <span>
+                              {capacity
+                                ? ` / ${capacity}`
+                                : " / Unlimited"}
+                            </span>
+
+                          </div>
+
+                          {capacity && (
+                            <div className="capacity-bar">
+                              <div
+                                className="capacity-progress"
+                                style={{
+                                  width: `${percentage}%`,
+                                }}
+                              />
+                            </div>
+                          )}
 
                           <small>
-
-                            {event.category ||
-                              "General"}
-
+                            {capacity
+                              ? `${percentage}% full`
+                              : "Open registration"}
                           </small>
 
                         </div>
 
-                      </div>
+                      </td>
 
-                    </td>
+                      {/* STATUS */}
 
-                    {/* =====================================
-                        DATE
-                    ===================================== */}
+                      <td>
 
-                    <td>
+                        <div className="event-status-stack">
 
-                      <div className="date-cell">
-
-                        <strong>
-
-                          {formatDate(
-                            event.startDate
+                          {isPublished ? (
+                            <span className="status-badge published">
+                              <span />
+                              Published
+                            </span>
+                          ) : (
+                            <span className="status-badge draft">
+                              <span />
+                              Draft
+                            </span>
                           )}
 
-                        </strong>
-
-                        <span>
-
-                          to
-
-                        </span>
-
-                        <strong>
-
-                          {formatDate(
-                            event.endDate
+                          {isArchived && (
+                            <span className="status-badge archived">
+                              <span />
+                              Archived
+                            </span>
                           )}
-
-                        </strong>
-
-                      </div>
-
-                    </td>
-
-                    {/* =====================================
-                        VENUE
-                    ===================================== */}
-
-                    <td>
-
-                      <div className="venue-cell">
-
-                        <strong>
-
-                          {event.eventType ===
-                          "virtual"
-                            ? "Virtual Event"
-                            : event.venue?.name ||
-                              "Venue TBA"}
-
-                        </strong>
-
-                        <span>
-
-                          {event.eventType ===
-                          "virtual"
-                            ? event.virtualPlatform ||
-                              ""
-                            : event.venue?.county ||
-                              ""}
-
-                        </span>
-
-                      </div>
-
-                    </td>
-
-                    {/* =====================================
-                        REGISTRATIONS
-                    ===================================== */}
-
-                    <td>
-
-                      <div className="registration-cell">
-
-                        <div className="registration-header">
-
-                          <strong>
-
-                            {registered}
-
-                          </strong>
-
-                          <span>
-
-                            {capacity
-                              ? ` / ${capacity}`
-                              : " Unlimited"}
-
-                          </span>
 
                         </div>
 
-                        {capacity && (
+                      </td>
 
-                          <div className="capacity-bar">
+                      {/* ACTIONS */}
 
-                            <div
-                              className="capacity-progress"
-                              style={{
-                                width: `${percentage}%`,
-                              }}
-                            />
+                      <td>
 
-                          </div>
+                        <div className="event-actions">
 
-                        )}
+                          <Link
+                            to={`/admin/events/${event._id}`}
+                            className="event-action-btn"
+                            title="View Event"
+                            aria-label="View Event"
+                          >
+                            <Eye size={17} />
+                          </Link>
 
-                        <small>
+                          <Link
+                            to={`/admin/events/edit/${event._id}`}
+                            className="event-action-btn"
+                            title="Edit Event"
+                            aria-label="Edit Event"
+                          >
+                            <Edit size={17} />
+                          </Link>
 
-                          {capacity
-                            ? `${percentage}% Full`
-                            : "Open Registration"}
+                          {!isPublished && (
+                            <button
+                              type="button"
+                              className="event-action-btn success"
+                              onClick={() =>
+                                handlePublish(
+                                  event._id
+                                )
+                              }
+                              disabled={submitting}
+                              title="Publish Event"
+                              aria-label="Publish Event"
+                            >
+                              <CheckCircle
+                                size={17}
+                              />
+                            </button>
+                          )}
 
-                        </small>
-
-                      </div>
-
-                    </td>
-
-                    {/* =====================================
-                        STATUS
-                    ===================================== */}
-
-                    <td>
-
-                      <div className="status-stack">
-
-                        {isPublished ? (
-
-                          <span className="badge success">
-
-                            Published
-
-                          </span>
-
-                        ) : (
-
-                          <span className="badge warning">
-
-                            Draft
-
-                          </span>
-
-                        )}
-
-                        {isArchived && (
-
-                          <span className="badge danger">
-
-                            Archived
-
-                          </span>
-
-                        )}
-
-                      </div>
-
-                    </td>
-
-                    {/* =====================================
-                        ACTIONS
-                    ===================================== */}
-
-                    <td>
-
-                      <div className="action-buttons">
-
-                        <Link
-                          to={`/admin/events/${event._id}`}
-                          className="icon-button"
-                          title="View Event"
-                          aria-label="View Event"
-                        >
-                          <Eye size={18} />
-                        </Link>
-
-                        <Link
-                          to={`/admin/events/edit/${event._id}`}
-                          className="icon-button"
-                          title="Edit Event"
-                          aria-label="Edit Event"
-                        >
-                          <Edit size={18} />
-                        </Link>
-
-                        {!isPublished && (
+                          {!isArchived && (
+                            <button
+                              type="button"
+                              className="event-action-btn warning"
+                              onClick={() =>
+                                handleArchive(
+                                  event._id
+                                )
+                              }
+                              disabled={submitting}
+                              title="Archive Event"
+                              aria-label="Archive Event"
+                            >
+                              <Archive size={17} />
+                            </button>
+                          )}
 
                           <button
                             type="button"
-                            className="icon-button success"
+                            className="event-action-btn danger"
                             onClick={() =>
-                              handlePublish(
+                              handleDelete(
                                 event._id
                               )
                             }
                             disabled={submitting}
-                            title="Publish Event"
-                            aria-label="Publish Event"
+                            title="Delete Event"
+                            aria-label="Delete Event"
                           >
-                            <CheckCircle
-                              size={18}
-                            />
+                            <Trash2 size={17} />
                           </button>
-
-                        )}
-
-                        {!isArchived && (
 
                           <button
                             type="button"
-                            className="icon-button warning"
-                            onClick={() =>
-                              handleArchive(
-                                event._id
-                              )
-                            }
-                            disabled={submitting}
-                            title="Archive Event"
-                            aria-label="Archive Event"
+                            className="event-action-btn more"
+                            title="More Actions"
+                            aria-label="More Actions"
                           >
-                            <Archive
-                              size={18}
+                            <MoreHorizontal
+                              size={17}
                             />
                           </button>
 
-                        )}
+                        </div>
 
-                        <button
-                          type="button"
-                          className="icon-button danger"
-                          onClick={() =>
-                            handleDelete(
-                              event._id
-                            )
-                          }
-                          disabled={submitting}
-                          title="Delete Event"
-                          aria-label="Delete Event"
-                        >
-                          <Trash2
-                            size={18}
-                          />
-                        </button>
+                      </td>
 
-                      </div>
+                    </tr>
+                  );
+                })
+              )}
 
-                    </td>
+            </tbody>
 
-                  </tr>
+          </table>
 
-                );
+        </div>
 
-              })
-
-            )}
-                    </tbody>
-
-        </table>
-
-      </div>
+      </section>
 
     </div>
   );

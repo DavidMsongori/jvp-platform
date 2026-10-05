@@ -211,9 +211,9 @@ function RegisterForm() {
     return cleanedPhone;
   };
 
-  /* ==========================================
+ /* ==========================================================
    CLIENT VALIDATION
-========================================== */
+========================================================== */
 
 const validateForm = () => {
   const nationalIdPattern =
@@ -225,8 +225,23 @@ const validateForm = () => {
     .replace(/-/g, "")
     .replace(/^\+/, "");
 
+  /*
+   * Kenyan phone numbers:
+   *
+   * Local:
+   *   07XXXXXXXX
+   *   01XXXXXXXX
+   *
+   * International:
+   *   2547XXXXXXXX
+   *   2541XXXXXXXX
+   *
+   * With plus:
+   *   +2547XXXXXXXX
+   *   +2541XXXXXXXX
+   */
   const phonePattern =
-    /^(?:2547\d{8}|07\d{8})$/;
+    /^(?:0[17]\d{8}|254[17]\d{8})$/;
 
   if (!form.firstName.trim()) {
     return "First name is required.";
@@ -274,7 +289,7 @@ const validateForm = () => {
       normalizedPhone
     )
   ) {
-    return "Enter a valid Kenyan phone number, such as 0740504969, 254740504969, or +254740504969.";
+    return "Enter a valid Kenyan phone number, such as 0712345678, 0112345678, 254712345678, 254112345678, or +254112345678.";
   }
 
   if (!form.county) {

@@ -1,0 +1,666 @@
+/* ==========================================================
+   JVP ADMIN EVENTS PAGE
+========================================================== */
+
+.admin-events-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 28px;
+  background: #f5f7f9;
+  color: #17212b;
+  box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   PAGE HEADER
+========================================================== */
+
+.events-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-bottom: 28px;
+  padding: 26px 28px;
+
+  background: #ffffff;
+  border: 1px solid #e7ebef;
+  border-radius: 16px;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.events-header-content {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  min-width: 0;
+}
+
+.events-header-icon {
+  width: 54px;
+  height: 54px;
+
+  flex: 0 0 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: #e9f7ee;
+  color: #16803c;
+
+  font-size: 22px;
+}
+
+.events-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 5px;
+
+  color: #8a949d;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.events-breadcrumb span {
+  color: #c2c8cd;
+}
+
+.events-page-title {
+  margin: 0;
+
+  color: #17212b;
+
+  font-size: 25px;
+  line-height: 1.25;
+  font-weight: 750;
+  letter-spacing: -0.3px;
+}
+
+.events-page-subtitle {
+  margin: 6px 0 0;
+
+  color: #707b85;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   HEADER ACTIONS
+========================================================== */
+
+.events-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+.events-refresh-button,
+.events-create-button {
+  height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 16px;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.events-refresh-button {
+  background: #ffffff;
+  border: 1px solid #dfe5e9;
+  color: #4e5b66;
+}
+
+.events-refresh-button:hover:not(:disabled) {
+  background: #f7f9fa;
+  border-color: #cdd5da;
+}
+
+.events-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.events-create-button {
+  background: #16803c;
+  border: 1px solid #16803c;
+  color: #ffffff;
+
+  box-shadow:
+    0 4px 10px rgba(22, 128, 60, 0.16);
+}
+
+.events-create-button:hover {
+  background: #126b32;
+  border-color: #126b32;
+
+  box-shadow:
+    0 6px 14px rgba(22, 128, 60, 0.22);
+
+  transform: translateY(-1px);
+}
+
+.events-create-button:active {
+  transform: translateY(0);
+}
+
+.events-spin {
+  animation: events-spin 0.9s linear infinite;
+}
+
+@keyframes events-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ==========================================================
+   SECTION
+========================================================== */
+
+.events-summary-section {
+  margin-bottom: 28px;
+}
+
+.events-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+  padding: 0 2px;
+}
+
+.events-section-heading h2 {
+  margin: 0;
+
+  color: #26313a;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.events-section-heading p {
+  margin: 4px 0 0;
+
+  color: #7c8790;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   MANAGEMENT CARD
+========================================================== */
+
+.events-management-card {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e4e9ed;
+  border-radius: 16px;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.025);
+}
+
+
+/* ==========================================================
+   MANAGEMENT HEADER
+========================================================== */
+
+.events-management-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 21px 24px;
+
+  border-bottom: 1px solid #edf0f2;
+}
+
+.events-management-header h2 {
+  margin: 0;
+
+  color: #202b34;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.events-management-header p {
+  margin: 5px 0 0;
+
+  color: #808a93;
+
+  font-size: 12px;
+}
+
+.events-count-badge {
+  flex-shrink: 0;
+
+  padding: 7px 11px;
+
+  border: 1px solid #dfe9e3;
+  border-radius: 20px;
+
+  background: #f1f8f3;
+  color: #16803c;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   FILTER AREA
+========================================================== */
+
+.events-filters-wrapper {
+  padding: 18px 24px;
+
+  background: #fbfcfc;
+
+  border-bottom: 1px solid #edf0f2;
+}
+
+
+/*
+   These selectors provide a clean baseline for the existing
+   EventFilters component without requiring its functionality
+   to change.
+*/
+
+.events-filters-wrapper form {
+  width: 100%;
+}
+
+.events-filters-wrapper input,
+.events-filters-wrapper select {
+  min-height: 40px;
+
+  border: 1px solid #dfe5e9;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #27333c;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.events-filters-wrapper input:focus,
+.events-filters-wrapper select:focus {
+  border-color: #16803c;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 128, 60, 0.08);
+}
+
+.events-filters-wrapper input::placeholder {
+  color: #a2aab1;
+}
+
+
+/* ==========================================================
+   TABLE AREA
+========================================================== */
+
+.events-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+
+  background: #ffffff;
+}
+
+.events-table-wrapper table {
+  width: 100%;
+  min-width: 850px;
+
+  border-collapse: collapse;
+}
+
+.events-table-wrapper th {
+  padding: 13px 16px;
+
+  background: #f8faf9;
+
+  border-bottom: 1px solid #e5e9ec;
+
+  color: #68747e;
+
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+
+  text-align: left;
+  white-space: nowrap;
+}
+
+.events-table-wrapper td {
+  padding: 14px 16px;
+
+  border-bottom: 1px solid #eef1f3;
+
+  color: #34414b;
+
+  font-size: 13px;
+
+  vertical-align: middle;
+}
+
+.events-table-wrapper tbody tr {
+  transition:
+    background 0.15s ease;
+}
+
+.events-table-wrapper tbody tr:hover {
+  background: #fafcfb;
+}
+
+.events-table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* ==========================================================
+   COMMON TABLE ELEMENTS
+========================================================== */
+
+.events-table-wrapper button {
+  font-family: inherit;
+}
+
+.events-table-wrapper a {
+  color: #16803c;
+  text-decoration: none;
+}
+
+.events-table-wrapper a:hover {
+  text-decoration: underline;
+}
+
+
+/* ==========================================================
+   STATUS BADGES
+========================================================== */
+
+.events-table-wrapper .status-badge,
+.events-table-wrapper .badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 25px;
+
+  padding: 0 9px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   EMPTY / LOADING STATES
+========================================================== */
+
+.events-table-wrapper .empty-state,
+.events-table-wrapper .no-events,
+.events-table-wrapper .loading-state {
+  min-height: 180px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  color: #8a949d;
+
+  text-align: center;
+  font-size: 13px;
+}
+
+
+/* ==========================================================
+   PAGINATION
+========================================================== */
+
+.events-table-wrapper .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 15px 20px;
+
+  border-top: 1px solid #edf0f2;
+
+  background: #ffffff;
+}
+
+.events-table-wrapper .pagination button {
+  min-width: 34px;
+  height: 34px;
+
+  border: 1px solid #dfe5e9;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #56626c;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.events-table-wrapper .pagination button:hover:not(:disabled) {
+  background: #f2f8f4;
+  border-color: #b9d9c4;
+  color: #16803c;
+}
+
+.events-table-wrapper .pagination button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 1100px) {
+  .admin-events-page {
+    padding: 22px;
+  }
+
+  .events-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .events-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .admin-events-page {
+    padding: 16px;
+  }
+
+  .events-page-header {
+    padding: 20px;
+
+    border-radius: 13px;
+  }
+
+  .events-header-content {
+    align-items: flex-start;
+  }
+
+  .events-header-icon {
+    width: 46px;
+    height: 46px;
+
+    flex-basis: 46px;
+
+    font-size: 18px;
+  }
+
+  .events-page-title {
+    font-size: 21px;
+  }
+
+  .events-page-subtitle {
+    font-size: 12px;
+  }
+
+  .events-header-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+  }
+
+  .events-refresh-button,
+  .events-create-button {
+    width: 100%;
+  }
+
+  .events-management-header {
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding: 18px;
+  }
+
+  .events-count-badge {
+    align-self: flex-start;
+  }
+
+  .events-filters-wrapper {
+    padding: 15px;
+  }
+
+  .events-table-wrapper th,
+  .events-table-wrapper td {
+    padding: 11px 12px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .admin-events-page {
+    padding: 12px;
+  }
+
+  .events-page-header {
+    margin-bottom: 20px;
+    padding: 17px;
+  }
+
+  .events-header-content {
+    gap: 12px;
+  }
+
+  .events-header-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-basis: 42px;
+
+    border-radius: 11px;
+
+    font-size: 16px;
+  }
+
+  .events-breadcrumb {
+    font-size: 10px;
+  }
+
+  .events-page-title {
+    font-size: 19px;
+  }
+
+  .events-page-subtitle {
+    display: none;
+  }
+
+  .events-header-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .events-section-heading {
+    margin-bottom: 10px;
+  }
+
+  .events-section-heading h2 {
+    font-size: 15px;
+  }
+
+  .events-management-card {
+    border-radius: 12px;
+  }
+
+  .events-management-header {
+    padding: 16px;
+  }
+
+  .events-management-header h2 {
+    font-size: 15px;
+  }
+}
