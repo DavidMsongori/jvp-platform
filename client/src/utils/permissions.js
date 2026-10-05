@@ -18,6 +18,10 @@ export const PERMISSIONS = {
   RECORD_PAYMENT: "record_payment",
   REFUND_PAYMENT: "refund_payment",
 
+  /* FINANCE */
+
+VIEW_FINANCE_DASHBOARD: "view_finance_dashboard",
+VIEW_FINANCE_REPORTS: "view_finance_reports",
 
   /* EVENTS */
 
@@ -120,14 +124,25 @@ export const ROLE_PERMISSIONS = {
      FINANCE
   ======================================================== */
 
-  finance: [
+finance: [
 
-    PERMISSIONS.VIEW_PAYMENTS,
-    PERMISSIONS.RECORD_PAYMENT,
-    PERMISSIONS.REFUND_PAYMENT,
-    PERMISSIONS.VIEW_REPORTS,
+  /* FINANCE */
 
-  ],
+  PERMISSIONS.VIEW_FINANCE_DASHBOARD,
+  PERMISSIONS.VIEW_FINANCE_REPORTS,
+
+
+  /* PAYMENTS */
+
+  PERMISSIONS.VIEW_PAYMENTS,
+  PERMISSIONS.RECORD_PAYMENT,
+  PERMISSIONS.REFUND_PAYMENT,
+
+  /* REPORTS */
+
+  PERMISSIONS.VIEW_REPORTS,
+
+],
 
 
   /* ========================================================

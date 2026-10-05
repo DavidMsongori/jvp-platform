@@ -159,6 +159,16 @@ import ElectionAspirants from "../pages/admin/elections/ElectionAspirants";
 import ElectionResults from "../pages/admin/elections/ElectionResults";
 
 /* ==========================================
+   FINANCE WORKSPACE
+========================================== */
+
+import FinanceLayout from "../pages/finance/FinanceLayout";
+import FinanceDashboard from "../pages/finance/FinanceDashboard";
+import FinancePayments from "../pages/finance/FinancePayments";
+import ManualMpesa from "../pages/finance/ManualMpesa";
+import FinanceReports from "../pages/finance/FinanceReports";
+
+/* ==========================================
    OTHER
 ========================================== */
 
@@ -217,14 +227,10 @@ function AppRoutes() {
             PUBLIC ELECTIONS
         ====================================== */}
 
-        {/* Public Elections Listing */}
-
         <Route
           path="/elections"
           element={<PublicElection />}
         />
-
-        {/* Public Election Details */}
 
         <Route
           path="/elections/:electionId"
@@ -368,28 +374,20 @@ function AppRoutes() {
           }
         >
 
-          {/* Dashboard Home */}
-
           <Route
             index
             element={<Dashboard />}
           />
-
-          {/* Profile */}
 
           <Route
             path="profile"
             element={<Profile />}
           />
 
-          {/* Membership Card */}
-
           <Route
             path="membership-card"
             element={<MembershipCardPage />}
           />
-
-          {/* Events */}
 
           <Route
             path="events"
@@ -401,28 +399,20 @@ function AppRoutes() {
             element={<EventDetails />}
           />
 
-          {/* Programs */}
-
           <Route
             path="programs"
             element={<ProgramsDashboard />}
           />
-
-          {/* Certificates */}
 
           <Route
             path="certificates"
             element={<Certificates />}
           />
 
-          {/* Notifications */}
-
           <Route
             path="notifications"
             element={<Notifications />}
           />
-
-          {/* Settings */}
 
           <Route
             path="settings"
@@ -433,49 +423,35 @@ function AppRoutes() {
               MEMBER ELECTIONS
           ====================================== */}
 
-          {/* Election Dashboard */}
-
           <Route
             path="elections"
             element={<Elections />}
           />
-
-          {/* My Applications */}
 
           <Route
             path="elections/my-applications"
             element={<MyApplications />}
           />
 
-          {/* My Votes */}
-
           <Route
             path="elections/my-votes"
             element={<MyVotes />}
           />
-
-          {/* Election Details */}
 
           <Route
             path="elections/:electionId"
             element={<ElectionDetails />}
           />
 
-          {/* Election Aspirants */}
-
           <Route
             path="elections/:electionId/aspirants"
             element={<Aspirants />}
           />
 
-          {/* Position Application */}
-
           <Route
             path="elections/:electionId/positions/:positionId/apply"
             element={<ElectionApplication />}
           />
-
-          {/* Position Voting */}
 
           <Route
             path="elections/:electionId/positions/:positionId/vote"
@@ -821,6 +797,79 @@ function AppRoutes() {
                 permission={PERMISSIONS.MANAGE_ELECTIONS}
               >
                 <ElectionResults />
+              </PermissionRoute>
+            }
+          />
+
+        </Route>
+
+        {/* =====================================
+            FINANCE WORKSPACE
+        ====================================== */}
+
+        <Route
+          path="/finance"
+          element={
+            <ProtectedRoute>
+              <PermissionRoute
+                permission={PERMISSIONS.VIEW_FINANCE_DASHBOARD}
+              >
+                <FinanceLayout />
+              </PermissionRoute>
+            </ProtectedRoute>
+          }
+        >
+
+          {/* =====================================
+              FINANCE DASHBOARD
+          ====================================== */}
+
+          <Route
+            index
+            element={<FinanceDashboard />}
+          />
+
+          {/* =====================================
+              PAYMENT RECORDS
+          ====================================== */}
+
+          <Route
+            path="payments"
+            element={
+              <PermissionRoute
+                permission={PERMISSIONS.VIEW_PAYMENTS}
+              >
+                <FinancePayments />
+              </PermissionRoute>
+            }
+          />
+
+          {/* =====================================
+              MANUAL M-PESA VERIFICATION
+          ====================================== */}
+
+          <Route
+            path="payments/manual-mpesa"
+            element={
+              <PermissionRoute
+                permission={PERMISSIONS.VIEW_PAYMENTS}
+              >
+                <ManualMpesa />
+              </PermissionRoute>
+            }
+          />
+
+          {/* =====================================
+              FINANCIAL REPORTS
+          ====================================== */}
+
+          <Route
+            path="reports"
+            element={
+              <PermissionRoute
+                permission={PERMISSIONS.VIEW_REPORTS}
+              >
+                <FinanceReports />
               </PermissionRoute>
             }
           />

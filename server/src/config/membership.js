@@ -10,7 +10,7 @@ export const MEMBERSHIP = {
 
   fees: {
 
-    ordinary: 100,
+    ordinary: 50,
 
     leadership: 500,
 

@@ -62,9 +62,7 @@ const saveStoredJSON = (key, value) => {
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
-
   const [user, setUser] = useState(null);
-
   const [member, setMember] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -103,7 +101,9 @@ export function AuthProvider({ children }) {
             newToken
           );
         } else {
-          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(
+            TOKEN_KEY
+          );
         }
 
         setToken(newToken || null);
@@ -138,7 +138,9 @@ export function AuthProvider({ children }) {
     const initializeAuth = () => {
       try {
         const storedToken =
-          localStorage.getItem(TOKEN_KEY);
+          localStorage.getItem(
+            TOKEN_KEY
+          );
 
         const storedUser =
           readStoredJSON(USER_KEY);
@@ -146,7 +148,10 @@ export function AuthProvider({ children }) {
         const storedMember =
           readStoredJSON(MEMBER_KEY);
 
-        setToken(storedToken || null);
+        setToken(
+          storedToken || null
+        );
+
         setUser(storedUser);
         setMember(storedMember);
       } finally {
@@ -164,7 +169,9 @@ export function AuthProvider({ children }) {
   const login = useCallback(
     async (credentials) => {
       const response =
-        await authService.login(credentials);
+        await authService.login(
+          credentials
+        );
 
       const data = response?.data;
 
@@ -174,9 +181,15 @@ export function AuthProvider({ children }) {
         );
       }
 
+      if (!data?.user) {
+        throw new Error(
+          "Login response did not include user information."
+        );
+      }
+
       saveAuthState({
         token: data.token,
-        user: data.user || null,
+        user: data.user,
         member: data.member || null,
       });
 
@@ -189,50 +202,61 @@ export function AuthProvider({ children }) {
      LOGOUT
   ========================================== */
 
-  const logout = useCallback(async () => {
-    try {
-      await authService.logout();
-    } catch {
-      // Clear the local session even when
-      // the backend logout request fails.
-    } finally {
-      clearAuthState();
-    }
-  }, [clearAuthState]);
+  const logout = useCallback(
+    async () => {
+      try {
+        await authService.logout();
+      } catch {
+        // Always clear local authentication.
+      } finally {
+        clearAuthState();
+      }
+    },
+    [clearAuthState]
+  );
 
   /* ==========================================
      REFRESH MEMBER PROFILE
   ========================================== */
 
- const refreshProfile =
-  useCallback(async () => {
-    try {
-      const response =
-        await getMyProfile();
+  const refreshProfile =
+    useCallback(async () => {
+      try {
+        setRefreshingMember(true);
 
-      const payload =
-        response?.data ||
-        response ||
-        {};
+        const response =
+          await getMyProfile();
 
-      const refreshedMember =
-        payload.member ||
-        payload;
+        const payload =
+          response?.data ||
+          response ||
+          {};
 
-      setMember(
-        refreshedMember
-      );
+        const refreshedMember =
+          payload.member ||
+          payload;
 
-      return refreshedMember;
-    } catch (error) {
-      console.error(
-        "Unable to refresh member profile:",
-        error
-      );
+        setMember(
+          refreshedMember
+        );
 
-      throw error;
-    }
-  }, []);
+        saveStoredJSON(
+          MEMBER_KEY,
+          refreshedMember
+        );
+
+        return refreshedMember;
+      } catch (error) {
+        console.error(
+          "Unable to refresh member profile:",
+          error
+        );
+
+        throw error;
+      } finally {
+        setRefreshingMember(false);
+      }
+    }, []);
 
   /* ==========================================
      UPDATE USER
@@ -281,36 +305,40 @@ export function AuthProvider({ children }) {
   );
 
   /* ==========================================
-     PERMISSIONS
+     ROLE
   ========================================== */
 
-  const hasPermission = useCallback(
-    (permission) => {
-      if (!user?.role) {
-        return false;
-      }
+  const role = String(
+    user?.role || "member"
+  ).toLowerCase();
 
-      return checkPermission(
-        user.role,
-        permission
-      );
-    },
-    [user?.role]
-  );
+  /* ==========================================
+     ROLE FLAGS
+  ========================================== */
+
+  const isSuperAdmin =
+    role === "super_admin";
+
+  const isAdmin =
+    role === "admin" ||
+    isSuperAdmin;
+
+  const isFinance =
+    role === "finance";
+
+  const isEvents =
+    role === "events";
+
+  const isMember =
+    role === "member";
 
   /* ==========================================
      AUTH STATE
   ========================================== */
 
-  const role =
-    user?.role ?? "member";
-
   const isAuthenticated =
     Boolean(token) &&
     Boolean(user);
-
-  const isAdmin =
-    role !== "member";
 
   /* ==========================================
      MEMBERSHIP STATE
@@ -349,6 +377,24 @@ export function AuthProvider({ children }) {
     membershipFeePaid;
 
   /* ==========================================
+     PERMISSIONS
+  ========================================== */
+
+  const hasPermission = useCallback(
+    (permission) => {
+      if (!role) {
+        return false;
+      }
+
+      return checkPermission(
+        role,
+        permission
+      );
+    },
+    [role]
+  );
+
+  /* ==========================================
      PROVIDER VALUE
   ========================================== */
 
@@ -363,10 +409,17 @@ export function AuthProvider({ children }) {
       loading,
       refreshingMember,
 
+      isAuthenticated,
+
+      /* Role */
+
       role,
 
-      isAuthenticated,
+      isSuperAdmin,
       isAdmin,
+      isFinance,
+      isEvents,
+      isMember,
 
       /* Membership */
 
@@ -401,24 +454,40 @@ export function AuthProvider({ children }) {
       token,
       user,
       member,
+
       loading,
       refreshingMember,
-      role,
+
       isAuthenticated,
+
+      role,
+
+      isSuperAdmin,
       isAdmin,
+      isFinance,
+      isEvents,
+      isMember,
+
       membershipStatus,
       membershipType,
       membershipNumber,
+
       membershipFeePaid,
+
       membershipActive,
       membershipInactive,
       membershipExpired,
       needsPayment,
+
       canAccessDashboard,
+
       hasPermission,
+
       login,
       logout,
+
       refreshProfile,
+
       updateUser,
       updateMember,
     ]

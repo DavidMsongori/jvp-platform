@@ -1,0 +1,440 @@
+/* ==========================================================
+   JVP CONNECT — FINANCE LAYOUT
+========================================================== */
+
+.finance-layout {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  background: #f5f7f9;
+  color: #142033;
+}
+
+/* ==========================================================
+   MAIN CONTENT AREA
+========================================================== */
+
+.finance-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: 250px;
+  display: flex;
+  flex-direction: column;
+  transition:
+    margin-left 0.25s ease,
+    width 0.25s ease;
+}
+
+/* ==========================================================
+   TOPBAR
+========================================================== */
+
+.finance-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: 76px;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 28px;
+
+  background: #ffffff;
+  border-bottom: 1px solid #e7ebef;
+  box-shadow: 0 2px 10px rgba(20, 32, 51, 0.04);
+}
+
+/* ==========================================================
+   TOPBAR LEFT
+========================================================== */
+
+.finance-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.finance-topbar-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: #edf8f1;
+  color: #16803c;
+
+  font-size: 18px;
+}
+
+.finance-topbar-left > div:last-child {
+  min-width: 0;
+}
+
+.finance-topbar-label {
+  display: block;
+  margin-bottom: 2px;
+
+  color: #16803c;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+}
+
+.finance-topbar h1 {
+  margin: 0;
+
+  color: #142033;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================
+   TOPBAR RIGHT
+========================================================== */
+
+.finance-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  flex-shrink: 0;
+}
+
+/* ==========================================================
+   ROLE BADGE
+========================================================== */
+
+.finance-role-badge {
+  min-height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 7px 13px;
+
+  border: 1px solid #dcefe3;
+  border-radius: 999px;
+
+  background: #f5fbf7;
+  color: #256b42;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.finance-role-dot {
+  width: 8px;
+  height: 8px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #16803c;
+  box-shadow: 0 0 0 3px #e4f4e9;
+}
+
+/* ==========================================================
+   LOGOUT BUTTON
+========================================================== */
+
+.finance-logout-button {
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+
+  border: 1px solid #e0e5ea;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #5b6675;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.finance-logout-button svg {
+  font-size: 14px;
+}
+
+.finance-logout-button:hover {
+  border-color: #d7bcbc;
+  background: #fff8f8;
+  color: #b42318;
+  box-shadow: 0 3px 10px rgba(20, 32, 51, 0.06);
+}
+
+.finance-logout-button:active {
+  transform: translateY(1px);
+}
+
+.finance-logout-button:focus-visible {
+  outline: none;
+  border-color: #16803c;
+  box-shadow: 0 0 0 3px rgba(22, 128, 60, 0.14);
+}
+
+/* ==========================================================
+   PAGE CONTENT
+========================================================== */
+
+.finance-page-content {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+
+  padding: 28px;
+
+  box-sizing: border-box;
+}
+
+/* ==========================================================
+   GENERIC PAGE CONTAINER SUPPORT
+========================================================== */
+
+.finance-page-content > * {
+  width: 100%;
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+.finance-main {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5cf transparent;
+}
+
+.finance-main::-webkit-scrollbar {
+  width: 7px;
+}
+
+.finance-main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.finance-main::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #cbd5cf;
+}
+
+.finance-main::-webkit-scrollbar-thumb:hover {
+  background: #aebbb3;
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 1180px) {
+  .finance-main {
+    margin-left: 250px;
+  }
+
+  .finance-topbar {
+    padding: 13px 22px;
+  }
+
+  .finance-page-content {
+    padding: 24px 22px;
+  }
+
+  .finance-topbar h1 {
+    font-size: 19px;
+  }
+}
+
+/* ==========================================================
+   SMALL TABLET
+========================================================== */
+
+@media (max-width: 900px) {
+  .finance-topbar {
+    min-height: 70px;
+    padding: 12px 18px;
+  }
+
+  .finance-page-content {
+    padding: 20px 18px;
+  }
+
+  .finance-topbar-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  .finance-topbar h1 {
+    font-size: 18px;
+  }
+
+  .finance-role-badge {
+    padding: 7px 10px;
+  }
+
+  .finance-logout-button {
+    padding: 8px 11px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 700px) {
+  .finance-main {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .finance-topbar {
+    min-height: 64px;
+    padding: 10px 14px;
+  }
+
+  .finance-topbar-left {
+    gap: 9px;
+  }
+
+  .finance-topbar-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    font-size: 15px;
+  }
+
+  .finance-topbar-label {
+    font-size: 9px;
+  }
+
+  .finance-topbar h1 {
+    max-width: 190px;
+    font-size: 16px;
+  }
+
+  .finance-topbar-right {
+    gap: 8px;
+  }
+
+  .finance-role-badge {
+    min-height: 34px;
+    padding: 6px 9px;
+    font-size: 12px;
+  }
+
+  .finance-role-badge span {
+    width: 7px;
+    height: 7px;
+  }
+
+  .finance-logout-button {
+    width: 36px;
+    min-height: 34px;
+    padding: 7px;
+
+    border-radius: 8px;
+  }
+
+  .finance-logout-button span {
+    display: none;
+  }
+
+  .finance-page-content {
+    padding: 18px 14px 24px;
+  }
+}
+
+/* ==========================================================
+   SMALL MOBILE
+========================================================== */
+
+@media (max-width: 480px) {
+  .finance-topbar {
+    padding: 9px 11px;
+  }
+
+  .finance-topbar-left {
+    gap: 8px;
+  }
+
+  .finance-topbar-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .finance-topbar h1 {
+    max-width: 150px;
+    font-size: 15px;
+  }
+
+  .finance-role-badge {
+    padding: 6px 8px;
+  }
+
+  .finance-role-badge {
+    font-size: 11px;
+  }
+
+  .finance-page-content {
+    padding: 15px 11px 22px;
+  }
+}
+
+/* ==========================================================
+   VERY SMALL DEVICES
+========================================================== */
+
+@media (max-width: 380px) {
+  .finance-topbar-label {
+    display: none;
+  }
+
+  .finance-topbar h1 {
+    max-width: 125px;
+    font-size: 14px;
+  }
+
+  .finance-role-badge {
+    display: none;
+  }
+
+  .finance-page-content {
+    padding: 14px 10px 20px;
+  }
+}
