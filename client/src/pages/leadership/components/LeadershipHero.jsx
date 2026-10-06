@@ -1,80 +1,54 @@
 import "./LeadershipHero.css";
 
-import { Users, MapPinned, ShieldCheck } from "lucide-react";
-
 export default function LeadershipHero() {
   return (
-    <section className="leadership-hero">
+    <section
+      className="leadership-hero"
+      aria-labelledby="leadership-hero-title"
+    >
+      <div className="leadership-hero-inner">
 
-      <div className="leadership-hero-overlay" />
+        <div className="leadership-hero-copy">
+          <span className="leadership-hero-eyebrow">
+            Jumuiya ya Vijana wa Pwani
+          </span>
 
-      <div className="leadership-hero-content">
+          <h1 id="leadership-hero-title">
+            Leadership
+            <span>That Serves.</span>
+          </h1>
 
-        <span className="leadership-badge">
-          JVP CONNECT
-        </span>
+          <div className="leadership-hero-divider" />
 
-        <h1>
-          Meet the Leadership of
-          <span> Jumuiya ya Vijana wa Pwani</span>
-        </h1>
-
-        <p>
-          A dedicated team of young leaders committed to
-          empowering communities, promoting inclusive
-          leadership, advocating for youth interests and
-          driving sustainable development across the Coast
-          Region of Kenya.
-        </p>
+          <p className="leadership-hero-description">
+            Meet the leaders entrusted with guiding, representing
+            and advancing the aspirations of young people across
+            the Coastal Region.
+          </p>
+        </div>
 
         <div className="leadership-hero-stats">
-
-          <div className="hero-stat">
-
-            <Users size={28} />
-
-            <div>
-
-              <strong>200+</strong>
-
-              <span>Leaders</span>
-
-            </div>
-
+          <div className="leadership-stat">
+            <strong>6</strong>
+            <span>Coastal Counties</span>
           </div>
 
-          <div className="hero-stat">
+          <div className="leadership-stat-divider" />
 
-            <MapPinned size={28} />
-
-            <div>
-
-              <strong>6</strong>
-
-              <span>Counties</span>
-
-            </div>
-
+          <div className="leadership-stat">
+            <strong>1</strong>
+            <span>Shared Vision</span>
           </div>
 
-          <div className="hero-stat">
+          <div className="leadership-stat-divider" />
 
-            <ShieldCheck size={28} />
-
-            <div>
-
-              <strong>1</strong>
-
-              <span>Regional Movement</span>
-
-            </div>
-
+          <div className="leadership-stat">
+            <strong>∞</strong>
+            <span>Youth Potential</span>
           </div>
-
         </div>
 
       </div>
-
     </section>
   );
 }

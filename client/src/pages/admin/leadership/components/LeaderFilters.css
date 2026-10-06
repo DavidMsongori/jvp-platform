@@ -1,353 +1,398 @@
 /* ==========================================================
-   LEADER FILTERS
+   JVP LEADERSHIP FILTERS
 ========================================================== */
 
 .leader-filters {
-
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 
-  display: grid;
+  padding: 16px;
 
-  grid-template-columns:
-    minmax(240px, 1.5fr)
-    repeat(5, minmax(150px, 1fr))
-    auto;
-
-  gap: 12px;
-
-  align-items: center;
-
-  padding: 18px;
-
-  background: var(--surface-primary, #ffffff);
-
-  border: 1px solid var(--border-color, #e5e7eb);
-
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
 
   box-shadow:
-    0 4px 14px rgba(15, 23, 42, 0.06);
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px rgba(15, 23, 42, 0.04);
 
+  box-sizing: border-box;
 }
+
 
 /* ==========================================================
    SEARCH
 ========================================================== */
 
-.filter-search {
+.leader-filter-search {
+  position: relative;
 
-  min-width: 0;
-
-  height: 44px;
+  width: 100%;
+  min-height: 44px;
 
   display: flex;
-
   align-items: center;
 
-  gap: 10px;
+  color: #64748b;
 
-  padding: 0 14px;
-
-  background: var(--input-background, #f8fafc);
-
-  border: 1px solid var(--border-color, #e2e8f0);
-
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-
-  color: var(--text-muted, #64748b);
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
-
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.filter-search:focus-within {
-
+.leader-filter-search:focus-within {
   background: #ffffff;
-
-  border-color: var(--primary-color, #2563eb);
+  border-color: #0f766e;
 
   box-shadow:
-    0 0 0 3px
-    rgba(37, 99, 235, 0.12);
-
+    0 0 0 3px rgba(15, 118, 110, 0.1);
 }
 
-.filter-search svg {
-
-  flex-shrink: 0;
-
+.leader-filter-search > svg {
+  flex: 0 0 auto;
+  margin-left: 14px;
 }
 
-.filter-search input {
-
+.leader-filter-search input {
   width: 100%;
+  height: 42px;
 
-  min-width: 0;
+  padding: 0 42px 0 10px;
 
-  height: 100%;
-
-  padding: 0;
-
-  border: none;
-
-  outline: none;
+  border: 0;
+  outline: 0;
 
   background: transparent;
 
-  color: var(--text-primary, #0f172a);
-
+  color: #0f172a;
   font-size: 14px;
+  font-weight: 500;
 
+  box-sizing: border-box;
 }
 
-.filter-search input::placeholder {
-
-  color: var(--text-muted, #94a3b8);
-
+.leader-filter-search input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
 }
+
+.leader-filter-search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+
+/* ==========================================================
+   CLEAR SEARCH
+========================================================== */
+
+.leader-filter-clear {
+  position: absolute;
+  right: 10px;
+
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: #e2e8f0;
+  color: #475569;
+
+  font-size: 18px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.leader-filter-clear:hover {
+  background: #cbd5e1;
+  color: #0f172a;
+
+  transform: scale(1.05);
+}
+
+.leader-filter-clear:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+}
+
+
+/* ==========================================================
+   FILTER CONTROLS
+========================================================== */
+
+.leader-filter-controls {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(150px, 1fr))
+    auto;
+
+  gap: 10px;
+
+  align-items: stretch;
+}
+
 
 /* ==========================================================
    FILTER GROUP
 ========================================================== */
 
-.filter-group {
-
+.leader-filter-group {
   min-width: 0;
-
-  height: 44px;
+  height: 42px;
 
   display: flex;
-
   align-items: center;
 
-  gap: 8px;
+  padding: 0 11px;
 
-  padding: 0 12px;
+  color: #64748b;
 
-  background: var(--input-background, #f8fafc);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
 
-  border: 1px solid var(--border-color, #e2e8f0);
-
-  border-radius: 10px;
-
-  color: var(--text-muted, #64748b);
+  box-sizing: border-box;
 
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
-    background 0.2s ease;
-
+    background-color 0.2s ease;
 }
 
-.filter-group:focus-within {
+.leader-filter-group:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
 
+.leader-filter-group:focus-within {
+  border-color: #0f766e;
   background: #ffffff;
 
-  border-color: var(--primary-color, #2563eb);
-
   box-shadow:
-    0 0 0 3px
-    rgba(37, 99, 235, 0.12);
-
+    0 0 0 3px rgba(15, 118, 110, 0.08);
 }
 
-.filter-group svg {
-
-  flex-shrink: 0;
-
-  color: var(--primary-color, #2563eb);
-
+.leader-filter-group > svg {
+  flex: 0 0 auto;
+  margin-right: 8px;
 }
 
-.filter-group select {
 
+/* ==========================================================
+   SELECT
+========================================================== */
+
+.leader-filter-group select {
   width: 100%;
-
   min-width: 0;
+  height: 40px;
 
-  height: 100%;
+  padding: 0 24px 0 0;
 
-  padding: 0;
+  border: 0;
+  outline: 0;
 
-  border: none;
+  background-color: transparent;
 
-  outline: none;
+  color: #334155;
 
-  background: transparent;
-
-  color: var(--text-primary, #1e293b);
-
+  font-family: inherit;
   font-size: 13px;
+  font-weight: 500;
 
   cursor: pointer;
 
+  appearance: auto;
 }
+
+.leader-filter-group select:focus {
+  outline: none;
+}
+
+.leader-filter-group select option {
+  color: #0f172a;
+  background: #ffffff;
+}
+
 
 /* ==========================================================
    RESET BUTTON
 ========================================================== */
 
-.leader-filters .btn-secondary {
-
-  height: 44px;
+.leader-filter-reset {
+  min-width: 92px;
+  height: 42px;
 
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
+  gap: 7px;
 
-  gap: 8px;
+  padding: 0 14px;
 
-  padding: 0 16px;
-
-  border: 1px solid var(--border-color, #cbd5e1);
-
-  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
 
   background: #ffffff;
+  color: #475569;
 
-  color: var(--text-secondary, #475569);
-
+  font-family: inherit;
   font-size: 13px;
-
   font-weight: 600;
-
-  white-space: nowrap;
 
   cursor: pointer;
 
   transition:
-    background 0.2s ease,
+    background-color 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease,
-    transform 0.2s ease;
-
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.leader-filters .btn-secondary:hover {
+.leader-filter-reset:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
 
-  background: var(--primary-color, #2563eb);
-
-  border-color: var(--primary-color, #2563eb);
-
-  color: #ffffff;
-
+  transform: translateY(-1px);
 }
 
-.leader-filters .btn-secondary:active {
-
-  transform: translateY(1px);
-
+.leader-filter-reset:active {
+  transform: translateY(0);
 }
+
+.leader-filter-reset:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+}
+
 
 /* ==========================================================
    TABLET
 ========================================================== */
 
-@media (max-width: 1250px) {
-
-  .leader-filters {
-
+@media (max-width: 1200px) {
+  .leader-filter-controls {
     grid-template-columns:
-
-      minmax(220px, 1fr)
-
-      repeat(3, minmax(150px, 1fr));
-
+      repeat(3, minmax(160px, 1fr));
   }
 
-  .leader-filters .filter-group:nth-of-type(4),
-
-  .leader-filters .filter-group:nth-of-type(5) {
-
-    grid-column: span 1;
-
+  .leader-filter-reset {
+    width: 100%;
   }
-
 }
+
 
 /* ==========================================================
    SMALL TABLET
 ========================================================== */
 
-@media (max-width: 900px) {
-
+@media (max-width: 800px) {
   .leader-filters {
+    padding: 14px;
+    gap: 12px;
+  }
 
+  .leader-filter-controls {
     grid-template-columns:
-
       repeat(2, minmax(0, 1fr));
 
+    gap: 9px;
   }
 
-  .filter-search {
-
-    grid-column: 1 / -1;
-
+  .leader-filter-reset {
+    grid-column: span 2;
   }
-
-  .leader-filters .btn-secondary {
-
-    width: 100%;
-
-  }
-
 }
+
 
 /* ==========================================================
    MOBILE
 ========================================================== */
 
-@media (max-width: 600px) {
-
+@media (max-width: 560px) {
   .leader-filters {
-
-    grid-template-columns: 1fr;
-
-    gap: 10px;
-
-    padding: 14px;
-
+    padding: 12px;
     border-radius: 12px;
-
   }
 
-  .filter-search,
+  .leader-filter-search {
+    min-height: 46px;
+  }
 
-  .filter-group,
+  .leader-filter-search input {
+    height: 44px;
+    font-size: 13px;
+  }
 
-  .leader-filters .btn-secondary {
+  .leader-filter-controls {
+    grid-template-columns: 1fr;
+  }
 
+  .leader-filter-group {
     width: 100%;
-
   }
 
-  .filter-search {
-
+  .leader-filter-reset {
+    width: 100%;
     grid-column: auto;
+  }
+}
 
+
+/* ==========================================================
+   VERY SMALL SCREENS
+========================================================== */
+
+@media (max-width: 360px) {
+  .leader-filters {
+    padding: 10px;
   }
 
+  .leader-filter-search input {
+    font-size: 12px;
+  }
+
+  .leader-filter-group select {
+    font-size: 12px;
+  }
+
+  .leader-filter-reset {
+    font-size: 12px;
+  }
 }
+
 
 /* ==========================================================
    REDUCED MOTION
 ========================================================== */
 
 @media (prefers-reduced-motion: reduce) {
-
-  .filter-search,
-
-  .filter-group,
-
-  .leader-filters .btn-secondary {
-
+  .leader-filter-search,
+  .leader-filter-group,
+  .leader-filter-reset,
+  .leader-filter-clear {
     transition: none;
-
   }
-
 }

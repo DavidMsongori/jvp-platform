@@ -1,315 +1,98 @@
-/* ========================================================================
-   JUMUIYA YA VIJANA WA PWANI (JVP)
-   CLIENT LEADERSHIP CONSTANTS
-======================================================================== */
+/* ==========================================================
+   JVP LEADERSHIP CONSTANTS
+========================================================== */
 
-/* ========================================================================
+/*
+  Leadership architecture:
+
+  1. Regional Cabinet
+  2. Regional Youth Assembly
+  3. Council of Governors
+  4. County Cabinets
+  5. County Youth Assemblies
+
+  Patronage is separate from the five structural levels.
+*/
+
+/* ==========================================================
    LEADERSHIP LEVELS
-======================================================================== */
+========================================================== */
 
 export const LEADERSHIP_LEVELS = {
-  REGIONAL_EXECUTIVE: "regional_executive",
+  REGIONAL_CABINET: "regional_cabinet",
+  REGIONAL_YOUTH_ASSEMBLY: "regional_youth_assembly",
   COUNCIL_OF_GOVERNORS: "council_of_governors",
-  YOUTH_ASSEMBLY: "youth_assembly",
-  COUNTY_LEADERSHIP: "county_leadership",
+  COUNTY_CABINET: "county_cabinet",
+  COUNTY_YOUTH_ASSEMBLY: "county_youth_assembly",
 };
 
-export const LEADERSHIP_LEVEL_OPTIONS = [
-  {
-    value: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    label: "Regional Executive",
-  },
-  {
-    value: LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
-    label: "Council of Governors",
-  },
-  {
-    value: LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
-    label: "Youth Assembly",
-  },
-  {
-    value: LEADERSHIP_LEVELS.COUNTY_LEADERSHIP,
-    label: "County Leadership",
-  },
-];
+export const LEADERSHIP_LEVEL_VALUES = Object.values(
+  LEADERSHIP_LEVELS
+);
 
-/* ========================================================================
-   LEADERSHIP DEPARTMENTS
-======================================================================== */
 
-export const LEADERSHIP_DEPARTMENTS = {
+/* ==========================================================
+   LEADERSHIP CATEGORIES
+========================================================== */
+
+export const LEADERSHIP_CATEGORIES = {
   EXECUTIVE: "executive",
-  GOVERNANCE: "governance",
   LEGISLATIVE: "legislative",
   SECRETARIAT: "secretariat",
   PATRONAGE: "patronage",
 };
 
-export const LEADERSHIP_DEPARTMENT_OPTIONS = [
-  {
-    value: LEADERSHIP_DEPARTMENTS.EXECUTIVE,
-    label: "Executive",
-  },
-  {
-    value: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
-    label: "Governance",
-  },
-  {
-    value: LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
-    label: "Legislative",
-  },
-  {
-    value: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
-    label: "Secretariat",
-  },
-  {
-    value: LEADERSHIP_DEPARTMENTS.PATRONAGE,
-    label: "Patronage",
-  },
-];
+export const LEADERSHIP_CATEGORY_VALUES = Object.values(
+  LEADERSHIP_CATEGORIES
+);
 
-/* ========================================================================
-   LEADERSHIP OFFICES
-======================================================================== */
 
-export const LEADERSHIP_OFFICES = {
-  /* ==========================================================
-     REGIONAL EXECUTIVE COMMITTEE
-  ========================================================== */
+/* ==========================================================
+   LEADERSHIP DEPARTMENTS
+========================================================== */
 
-  PRESIDENT: {
-    value: "president",
-    label: "President",
-  },
-
-  DEPUTY_PRESIDENT: {
-    value: "deputy_president",
-    label: "Deputy President",
-  },
-
-  SECRETARY_GENERAL: {
-    value: "secretary_general",
-    label: "Secretary General",
-  },
-
-  TREASURER: {
-    value: "treasurer",
-    label: "Treasurer",
-  },
-
-  COMMUNICATIONS_SECRETARY: {
-    value: "communications_secretary",
-    label: "Communications Secretary",
-  },
-
-  PRINCIPAL_ASSISTANT: {
-    value: "principal_assistant",
-    label: "Principal Assistant",
-  },
-
-  DIRECTOR_WELFARE_MEMBERSHIP_SUPPORT: {
-    value: "director_welfare_membership_support",
-    label: "Director, Welfare, Membership & Support",
-  },
-
-  DIRECTOR_YOUTH_EMPOWERMENT: {
-    value: "director_youth_empowerment",
-    label: "Director, Youth Empowerment",
-  },
-
-  PROTOCOL_SECRETARY: {
-    value: "protocol_secretary",
-    label: "Protocol Secretary",
-  },
-
-  DIRECTOR_LEGAL_INCLUSION_AFFAIRS: {
-    value: "director_legal_inclusion_affairs",
-    label: "Director, Legal & Inclusion Affairs",
-  },
-
-  CHIEF_OF_STAFF: {
-    value: "chief_of_staff",
-    label: "Chief of Staff",
-  },
-
-  DIRECTOR_PROGRAMS: {
-    value: "director_programs",
-    label: "Director, Programs",
-  },
-
-  PRESIDENTIAL_ADVISOR: {
-    value: "presidential_advisor",
-    label: "Presidential Advisor",
-  },
-
-  DIRECTOR_RESOURCE_MOBILIZATION_PARTNERSHIPS: {
-    value: "director_resource_mobilization_partnerships",
-    label: "Director, Resource Mobilization & Partnerships",
-  },
-
-  /* ==========================================================
-     COUNCIL OF GOVERNORS
-  ========================================================== */
-
-  GOVERNOR: {
-    value: "governor",
-    label: "Governor",
-  },
-
-  DEPUTY_GOVERNOR: {
-    value: "deputy_governor",
-    label: "Deputy Governor",
-  },
-
-  /* ==========================================================
-     YOUTH ASSEMBLY
-  ========================================================== */
-
-  SPEAKER: {
-    value: "speaker",
-    label: "Speaker",
-  },
-
-  DEPUTY_SPEAKER: {
-    value: "deputy_speaker",
-    label: "Deputy Speaker",
-  },
-
-  ELECTED_MP: {
-    value: "elected_mp",
-    label: "Elected Youth Member of Assembly",
-  },
-
-  NOMINATED_MP: {
-    value: "nominated_mp",
-    label: "Nominated Youth Member of Assembly",
-  },
-
-  CLERK: {
-    value: "clerk",
-    label: "Clerk",
-  },
-
-  DEPUTY_CLERK: {
-    value: "deputy_clerk",
-    label: "Deputy Clerk",
-  },
-
-  /* ==========================================================
-     COUNTY LEADERSHIP
-  ========================================================== */
-
-  YOUTH_MCA: {
-    value: "youth_mca",
-    label: "Youth Member of County Assembly",
-  },
-
-  /* ==========================================================
-     HONORARY
-  ========================================================== */
-
-  PATRON: {
-    value: "patron",
-    label: "Patron",
-  },
+export const LEADERSHIP_DEPARTMENTS = {
+  EXECUTIVE: "executive",
+  LEGISLATIVE: "legislative",
+  SECRETARIAT: "secretariat",
 };
 
-export const LEADERSHIP_OFFICE_OPTIONS =
-  Object.values(LEADERSHIP_OFFICES);
+export const LEADERSHIP_DEPARTMENT_VALUES = Object.values(
+  LEADERSHIP_DEPARTMENTS
+);
 
-/* ========================================================================
-   APPOINTMENT TYPES
-======================================================================== */
 
-export const APPOINTMENT_TYPES = {
-  ELECTED: "elected",
-  NOMINATED: "nominated",
-  APPOINTED: "appointed",
-};
+/* ==========================================================
+   STRUCTURAL SCOPE
+========================================================== */
 
-export const APPOINTMENT_TYPE_OPTIONS = [
-  {
-    value: APPOINTMENT_TYPES.ELECTED,
-    label: "Elected",
-  },
-  {
-    value: APPOINTMENT_TYPES.NOMINATED,
-    label: "Nominated",
-  },
-  {
-    value: APPOINTMENT_TYPES.APPOINTED,
-    label: "Appointed",
-  },
-];
+/*
+  IMPORTANT:
 
-/* ========================================================================
-   LEADERSHIP STATUS
-======================================================================== */
+  scope describes the structural part of JVP leadership.
 
-export const LEADERSHIP_STATUS = {
-  ACTIVE: "active",
-  INACTIVE: "inactive",
-  COMPLETED: "completed",
-  SUSPENDED: "suspended",
-  VACANT: "vacant",
-};
+  It is NOT geographic.
 
-export const LEADERSHIP_STATUS_OPTIONS = [
-  {
-    value: LEADERSHIP_STATUS.ACTIVE,
-    label: "Active",
-  },
-  {
-    value: LEADERSHIP_STATUS.INACTIVE,
-    label: "Inactive",
-  },
-  {
-    value: LEADERSHIP_STATUS.COMPLETED,
-    label: "Completed",
-  },
-  {
-    value: LEADERSHIP_STATUS.SUSPENDED,
-    label: "Suspended",
-  },
-  {
-    value: LEADERSHIP_STATUS.VACANT,
-    label: "Vacant",
-  },
-];
-
-/* ========================================================================
-   ORGANIZATIONAL SCOPE
-======================================================================== */
+  Council of Governors deliberately has no scope because
+  it is a separate structural level and operates through
+  county representation.
+*/
 
 export const LEADERSHIP_SCOPE = {
-  REGIONAL: "regional",
-  COUNTY: "county",
-  CONSTITUENCY: "constituency",
-  WARD: "ward",
+  REGIONAL_CABINET: "regional_cabinet",
+  REGIONAL_YOUTH_ASSEMBLY: "regional_youth_assembly",
+  COUNTY_CABINET: "county_cabinet",
+  COUNTY_YOUTH_ASSEMBLY: "county_youth_assembly",
 };
 
-export const LEADERSHIP_SCOPE_OPTIONS = [
-  {
-    value: LEADERSHIP_SCOPE.REGIONAL,
-    label: "Regional",
-  },
-  {
-    value: LEADERSHIP_SCOPE.COUNTY,
-    label: "County",
-  },
-  {
-    value: LEADERSHIP_SCOPE.CONSTITUENCY,
-    label: "Constituency",
-  },
-  {
-    value: LEADERSHIP_SCOPE.WARD,
-    label: "Ward",
-  },
-];
+export const LEADERSHIP_SCOPE_VALUES = Object.values(
+  LEADERSHIP_SCOPE
+);
 
-/* ========================================================================
+
+/* ==========================================================
    REPORT VISIBILITY
-======================================================================== */
+========================================================== */
 
 export const REPORT_VISIBILITY = {
   PRIVATE: "private",
@@ -319,48 +102,1080 @@ export const REPORT_VISIBILITY = {
   REGIONAL: "regional",
 };
 
-export const REPORT_VISIBILITY_OPTIONS = [
+export const REPORT_VISIBILITY_VALUES = Object.values(
+  REPORT_VISIBILITY
+);
+
+
+/* ==========================================================
+   LEADERSHIP OFFICES
+========================================================== */
+
+export const LEADERSHIP_OFFICES = {
+  /* --------------------------------------------------------
+     PATRONAGE
+  -------------------------------------------------------- */
+
+  PATRON: "patron",
+
+  /* --------------------------------------------------------
+     REGIONAL CABINET
+  -------------------------------------------------------- */
+
+  PRESIDENT: "president",
+  DEPUTY_PRESIDENT: "deputy_president",
+  PRIME_CABINET_SECRETARY: "prime_cabinet_secretary",
+  ATTORNEY_GENERAL: "attorney_general",
+  CABINET_SECRETARY: "cabinet_secretary",
+
+  /* --------------------------------------------------------
+     REGIONAL YOUTH ASSEMBLY
+  -------------------------------------------------------- */
+
+  REGIONAL_SPEAKER: "regional_speaker",
+  REGIONAL_DEPUTY_SPEAKER: "regional_deputy_speaker",
+  REGIONAL_CLERK: "regional_clerk",
+  REGIONAL_DEPUTY_CLERK: "regional_deputy_clerk",
+  ELECTED_MP: "elected_mp",
+  NOMINATED_MP: "nominated_mp",
+
+  /* --------------------------------------------------------
+     COUNCIL OF GOVERNORS
+  -------------------------------------------------------- */
+
+  COUNCIL_GOVERNOR: "council_governor",
+
+  /* --------------------------------------------------------
+     COUNTY CABINET
+  -------------------------------------------------------- */
+
+  COUNTY_GOVERNOR: "county_governor",
+  DEPUTY_GOVERNOR: "deputy_governor",
+  COUNTY_CABINET_SECRETARY: "county_cabinet_secretary",
+
+  /* --------------------------------------------------------
+     COUNTY YOUTH ASSEMBLY
+  -------------------------------------------------------- */
+
+  COUNTY_SPEAKER: "county_speaker",
+  COUNTY_DEPUTY_SPEAKER: "county_deputy_speaker",
+  COUNTY_CLERK: "county_clerk",
+  COUNTY_DEPUTY_CLERK: "county_deputy_clerk",
+  ELECTED_MCA: "elected_mca",
+  NOMINATED_MCA: "nominated_mca",
+};
+
+export const LEADERSHIP_OFFICE_VALUES = Object.values(
+  LEADERSHIP_OFFICES
+);
+
+
+/* ==========================================================
+   APPOINTMENT TYPES
+========================================================== */
+
+export const APPOINTMENT_TYPES = {
+  ELECTED: "elected",
+  NOMINATED: "nominated",
+  APPOINTED: "appointed",
+};
+
+export const APPOINTMENT_TYPE_VALUES = Object.values(
+  APPOINTMENT_TYPES
+);
+
+
+/* ==========================================================
+   LEADERSHIP STATUS
+========================================================== */
+
+export const LEADERSHIP_STATUS = {
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+  COMPLETED: "completed",
+  SUSPENDED: "suspended",
+  VACANT: "vacant",
+};
+
+export const LEADERSHIP_STATUS_VALUES = Object.values(
+  LEADERSHIP_STATUS
+);
+
+
+/* ==========================================================
+   LEGACY OFFICE ALIASES
+========================================================== */
+
+/*
+  These aliases allow existing JVP records and older
+  frontend/backend code to continue resolving old office
+  names into the new architecture.
+*/
+
+export const LEGACY_LEADERSHIP_OFFICE_ALIASES = {
+  governor: LEADERSHIP_OFFICES.COUNTY_GOVERNOR,
+
+  speaker: LEADERSHIP_OFFICES.REGIONAL_SPEAKER,
+
+  deputy_speaker:
+    LEADERSHIP_OFFICES.REGIONAL_DEPUTY_SPEAKER,
+
+  clerk:
+    LEADERSHIP_OFFICES.REGIONAL_CLERK,
+
+  deputy_clerk:
+    LEADERSHIP_OFFICES.REGIONAL_DEPUTY_CLERK,
+
+  youth_mca:
+    LEADERSHIP_OFFICES.ELECTED_MCA,
+
+  patron:
+    LEADERSHIP_OFFICES.PATRON,
+};
+
+
+/* ==========================================================
+   REGIONAL CABINET PORTFOLIOS
+========================================================== */
+
+export const REGIONAL_CABINET_PORTFOLIOS = [
   {
-    value: REPORT_VISIBILITY.PRIVATE,
-    label: "Private",
+    key: "finance_planning",
+    title: "Finance, Planning & Economic Affairs",
   },
+
   {
-    value: REPORT_VISIBILITY.WARD,
-    label: "Ward",
+    key: "youth_employment",
+    title:
+      "Youth Employment, Entrepreneurship, Labour, Education, Skills & Human Capital",
   },
+
   {
-    value: REPORT_VISIBILITY.CONSTITUENCY,
-    label: "Constituency",
+    key: "agriculture_food_security",
+    title:
+      "Agriculture, Agribusiness & Food Security",
   },
+
   {
-    value: REPORT_VISIBILITY.COUNTY,
-    label: "County",
+    key: "blue_economy",
+    title:
+      "Blue Economy, Fisheries & Maritime Affairs",
   },
+
   {
-    value: REPORT_VISIBILITY.REGIONAL,
-    label: "Regional",
+    key: "tourism_culture",
+    title:
+      "Tourism, Culture, Arts & Creative Economy",
+  },
+
+  {
+    key: "trade",
+    title:
+      "Trade, Investment & Cooperatives",
+  },
+
+  {
+    key: "ict_digital",
+    title:
+      "ICT, Digital Economy & Innovation",
+  },
+
+  {
+    key: "environment",
+    title:
+      "Environment, Climate Change & Natural Resources",
+  },
+
+  {
+    key: "health_sports",
+    title:
+      "Health, Sports & Youth Wellness",
+  },
+
+  {
+    key: "gender_social",
+    title:
+      "Gender, Social Protection & Community Development",
+  },
+
+  {
+    key: "infrastructure",
+    title:
+      "Infrastructure, Housing & Urban Development",
   },
 ];
 
-/* ========================================================================
-   LEADERSHIP PERMISSIONS
-======================================================================== */
 
-export const LEADERSHIP_PERMISSIONS = {
-  VIEW_MEMBERS: "view_members",
-  VIEW_LEADERS: "view_leaders",
-  VIEW_REPORTS: "view_reports",
-  SUBMIT_REPORTS: "submit_reports",
-  VIEW_ANALYTICS: "view_analytics",
-  MANAGE_DOCUMENTS: "manage_documents",
-  MANAGE_MEETINGS: "manage_meetings",
-  MANAGE_ANNOUNCEMENTS: "manage_announcements",
-  MANAGE_LEADERS: "manage_leaders",
+/* ==========================================================
+   OFFICE CONFIGURATION
+========================================================== */
+
+export const OFFICE_CONFIGURATION = {
+
+  /* ========================================================
+     PATRON
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.PATRON]: {
+    title: "Patron",
+
+    level: null,
+
+    category:
+      LEADERSHIP_CATEGORIES.PATRONAGE,
+
+    department: null,
+
+    scope: null,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: false,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     PRESIDENT
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.PRESIDENT]: {
+    title: "President",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_CABINET,
+
+    category:
+      LEADERSHIP_CATEGORIES.EXECUTIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_CABINET,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     DEPUTY PRESIDENT
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.DEPUTY_PRESIDENT]: {
+    title: "Deputy President",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_CABINET,
+
+    category:
+      LEADERSHIP_CATEGORIES.EXECUTIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_CABINET,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     PRIME CABINET SECRETARY
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.PRIME_CABINET_SECRETARY]: {
+    title: "Prime Cabinet Secretary",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_CABINET,
+
+    category:
+      LEADERSHIP_CATEGORIES.EXECUTIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_CABINET,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     ATTORNEY GENERAL
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.ATTORNEY_GENERAL]: {
+    title: "Attorney General",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_CABINET,
+
+    category:
+      LEADERSHIP_CATEGORIES.EXECUTIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_CABINET,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     CABINET SECRETARY
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.CABINET_SECRETARY]: {
+    title: "Cabinet Secretary",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_CABINET,
+
+    category:
+      LEADERSHIP_CATEGORIES.EXECUTIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_CABINET,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: true,
+
+    portfolios:
+      REGIONAL_CABINET_PORTFOLIOS,
+  },
+
+
+  /* ========================================================
+     REGIONAL SPEAKER
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.REGIONAL_SPEAKER]: {
+    title: "Regional Youth Assembly Speaker",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     REGIONAL DEPUTY SPEAKER
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.REGIONAL_DEPUTY_SPEAKER]: {
+    title:
+      "Regional Youth Assembly Deputy Speaker",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     REGIONAL CLERK
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.REGIONAL_CLERK]: {
+    title: "Regional Youth Assembly Clerk",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     REGIONAL DEPUTY CLERK
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.REGIONAL_DEPUTY_CLERK]: {
+    title:
+      "Regional Youth Assembly Deputy Clerk",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.REGIONAL,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: true,
+
+    requiresCounty: false,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     ELECTED MP
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.ELECTED_MP]: {
+    title: "Elected Youth MP",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.CONSTITUENCY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: true,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     NOMINATED MP
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.NOMINATED_MP]: {
+    title: "Nominated Youth MP",
+
+    level:
+      LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.REGIONAL_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.CONSTITUENCY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.NOMINATED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: true,
+
+    requiresWard: false,
+
+    allowMultiple: true,
+  },
+
+
+  /* ========================================================
+     COUNCIL OF GOVERNORS
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.COUNCIL_GOVERNOR]: {
+    title: "Youth Governor",
+
+    level:
+      LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
+
+    category:
+      LEADERSHIP_CATEGORIES.SECRETARIAT,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.SECRETARIAT,
+
+    /*
+      Council of Governors is its own level.
+      It deliberately has no structural scope.
+    */
+    scope: null,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: true,
+  },
+
+
+  /* ========================================================
+     COUNTY GOVERNOR
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.COUNTY_GOVERNOR]: {
+    title: "Youth Governor",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_CABINET,
+
+    category:
+      LEADERSHIP_CATEGORIES.EXECUTIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_CABINET,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     DEPUTY GOVERNOR
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.DEPUTY_GOVERNOR]: {
+    title: "Deputy Youth Governor",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_CABINET,
+
+    category:
+      LEADERSHIP_CATEGORIES.EXECUTIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_CABINET,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     COUNTY CABINET SECRETARY
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.COUNTY_CABINET_SECRETARY]: {
+    title: "County Cabinet Secretary",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_CABINET,
+
+    category:
+      LEADERSHIP_CATEGORIES.EXECUTIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_CABINET,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: true,
+  },
+
+
+  /* ========================================================
+     COUNTY SPEAKER
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.COUNTY_SPEAKER]: {
+    title: "County Youth Assembly Speaker",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     COUNTY DEPUTY SPEAKER
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.COUNTY_DEPUTY_SPEAKER]: {
+    title:
+      "County Youth Assembly Deputy Speaker",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     COUNTY CLERK
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.COUNTY_CLERK]: {
+    title: "County Youth Assembly Clerk",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     COUNTY DEPUTY CLERK
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.COUNTY_DEPUTY_CLERK]: {
+    title:
+      "County Youth Assembly Deputy Clerk",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.APPOINTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     ELECTED MCA
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.ELECTED_MCA]: {
+    title: "Elected Youth MCA",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.WARD,
+
+    appointmentType:
+      APPOINTMENT_TYPES.ELECTED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: true,
+
+    requiresWard: true,
+
+    allowMultiple: false,
+  },
+
+
+  /* ========================================================
+     NOMINATED MCA
+  ======================================================== */
+
+  [LEADERSHIP_OFFICES.NOMINATED_MCA]: {
+    title: "Nominated Youth MCA",
+
+    level:
+      LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
+
+    category:
+      LEADERSHIP_CATEGORIES.LEGISLATIVE,
+
+    department:
+      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+
+    scope:
+      LEADERSHIP_SCOPE.COUNTY_YOUTH_ASSEMBLY,
+
+    reportVisibility:
+      REPORT_VISIBILITY.COUNTY,
+
+    appointmentType:
+      APPOINTMENT_TYPES.NOMINATED,
+
+    requiresMember: true,
+
+    requiresCounty: true,
+
+    requiresConstituency: false,
+
+    requiresWard: false,
+
+    allowMultiple: true,
+  },
 };
 
-/* ========================================================================
-   COAST REGION COUNTIES
-======================================================================== */
+
+/* ==========================================================
+   PERMISSIONS
+========================================================== */
+
+export const LEADERSHIP_PERMISSIONS = {
+  VIEW_LEADERSHIP: "view_leadership",
+  CREATE_LEADER: "create_leader",
+  EDIT_LEADER: "edit_leader",
+  DELETE_LEADER: "delete_leader",
+
+  ACTIVATE_LEADER: "activate_leader",
+  DEACTIVATE_LEADER: "deactivate_leader",
+
+  VIEW_STATISTICS: "view_leadership_statistics",
+  VIEW_HIERARCHY: "view_leadership_hierarchy",
+
+  MANAGE_REGIONAL_CABINET:
+    "manage_regional_cabinet",
+
+  MANAGE_REGIONAL_YOUTH_ASSEMBLY:
+    "manage_regional_youth_assembly",
+
+  MANAGE_COUNCIL_OF_GOVERNORS:
+    "manage_council_of_governors",
+
+  MANAGE_COUNTY_CABINET:
+    "manage_county_cabinet",
+
+  MANAGE_COUNTY_YOUTH_ASSEMBLY:
+    "manage_county_youth_assembly",
+
+  MANAGE_PATRONAGE:
+    "manage_patronage",
+};
+
+export const LEADERSHIP_PERMISSION_VALUES =
+  Object.values(LEADERSHIP_PERMISSIONS);
+
+
+/* ==========================================================
+   COAST COUNTIES
+========================================================== */
 
 export const COAST_COUNTIES = [
   "Mombasa",
@@ -371,222 +1186,57 @@ export const COAST_COUNTIES = [
   "Taita Taveta",
 ];
 
-/* ========================================================================
-   OFFICE CONFIGURATION
-======================================================================== */
 
-export const OFFICE_CONFIGURATION = {
-  president: {
-    title: "President",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.EXECUTIVE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
+/* ==========================================================
+   HELPER: OFFICE CONFIGURATION VALUES
+========================================================== */
 
-  deputy_president: {
-    title: "Deputy President",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.EXECUTIVE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  secretary_general: {
-    title: "Secretary General",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  treasurer: {
-    title: "Treasurer",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  communications_secretary: {
-    title: "Communications Secretary",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  principal_assistant: {
-    title: "Principal Assistant",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  director_welfare_membership_support: {
-    title: "Director, Welfare, Membership & Support",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  director_youth_empowerment: {
-    title: "Director, Youth Empowerment",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  protocol_secretary: {
-    title: "Protocol Secretary",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  director_legal_inclusion_affairs: {
-    title: "Director, Legal & Inclusion Affairs",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  chief_of_staff: {
-    title: "Chief of Staff",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.EXECUTIVE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  director_programs: {
-    title: "Director, Programs",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  presidential_advisor: {
-    title: "Presidential Advisor",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.EXECUTIVE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  director_resource_mobilization_partnerships: {
-    title: "Director, Resource Mobilization & Partnerships",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  governor: {
-    title: "Governor",
-    level: LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
-    department: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
-    scope: LEADERSHIP_SCOPE.COUNTY,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  deputy_governor: {
-    title: "Deputy Governor",
-    level: LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
-    department: LEADERSHIP_DEPARTMENTS.GOVERNANCE,
-    scope: LEADERSHIP_SCOPE.COUNTY,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  speaker: {
-    title: "Speaker",
-    level: LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
-    department: LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  deputy_speaker: {
-    title: "Deputy Speaker",
-    level: LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
-    department: LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  elected_mp: {
-    title: "Elected Youth Member of Assembly",
-    level: LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
-    department: LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
-    scope: LEADERSHIP_SCOPE.CONSTITUENCY,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  nominated_mp: {
-    title: "Nominated Youth Member of Assembly",
-    level: LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
-    department: LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
-    scope: LEADERSHIP_SCOPE.CONSTITUENCY,
-    appointmentType: APPOINTMENT_TYPES.NOMINATED,
-  },
-
-  clerk: {
-    title: "Clerk",
-    level: LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
-    department: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  deputy_clerk: {
-    title: "Deputy Clerk",
-    level: LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
-    department: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
-
-  youth_mca: {
-    title: "Youth Member of County Assembly",
-    level: LEADERSHIP_LEVELS.COUNTY_LEADERSHIP,
-    department: LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
-    scope: LEADERSHIP_SCOPE.WARD,
-    appointmentType: APPOINTMENT_TYPES.ELECTED,
-  },
-
-  patron: {
-    title: "Patron",
-    level: LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
-    department: LEADERSHIP_DEPARTMENTS.PATRONAGE,
-    scope: LEADERSHIP_SCOPE.REGIONAL,
-    appointmentType: APPOINTMENT_TYPES.APPOINTED,
-  },
+export const getOfficeConfiguration = (
+  position
+) => {
+  return OFFICE_CONFIGURATION[position] || null;
 };
 
-/* ========================================================================
-   HELPERS
-======================================================================== */
 
-/**
- * Returns the configuration for a leadership office.
- */
-export const getOfficeConfiguration = (office) => {
-  return OFFICE_CONFIGURATION[office] || null;
-};
+/* ==========================================================
+   DEFAULT EXPORT
+========================================================== */
 
-/**
- * Returns the display label for a leadership office.
- */
-export const getOfficeLabel = (office) => {
-  const option = LEADERSHIP_OFFICE_OPTIONS.find(
-    (item) => item.value === office
-  );
+export default {
+  LEADERSHIP_LEVELS,
+  LEADERSHIP_LEVEL_VALUES,
 
-  return option?.label || office;
+  LEADERSHIP_CATEGORIES,
+  LEADERSHIP_CATEGORY_VALUES,
+
+  LEADERSHIP_DEPARTMENTS,
+  LEADERSHIP_DEPARTMENT_VALUES,
+
+  LEADERSHIP_SCOPE,
+  LEADERSHIP_SCOPE_VALUES,
+
+  REPORT_VISIBILITY,
+  REPORT_VISIBILITY_VALUES,
+
+  LEADERSHIP_OFFICES,
+  LEADERSHIP_OFFICE_VALUES,
+
+  APPOINTMENT_TYPES,
+  APPOINTMENT_TYPE_VALUES,
+
+  LEADERSHIP_STATUS,
+  LEADERSHIP_STATUS_VALUES,
+
+  LEGACY_LEADERSHIP_OFFICE_ALIASES,
+
+  REGIONAL_CABINET_PORTFOLIOS,
+
+  OFFICE_CONFIGURATION,
+
+  LEADERSHIP_PERMISSIONS,
+  LEADERSHIP_PERMISSION_VALUES,
+
+  COAST_COUNTIES,
+
+  getOfficeConfiguration,
 };

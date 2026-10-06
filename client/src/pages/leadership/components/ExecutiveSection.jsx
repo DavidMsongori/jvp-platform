@@ -10,7 +10,14 @@ export default function ExecutiveSection({
   }
 
   return (
-    <section className="executive-section">
+    <section
+      className="executive-section"
+      aria-labelledby="regional-cabinet-title"
+    >
+
+      {/* =====================================================
+          SECTION HEADER
+      ===================================================== */}
 
       <div className="executive-header">
 
@@ -18,30 +25,47 @@ export default function ExecutiveSection({
           Regional Leadership
         </span>
 
-        <h2>
-          Regional Executive Committee
+        <h2 id="regional-cabinet-title">
+          Regional Cabinet
         </h2>
 
-        <p>
-          The Regional Executive Committee provides
-          strategic direction and oversees the
-          implementation of JVP's vision, programmes
-          and activities across the six Coastal
-          Counties.
+        <div className="executive-divider" />
+
+        <p className="executive-intro">
+          The Regional Cabinet is the principal executive
+          leadership structure of Jumuiya ya Vijana wa Pwani.
+          It provides strategic direction, coordinates regional
+          programmes and drives the implementation of JVP's
+          vision, policies and priorities across the six
+          Coastal Counties.
+        </p>
+
+        <p className="executive-subtext">
+          The Cabinet brings together the President,
+          Deputy President and Cabinet Secretaries responsible
+          for key areas of youth development, economic
+          empowerment, governance and regional transformation.
         </p>
 
       </div>
 
-      <div className="executive-grid">
 
-        {leaders.map((leader) => (
+      {/* =====================================================
+          CABINET DIRECTORY
+      ===================================================== */}
 
-          <LeaderCard
-            key={leader._id}
-            leader={leader}
-          />
+      <div className="executive-content">
 
-        ))}
+        <div className="executive-grid">
+
+          {leaders.map((leader) => (
+            <LeaderCard
+              key={leader._id}
+              leader={leader}
+            />
+          ))}
+
+        </div>
 
       </div>
 

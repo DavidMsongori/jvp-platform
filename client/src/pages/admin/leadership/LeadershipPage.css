@@ -4,10 +4,14 @@
 
 .leadership-page {
   width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 32px;
+  min-height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+
+  background: #f6f8fb;
+  color: #172033;
 }
+
 
 /* ==========================================================
    HEADER
@@ -15,130 +19,435 @@
 
 .leadership-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
+
   gap: 24px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
+  padding: 24px 26px;
+
+  background: #ffffff;
+  border: 1px solid #e5e9f0;
+  border-radius: 16px;
+
+  box-shadow:
+    0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.leadership-header-content {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+  min-width: 0;
+}
+
+.leadership-header-icon {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0f766e,
+      #115e59
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 18px rgba(15, 118, 110, 0.20);
 }
 
 .leadership-header h1 {
-  margin: 0 0 8px;
-  font-size: 28px;
-  font-weight: 700;
+  margin: 0 0 6px;
+
+  font-size: 25px;
   line-height: 1.2;
-  color: var(--text-primary, #1f2937);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+
+  color: #172033;
 }
 
 .leadership-header p {
-  max-width: 720px;
   margin: 0;
-  color: var(--text-secondary, #6b7280);
-  font-size: 15px;
+  max-width: 800px;
+
+  font-size: 14px;
   line-height: 1.6;
+
+  color: #667085;
 }
 
+
 /* ==========================================================
-   HEADER ACTION
+   PRIMARY BUTTON
 ========================================================== */
 
-.leadership-header .btn-primary {
+.leadership-page .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 8px;
+
+  min-height: 44px;
+  padding: 0 18px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: #0f766e;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.leadership-page .btn-primary:hover {
+  background: #0b5f59;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 7px 18px rgba(15, 118, 110, 0.20);
+}
+
+.leadership-page .btn-primary:active {
+  transform: translateY(0);
+}
+
+.leadership-page .btn-primary:focus-visible {
+  outline: 3px solid rgba(15, 118, 110, 0.20);
+  outline-offset: 2px;
+}
+
+
+/* ==========================================================
+   GOVERNANCE STRUCTURE
+========================================================== */
+
+.leadership-structure {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-bottom: 20px;
+}
+
+.leadership-structure-card {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  min-width: 0;
+  min-height: 82px;
+
+  padding: 14px;
+
+  border: 1px solid #e4e8ee;
+  border-radius: 14px;
+
+  background: #ffffff;
+  color: #172033;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 2px 8px rgba(15, 23, 42, 0.025);
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.leadership-structure-card:hover {
+  border-color: #8bcac3;
+
+  background: #fbfffe;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+.leadership-structure-card:focus-visible {
+  outline: 3px solid rgba(15, 118, 110, 0.18);
+  outline-offset: 2px;
+}
+
+.structure-card-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #ecfdf9;
+  color: #0f766e;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.leadership-structure-card:hover
+.structure-card-icon {
+  background: #d9f7f1;
+  color: #0b5f59;
+}
+
+.leadership-structure-card > div:last-child {
+  min-width: 0;
+}
+
+.leadership-structure-card strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-size: 12px;
+  line-height: 1.35;
+
+  font-weight: 750;
+
+  color: #1f2937;
+}
+
+.leadership-structure-card span {
+  display: block;
+
+  font-size: 11px;
+  line-height: 1.3;
+
+  color: #8a94a6;
+}
+
+
+/* ==========================================================
+   FILTER AREA
+========================================================== */
+
+.leadership-page .leader-filters,
+.leadership-page .leadership-filters,
+.leadership-page .filters {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+
+/* ==========================================================
+   ERROR
+========================================================== */
+
+.error-banner {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  margin-bottom: 18px;
+  padding: 13px 16px;
+
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+
+  background: #fef2f2;
+  color: #b42318;
+
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+
+  box-shadow:
+    0 2px 8px rgba(127, 29, 29, 0.04);
+}
+
+
+/* ==========================================================
+   RESULTS SUMMARY
+========================================================== */
+
+.leadership-results-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 12px;
+  padding: 12px 16px;
+
+  border: 1px solid #e5e9f0;
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 2px 7px rgba(15, 23, 42, 0.025);
+}
+
+.leadership-results-summary
+> div:first-child {
+  display: flex;
+  align-items: baseline;
+
+  gap: 6px;
+
   white-space: nowrap;
 }
 
-/* ==========================================================
-   FILTERS
-========================================================== */
+.leadership-results-summary strong {
+  font-size: 17px;
+  line-height: 1;
 
-.leadership-page .leader-filters {
+  font-weight: 800;
+
+  color: #172033;
+}
+
+.leadership-results-summary
+> div:first-child span {
+  font-size: 12px;
+  color: #667085;
+}
+
+.leadership-results-context {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding: 18px;
-  background: var(--surface-primary, #ffffff);
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 12px;
+
+  gap: 7px;
 }
 
-/* ==========================================================
-   ERROR BANNER
-========================================================== */
-
-.leadership-page .error-banner {
-  display: flex;
+.leadership-results-context > span {
+  display: inline-flex;
   align-items: center;
-  min-height: 48px;
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  color: #991b1b;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
+
+  min-height: 28px;
+  padding: 0 9px;
+
+  border: 1px solid #dce7e6;
+  border-radius: 7px;
+
+  background: #f3fbfa;
+  color: #0f766e;
+
+  font-size: 11px;
+  font-weight: 650;
 }
 
+.clear-structure-filter {
+  min-height: 28px;
+  padding: 0 9px;
+
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #667085;
+
+  font-size: 11px;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.clear-structure-filter:hover {
+  border-color: #0f766e;
+  background: #f3fbfa;
+  color: #0f766e;
+}
+
+.clear-structure-filter:focus-visible {
+  outline: 3px solid rgba(15, 118, 110, 0.16);
+  outline-offset: 2px;
+}
+
+
 /* ==========================================================
-   TABLE CARD
+   TABLE SUPPORT
 ========================================================== */
 
-.leadership-page .leadership-card {
+.leadership-page .leader-table,
+.leadership-page .table-container,
+.leadership-page .leaders-table-container {
   width: 100%;
-  overflow: hidden;
-  background: var(--surface-primary, #ffffff);
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 12px;
-  box-shadow: var(
-    --shadow-sm,
-    0 2px 8px rgba(0, 0, 0, 0.04)
-  );
 }
+
 
 /* ==========================================================
-   EMPTY STATE
+   MODAL SUPPORT
 ========================================================== */
 
-.leadership-page .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 260px;
-  padding: 40px 24px;
-  color: var(--text-secondary, #6b7280);
-  text-align: center;
+.leadership-page .modal-overlay {
+  z-index: 1000;
 }
 
-.leadership-page .empty-state svg {
-  margin-bottom: 16px;
-  opacity: 0.55;
-}
-
-.leadership-page .empty-state h3 {
-  margin: 0 0 8px;
-  color: var(--text-primary, #1f2937);
-  font-size: 18px;
-}
-
-.leadership-page .empty-state p {
-  max-width: 420px;
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-}
 
 /* ==========================================================
-   RESPONSIVE
+   TABLET
 ========================================================== */
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
+  .leadership-structure {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .leadership-header {
+    align-items: flex-start;
+  }
+}
+
+
+/* ==========================================================
+   SMALL TABLET
+========================================================== */
+
+@media (max-width: 900px) {
   .leadership-page {
-    padding: 24px;
+    padding: 18px;
   }
 
   .leadership-header {
@@ -146,53 +455,137 @@
     align-items: stretch;
   }
 
-  .leadership-header .btn-primary {
-    width: fit-content;
+  .leadership-header-content {
+    align-items: flex-start;
+  }
+
+  .leadership-page .btn-primary {
+    width: 100%;
+  }
+
+  .leadership-structure {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .leadership-results-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .leadership-results-context {
+    justify-content: flex-start;
   }
 }
 
-@media (max-width: 768px) {
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
   .leadership-page {
-    padding: 20px 16px;
+    padding: 12px;
   }
 
   .leadership-header {
-    margin-bottom: 20px;
+    padding: 18px;
+    margin-bottom: 16px;
+
+    border-radius: 13px;
+  }
+
+  .leadership-header-content {
+    gap: 12px;
+  }
+
+  .leadership-header-icon {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+
+    border-radius: 11px;
   }
 
   .leadership-header h1 {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .leadership-header p {
-    font-size: 14px;
+    font-size: 12px;
+    line-height: 1.5;
   }
 
-  .leadership-page .leader-filters {
-    align-items: stretch;
-    flex-direction: column;
-    padding: 14px;
+  .leadership-structure {
+    grid-template-columns: 1fr;
+
+    gap: 9px;
+    margin-bottom: 16px;
   }
 
-  .leadership-page .leader-filters > * {
+  .leadership-structure-card {
+    min-height: 68px;
+    padding: 12px;
+  }
+
+  .structure-card-icon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .leadership-results-summary {
+    padding: 11px 13px;
+  }
+
+  .leadership-results-context {
     width: 100%;
-  }
-
-  .leadership-header .btn-primary {
-    width: 100%;
+    justify-content: flex-start;
   }
 }
 
-@media (max-width: 480px) {
+
+/* ==========================================================
+   VERY SMALL MOBILE
+========================================================== */
+
+@media (max-width: 380px) {
   .leadership-page {
-    padding: 16px 12px;
+    padding: 9px;
+  }
+
+  .leadership-header {
+    padding: 15px;
+  }
+
+  .leadership-header-icon {
+    display: none;
   }
 
   .leadership-header h1 {
-    font-size: 22px;
+    font-size: 19px;
   }
 
-  .leadership-page .error-banner {
-    font-size: 13px;
+  .leadership-structure-card {
+    gap: 9px;
+  }
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .leadership-page *,
+  .leadership-page *::before,
+  .leadership-page *::after {
+    scroll-behavior: auto !important;
+
+    transition-duration: 0.01ms !important;
+
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
   }
 }

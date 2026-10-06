@@ -5,7 +5,6 @@ import "./Leadership.css";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
-import LeadershipHero from "./components/LeadershipHero";
 import PatronSection from "./components/PatronSection";
 import ExecutiveSection from "./components/ExecutiveSection";
 import AssemblySection from "./components/AssemblySection";
@@ -35,8 +34,6 @@ export default function Leadership() {
          * PUBLIC ENDPOINT ONLY
          *
          * GET /api/leaders/public
-         *
-         * NEVER use getLeaders() here.
          */
 
         const response =
@@ -44,11 +41,16 @@ export default function Leadership() {
 
         if (!isMounted) return;
 
-        setLeaders(
-          Array.isArray(response?.data)
-            ? response.data
-            : []
+        const publicLeaders = Array.isArray(response?.data)
+          ? response.data
+          : [];
+
+        console.log(
+          "Public leadership loaded:",
+          publicLeaders
         );
+
+        setLeaders(publicLeaders);
       } catch (err) {
         console.error(
           "Failed to load public leadership:",
@@ -76,25 +78,41 @@ export default function Leadership() {
   }, []);
 
   /* ==========================================================
-     GROUP LEADERS
+     PATRON
+     
+     Patron is identified by office/category.
   ========================================================== */
 
   const patron = useMemo(
     () =>
       leaders.find(
         (leader) =>
-          leader.category === "patron"
+          leader.office === "patron" ||
+          leader.category === "patronage"
       ) || null,
     [leaders]
   );
+
+  /* ==========================================================
+     REGIONAL CABINET
+     
+     Structural level:
+       regional_cabinet
+     
+     Functional category:
+       executive
+     
+     Do NOT use:
+       regional_executive
+  ========================================================== */
 
   const executive = useMemo(
     () =>
       leaders
         .filter(
           (leader) =>
-            leader.category ===
-            "regional_executive"
+            leader.level === "regional_cabinet" &&
+            leader.category === "executive"
         )
         .sort(
           (a, b) =>
@@ -104,29 +122,45 @@ export default function Leadership() {
     [leaders]
   );
 
+  /* ==========================================================
+     COUNCIL OF GOVERNORS
+     
+     Council Governors are a separate leadership level.
+  ========================================================== */
+
   const councilOfGovernors = useMemo(
-  () =>
-    leaders
-      .filter(
-        (leader) =>
-          leader.category ===
-          "council_of_governors"
-      )
-      .sort(
-        (a, b) =>
-          (a.displayOrder || 0) -
-          (b.displayOrder || 0)
-      ),
-  [leaders]
-);
+    () =>
+      leaders
+        .filter(
+          (leader) =>
+            leader.level === "council_of_governors"
+        )
+        .sort(
+          (a, b) =>
+            (a.displayOrder || 0) -
+            (b.displayOrder || 0)
+        ),
+    [leaders]
+  );
+
+  /* ==========================================================
+     REGIONAL YOUTH ASSEMBLY
+     
+     Structural level:
+       regional_youth_assembly
+     
+     Functional category:
+       legislative
+  ========================================================== */
 
   const assembly = useMemo(
     () =>
       leaders
         .filter(
           (leader) =>
-            leader.category ===
-            "youth_assembly"
+            leader.level ===
+              "regional_youth_assembly" &&
+            leader.category === "legislative"
         )
         .sort(
           (a, b) =>
@@ -135,6 +169,17 @@ export default function Leadership() {
         ),
     [leaders]
   );
+
+  /* ==========================================================
+     COUNTY LEADERSHIP
+     
+     County leadership is divided into:
+     
+     1. County Cabinet
+     2. County Youth Assembly
+     
+     Both are grouped by county.
+  ========================================================== */
 
   const countyLeadership = useMemo(() => {
     const grouped = {};
@@ -142,12 +187,14 @@ export default function Leadership() {
     leaders
       .filter(
         (leader) =>
-          leader.category ===
-          "county_leadership"
+          leader.level === "county_cabinet" ||
+          leader.level === "county_youth_assembly"
       )
       .forEach((leader) => {
         const county =
-          leader.county || "Other";
+          leader.county ||
+          leader.countyName ||
+          "Other";
 
         if (!grouped[county]) {
           grouped[county] = [];
@@ -168,6 +215,30 @@ export default function Leadership() {
   }, [leaders]);
 
   /* ==========================================================
+     DEBUG
+  ========================================================== */
+
+  useEffect(() => {
+    if (!leaders.length) return;
+
+    console.log("Leadership grouping:", {
+      total: leaders.length,
+      patron,
+      regionalCabinet: executive,
+      councilOfGovernors,
+      regionalAssembly: assembly,
+      countyLeadership,
+    });
+  }, [
+    leaders,
+    patron,
+    executive,
+    councilOfGovernors,
+    assembly,
+    countyLeadership,
+  ]);
+
+  /* ==========================================================
      PAGE
   ========================================================== */
 
@@ -176,8 +247,6 @@ export default function Leadership() {
       <Navbar />
 
       <main className="leadership-page">
-
-        <LeadershipHero />
 
         {loading && (
           <div className="leadership-message">
@@ -193,21 +262,41 @@ export default function Leadership() {
 
         {!loading && !error && (
           <>
+            {/* ==================================================
+                PATRON
+            ================================================== */}
+
             <PatronSection
               leader={patron}
             />
+
+            {/* ==================================================
+                REGIONAL CABINET
+            ================================================== */}
 
             <ExecutiveSection
               leaders={executive}
             />
 
+            {/* ==================================================
+                COUNCIL OF GOVERNORS
+            ================================================== */}
+
             <CouncilGovernors
-  leaders={councilOfGovernors}
-/>
+              leaders={councilOfGovernors}
+            />
+
+            {/* ==================================================
+                REGIONAL YOUTH ASSEMBLY
+            ================================================== */}
 
             <AssemblySection
               leaders={assembly}
             />
+
+            {/* ==================================================
+                COUNTY LEADERSHIP
+            ================================================== */}
 
             <CountyLeadershipSection
               counties={countyLeadership}

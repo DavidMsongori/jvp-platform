@@ -1,126 +1,490 @@
 /* ==========================================================
-   MEMBERS PAGE
+   ADMIN MEMBERS PAGE
 ========================================================== */
 
 .admin-members-page {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
+  width: 100%;
   min-height: 100%;
-  background: #f8fafc;
+  padding: 28px 30px 40px;
+  background: #f6f8fb;
+  color: #172033;
+  box-sizing: border-box;
 }
 
 /* ==========================================================
    PAGE HEADER
 ========================================================== */
 
-.page-header {
+.members-page-header {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.members-header-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  min-width: 0;
+}
+
+.members-header-icon {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+
+  display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: linear-gradient(
+    135deg,
+    #0c7c86,
+    #075e67
+  );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 18px rgba(12, 124, 134, 0.18);
+}
+
+.members-header-content {
+  min-width: 0;
+}
+
+.members-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 6px;
+
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a94a6;
+}
+
+.members-breadcrumb span {
+  color: #c2c9d4;
+}
+
+.members-header-content h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+
+  color: #162033;
+}
+
+.members-header-content p {
+  margin: 7px 0 0;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  color: #697386;
+}
+
+/* ==========================================================
+   HEADER ACTIONS
+========================================================== */
+
+.members-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-.page-header h1 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #0f172a;
-}
+.members-action-button {
+  height: 40px;
 
-.page-header p {
-  margin-top: 0.35rem;
-  color: #64748b;
-  font-size: 0.95rem;
-}
-
-/* ==========================================================
-   PAGE ACTIONS
-========================================================== */
-
-.page-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.page-actions button {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 8px;
 
-  padding: 0.8rem 1.25rem;
+  padding: 0 15px;
 
-  border: none;
-  border-radius: 10px;
+  border-radius: 9px;
+  border: 1px solid transparent;
 
-  background: #2563eb;
-  color: #ffffff;
-
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 650;
 
   cursor: pointer;
 
-  transition: all 0.25s ease;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
 }
 
-.page-actions button:hover {
-  background: #1d4ed8;
+.members-action-button:hover {
+  transform: translateY(-1px);
 }
 
-.page-actions button:disabled {
-  background: #cbd5e1;
+.members-action-button:active {
+  transform: translateY(0);
+}
+
+.members-action-button:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
+  transform: none;
+}
+
+.members-action-button.secondary {
+  background: #ffffff;
+  border-color: #dfe4ec;
+  color: #455166;
+
+  box-shadow:
+    0 2px 5px rgba(20, 35, 55, 0.04);
+}
+
+.members-action-button.secondary:hover {
+  background: #f9fafc;
+  border-color: #cbd2dc;
+}
+
+.members-action-button.primary {
+  background: #087f8c;
+  border-color: #087f8c;
+  color: #ffffff;
+
+  box-shadow:
+    0 5px 14px rgba(8, 127, 140, 0.2);
+}
+
+.members-action-button.primary:hover {
+  background: #076e79;
+  border-color: #076e79;
+  box-shadow:
+    0 7px 18px rgba(8, 127, 140, 0.26);
 }
 
 /* ==========================================================
-   SECTION SPACING
+   PAGE CONTENT
 ========================================================== */
 
-.admin-members-page > * {
+.members-page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* ==========================================================
+   SECTION HEADING
+========================================================== */
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  margin-bottom: 13px;
+}
+
+.section-eyebrow {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: #0b7b87;
+}
+
+.section-heading h2 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 720;
+  letter-spacing: -0.25px;
+
+  color: #1b2638;
+}
+
+/* ==========================================================
+   MANAGEMENT CARD
+========================================================== */
+
+.members-management-card {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e3e8ef;
+  border-radius: 15px;
+
+  box-shadow:
+    0 4px 16px rgba(26, 39, 58, 0.045);
+}
+
+/* ==========================================================
+   MANAGEMENT HEADER
+========================================================== */
+
+.management-card-header {
+  min-height: 78px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 18px 22px;
+
+  border-bottom: 1px solid #edf0f4;
+}
+
+.management-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-width: 0;
+}
+
+.management-title-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #eef8f9;
+  color: #087f8c;
+}
+
+.management-title h2 {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 720;
+
+  color: #1c2738;
+}
+
+.management-title p {
+  margin: 4px 0 0;
+
+  font-size: 12.5px;
+  color: #7a8495;
+}
+
+.member-count-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+
+  padding: 7px 11px;
+
+  border-radius: 8px;
+
+  background: #f5f7fa;
+
+  white-space: nowrap;
+}
+
+.member-count-badge strong {
+  font-size: 14px;
+  font-weight: 750;
+  color: #253247;
+}
+
+.member-count-badge span {
+  font-size: 11px;
+  color: #7d8797;
+}
+
+/* ==========================================================
+   FILTERS
+========================================================== */
+
+.members-filters-wrapper {
+  padding: 16px 22px;
+
+  background: #fafbfd;
+
+  border-bottom: 1px solid #edf0f4;
+}
+
+/*
+   The existing MemberFilters component may already have
+   its own styling. These selectors help remove excessive
+   spacing when nested inside this page.
+*/
+
+.members-filters-wrapper > * {
   width: 100%;
 }
 
 /* ==========================================================
-   RESPONSIVE
+   TABLE
 ========================================================== */
 
-@media (max-width: 992px) {
+.members-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
 
-  .admin-members-page {
-    padding: 1.5rem;
-  }
-
+  background: #ffffff;
 }
 
-@media (max-width: 768px) {
+.members-table-wrapper > * {
+  width: 100%;
+}
 
+/* ==========================================================
+   LOADING SPINNER
+========================================================== */
+
+.members-spin {
+  animation: membersSpin 0.9s linear infinite;
+}
+
+@keyframes membersSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   RESPONSIVE — TABLET
+========================================================== */
+
+@media (max-width: 1050px) {
   .admin-members-page {
-    padding: 1rem;
-    gap: 1.5rem;
+    padding: 24px 22px 35px;
   }
 
-  .page-header {
+  .members-page-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
-  .page-header h1 {
-    font-size: 1.7rem;
-  }
-
-  .page-actions {
-    width: 100%;
+  .members-header-actions {
     justify-content: flex-start;
-    flex-wrap: wrap;
+  }
+}
+
+/* ==========================================================
+   RESPONSIVE — MOBILE
+========================================================== */
+
+@media (max-width: 720px) {
+  .admin-members-page {
+    padding: 18px 14px 30px;
   }
 
-  .page-actions button {
+  .members-page-header {
+    margin-bottom: 22px;
+    gap: 17px;
+  }
+
+  .members-header-icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    border-radius: 11px;
+  }
+
+  .members-header-content h1 {
+    font-size: 23px;
+  }
+
+  .members-header-content p {
+    font-size: 13px;
+  }
+
+  .members-header-actions {
     width: 100%;
-    justify-content: center;
   }
 
+  .members-action-button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .members-action-button span {
+    display: inline;
+  }
+
+  .section-heading {
+    margin-bottom: 10px;
+  }
+
+  .section-heading h2 {
+    font-size: 16px;
+  }
+
+  .management-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding: 16px;
+  }
+
+  .member-count-badge {
+    align-self: flex-start;
+  }
+
+  .members-filters-wrapper {
+    padding: 14px 16px;
+  }
+}
+
+/* ==========================================================
+   SMALL MOBILE
+========================================================== */
+
+@media (max-width: 480px) {
+  .members-header-main {
+    gap: 11px;
+  }
+
+  .members-breadcrumb {
+    font-size: 10px;
+  }
+
+  .members-header-content h1 {
+    font-size: 21px;
+  }
+
+  .members-header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .members-action-button.primary {
+    grid-column: 1 / -1;
+  }
+
+  .management-title p {
+    line-height: 1.45;
+  }
 }

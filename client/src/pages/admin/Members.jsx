@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
-
 import {
-  getMembers,
-} from "../../services/admin.service";
+  Users,
+  UserPlus,
+  RefreshCw,
+  Download,
+} from "lucide-react";
+
+import { getMembers } from "../../services/admin.service";
 
 import MemberSummary from "../../components/admin/members/MemberSummary";
 import MemberFilters from "../../components/admin/members/MemberFilters";
@@ -11,139 +15,267 @@ import MembersTable from "../../components/admin/members/MembersTable";
 import "./Members.css";
 
 function Members() {
-
   const [members, setMembers] = useState([]);
-
   const [summary, setSummary] = useState({});
+  const [pagination, setPagination] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const [pagination, setPagination] =
-    useState({});
+  const [filters, setFilters] = useState({
+    search: "",
+    county: "",
+    membershipStatus: "",
+    membershipType: "",
+    page: 1,
+    limit: 10,
+  });
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [filters, setFilters] =
-    useState({
-
-      search: "",
-
-      county: "",
-
-      membershipStatus: "",
-
-      membershipType: "",
-
-      page: 1,
-
-      limit: 10,
-
-    });
-
-  /* ==========================================
+  /* ==========================================================
      LOAD MEMBERS
-  ========================================== */
+  ========================================================== */
 
   const loadMembers = async () => {
-
     try {
-
       setLoading(true);
 
-      const response =
-        await getMembers(filters);
+      const response = await getMembers(filters);
 
-        console.log(response);
-
-console.log(response.data.members.length);
-
-console.log(response.data.members);
+      const data = response?.data || {};
 
       setMembers(
-        response.data.members
+        Array.isArray(data.members)
+          ? data.members
+          : []
       );
 
       setSummary(
-        response.data.summary
+        data.summary || {}
       );
 
       setPagination(
-        response.data.pagination
+        data.pagination || {}
+      );
+    } catch (error) {
+      console.error(
+        "Failed to load members:",
+        error
       );
 
-    } catch (error) {
-
-      console.error(error);
-
+      setMembers([]);
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
+  /* ==========================================================
+     LOAD ON FILTER CHANGE
+  ========================================================== */
+
   useEffect(() => {
-
     loadMembers();
-
   }, [filters]);
 
-  return (
+  /* ==========================================================
+     REFRESH
+  ========================================================== */
 
+  const handleRefresh = () => {
+    loadMembers();
+  };
+
+  return (
     <div className="admin-members-page">
 
-      <div className="page-header">
+      {/* ======================================================
+          PAGE HEADER
+      ====================================================== */}
 
-        <div>
+      <header className="members-page-header">
 
-          <h1>
+        <div className="members-header-main">
 
-            Members
+          <div className="members-header-icon">
+            <Users size={24} />
+          </div>
 
-          </h1>
+          <div className="members-header-content">
 
-          <p>
+            <div className="members-breadcrumb">
+              Administration
+              <span>/</span>
+              Members
+            </div>
 
-            Manage all registered JVP members.
+            <h1>
+              Members Management
+            </h1>
 
-          </p>
+            <p>
+              Manage, monitor and maintain the
+              JVP membership database.
+            </p>
+
+          </div>
 
         </div>
 
-      </div>
+        <div className="members-header-actions">
 
-      <MemberSummary
-        summary={summary}
-      />
+          <button
+            type="button"
+            className="members-action-button secondary"
+            onClick={handleRefresh}
+            disabled={loading}
+          >
+            <RefreshCw
+              size={17}
+              className={
+                loading
+                  ? "members-spin"
+                  : ""
+              }
+            />
 
-      <MemberFilters
+            <span>
+              Refresh
+            </span>
+          </button>
 
-        filters={filters}
+          <button
+            type="button"
+            className="members-action-button secondary"
+          >
+            <Download size={17} />
 
-        setFilters={setFilters}
+            <span>
+              Export
+            </span>
+          </button>
 
-      />
+          <button
+            type="button"
+            className="members-action-button primary"
+          >
+            <UserPlus size={17} />
 
-      <MembersTable
+            <span>
+              Add Member
+            </span>
+          </button>
 
-        members={members}
+        </div>
 
-        loading={loading}
+      </header>
 
-        pagination={pagination}
+      {/* ======================================================
+          PAGE CONTENT
+      ====================================================== */}
 
-        filters={filters}
+      <main className="members-page-content">
 
-        setFilters={setFilters}
+        {/* ====================================================
+            SUMMARY
+        ==================================================== */}
 
-        refresh={loadMembers}
+        <section className="members-summary-section">
 
-      />
+          <div className="section-heading">
+
+            <div>
+              <span className="section-eyebrow">
+                Membership Overview
+              </span>
+
+              <h2>
+                Member Statistics
+              </h2>
+            </div>
+
+          </div>
+
+          <MemberSummary
+            summary={summary}
+          />
+
+        </section>
+
+        {/* ====================================================
+            MANAGEMENT WORKSPACE
+        ==================================================== */}
+
+        <section className="members-management-card">
+
+          <div className="management-card-header">
+
+            <div className="management-title">
+
+              <div className="management-title-icon">
+                <Users size={19} />
+              </div>
+
+              <div>
+                <h2>
+                  Member Directory
+                </h2>
+
+                <p>
+                  Search, filter and manage
+                  registered JVP members.
+                </p>
+              </div>
+
+            </div>
+
+            <div className="member-count-badge">
+
+              <strong>
+                {pagination?.total ??
+                  members.length}
+              </strong>
+
+              <span>
+                Members
+              </span>
+
+            </div>
+
+          </div>
+
+          {/* ==================================================
+              FILTERS
+          ================================================== */}
+
+          <div className="members-filters-wrapper">
+
+            <MemberFilters
+              filters={filters}
+              setFilters={setFilters}
+            />
+
+          </div>
+
+          {/* ==================================================
+              TABLE
+          ================================================== */}
+
+          <div className="members-table-wrapper">
+
+            <MembersTable
+              members={members}
+              loading={loading}
+              pagination={pagination}
+              filters={filters}
+              setFilters={setFilters}
+              refresh={loadMembers}
+            />
+
+          </div>
+
+        </section>
+
+      </main>
 
     </div>
-
   );
-
 }
 
 export default Members;

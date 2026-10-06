@@ -22,6 +22,7 @@ import memberService from "../../../../services/member.service";
 
 import {
   LEADERSHIP_LEVELS,
+  LEADERSHIP_CATEGORIES,
   LEADERSHIP_DEPARTMENTS,
   LEADERSHIP_SCOPE,
   APPOINTMENT_TYPES,
@@ -29,7 +30,7 @@ import {
 } from "../../../../constants/leadership.constants";
 
 /* ============================================================
-   OPTIONS
+   CATEGORY OPTIONS
 ============================================================ */
 
 const CATEGORIES = [
@@ -38,74 +39,99 @@ const CATEGORIES = [
     value: "patron",
   },
   {
-    label: "Regional Executive",
-    value:
-      LEADERSHIP_LEVELS.REGIONAL_EXECUTIVE,
+    label: "Executive",
+    value: LEADERSHIP_CATEGORIES.EXECUTIVE,
+  },
+  {
+    label: "Legislative",
+    value: LEADERSHIP_CATEGORIES.LEGISLATIVE,
+  },
+  {
+    label: "Secretariat",
+    value: LEADERSHIP_CATEGORIES.SECRETARIAT,
+  },
+  {
+    label: "Patronage",
+    value: LEADERSHIP_CATEGORIES.PATRONAGE,
+  },
+];
+
+/* ============================================================
+   LEADERSHIP LEVELS
+============================================================ */
+
+const LEADERSHIP_LEVEL_OPTIONS = [
+  {
+    label: "Regional Cabinet",
+    value: LEADERSHIP_LEVELS.REGIONAL_CABINET,
+  },
+  {
+    label: "Regional Youth Assembly",
+    value: LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
   },
   {
     label: "Council of Governors",
-    value:
-      LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
+    value: LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
   },
   {
-    label: "Youth Assembly",
-    value:
-      LEADERSHIP_LEVELS.YOUTH_ASSEMBLY,
+    label: "County Cabinet",
+    value: LEADERSHIP_LEVELS.COUNTY_CABINET,
   },
   {
-    label: "County Leadership",
-    value:
-      LEADERSHIP_LEVELS.COUNTY_LEADERSHIP,
+    label: "County Youth Assembly",
+    value: LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
   },
 ];
+
+/* ============================================================
+   DEPARTMENTS
+============================================================ */
 
 const DEPARTMENTS = [
   {
     label: "Executive",
-    value:
-      LEADERSHIP_DEPARTMENTS.EXECUTIVE,
-  },
-  {
-    label: "Governance",
-    value:
-      LEADERSHIP_DEPARTMENTS.GOVERNANCE,
+    value: LEADERSHIP_DEPARTMENTS.EXECUTIVE,
   },
   {
     label: "Legislative",
-    value:
-      LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
+    value: LEADERSHIP_DEPARTMENTS.LEGISLATIVE,
   },
   {
     label: "Secretariat",
-    value:
-      LEADERSHIP_DEPARTMENTS.SECRETARIAT,
+    value: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
   },
   {
     label: "Patronage",
-    value:
-      LEADERSHIP_DEPARTMENTS.PATRONAGE,
+    value: LEADERSHIP_DEPARTMENTS.PATRONAGE || "patronage",
   },
 ];
 
+/* ============================================================
+   SCOPES
+============================================================ */
+
 const SCOPES = [
   {
-    label: "Regional",
-    value: LEADERSHIP_SCOPE.REGIONAL,
+    label: "Regional Cabinet",
+    value: LEADERSHIP_SCOPE.REGIONAL_CABINET,
   },
   {
-    label: "County",
-    value: LEADERSHIP_SCOPE.COUNTY,
+    label: "Regional Youth Assembly",
+    value: LEADERSHIP_SCOPE.REGIONAL_YOUTH_ASSEMBLY,
   },
   {
-    label: "Constituency",
-    value:
-      LEADERSHIP_SCOPE.CONSTITUENCY,
+    label: "County Cabinet",
+    value: LEADERSHIP_SCOPE.COUNTY_CABINET,
   },
   {
-    label: "Ward",
-    value: LEADERSHIP_SCOPE.WARD,
+    label: "County Youth Assembly",
+    value: LEADERSHIP_SCOPE.COUNTY_YOUTH_ASSEMBLY,
   },
 ];
+
+/* ============================================================
+   APPOINTMENT TYPES
+============================================================ */
 
 const APPOINTMENT_TYPE_OPTIONS = [
   {
@@ -120,15 +146,22 @@ const APPOINTMENT_TYPE_OPTIONS = [
     label: "Appointed",
     value: APPOINTMENT_TYPES.APPOINTED,
   },
+  {
+    label: "Honorary",
+    value: "honorary",
+  },
 ];
+
+/* ============================================================
+   POSITIONS
+============================================================ */
 
 const POSITIONS = Object.entries(
   OFFICE_CONFIGURATION
 ).map(
   ([value, configuration]) => ({
     value,
-    label:
-      configuration.title,
+    label: configuration.title,
     configuration,
   })
 );
@@ -141,6 +174,7 @@ const DEFAULT_FORM = {
   member: "",
 
   category: "",
+  level: "",
   position: "",
 
   department: "",
@@ -173,21 +207,14 @@ const DEFAULT_FORM = {
    HELPERS
 ============================================================ */
 
-const formatDateForInput = (
-  date
-) => {
+const formatDateForInput = (date) => {
   if (!date) {
     return "";
   }
 
-  const parsedDate =
-    new Date(date);
+  const parsedDate = new Date(date);
 
-  if (
-    Number.isNaN(
-      parsedDate.getTime()
-    )
-  ) {
+  if (Number.isNaN(parsedDate.getTime())) {
     return "";
   }
 
@@ -196,9 +223,7 @@ const formatDateForInput = (
     .split("T")[0];
 };
 
-const getMemberName = (
-  member
-) => {
+const getMemberName = (member) => {
   if (!member) {
     return "";
   }
@@ -214,9 +239,7 @@ const getMemberName = (
     .trim();
 };
 
-const getMemberLocation = (
-  member
-) => {
+const getMemberLocation = (member) => {
   if (!member) {
     return "";
   }
@@ -241,67 +264,84 @@ export default function LeaderFormModal({
   onClose,
   onSave,
 }) {
-  const [
-    form,
-    setForm,
-  ] = useState(
+  const [form, setForm] = useState(
     DEFAULT_FORM
   );
 
-  const [
-    members,
-    setMembers,
-  ] = useState([]);
+  const [members, setMembers] = useState([]);
 
-  const [
-    selectedMember,
-    setSelectedMember,
-  ] = useState(null);
+  const [selectedMember, setSelectedMember] =
+    useState(null);
 
-  const [
-    memberSearch,
-    setMemberSearch,
-  ] = useState("");
+  const [memberSearch, setMemberSearch] =
+    useState("");
 
-  const [
-    membersLoading,
-    setMembersLoading,
-  ] = useState(false);
+  const [membersLoading, setMembersLoading] =
+    useState(false);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] = useState("");
 
   /* ==========================================================
      DERIVED VALUES
   ========================================================== */
 
   const isPatron =
+    form.category === "patron" ||
     form.category ===
-    "patron";
+      LEADERSHIP_CATEGORIES.PATRONAGE;
 
-  const filteredPositions =
-    useMemo(() => {
-      if (!form.category) {
-        return POSITIONS;
-      }
+  /* ==========================================================
+     FILTER POSITIONS
+  ========================================================== */
 
-      return POSITIONS.filter(
-        (position) => {
-          const level =
-            position.configuration
-              ?.level;
+  const filteredPositions = useMemo(() => {
+    let positions = POSITIONS;
 
-          return (
-            form.category ===
-              "patron" ||
-            level ===
-              form.category
-          );
-        }
+    /*
+      Filter by leadership level first.
+      This is the structural level of the office.
+    */
+
+    if (form.level) {
+      positions = positions.filter(
+        (position) =>
+          position.configuration?.level ===
+          form.level
       );
-    }, [form.category]);
+    }
+
+    /*
+      Then filter by functional category.
+    */
+
+    if (
+      form.category &&
+      !isPatron
+    ) {
+      positions = positions.filter(
+        (position) =>
+          position.configuration?.category ===
+          form.category
+      );
+    }
+
+    /*
+      Patron is a special office.
+    */
+
+    if (isPatron) {
+      positions = positions.filter(
+        (position) =>
+          position.value === "patron"
+      );
+    }
+
+    return positions;
+  }, [
+    form.level,
+    form.category,
+    isPatron,
+  ]);
 
   /* ==========================================================
      INITIALIZE FORM
@@ -315,10 +355,14 @@ export default function LeaderFormModal({
     if (leader) {
       const leaderMember =
         leader.member &&
-        typeof leader.member ===
-          "object"
+        typeof leader.member === "object"
           ? leader.member
           : null;
+
+      const configuration =
+        OFFICE_CONFIGURATION[
+          leader.position
+        ];
 
       setForm({
         member:
@@ -328,6 +372,12 @@ export default function LeaderFormModal({
 
         category:
           leader.category ||
+          configuration?.category ||
+          "",
+
+        level:
+          leader.level ||
+          configuration?.level ||
           "",
 
         position:
@@ -336,14 +386,17 @@ export default function LeaderFormModal({
 
         department:
           leader.department ||
+          configuration?.department ||
           "",
 
         scope:
-          leader.scope ||
+          leader.scope ??
+          configuration?.scope ??
           "",
 
         appointmentType:
           leader.appointmentType ||
+          configuration?.appointmentType ||
           "",
 
         county:
@@ -353,8 +406,7 @@ export default function LeaderFormModal({
 
         constituency:
           leader.constituency ||
-          leaderMember
-            ?.constituency ||
+          leaderMember?.constituency ||
           "",
 
         ward:
@@ -363,12 +415,10 @@ export default function LeaderFormModal({
           "",
 
         displayOrder:
-          leader.displayOrder ??
-          999,
+          leader.displayOrder ?? 999,
 
         featured:
-          leader.featured ??
-          false,
+          leader.featured ?? false,
 
         termStart:
           formatDateForInput(
@@ -381,37 +431,30 @@ export default function LeaderFormModal({
           ),
 
         verified:
-          leader.verified ??
-          true,
+          leader.verified ?? true,
 
         remarks:
-          leader.remarks ||
-          "",
+          leader.remarks || "",
 
         patron: {
           fullName:
-            leader.patron
-              ?.fullName ||
+            leader.patron?.fullName ||
             "",
 
           title:
-            leader.patron
-              ?.title ||
+            leader.patron?.title ||
             "",
 
           organization:
-            leader.patron
-              ?.organization ||
+            leader.patron?.organization ||
             "",
 
           photo:
-            leader.patron
-              ?.photo ||
+            leader.patron?.photo ||
             "",
 
           bio:
-            leader.patron
-              ?.bio ||
+            leader.patron?.bio ||
             "",
         },
       });
@@ -441,10 +484,7 @@ export default function LeaderFormModal({
           ),
       });
 
-      setSelectedMember(
-        null
-      );
-
+      setSelectedMember(null);
       setMemberSearch("");
     }
 
@@ -481,57 +521,48 @@ export default function LeaderFormModal({
 
     let active = true;
 
-    const loadMembers =
-      async () => {
-        try {
-          setMembersLoading(
-            true
+    const loadMembers = async () => {
+      try {
+        setMembersLoading(true);
+
+        const response =
+          await memberService.searchMembers(
+            searchValue
           );
 
-          const response =
-            await memberService
-              .searchMembers(
-                searchValue
-              );
+        const results =
+          response?.data ||
+          response?.members ||
+          response ||
+          [];
 
-          const results =
-            response?.data ||
-            response?.members ||
-            response ||
-            [];
-
-          if (active) {
-            setMembers(
-              Array.isArray(
-                results
-              )
-                ? results
-                : []
-            );
-          }
-        } catch (requestError) {
-          console.error(
-            "Member search failed:",
-            requestError
+        if (active) {
+          setMembers(
+            Array.isArray(results)
+              ? results
+              : []
           );
-
-          if (active) {
-            setMembers([]);
-          }
-        } finally {
-          if (active) {
-            setMembersLoading(
-              false
-            );
-          }
         }
-      };
+      } catch (requestError) {
+        console.error(
+          "Member search failed:",
+          requestError
+        );
 
-    const timer =
-      setTimeout(
-        loadMembers,
-        350
-      );
+        if (active) {
+          setMembers([]);
+        }
+      } finally {
+        if (active) {
+          setMembersLoading(false);
+        }
+      }
+    };
+
+    const timer = setTimeout(
+      loadMembers,
+      350
+    );
 
     return () => {
       active = false;
@@ -552,192 +583,205 @@ export default function LeaderFormModal({
     field,
     value
   ) => {
-    setForm(
-      (previous) => ({
-        ...previous,
-        [field]: value,
-      })
-    );
+    setForm((previous) => ({
+      ...previous,
+      [field]: value,
+    }));
   };
 
   const updatePatronField = (
     field,
     value
   ) => {
-    setForm(
-      (previous) => ({
-        ...previous,
+    setForm((previous) => ({
+      ...previous,
 
-        patron: {
-          ...previous.patron,
-          [field]: value,
-        },
-      })
-    );
+      patron: {
+        ...previous.patron,
+        [field]: value,
+      },
+    }));
+  };
+
+  /* ==========================================================
+     LEVEL CHANGE
+  ========================================================== */
+
+  const handleLevelChange = (
+    level
+  ) => {
+    setForm((previous) => ({
+      ...previous,
+
+      level,
+
+      position: "",
+
+      /*
+        Clear values that will be
+        automatically determined
+        by the selected office.
+      */
+      department: "",
+      scope: "",
+      appointmentType: "",
+    }));
+  };
+
+  /* ==========================================================
+     CATEGORY CHANGE
+  ========================================================== */
+
+  const handleCategoryChange = (
+    category
+  ) => {
+    const patron =
+      category === "patron" ||
+      category ===
+        LEADERSHIP_CATEGORIES.PATRONAGE;
+
+    setForm((previous) => ({
+      ...previous,
+
+      category,
+
+      position: "",
+
+      level: patron
+        ? ""
+        : previous.level,
+
+      member: patron
+        ? ""
+        : previous.member,
+
+      appointmentType: patron
+        ? "honorary"
+        : previous.appointmentType,
+
+      scope: patron
+        ? ""
+        : previous.scope,
+
+      department: patron
+        ? (
+            LEADERSHIP_DEPARTMENTS.PATRONAGE ||
+            "patronage"
+          )
+        : previous.department,
+    }));
+
+    if (patron) {
+      setSelectedMember(null);
+      setMemberSearch("");
+      setMembers([]);
+    }
   };
 
   /* ==========================================================
      POSITION CHANGE
   ========================================================== */
 
-  const handlePositionChange =
-    (position) => {
-      const selectedPosition =
-        POSITIONS.find(
-          (item) =>
-            item.value ===
-            position
-        );
-
-      if (
-        !selectedPosition
-      ) {
-        updateField(
-          "position",
-          position
-        );
-
-        return;
-      }
-
-      const configuration =
-        selectedPosition
-          .configuration;
-
-      setForm(
-        (previous) => ({
-          ...previous,
-
-          position,
-
-          category:
-            configuration.level,
-
-          department:
-            configuration
-              .department,
-
-          scope:
-            configuration.scope,
-
-          appointmentType:
-            configuration
-              .appointmentType,
-        })
-      );
-    };
-
-  /* ==========================================================
-     CATEGORY CHANGE
-  ========================================================== */
-
-  const handleCategoryChange =
-    (category) => {
-      setForm(
-        (previous) => ({
-          ...previous,
-
-          category,
-
-          position: "",
-
-          member:
-            category ===
-            "patron"
-              ? ""
-              : previous.member,
-
-          appointmentType:
-            category ===
-            "patron"
-              ? "honorary"
-              : previous
-                  .appointmentType,
-
-          scope:
-            category ===
-            "patron"
-              ? "organization"
-              : previous.scope,
-
-          department:
-            category ===
-            "patron"
-              ? LEADERSHIP_DEPARTMENTS
-                  .PATRONAGE
-              : previous.department,
-        })
+  const handlePositionChange = (
+    position
+  ) => {
+    const selectedPosition =
+      POSITIONS.find(
+        (item) =>
+          item.value === position
       );
 
-      if (
-        category ===
-        "patron"
-      ) {
-        setSelectedMember(
-          null
-        );
+    if (!selectedPosition) {
+      updateField(
+        "position",
+        position
+      );
 
-        setMemberSearch("");
-        setMembers([]);
-      }
-    };
+      return;
+    }
+
+    const configuration =
+      selectedPosition.configuration;
+
+    setForm((previous) => ({
+      ...previous,
+
+      position,
+
+      /*
+        IMPORTANT:
+        Category receives configuration.category,
+        NOT configuration.level.
+      */
+      category:
+        configuration.category ||
+        previous.category,
+
+      level:
+        configuration.level ||
+        "",
+
+      department:
+        configuration.department ||
+        "",
+
+      /*
+        Council of Governors has
+        no structural scope.
+      */
+      scope:
+        configuration.scope ?? "",
+
+      appointmentType:
+        configuration.appointmentType ||
+        previous.appointmentType,
+    }));
+  };
 
   /* ==========================================================
      MEMBER SELECTION
   ========================================================== */
 
-  const handleSelectMember =
-    (member) => {
-      setSelectedMember(
-        member
-      );
+  const handleSelectMember = (
+    member
+  ) => {
+    setSelectedMember(member);
 
-      setForm(
-        (previous) => ({
-          ...previous,
+    setForm((previous) => ({
+      ...previous,
 
-          member:
-            member._id,
+      member: member._id,
 
-          county:
-            member.county ||
-            "",
+      county:
+        member.county || "",
 
-          constituency:
-            member
-              .constituency ||
-            "",
+      constituency:
+        member.constituency || "",
 
-          ward:
-            member.ward ||
-            "",
-        })
-      );
+      ward:
+        member.ward || "",
+    }));
 
-      setMemberSearch(
-        getMemberName(member)
-      );
+    setMemberSearch(
+      getMemberName(member)
+    );
 
-      setMembers([]);
-      setError("");
-    };
+    setMembers([]);
+    setError("");
+  };
 
   const handleRemoveSelectedMember =
     () => {
-      setSelectedMember(
-        null
-      );
+      setSelectedMember(null);
 
-      setForm(
-        (previous) => ({
-          ...previous,
+      setForm((previous) => ({
+        ...previous,
 
-          member: "",
-          county: "",
-          constituency: "",
-          ward: "",
-        })
-      );
+        member: "",
+        county: "",
+        constituency: "",
+        ward: "",
+      }));
 
       setMemberSearch("");
       setMembers([]);
@@ -752,19 +796,23 @@ export default function LeaderFormModal({
       return "Please select a leadership category.";
     }
 
+    if (!isPatron && !form.level) {
+      return "Please select a leadership level.";
+    }
+
     if (!form.position) {
       return "Please select a leadership office.";
     }
 
-    if (!form.department) {
+    if (
+      !isPatron &&
+      !form.department
+    ) {
       return "Please select a department.";
     }
 
-    if (!form.scope) {
-      return "Please select a leadership scope.";
-    }
-
     if (
+      !isPatron &&
       !form.appointmentType
     ) {
       return "Please select an appointment type.";
@@ -779,8 +827,7 @@ export default function LeaderFormModal({
 
     if (
       isPatron &&
-      !form.patron.fullName
-        .trim()
+      !form.patron.fullName.trim()
     ) {
       return "Patron full name is required.";
     }
@@ -791,12 +838,8 @@ export default function LeaderFormModal({
 
     if (
       form.termEnd &&
-      new Date(
-        form.termEnd
-      ) <
-        new Date(
-          form.termStart
-        )
+      new Date(form.termEnd) <
+        new Date(form.termStart)
     ) {
       return "Term end date cannot be before the term start date.";
     }
@@ -808,154 +851,127 @@ export default function LeaderFormModal({
      SUBMIT
   ========================================================== */
 
-  const handleSubmit =
-    async (event) => {
-      event.preventDefault();
+  const handleSubmit = async (
+    event
+  ) => {
+    event.preventDefault();
 
-      const validationError =
-        validate();
+    const validationError =
+      validate();
 
-      if (
-        validationError
-      ) {
-        setError(
-          validationError
-        );
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
-        return;
-      }
+    setError("");
 
-      setError("");
+    const payload = {
+      category:
+        form.category,
 
-      const payload = {
-        category:
-          form.category,
+      level:
+        form.level || null,
 
-        position:
-          form.position,
+      position:
+        form.position,
 
-        department:
-          form.department,
+      department:
+        form.department || null,
 
-        scope:
-          form.scope,
+      scope:
+        form.scope || null,
 
-        appointmentType:
-          form.appointmentType,
+      appointmentType:
+        form.appointmentType,
 
-        displayOrder:
-          Number(
-            form.displayOrder
-          ),
+      displayOrder:
+        Number(form.displayOrder),
 
-        featured:
-          Boolean(
-            form.featured
-          ),
+      featured:
+        Boolean(form.featured),
 
-        termStart:
-          form.termStart,
+      termStart:
+        form.termStart,
 
-        termEnd:
-          form.termEnd ||
-          null,
+      termEnd:
+        form.termEnd || null,
 
-        verified:
-          Boolean(
-            form.verified
-          ),
+      verified:
+        Boolean(form.verified),
 
-        remarks:
-          form.remarks
-            .trim(),
+      remarks:
+        form.remarks.trim(),
 
-        ...(isPatron
-          ? {
-              member: null,
+      ...(isPatron
+        ? {
+            member: null,
 
-              patron: {
-                fullName:
-                  form.patron
-                    .fullName
-                    .trim(),
+            patron: {
+              fullName:
+                form.patron.fullName.trim(),
 
-                title:
-                  form.patron
-                    .title
-                    .trim(),
+              title:
+                form.patron.title.trim(),
 
-                organization:
-                  form.patron
-                    .organization
-                    .trim(),
+              organization:
+                form.patron.organization.trim(),
 
-                photo:
-                  form.patron
-                    .photo
-                    .trim(),
+              photo:
+                form.patron.photo.trim(),
 
-                bio:
-                  form.patron
-                    .bio
-                    .trim(),
-              },
-            }
-          : {
-              member:
-                form.member,
+              bio:
+                form.patron.bio.trim(),
+            },
+          }
+        : {
+            member:
+              form.member,
 
-              county:
-                selectedMember
-                  ?.county ||
-                form.county ||
-                null,
+            county:
+              selectedMember?.county ||
+              form.county ||
+              null,
 
-              constituency:
-                selectedMember
-                  ?.constituency ||
-                form.constituency ||
-                null,
+            constituency:
+              selectedMember?.constituency ||
+              form.constituency ||
+              null,
 
-              ward:
-                selectedMember
-                  ?.ward ||
-                form.ward ||
-                null,
-            }),
-      };
-
-      await onSave(
-        payload
-      );
+            ward:
+              selectedMember?.ward ||
+              form.ward ||
+              null,
+          }),
     };
+
+    await onSave(payload);
+  };
 
   /* ==========================================================
      CLOSE
   ========================================================== */
 
-  const handleClose =
-    () => {
-      if (loading) {
-        return;
-      }
+  const handleClose = () => {
+    if (loading) {
+      return;
+    }
 
-      setForm({
-        ...DEFAULT_FORM,
-        patron: {
-          ...DEFAULT_FORM.patron,
-        },
-      });
+    setForm({
+      ...DEFAULT_FORM,
 
-      setSelectedMember(
-        null
-      );
+      patron: {
+        ...DEFAULT_FORM.patron,
+      },
+    });
 
-      setMemberSearch("");
-      setMembers([]);
-      setError("");
+    setSelectedMember(null);
+    setMemberSearch("");
+    setMembers([]);
+    setError("");
 
-      onClose();
-    };
+    onClose();
+  };
 
   if (!open) {
     return null;
@@ -984,16 +1000,14 @@ export default function LeaderFormModal({
         aria-modal="true"
         aria-labelledby="leader-form-title"
       >
-        {/* ===============================================
+        {/* ==================================================
             HEADER
-        =============================================== */}
+        ================================================== */}
 
         <header className="leader-form-modal-header">
           <div className="leader-form-modal-heading">
             <div className="leader-form-modal-heading-icon">
-              <ShieldCheck
-                size={25}
-              />
+              <ShieldCheck size={25} />
             </div>
 
             <div>
@@ -1018,9 +1032,7 @@ export default function LeaderFormModal({
           <button
             type="button"
             className="leader-form-modal-close"
-            onClick={
-              handleClose
-            }
+            onClick={handleClose}
             disabled={loading}
             aria-label="Close leadership form"
           >
@@ -1028,9 +1040,9 @@ export default function LeaderFormModal({
           </button>
         </header>
 
-        {/* ===============================================
+        {/* ==================================================
             ERROR
-        =============================================== */}
+        ================================================== */}
 
         {error && (
           <div
@@ -1053,42 +1065,39 @@ export default function LeaderFormModal({
 
         <form
           className="leader-form"
-          onSubmit={
-            handleSubmit
-          }
+          onSubmit={handleSubmit}
         >
           <div className="leader-form-modal-body">
-            {/* ===========================================
-                CLASSIFICATION
-            =========================================== */}
+
+            {/* =================================================
+                SECTION 01
+            ================================================= */}
 
             <section className="leader-form-section">
               <div className="leader-form-section-heading">
                 <span className="leader-form-section-icon">
-                  <BriefcaseBusiness
-                    size={20}
-                  />
+                  <BriefcaseBusiness size={20} />
                 </span>
 
                 <div>
-                  <small>
-                    Section 01
-                  </small>
+                  <small>Section 01</small>
 
                   <h3>
                     Leadership Classification
                   </h3>
 
                   <p>
-                    Select the office and
-                    define how the
-                    leadership assignment
-                    is classified.
+                    Select the leadership
+                    structure and official
+                    office.
                   </p>
                 </div>
               </div>
 
               <div className="leader-form-grid">
+
+                {/* CATEGORY */}
+
                 <div className="leader-form-group">
                   <label htmlFor="leader-category">
                     Leadership Category
@@ -1097,15 +1106,10 @@ export default function LeaderFormModal({
 
                   <select
                     id="leader-category"
-                    value={
-                      form.category
-                    }
-                    onChange={(
-                      event
-                    ) =>
+                    value={form.category}
+                    onChange={(event) =>
                       handleCategoryChange(
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
                     disabled={loading}
@@ -1124,14 +1128,73 @@ export default function LeaderFormModal({
                             category.value
                           }
                         >
-                          {
-                            category.label
-                          }
+                          {category.label}
                         </option>
                       )
                     )}
                   </select>
                 </div>
+
+                {/* LEVEL */}
+
+                {!isPatron && (
+                  <div className="leader-form-group">
+                    <label htmlFor="leader-level">
+                      Leadership Level
+                      <span>*</span>
+                    </label>
+
+                    <select
+                      id="leader-level"
+                      value={form.level}
+                      onChange={(event) =>
+                        handleLevelChange(
+                          event.target.value
+                        )
+                      }
+                      disabled={loading}
+                    >
+                      <option value="">
+                        Select leadership level
+                      </option>
+
+                      {LEADERSHIP_LEVEL_OPTIONS
+                        .filter(
+                          (level) => {
+                            if (
+                              !form.category
+                            ) {
+                              return true;
+                            }
+
+                            return POSITIONS.some(
+                              (position) =>
+                                position.configuration
+                                  ?.level ===
+                                  level.value &&
+                                position.configuration
+                                  ?.category ===
+                                  form.category
+                            );
+                          }
+                        )
+                        .map((level) => (
+                          <option
+                            key={
+                              level.value
+                            }
+                            value={
+                              level.value
+                            }
+                          >
+                            {level.label}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* POSITION */}
 
                 <div className="leader-form-group">
                   <label htmlFor="leader-position">
@@ -1141,22 +1204,24 @@ export default function LeaderFormModal({
 
                   <select
                     id="leader-position"
-                    value={
-                      form.position
-                    }
-                    onChange={(
-                      event
-                    ) =>
+                    value={form.position}
+                    onChange={(event) =>
                       handlePositionChange(
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
-                    disabled={loading}
+                    disabled={
+                      loading ||
+                      (!isPatron &&
+                        !form.level)
+                    }
                   >
                     <option value="">
-                      Select leadership
-                      office
+                      {isPatron
+                        ? "Select leadership office"
+                        : form.level
+                          ? "Select leadership office"
+                          : "Select leadership level first"}
                     </option>
 
                     {filteredPositions.map(
@@ -1169,39 +1234,50 @@ export default function LeaderFormModal({
                             position.value
                           }
                         >
-                          {
-                            position.label
-                          }
+                          {position.label}
                         </option>
                       )
                     )}
                   </select>
 
-                  <small className="leader-form-help">
-                    Selecting an office
-                    automatically fills its
-                    official classification.
-                  </small>
+                  {!isPatron &&
+                    !form.level && (
+                      <small className="leader-form-help">
+                        Select a leadership
+                        level first to view
+                        its offices.
+                      </small>
+                    )}
+
+                  {!isPatron &&
+                    form.level &&
+                    filteredPositions.length ===
+                      0 && (
+                      <small className="leader-form-help leader-form-help--warning">
+                        No offices are
+                        configured for this
+                        category and level.
+                      </small>
+                    )}
                 </div>
+
+                {/* DEPARTMENT */}
 
                 <div className="leader-form-group">
                   <label htmlFor="leader-department">
                     Department
-                    <span>*</span>
+                    {!isPatron && (
+                      <span>*</span>
+                    )}
                   </label>
 
                   <select
                     id="leader-department"
-                    value={
-                      form.department
-                    }
-                    onChange={(
-                      event
-                    ) =>
+                    value={form.department}
+                    onChange={(event) =>
                       updateField(
                         "department",
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
                     disabled={loading}
@@ -1220,39 +1296,38 @@ export default function LeaderFormModal({
                             department.value
                           }
                         >
-                          {
-                            department.label
-                          }
+                          {department.label}
                         </option>
                       )
                     )}
                   </select>
                 </div>
 
+                {/* SCOPE */}
+
                 <div className="leader-form-group">
                   <label htmlFor="leader-scope">
                     Leadership Scope
-                    <span>*</span>
                   </label>
 
                   <select
                     id="leader-scope"
-                    value={
-                      form.scope
-                    }
-                    onChange={(
-                      event
-                    ) =>
+                    value={form.scope}
+                    onChange={(event) =>
                       updateField(
                         "scope",
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
-                    disabled={loading}
+                    disabled={
+                      loading ||
+                      isPatron
+                    }
                   >
                     <option value="">
-                      Select scope
+                      {isPatron
+                        ? "Not applicable"
+                        : "Select scope"}
                     </option>
 
                     {SCOPES.map(
@@ -1269,19 +1344,27 @@ export default function LeaderFormModal({
                         </option>
                       )
                     )}
-
-                    {isPatron && (
-                      <option value="organization">
-                        Organization
-                      </option>
-                    )}
                   </select>
+
+                  {!isPatron &&
+                    form.position ===
+                      "council_governor" && (
+                      <small className="leader-form-help">
+                        Council of Governors
+                        does not use a
+                        structural scope.
+                      </small>
+                    )}
                 </div>
+
+                {/* APPOINTMENT */}
 
                 <div className="leader-form-group">
                   <label htmlFor="leader-appointment">
                     Appointment Type
-                    <span>*</span>
+                    {!isPatron && (
+                      <span>*</span>
+                    )}
                   </label>
 
                   <select
@@ -1289,64 +1372,46 @@ export default function LeaderFormModal({
                     value={
                       form.appointmentType
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    onChange={(event) =>
                       updateField(
                         "appointmentType",
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
                     disabled={loading}
                   >
                     <option value="">
-                      Select appointment
-                      type
+                      Select appointment type
                     </option>
 
                     {APPOINTMENT_TYPE_OPTIONS.map(
                       (type) => (
                         <option
-                          key={
-                            type.value
-                          }
-                          value={
-                            type.value
-                          }
+                          key={type.value}
+                          value={type.value}
                         >
                           {type.label}
                         </option>
                       )
-                    )}
-
-                    {isPatron && (
-                      <option value="honorary">
-                        Honorary
-                      </option>
                     )}
                   </select>
                 </div>
               </div>
             </section>
 
-            {/* ===========================================
+            {/* =================================================
                 MEMBER ASSIGNMENT
-            =========================================== */}
+            ================================================= */}
 
             {!isPatron && (
               <section className="leader-form-section">
                 <div className="leader-form-section-heading">
                   <span className="leader-form-section-icon">
-                    <UsersRound
-                      size={20}
-                    />
+                    <UsersRound size={20} />
                   </span>
 
                   <div>
-                    <small>
-                      Section 02
-                    </small>
+                    <small>Section 02</small>
 
                     <h3>
                       Member Assignment
@@ -1377,31 +1442,22 @@ export default function LeaderFormModal({
                       id="leader-member-search"
                       type="search"
                       placeholder="Search by name, phone, National ID or member number..."
-                      value={
-                        memberSearch
-                      }
-                      onChange={(
-                        event
-                      ) => {
+                      value={memberSearch}
+                      onChange={(event) => {
                         const value =
-                          event.target
-                            .value;
+                          event.target.value;
 
                         setMemberSearch(
                           value
                         );
 
-                        if (
-                          form.member
-                        ) {
+                        if (form.member) {
                           setSelectedMember(
                             null
                           );
 
                           setForm(
-                            (
-                              previous
-                            ) => ({
+                            (previous) => ({
                               ...previous,
                               member: "",
                             })
@@ -1421,13 +1477,10 @@ export default function LeaderFormModal({
                     {!membersLoading &&
                       memberSearch.trim() &&
                       !form.member &&
-                      members.length >
-                        0 && (
+                      members.length > 0 && (
                         <div className="member-search-results">
                           {members.map(
-                            (
-                              member
-                            ) => (
+                            (member) => (
                               <button
                                 type="button"
                                 key={
@@ -1450,9 +1503,7 @@ export default function LeaderFormModal({
                                     />
                                   ) : (
                                     <UserRound
-                                      size={
-                                        20
-                                      }
+                                      size={20}
                                     />
                                   )}
                                 </span>
@@ -1485,11 +1536,9 @@ export default function LeaderFormModal({
                     {!membersLoading &&
                       memberSearch.trim() &&
                       !form.member &&
-                      members.length ===
-                        0 && (
+                      members.length === 0 && (
                         <div className="member-search-empty">
-                          No active members
-                          found.
+                          No active members found.
                         </div>
                       )}
                   </div>
@@ -1508,9 +1557,7 @@ export default function LeaderFormModal({
                           )}
                         />
                       ) : (
-                        <UserRound
-                          size={30}
-                        />
+                        <UserRound size={30} />
                       )}
                     </div>
 
@@ -1539,10 +1586,7 @@ export default function LeaderFormModal({
                     </div>
 
                     <div className="selected-member-status">
-                      <CheckCircle2
-                        size={18}
-                      />
-
+                      <CheckCircle2 size={18} />
                       Selected
                     </div>
 
@@ -1562,23 +1606,19 @@ export default function LeaderFormModal({
               </section>
             )}
 
-            {/* ===========================================
+            {/* =================================================
                 PATRON
-            =========================================== */}
+            ================================================= */}
 
             {isPatron && (
               <section className="leader-form-section">
                 <div className="leader-form-section-heading">
                   <span className="leader-form-section-icon">
-                    <UserRound
-                      size={20}
-                    />
+                    <UserRound size={20} />
                   </span>
 
                   <div>
-                    <small>
-                      Section 02
-                    </small>
+                    <small>Section 02</small>
 
                     <h3>
                       Patron Information
@@ -1603,16 +1643,12 @@ export default function LeaderFormModal({
                       id="patron-name"
                       type="text"
                       value={
-                        form.patron
-                          .fullName
+                        form.patron.fullName
                       }
-                      onChange={(
-                        event
-                      ) =>
+                      onChange={(event) =>
                         updatePatronField(
                           "fullName",
-                          event.target
-                            .value
+                          event.target.value
                         )
                       }
                       disabled={loading}
@@ -1629,16 +1665,12 @@ export default function LeaderFormModal({
                       id="patron-title"
                       type="text"
                       value={
-                        form.patron
-                          .title
+                        form.patron.title
                       }
-                      onChange={(
-                        event
-                      ) =>
+                      onChange={(event) =>
                         updatePatronField(
                           "title",
-                          event.target
-                            .value
+                          event.target.value
                         )
                       }
                       disabled={loading}
@@ -1655,16 +1687,12 @@ export default function LeaderFormModal({
                       id="patron-organization"
                       type="text"
                       value={
-                        form.patron
-                          .organization
+                        form.patron.organization
                       }
-                      onChange={(
-                        event
-                      ) =>
+                      onChange={(event) =>
                         updatePatronField(
                           "organization",
-                          event.target
-                            .value
+                          event.target.value
                         )
                       }
                       disabled={loading}
@@ -1681,16 +1709,12 @@ export default function LeaderFormModal({
                       id="patron-photo"
                       type="url"
                       value={
-                        form.patron
-                          .photo
+                        form.patron.photo
                       }
-                      onChange={(
-                        event
-                      ) =>
+                      onChange={(event) =>
                         updatePatronField(
                           "photo",
-                          event.target
-                            .value
+                          event.target.value
                         )
                       }
                       disabled={loading}
@@ -1707,16 +1731,12 @@ export default function LeaderFormModal({
                       id="patron-bio"
                       rows="5"
                       value={
-                        form.patron
-                          .bio
+                        form.patron.bio
                       }
-                      onChange={(
-                        event
-                      ) =>
+                      onChange={(event) =>
                         updatePatronField(
                           "bio",
-                          event.target
-                            .value
+                          event.target.value
                         )
                       }
                       disabled={loading}
@@ -1727,16 +1747,14 @@ export default function LeaderFormModal({
               </section>
             )}
 
-            {/* ===========================================
+            {/* =================================================
                 TERM
-            =========================================== */}
+            ================================================= */}
 
             <section className="leader-form-section">
               <div className="leader-form-section-heading">
                 <span className="leader-form-section-icon">
-                  <CalendarDays
-                    size={20}
-                  />
+                  <CalendarDays size={20} />
                 </span>
 
                 <div>
@@ -1769,13 +1787,10 @@ export default function LeaderFormModal({
                     value={
                       form.termStart
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    onChange={(event) =>
                       updateField(
                         "termStart",
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
                     disabled={loading}
@@ -1793,13 +1808,10 @@ export default function LeaderFormModal({
                     value={
                       form.termEnd
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    onChange={(event) =>
                       updateField(
                         "termEnd",
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
                     disabled={loading}
@@ -1818,21 +1830,17 @@ export default function LeaderFormModal({
                     value={
                       form.displayOrder
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    onChange={(event) =>
                       updateField(
                         "displayOrder",
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
                     disabled={loading}
                   />
 
                   <small className="leader-form-help">
-                    Lower numbers appear
-                    first.
+                    Lower numbers appear first.
                   </small>
                 </div>
               </div>
@@ -1844,13 +1852,10 @@ export default function LeaderFormModal({
                     checked={
                       form.featured
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    onChange={(event) =>
                       updateField(
                         "featured",
-                        event.target
-                          .checked
+                        event.target.checked
                       )
                     }
                     disabled={loading}
@@ -1872,13 +1877,10 @@ export default function LeaderFormModal({
                     checked={
                       form.verified
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    onChange={(event) =>
                       updateField(
                         "verified",
-                        event.target
-                          .checked
+                        event.target.checked
                       )
                     }
                     disabled={loading}
@@ -1896,16 +1898,14 @@ export default function LeaderFormModal({
               </div>
             </section>
 
-            {/* ===========================================
+            {/* =================================================
                 REMARKS
-            =========================================== */}
+            ================================================= */}
 
             <section className="leader-form-section">
               <div className="leader-form-section-heading">
                 <span className="leader-form-section-icon">
-                  <FileText
-                    size={20}
-                  />
+                  <FileText size={20} />
                 </span>
 
                 <div>
@@ -1937,13 +1937,10 @@ export default function LeaderFormModal({
                   value={
                     form.remarks
                   }
-                  onChange={(
-                    event
-                  ) =>
+                  onChange={(event) =>
                     updateField(
                       "remarks",
-                      event.target
-                        .value
+                      event.target.value
                     )
                   }
                   disabled={loading}
@@ -1951,25 +1948,20 @@ export default function LeaderFormModal({
                 />
 
                 <small className="leader-form-character-count">
-                  {
-                    form.remarks
-                      .length
-                  }
+                  {form.remarks.length}
                   /500
                 </small>
               </div>
             </section>
           </div>
 
-          {/* ===============================================
-              ACTIONS
-          =============================================== */}
+          {/* ==================================================
+              FOOTER
+          ================================================== */}
 
           <footer className="leader-form-modal-footer">
             <div className="leader-form-footer-note">
-              <ShieldCheck
-                size={17}
-              />
+              <ShieldCheck size={17} />
 
               Leadership assignments
               should only be made by
@@ -1980,9 +1972,7 @@ export default function LeaderFormModal({
               <button
                 type="button"
                 className="leader-form-cancel"
-                onClick={
-                  handleClose
-                }
+                onClick={handleClose}
                 disabled={loading}
               >
                 Cancel
@@ -1993,9 +1983,7 @@ export default function LeaderFormModal({
                 className="leader-form-submit"
                 disabled={loading}
               >
-                <CheckCircle2
-                  size={18}
-                />
+                <CheckCircle2 size={18} />
 
                 {loading
                   ? "Saving..."
