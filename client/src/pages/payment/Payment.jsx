@@ -34,7 +34,7 @@ import "./Payment.css";
 
 const MEMBERSHIP_FEES = {
   ordinary: 50,
-  leadership: 500,
+  leadership: 100,
 };
 
 /* ==========================================
