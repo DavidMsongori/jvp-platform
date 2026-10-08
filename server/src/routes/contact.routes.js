@@ -2,7 +2,7 @@ import express from "express";
 
 import * as contactController from "../controllers/contact.controller.js";
 
-import auth from "../middleware/Auth.js";
+import auth from "../middleware/auth.js";
 
 const router = express.Router();
 

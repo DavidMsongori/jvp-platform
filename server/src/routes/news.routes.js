@@ -2,8 +2,8 @@ import express from "express";
 
 import * as newsController from "../controllers/news.controller.js";
 
-import auth from "../middleware/Auth.js";
-import { uploadNewsImage } from "../middleware/Upload.js";
+import auth from "../middleware/auth.js";
+import { uploadNewsImage } from "../middleware/upload.js";
 
 const router = express.Router();
 
