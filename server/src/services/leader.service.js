@@ -646,6 +646,8 @@ class LeaderService {
 
       LEADERSHIP_OFFICES.COUNTY_DEPUTY_CLERK,
 
+      LEADERSHIP_OFFICES.NOMINATED_MCA,
+
     ].includes(position);
 
   }
@@ -743,95 +745,69 @@ class LeaderService {
 
 
   /**
-   * Prevent duplicate active office assignments
-   * within the same jurisdiction.
+ * Prevent duplicate active office assignments
+ * within the same jurisdiction.
+ *
+ * Regional offices are globally unique.
+ * County offices are unique per county.
+ * Constituency offices are unique per constituency.
+ * Ward offices are unique per ward.
+ *
+ * Offices that legally allow multiple holders
+ * are excluded from duplicate validation.
+ */
+async validateOfficeAssignment(
+  position,
+  location,
+  ignoreLeaderId = null
+) {
+  const office = this.getOffice(position);
+
+  /*
+   * Some offices may legitimately have
+   * multiple holders within the same jurisdiction.
    *
-   * Regional offices are globally unique.
-   * County offices are unique per county.
-   * Constituency offices are unique per constituency.
-   * Ward offices are unique per ward.
+   * Example:
+   * - Nominated MCA
    */
-  async validateOfficeAssignment(
-    position,
-    location,
-    ignoreLeaderId = null
-  ) {
-
-    const office =
-      this.getOffice(position);
-
-
-    /*
-     * Portfolio offices may have several holders.
-     */
-    if (
-      this.officeAllowsMultiple(position)
-    ) {
-
-      return;
-
-    }
-
-
-    const query = {
-
-      position,
-
-      isActive: true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    };
-
-
-    if (ignoreLeaderId) {
-
-      query._id = {
-        $ne: ignoreLeaderId,
-      };
-
-    }
-
-
-    Object.assign(
-
-      query,
-
-      this.buildOfficeJurisdictionQuery(
-
-        location,
-
-        office.reportVisibility
-
-      )
-
-    );
-
-
-    const existing =
-      await Leader.findOne(query);
-
-
-    if (existing) {
-
-      const jurisdiction =
-        this.getJurisdictionLabel(
-          existing
-        );
-
-
-      throw new AppError(
-
-        409,
-
-        `The ${position} office is already occupied${jurisdiction}.`
-
-      );
-
-    }
-
+  if (this.officeAllowsMultiple(position)) {
+    return;
   }
+
+  const query = {
+    position,
+
+    isActive: true,
+
+    status: LEADERSHIP_STATUS.ACTIVE,
+  };
+
+  if (ignoreLeaderId) {
+    query._id = {
+      $ne: ignoreLeaderId,
+    };
+  }
+
+  Object.assign(
+    query,
+    this.buildOfficeJurisdictionQuery(
+      location,
+      office.reportVisibility
+    )
+  );
+
+  const existing = await Leader.findOne(query);
+
+  if (existing) {
+    const jurisdiction =
+      this.getJurisdictionLabel(existing);
+
+    throw new AppError(
+      409,
+      `The ${position} office is already occupied${jurisdiction}.`
+    );
+  }
+}
 
 
   /**

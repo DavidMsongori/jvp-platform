@@ -211,7 +211,6 @@ export const COAST_GEOGRAPHY = {
           "KINAKOMBA",
           "MIKINDUNI",
           "WAYU",
-          "KIPINI EAST",
         ],
       },
 
@@ -221,7 +220,8 @@ export const COAST_GEOGRAPHY = {
           "GARSEN NORTH",
           "GARSEN SOUTH",
           "KIPINI WEST",
-          "GWANO",
+          "KIPINI EAST",
+          "GARSEN WEST",
         ],
       },
     },

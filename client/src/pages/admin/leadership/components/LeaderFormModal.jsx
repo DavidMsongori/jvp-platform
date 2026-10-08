@@ -30,6 +30,13 @@ import {
 } from "../../../../constants/leadership.constants";
 
 /* ============================================================
+   STANDARD ELECTED TERM
+============================================================ */
+
+const ELECTED_TERM_START = "2025-12-22";
+const ELECTED_TERM_END = "2028-12-22";
+
+/* ============================================================
    CATEGORY OPTIONS
 ============================================================ */
 
@@ -102,7 +109,9 @@ const DEPARTMENTS = [
   },
   {
     label: "Patronage",
-    value: LEADERSHIP_DEPARTMENTS.PATRONAGE || "patronage",
+    value:
+      LEADERSHIP_DEPARTMENTS.PATRONAGE ||
+      "patronage",
   },
 ];
 
@@ -290,17 +299,16 @@ export default function LeaderFormModal({
     form.category ===
       LEADERSHIP_CATEGORIES.PATRONAGE;
 
+  const isElected =
+    form.appointmentType ===
+    APPOINTMENT_TYPES.ELECTED;
+
   /* ==========================================================
      FILTER POSITIONS
   ========================================================== */
 
   const filteredPositions = useMemo(() => {
     let positions = POSITIONS;
-
-    /*
-      Filter by leadership level first.
-      This is the structural level of the office.
-    */
 
     if (form.level) {
       positions = positions.filter(
@@ -309,10 +317,6 @@ export default function LeaderFormModal({
           form.level
       );
     }
-
-    /*
-      Then filter by functional category.
-    */
 
     if (
       form.category &&
@@ -324,10 +328,6 @@ export default function LeaderFormModal({
           form.category
       );
     }
-
-    /*
-      Patron is a special office.
-    */
 
     if (isPatron) {
       positions = positions.filter(
@@ -364,6 +364,15 @@ export default function LeaderFormModal({
           leader.position
         ];
 
+      const appointmentType =
+        leader.appointmentType ||
+        configuration?.appointmentType ||
+        "";
+
+      const isLeaderElected =
+        appointmentType ===
+        APPOINTMENT_TYPES.ELECTED;
+
       setForm({
         member:
           leader.member?._id ||
@@ -394,10 +403,7 @@ export default function LeaderFormModal({
           configuration?.scope ??
           "",
 
-        appointmentType:
-          leader.appointmentType ||
-          configuration?.appointmentType ||
-          "",
+        appointmentType,
 
         county:
           leader.county ||
@@ -420,15 +426,31 @@ export default function LeaderFormModal({
         featured:
           leader.featured ?? false,
 
+        /*
+         * Existing elected leaders with
+         * missing dates receive the standard
+         * elected term.
+         *
+         * Existing stored dates remain
+         * unchanged.
+         */
         termStart:
-          formatDateForInput(
-            leader.termStart
-          ),
+          isLeaderElected
+            ? formatDateForInput(
+                leader.termStart
+              ) || ELECTED_TERM_START
+            : formatDateForInput(
+                leader.termStart
+              ),
 
         termEnd:
-          formatDateForInput(
-            leader.termEnd
-          ),
+          isLeaderElected
+            ? formatDateForInput(
+                leader.termEnd
+              ) || ELECTED_TERM_END
+            : formatDateForInput(
+                leader.termEnd
+              ),
 
         verified:
           leader.verified ?? true,
@@ -478,10 +500,8 @@ export default function LeaderFormModal({
           ...DEFAULT_FORM.patron,
         },
 
-        termStart:
-          formatDateForInput(
-            new Date()
-          ),
+        termStart: "",
+        termEnd: "",
       });
 
       setSelectedMember(null);
@@ -583,10 +603,57 @@ export default function LeaderFormModal({
     field,
     value
   ) => {
-    setForm((previous) => ({
-      ...previous,
-      [field]: value,
-    }));
+    setForm((previous) => {
+      /*
+       * Elected leaders always use the
+       * standard JVP elected term.
+       */
+      if (
+        field === "appointmentType" &&
+        value ===
+          APPOINTMENT_TYPES.ELECTED
+      ) {
+        return {
+          ...previous,
+
+          appointmentType: value,
+
+          termStart:
+            ELECTED_TERM_START,
+
+          termEnd:
+            ELECTED_TERM_END,
+        };
+      }
+
+      /*
+       * If appointment type changes away
+       * from Elected, clear the automatic
+       * elected dates.
+       */
+      if (
+        field === "appointmentType" &&
+        value !==
+          APPOINTMENT_TYPES.ELECTED &&
+        previous.appointmentType ===
+          APPOINTMENT_TYPES.ELECTED
+      ) {
+        return {
+          ...previous,
+
+          appointmentType: value,
+
+          termStart: "",
+
+          termEnd: "",
+        };
+      }
+
+      return {
+        ...previous,
+        [field]: value,
+      };
+    });
   };
 
   const updatePatronField = (
@@ -617,14 +684,16 @@ export default function LeaderFormModal({
 
       position: "",
 
-      /*
-        Clear values that will be
-        automatically determined
-        by the selected office.
-      */
       department: "",
       scope: "",
       appointmentType: "",
+
+      /*
+       * Reset term when the leadership
+       * structure changes.
+       */
+      termStart: "",
+      termEnd: "",
     }));
   };
 
@@ -669,6 +738,18 @@ export default function LeaderFormModal({
             "patronage"
           )
         : previous.department,
+
+      /*
+       * Patron does not use the elected
+       * leadership term.
+       */
+      termStart: patron
+        ? ""
+        : previous.termStart,
+
+      termEnd: patron
+        ? ""
+        : previous.termEnd,
     }));
 
     if (patron) {
@@ -703,39 +784,52 @@ export default function LeaderFormModal({
     const configuration =
       selectedPosition.configuration;
 
-    setForm((previous) => ({
-      ...previous,
-
-      position,
-
-      /*
-        IMPORTANT:
-        Category receives configuration.category,
-        NOT configuration.level.
-      */
-      category:
-        configuration.category ||
-        previous.category,
-
-      level:
-        configuration.level ||
-        "",
-
-      department:
-        configuration.department ||
-        "",
-
-      /*
-        Council of Governors has
-        no structural scope.
-      */
-      scope:
-        configuration.scope ?? "",
-
-      appointmentType:
+    setForm((previous) => {
+      const appointmentType =
         configuration.appointmentType ||
-        previous.appointmentType,
-    }));
+        previous.appointmentType;
+
+      const isPositionElected =
+        appointmentType ===
+        APPOINTMENT_TYPES.ELECTED;
+
+      return {
+        ...previous,
+
+        position,
+
+        category:
+          configuration.category ||
+          previous.category,
+
+        level:
+          configuration.level ||
+          "",
+
+        department:
+          configuration.department ||
+          "",
+
+        scope:
+          configuration.scope ?? "",
+
+        appointmentType,
+
+        /*
+         * If the office configuration itself
+         * is Elected, apply the standard term.
+         */
+        termStart:
+          isPositionElected
+            ? ELECTED_TERM_START
+            : previous.termStart,
+
+        termEnd:
+          isPositionElected
+            ? ELECTED_TERM_END
+            : previous.termEnd,
+      };
+    });
   };
 
   /* ==========================================================
@@ -866,6 +960,25 @@ export default function LeaderFormModal({
 
     setError("");
 
+    /*
+     * Enforce the standard elected term
+     * again at submission level.
+     *
+     * This guarantees that even if the
+     * form state is changed unexpectedly,
+     * elected leaders are submitted with
+     * the correct term.
+     */
+    const finalTermStart =
+      isElected
+        ? ELECTED_TERM_START
+        : form.termStart;
+
+    const finalTermEnd =
+      isElected
+        ? ELECTED_TERM_END
+        : form.termEnd || null;
+
     const payload = {
       category:
         form.category,
@@ -892,10 +1005,10 @@ export default function LeaderFormModal({
         Boolean(form.featured),
 
       termStart:
-        form.termStart,
+        finalTermStart,
 
       termEnd:
-        form.termEnd || null,
+        finalTermEnd,
 
       verified:
         Boolean(form.verified),
@@ -1775,6 +1888,9 @@ export default function LeaderFormModal({
               </div>
 
               <div className="leader-form-grid leader-form-grid--three">
+
+                {/* TERM START */}
+
                 <div className="leader-form-group">
                   <label htmlFor="term-start">
                     Term Start
@@ -1793,9 +1909,24 @@ export default function LeaderFormModal({
                         event.target.value
                       )
                     }
-                    disabled={loading}
+                    disabled={
+                      loading ||
+                      isElected
+                    }
+                    readOnly={
+                      isElected
+                    }
                   />
+
+                  {isElected && (
+                    <small className="leader-form-help">
+                      Standard elected term:
+                      22 December 2025.
+                    </small>
+                  )}
                 </div>
+
+                {/* TERM END */}
 
                 <div className="leader-form-group">
                   <label htmlFor="term-end">
@@ -1814,9 +1945,24 @@ export default function LeaderFormModal({
                         event.target.value
                       )
                     }
-                    disabled={loading}
+                    disabled={
+                      loading ||
+                      isElected
+                    }
+                    readOnly={
+                      isElected
+                    }
                   />
+
+                  {isElected && (
+                    <small className="leader-form-help">
+                      Standard elected term:
+                      22 December 2028.
+                    </small>
+                  )}
                 </div>
+
+                {/* DISPLAY ORDER */}
 
                 <div className="leader-form-group">
                   <label htmlFor="display-order">
