@@ -2,40 +2,36 @@ import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
 import AboutHero from "../../components/about/AboutHero";
-import OurJourney from "../../components/about/OurJourney";
-import LeadershipStructure from "../../components/about/LeadershipStructure";
-import PartnersSection from "../../components/about/PartnersSection";
-import JoinMovement from "../../components/about/JoinMovement";
 import WhoWeAre from "../../components/about/WhoWeAre";
-import Impact from "../../components/about/Impact";
-import Counties from "../../components/about/Counties";
-import Foundation from "../../components/about/Foundation";
+import OurJourney from "../../components/about/OurJourney";
 import Pillars from "../../components/about/Pillars";
+import LeadershipStructure from "../../components/about/LeadershipStructure";
+import JoinMovement from "../../components/about/JoinMovement";
 
 function About() {
   return (
     <>
       <Navbar />
 
-      <AboutHero />
+      <main className="public-about-page">
+        {/* Introduction */}
+        <AboutHero />
 
-      <WhoWeAre />
+        {/* Who JVP is */}
+        <WhoWeAre />
 
-      <Foundation />
-      
-      <OurJourney />
+        {/* Journey + impact */}
+        <OurJourney />
 
-       <Impact /> 
+        {/* What JVP does */}
+        <Pillars />
 
-      <LeadershipStructure />
+        {/* How JVP is organized */}
+        <LeadershipStructure />
 
-       {/*<Counties /> */}
-
-       <Pillars />
-
-      <PartnersSection />
-
-      <JoinMovement />
+        {/* Final conversion */}
+        <JoinMovement />
+      </main>
 
       <Footer />
     </>

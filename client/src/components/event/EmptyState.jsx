@@ -1,4 +1,9 @@
-import { CalendarX, RotateCcw } from "lucide-react";
+import {
+  CalendarX,
+  RotateCcw,
+} from "lucide-react";
+
+import "./EmptyState.css";
 
 const EmptyState = ({
   title = "No Events Found",
@@ -7,31 +12,35 @@ const EmptyState = ({
   onAction,
 }) => {
   return (
-    <div className="events-empty">
-
-      <div className="events-empty__icon">
-        <CalendarX size={72} />
+    <div className="jvp-events-empty">
+      <div className="jvp-events-empty__icon">
+        <CalendarX size={22} strokeWidth={1.7} />
       </div>
 
-      <h2 className="events-empty__title">
-        {title}
-      </h2>
+      <div className="jvp-events-empty__content">
+        <span className="jvp-events-empty__eyebrow">
+          EVENTS
+        </span>
 
-      <p className="events-empty__message">
-        {message}
-      </p>
+        <h2 className="jvp-events-empty__title">
+          {title}
+        </h2>
 
-      {onAction && (
-        <button
-          type="button"
-          className="events-button"
-          onClick={onAction}
-        >
-          <RotateCcw size={18} />
-          {buttonText}
-        </button>
-      )}
+        <p className="jvp-events-empty__message">
+          {message}
+        </p>
 
+        {onAction && (
+          <button
+            type="button"
+            className="jvp-events-empty__button"
+            onClick={onAction}
+          >
+            <RotateCcw size={13} />
+            <span>{buttonText}</span>
+          </button>
+        )}
+      </div>
     </div>
   );
 };

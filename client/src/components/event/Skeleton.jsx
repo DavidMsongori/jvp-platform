@@ -1,46 +1,41 @@
+import "./Skeleton.css";
+
 const Skeleton = () => {
   return (
-    <article className="event-card event-card--skeleton">
+    <article className="jvp-event-skeleton">
+      <div className="jvp-event-skeleton__image" />
 
-      {/* Image */}
-      <div className="event-skeleton__image" />
-
-      <div className="event-card__body">
-
+      <div className="jvp-event-skeleton__body">
         {/* Category */}
-        <div className="event-skeleton__badge" />
+        <div className="jvp-event-skeleton__badge" />
 
         {/* Title */}
-        <div className="event-skeleton__title" />
-        <div className="event-skeleton__title event-skeleton__title--short" />
+        <div className="jvp-event-skeleton__title" />
+        <div className="jvp-event-skeleton__title jvp-event-skeleton__title--short" />
 
-        {/* Summary */}
-        <div className="event-skeleton__text" />
-        <div className="event-skeleton__text" />
-        <div className="event-skeleton__text event-skeleton__text--short" />
+        {/* Description */}
+        <div className="jvp-event-skeleton__text" />
+        <div className="jvp-event-skeleton__text" />
+        <div className="jvp-event-skeleton__text jvp-event-skeleton__text--short" />
 
         {/* Meta */}
-        <div className="event-skeleton__meta" />
-        <div className="event-skeleton__meta" />
-        <div className="event-skeleton__meta event-skeleton__meta--short" />
+        <div className="jvp-event-skeleton__meta" />
+        <div className="jvp-event-skeleton__meta" />
+        <div className="jvp-event-skeleton__meta jvp-event-skeleton__meta--short" />
 
         {/* Footer */}
-        <div className="event-card__footer">
-
-          <div>
-            <div className="event-skeleton__price" />
-            <div className="event-skeleton__capacity" />
+        <div className="jvp-event-skeleton__footer">
+          <div className="jvp-event-skeleton__registration">
+            <div className="jvp-event-skeleton__price" />
+            <div className="jvp-event-skeleton__capacity" />
           </div>
 
-          <div className="event-skeleton__status" />
-
+          <div className="jvp-event-skeleton__status" />
         </div>
 
         {/* Button */}
-        <div className="event-skeleton__button" />
-
+        <div className="jvp-event-skeleton__button" />
       </div>
-
     </article>
   );
 };

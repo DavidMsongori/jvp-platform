@@ -98,12 +98,16 @@ function Navbar() {
               : "nav-links"
           }
         >
+          {/* HOME */}
+
           <Link
             to="/"
             onClick={closeMenu}
           >
             Home
           </Link>
+
+          {/* ABOUT */}
 
           <Link
             to="/about"
@@ -112,6 +116,17 @@ function Navbar() {
             About Us
           </Link>
 
+          {/* NEWS */}
+
+          <Link
+            to="/news"
+            onClick={closeMenu}
+          >
+            News
+          </Link>
+
+          {/* EVENTS */}
+
           <Link
             to="/events"
             onClick={closeMenu}
@@ -119,24 +134,7 @@ function Navbar() {
             Events
           </Link>
 
-          {/* =====================================
-              ELECTIONS
-          ====================================== */}
-
-          <Link
-            to="/elections"
-            className="elections-nav-link"
-            onClick={closeMenu}
-          >
-            Elections
-          </Link>
-
-          <Link
-            to="/summit"
-            onClick={closeMenu}
-          >
-            Summit
-          </Link>
+          {/* LEADERSHIP */}
 
           <Link
             to="/leadership"
@@ -145,11 +143,13 @@ function Navbar() {
             Leadership
           </Link>
 
+          {/* CONTACT */}
+
           <Link
-            to="/news"
+            to="/contact"
             onClick={closeMenu}
           >
-            News
+            Contact
           </Link>
 
           {/* =====================================
@@ -188,25 +188,31 @@ function Navbar() {
                   : ""
               }`}
             >
+              {/* ELECTIONS */}
+
+              <Link
+                to="/elections"
+                onClick={closeMenu}
+              >
+                Elections
+              </Link>
+
+              {/* SUMMIT */}
+
+              <Link
+                to="/summit"
+                onClick={closeMenu}
+              >
+                Summit
+              </Link>
+
+              {/* PROGRAMS */}
+
               <Link
                 to="/programs"
                 onClick={closeMenu}
               >
                 Programs
-              </Link>
-
-              <Link
-                to="/membership"
-                onClick={closeMenu}
-              >
-                Membership
-              </Link>
-
-              <Link
-                to="/contact"
-                onClick={closeMenu}
-              >
-                Contact
               </Link>
             </div>
           </div>

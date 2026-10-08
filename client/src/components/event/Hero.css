@@ -1,0 +1,626 @@
+/* =========================================================
+   EVENTS HERO
+   ========================================================= */
+
+.events-hero {
+  position: relative;
+
+  width: 100%;
+  min-height: 410px;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  color: #ffffff;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   OVERLAY
+   ========================================================= */
+
+.events-hero__overlay {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(5, 18, 13, 0.38);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   GRADIENT
+   ========================================================= */
+
+.events-hero__gradient {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7, 22, 16, 0.9) 0%,
+      rgba(7, 22, 16, 0.7) 42%,
+      rgba(7, 22, 16, 0.25) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(5, 15, 11, 0.7),
+      transparent 55%
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   HERO CONTAINER
+   ========================================================= */
+
+.events-hero__container {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  max-width: 1180px;
+
+  min-height: 410px;
+
+  margin: 0 auto;
+  padding: 100px 20px 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.events-hero__content {
+  max-width: 700px;
+}
+
+
+/* =========================================================
+   EYEBROW
+   ========================================================= */
+
+.events-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 13px;
+
+  color: #69d0a5;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+}
+
+.events-hero__eyebrow svg {
+  flex-shrink: 0;
+  color: #69d0a5;
+}
+
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.events-hero__content h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.02;
+
+  letter-spacing: -0.055em;
+
+  font-weight: 800;
+}
+
+.events-hero__content h1 span {
+  color: #69d0a5;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
+.events-hero__content > p {
+  max-width: 560px;
+
+  margin: 16px 0 0;
+
+  color: rgba(239, 247, 243, 0.78);
+
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.events-search {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  width: min(100%, 510px);
+  height: 46px;
+
+  margin-top: 21px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.1);
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+
+  backdrop-filter: blur(12px);
+
+  box-sizing: border-box;
+}
+
+.events-search:focus-within {
+  border-color: rgba(105, 208, 165, 0.7);
+
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.events-search__icon {
+  flex-shrink: 0;
+
+  margin-left: 15px;
+
+  color: #69d0a5;
+}
+
+.events-search input {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+
+  padding: 0 13px;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 11px;
+
+  box-sizing: border-box;
+}
+
+.events-search input::placeholder {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.events-search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.events-search__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  margin-right: 8px;
+
+  flex-shrink: 0;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: rgba(255, 255, 255, 0.09);
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 17px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.events-search__clear:hover {
+  background: rgba(105, 208, 165, 0.18);
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.events-hero__stats {
+  display: flex;
+  align-items: stretch;
+
+  width: fit-content;
+  max-width: 100%;
+
+  margin-top: 27px;
+
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.055);
+
+  backdrop-filter: blur(10px);
+
+  box-sizing: border-box;
+}
+
+.events-hero-stat {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 145px;
+
+  padding: 11px 17px;
+
+  box-sizing: border-box;
+}
+
+.events-hero-stat + .events-hero-stat {
+  border-left: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.events-hero-stat__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 29px;
+  height: 29px;
+
+  flex-shrink: 0;
+
+  border-radius: 7px;
+
+  background: rgba(105, 208, 165, 0.12);
+
+  color: #69d0a5;
+}
+
+.events-hero-stat div:last-child {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.events-hero-stat strong {
+  color: #ffffff;
+
+  font-size: 18px;
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: -0.03em;
+}
+
+.events-hero-stat span {
+  color: rgba(255, 255, 255, 0.46);
+
+  font-size: 7px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   LOCATION
+   ========================================================= */
+
+.events-hero__location {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  margin-top: 15px;
+
+  color: rgba(255, 255, 255, 0.42);
+
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.events-hero__location svg {
+  flex-shrink: 0;
+
+  color: #69d0a5;
+}
+
+
+/* =========================================================
+   SIDE MARKER
+   ========================================================= */
+
+.events-hero__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  gap: 7px;
+
+  padding-right: 5px;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.events-hero__side span {
+  font-size: 7px;
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+
+  writing-mode: vertical-rl;
+
+  transform: rotate(180deg);
+}
+
+.events-hero__side strong {
+  color: #69d0a5;
+
+  font-size: 25px;
+  font-weight: 700;
+
+  letter-spacing: -0.05em;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .events-hero,
+  .events-hero__container {
+    min-height: 380px;
+  }
+
+  .events-hero__container {
+    padding: 95px 18px 50px;
+  }
+
+  .events-hero__content h1 {
+    font-size: clamp(36px, 6vw, 52px);
+  }
+
+  .events-hero-stat {
+    min-width: 135px;
+
+    padding: 10px 13px;
+  }
+
+  .events-hero__side {
+    padding-right: 0;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 680px) {
+
+  .events-hero,
+  .events-hero__container {
+    min-height: 360px;
+  }
+
+  .events-hero__gradient {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(7, 22, 16, 0.9),
+        rgba(7, 22, 16, 0.58)
+      ),
+      linear-gradient(
+        0deg,
+        rgba(5, 15, 11, 0.78),
+        transparent 60%
+      );
+  }
+
+  .events-hero__container {
+    padding: 94px 14px 42px;
+
+    align-items: flex-end;
+  }
+
+  .events-hero__content {
+    max-width: 100%;
+  }
+
+  .events-hero__eyebrow {
+    margin-bottom: 10px;
+
+    font-size: 8px;
+  }
+
+  .events-hero__content h1 {
+    font-size: clamp(31px, 9vw, 43px);
+
+    line-height: 1.02;
+  }
+
+  .events-hero__content > p {
+    max-width: 470px;
+
+    margin-top: 13px;
+
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .events-search {
+    width: 100%;
+    height: 43px;
+
+    margin-top: 18px;
+  }
+
+  .events-search input {
+    font-size: 10px;
+  }
+
+  .events-hero__stats {
+    width: 100%;
+
+    margin-top: 22px;
+  }
+
+  .events-hero-stat {
+    flex: 1;
+
+    min-width: 0;
+
+    gap: 7px;
+
+    padding: 9px 8px;
+  }
+
+  .events-hero-stat__icon {
+    width: 27px;
+    height: 27px;
+  }
+
+  .events-hero-stat strong {
+    font-size: 16px;
+  }
+
+  .events-hero-stat span {
+    font-size: 6.5px;
+  }
+
+  .events-hero__location {
+    margin-top: 12px;
+
+    font-size: 7px;
+  }
+
+  .events-hero__side {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+  .events-hero,
+  .events-hero__container {
+    min-height: 335px;
+  }
+
+  .events-hero__container {
+    padding: 88px 12px 35px;
+  }
+
+  .events-hero__content h1 {
+    font-size: 29px;
+  }
+
+  .events-hero__content > p {
+    margin-top: 11px;
+
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  .events-search {
+    height: 40px;
+
+    margin-top: 16px;
+  }
+
+  .events-search input {
+    font-size: 9px;
+  }
+
+  .events-hero__stats {
+    margin-top: 19px;
+  }
+
+  .events-hero-stat {
+    gap: 5px;
+
+    padding: 8px 6px;
+  }
+
+  .events-hero-stat__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .events-hero-stat strong {
+    font-size: 14px;
+  }
+
+  .events-hero-stat span {
+    font-size: 5.8px;
+  }
+
+  .events-hero__location {
+    font-size: 6.5px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .events-hero {
+    scroll-behavior: auto;
+  }
+}

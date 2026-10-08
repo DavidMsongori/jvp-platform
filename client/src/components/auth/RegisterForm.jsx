@@ -5,69 +5,20 @@ import {
   CheckCircle2,
   Loader2,
   UserPlus,
+  MapPin,
+  ShieldCheck,
+  CreditCard,
 } from "lucide-react";
 
 import * as authService from "../../services/auth.service";
 
+import {
+  COAST_COUNTIES,
+  getConstituencies,
+  getWards,
+} from "../../data/geography";
+
 import "./RegisterForm.css";
-
-/* ==========================================================
-   COAST REGION LOCATIONS
-========================================================== */
-
-const COAST_LOCATIONS = {
-  Mombasa: [
-    "Changamwe",
-    "Jomvu",
-    "Kisauni",
-    "Likoni",
-    "Mvita",
-    "Nyali",
-  ],
-
-  Kwale: [
-    "Kinango",
-    "Lunga Lunga",
-    "Matuga",
-    "Msambweni",
-  ],
-
-  Kilifi: [
-    "Ganze",
-    "Kaloleni",
-    "Kilifi North",
-    "Kilifi South",
-    "Magarini",
-    "Malindi",
-    "Rabai",
-  ],
-
-  "Tana River": [
-    "Bura",
-    "Galole",
-    "Garsen",
-  ],
-
-  Lamu: [
-    "Lamu East",
-    "Lamu West",
-  ],
-
-  "Taita Taveta": [
-    "Mwatate",
-    "Taveta",
-    "Voi",
-    "Wundanyi",
-  ],
-};
-
-/*
- * Ward selection can later be replaced with
- * a complete county → constituency → ward map.
- *
- * For now, the user enters the ward manually
- * because the Member model requires it.
- */
 
 const INITIAL_FORM = {
   firstName: "",
@@ -83,46 +34,41 @@ const INITIAL_FORM = {
   ward: "",
   membershipType: "ordinary",
   email: "",
-
   disability: {
     hasDisability: false,
     type: "",
   },
 };
 
-/* ==========================================================
-   REGISTER FORM
-========================================================== */
-
 function RegisterForm() {
   const navigate = useNavigate();
 
-  const [form, setForm] =
-    useState(INITIAL_FORM);
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
+  /* ========================================================
+     GEOGRAPHY
+  ======================================================== */
 
-  const [error, setError] =
-    useState("");
+  const constituencies = useMemo(() => {
+    return getConstituencies(form.county);
+  }, [form.county]);
 
-  const [success, setSuccess] =
-    useState("");
+  const wards = useMemo(() => {
+    return getWards(
+      form.county,
+      form.constituency
+    );
+  }, [
+    form.county,
+    form.constituency,
+  ]);
 
-  const availableConstituencies =
-    useMemo(() => {
-      if (!form.county) {
-        return [];
-      }
-
-      return (
-        COAST_LOCATIONS[form.county] || []
-      );
-    }, [form.county]);
-
-  /* ==========================================
-     HANDLE INPUT CHANGE
-  ========================================== */
+  /* ========================================================
+     CHANGE HANDLER
+  ======================================================== */
 
   const handleChange = (event) => {
     const {
@@ -135,6 +81,7 @@ function RegisterForm() {
     setError("");
     setSuccess("");
 
+    /* County changed */
     if (name === "county") {
       setForm((currentForm) => ({
         ...currentForm,
@@ -146,14 +93,24 @@ function RegisterForm() {
       return;
     }
 
+    /* Constituency changed */
+    if (name === "constituency") {
+      setForm((currentForm) => ({
+        ...currentForm,
+        constituency: value,
+        ward: "",
+      }));
+
+      return;
+    }
+
+    /* Disability checkbox */
     if (name === "hasDisability") {
       setForm((currentForm) => ({
         ...currentForm,
-
         disability: {
           ...currentForm.disability,
           hasDisability: checked,
-
           type: checked
             ? currentForm.disability.type
             : "",
@@ -163,10 +120,10 @@ function RegisterForm() {
       return;
     }
 
+    /* Disability type */
     if (name === "disabilityType") {
       setForm((currentForm) => ({
         ...currentForm,
-
         disability: {
           ...currentForm.disability,
           type: value,
@@ -178,7 +135,6 @@ function RegisterForm() {
 
     setForm((currentForm) => ({
       ...currentForm,
-
       [name]:
         type === "checkbox"
           ? checked
@@ -186,152 +142,140 @@ function RegisterForm() {
     }));
   };
 
-  /* ==========================================
-     NORMALIZE PHONE
-  ========================================== */
+  /* ========================================================
+     PHONE NORMALIZATION
+  ======================================================== */
 
   const normalizePhone = (phone) => {
-    const cleanedPhone =
-      phone.replace(/\s+/g, "");
+    const cleanedPhone = phone
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/-/g, "");
 
-    if (
-      cleanedPhone.startsWith("+254")
-    ) {
+    if (cleanedPhone.startsWith("+254")) {
       return cleanedPhone.substring(1);
     }
 
-    if (
-      cleanedPhone.startsWith("0")
-    ) {
-      return `254${cleanedPhone.substring(
-        1
-      )}`;
+    if (cleanedPhone.startsWith("0")) {
+      return `254${cleanedPhone.substring(1)}`;
     }
 
     return cleanedPhone;
   };
 
- /* ==========================================================
-   CLIENT VALIDATION
-========================================================== */
+  /* ========================================================
+     VALIDATION
+  ======================================================== */
 
-const validateForm = () => {
-  const nationalIdPattern =
-    /^[0-9]{6,10}$/;
+  const validateForm = () => {
+    const nationalIdPattern =
+      /^[0-9]{6,10}$/;
 
-  const normalizedPhone = form.phone
-    .trim()
-    .replace(/\s+/g, "")
-    .replace(/-/g, "")
-    .replace(/^\+/, "");
+    const normalizedPhone = form.phone
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/-/g, "")
+      .replace(/^\+/, "");
 
-  /*
-   * Kenyan phone numbers:
-   *
-   * Local:
-   *   07XXXXXXXX
-   *   01XXXXXXXX
-   *
-   * International:
-   *   2547XXXXXXXX
-   *   2541XXXXXXXX
-   *
-   * With plus:
-   *   +2547XXXXXXXX
-   *   +2541XXXXXXXX
-   */
-  const phonePattern =
-    /^(?:0[17]\d{8}|254[17]\d{8})$/;
+    const phonePattern =
+      /^(?:0[17]\d{8}|254[17]\d{8})$/;
 
-  if (!form.firstName.trim()) {
-    return "First name is required.";
-  }
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (!form.lastName.trim()) {
-    return "Last name is required.";
-  }
+    if (!form.firstName.trim()) {
+      return "First name is required.";
+    }
 
-  if (!form.gender) {
-    return "Select your gender.";
-  }
+    if (!form.lastName.trim()) {
+      return "Last name is required.";
+    }
 
-  if (!form.dateOfBirth) {
-    return "Date of birth is required.";
-  }
+    if (!form.gender) {
+      return "Select your gender.";
+    }
 
-  const selectedDate =
-    new Date(form.dateOfBirth);
+    if (!form.dateOfBirth) {
+      return "Date of birth is required.";
+    }
 
-  const today = new Date();
+    const selectedDate =
+      new Date(form.dateOfBirth);
 
-  if (
-    Number.isNaN(
-      selectedDate.getTime()
-    )
-  ) {
-    return "Enter a valid date of birth.";
-  }
+    const today = new Date();
 
-  if (selectedDate >= today) {
-    return "Date of birth must be in the past.";
-  }
+    if (
+      Number.isNaN(
+        selectedDate.getTime()
+      )
+    ) {
+      return "Enter a valid date of birth.";
+    }
 
-  if (
-    !nationalIdPattern.test(
-      form.nationalId.trim()
-    )
-  ) {
-    return "Enter a valid National ID containing 6 to 10 digits.";
-  }
+    if (selectedDate >= today) {
+      return "Date of birth must be in the past.";
+    }
 
-  if (
-    !phonePattern.test(
-      normalizedPhone
-    )
-  ) {
-    return "Enter a valid Kenyan phone number, such as 0712345678, 0112345678, 254712345678, 254112345678, or +254112345678.";
-  }
+    if (
+      !nationalIdPattern.test(
+        form.nationalId.trim()
+      )
+    ) {
+      return (
+        "Enter a valid National ID containing " +
+        "6 to 10 digits."
+      );
+    }
 
-  if (!form.county) {
-    return "Select your county.";
-  }
+    if (
+      !phonePattern.test(
+        normalizedPhone
+      )
+    ) {
+      return (
+        "Enter a valid Kenyan phone number, " +
+        "such as 0712345678, 0112345678, " +
+        "254712345678, or +254112345678."
+      );
+    }
 
-  if (!form.constituency) {
-    return "Select your constituency.";
-  }
+    if (!form.county) {
+      return "Select your county.";
+    }
 
-  if (!form.ward.trim()) {
-    return "Ward is required.";
-  }
+    if (!form.constituency) {
+      return "Select your constituency.";
+    }
 
-  if (
-    form.disability.hasDisability &&
-    !form.disability.type.trim()
-  ) {
-    return "Enter the type of disability.";
-  }
+    if (!form.ward) {
+      return "Select your ward.";
+    }
 
-  if (!form.email.trim()) {
-    return "Email address is required.";
-  }
+    if (
+      form.disability.hasDisability &&
+      !form.disability.type.trim()
+    ) {
+      return "Enter the type of disability.";
+    }
 
-  const emailPattern =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!form.email.trim()) {
+      return "Email address is required.";
+    }
 
-  if (
-    !emailPattern.test(
-      form.email.trim()
-    )
-  ) {
-    return "Enter a valid email address.";
-  }
+    if (
+      !emailPattern.test(
+        form.email.trim()
+      )
+    ) {
+      return "Enter a valid email address.";
+    }
 
-  return "";
-};
+    return "";
+  };
 
-  /* ==========================================
-     EXTRACT API ERROR
-  ========================================== */
+  /* ========================================================
+     ERROR HANDLING
+  ======================================================== */
 
   const extractErrorMessage = (
     requestError
@@ -361,9 +305,9 @@ const validateForm = () => {
     );
   };
 
-  /* ==========================================
-     REGISTER
-  ========================================== */
+  /* ========================================================
+     SUBMIT
+  ======================================================== */
 
   const handleSubmit = async (
     event
@@ -391,7 +335,8 @@ const validateForm = () => {
       lastName:
         form.lastName.trim(),
 
-      gender: form.gender,
+      gender:
+        form.gender,
 
       dateOfBirth:
         form.dateOfBirth,
@@ -399,20 +344,20 @@ const validateForm = () => {
       nationalId:
         form.nationalId.trim(),
 
-      phone: normalizePhone(
-        form.phone
-      ),
+      phone:
+        normalizePhone(form.phone),
 
       occupation:
         form.occupation.trim(),
 
-      county: form.county,
+      county:
+        form.county,
 
       constituency:
         form.constituency,
 
       ward:
-        form.ward.trim(),
+        form.ward,
 
       membershipType:
         form.membershipType,
@@ -455,26 +400,28 @@ const validateForm = () => {
         "Registration completed. Check your email for the verification code."
       );
 
-      navigate("/verify-otp", {
-        replace: true,
+      navigate(
+        "/verify-otp",
+        {
+          replace: true,
+          state: {
+            email:
+              registeredEmail,
 
-        state: {
-          email:
-            registeredEmail,
+            purpose:
+              "ACCOUNT_ACTIVATION",
 
-          purpose:
-            "ACCOUNT_ACTIVATION",
+            otpId:
+              responseData?.otpId,
 
-          otpId:
-            responseData?.otpId,
+            expiresAt:
+              responseData?.expiresAt,
 
-          expiresAt:
-            responseData?.expiresAt,
-
-          nextStep:
-            responseData?.nextStep,
-        },
-      });
+            nextStep:
+              responseData?.nextStep,
+          },
+        }
+      );
     } catch (
       registrationError
     ) {
@@ -493,37 +440,51 @@ const validateForm = () => {
     }
   };
 
+  /* ========================================================
+     RENDER
+  ======================================================== */
+
   return (
     <form
       className="register-form"
       onSubmit={handleSubmit}
       noValidate
     >
+      {/* ====================================================
+          FORM HEADING
+      ==================================================== */}
+
       <div className="register-form-heading">
         <div className="register-form-icon">
-          <UserPlus size={26} />
+          <UserPlus size={20} />
         </div>
 
         <div>
+          <span className="register-eyebrow">
+            STEP 1 OF YOUR JVP JOURNEY
+          </span>
+
           <h2>
-            Create Your Membership Account
+            Create your JVP account
           </h2>
 
           <p>
-            Complete the form using your
-            correct personal and location
-            details.
+            Provide your details accurately
+            to begin your JVP membership.
           </p>
         </div>
       </div>
+
+      {/* ====================================================
+          ALERTS
+      ==================================================== */}
 
       {error && (
         <div
           className="register-alert register-alert-error"
           role="alert"
         >
-          <AlertCircle size={20} />
-
+          <AlertCircle size={18} />
           <span>{error}</span>
         </div>
       )}
@@ -533,19 +494,18 @@ const validateForm = () => {
           className="register-alert register-alert-success"
           role="status"
         >
-          <CheckCircle2 size={20} />
-
+          <CheckCircle2 size={18} />
           <span>{success}</span>
         </div>
       )}
 
-      {/* ======================================
-          PERSONAL INFORMATION
-      ====================================== */}
+      {/* ====================================================
+          01 — PERSONAL INFORMATION
+      ==================================================== */}
 
       <section className="form-section">
         <div className="form-section-header">
-          <span>1</span>
+          <span>01</span>
 
           <div>
             <h3>
@@ -553,8 +513,7 @@ const validateForm = () => {
             </h3>
 
             <p>
-              Enter your official personal
-              details.
+              Tell us about yourself.
             </p>
           </div>
         </div>
@@ -572,7 +531,7 @@ const validateForm = () => {
               name="firstName"
               value={form.firstName}
               onChange={handleChange}
-              placeholder="Enter first name"
+              placeholder="First name"
               autoComplete="given-name"
               disabled={loading}
               required
@@ -590,7 +549,7 @@ const validateForm = () => {
               name="middleName"
               value={form.middleName}
               onChange={handleChange}
-              placeholder="Enter middle name"
+              placeholder="Middle name"
               autoComplete="additional-name"
               disabled={loading}
             />
@@ -608,7 +567,7 @@ const validateForm = () => {
               name="lastName"
               value={form.lastName}
               onChange={handleChange}
-              placeholder="Enter last name"
+              placeholder="Last name"
               autoComplete="family-name"
               disabled={loading}
               required
@@ -672,7 +631,7 @@ const validateForm = () => {
               name="nationalId"
               value={form.nationalId}
               onChange={handleChange}
-              placeholder="Enter National ID"
+              placeholder="National ID"
               inputMode="numeric"
               maxLength={10}
               disabled={loading}
@@ -700,7 +659,8 @@ const validateForm = () => {
             />
 
             <small>
-              Use a Kenyan phone number.
+              Kenyan numbers beginning with
+              01 or 07 are accepted.
             </small>
           </div>
 
@@ -715,7 +675,7 @@ const validateForm = () => {
               name="occupation"
               value={form.occupation}
               onChange={handleChange}
-              placeholder="Enter occupation"
+              placeholder="Occupation"
               autoComplete="organization-title"
               disabled={loading}
             />
@@ -723,23 +683,22 @@ const validateForm = () => {
         </div>
       </section>
 
-      {/* ======================================
-          DISABILITY INFORMATION
-      ====================================== */}
+      {/* ====================================================
+          02 — INCLUSION
+      ==================================================== */}
 
       <section className="form-section">
         <div className="form-section-header">
-          <span>2</span>
+          <span>02</span>
 
           <div>
             <h3>
-              Disability Information
+              Inclusion & Accessibility
             </h3>
 
             <p>
-              This information supports
-              inclusion and accessibility
-              planning.
+              Help us build inclusive youth
+              programmes and services.
             </p>
           </div>
         </div>
@@ -760,8 +719,7 @@ const validateForm = () => {
             <span className="checkbox-control" />
 
             <span>
-              I am a person with a
-              disability
+              I am a person with a disability
             </span>
           </label>
 
@@ -790,58 +748,63 @@ const validateForm = () => {
         </div>
       </section>
 
-      {/* ======================================
-          LOCATION INFORMATION
-      ====================================== */}
+      {/* ====================================================
+          03 — LOCATION
+      ==================================================== */}
 
       <section className="form-section">
         <div className="form-section-header">
-          <span>3</span>
+          <span>03</span>
 
           <div>
-            <h3>
-              Location Information
-            </h3>
+            <h3>Location</h3>
 
             <p>
-              Membership is available to
-              residents of the six Coast
-              Region counties.
+              Select your location within
+              the Coast Region.
             </p>
           </div>
         </div>
 
         <div className="form-grid">
+          {/* COUNTY */}
+
           <div className="form-group">
             <label htmlFor="county">
               County
               <span>*</span>
             </label>
 
-            <select
-              id="county"
-              name="county"
-              value={form.county}
-              onChange={handleChange}
-              disabled={loading}
-              required
-            >
-              <option value="">
-                Select county
-              </option>
+            <div className="input-with-icon">
+              <MapPin size={15} />
 
-              {Object.keys(
-                COAST_LOCATIONS
-              ).map((county) => (
-                <option
-                  key={county}
-                  value={county}
-                >
-                  {county}
+              <select
+                id="county"
+                name="county"
+                value={form.county}
+                onChange={handleChange}
+                disabled={loading}
+                required
+              >
+                <option value="">
+                  Select county
                 </option>
-              ))}
-            </select>
+
+                {COAST_COUNTIES.map(
+                  (county) => (
+                    <option
+                      key={county}
+                      value={county}
+                    >
+                      {county}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
           </div>
+
+          {/* CONSTITUENCY */}
 
           <div className="form-group">
             <label htmlFor="constituency">
@@ -868,7 +831,7 @@ const validateForm = () => {
                   : "Select county first"}
               </option>
 
-              {availableConstituencies.map(
+              {constituencies.map(
                 (constituency) => (
                   <option
                     key={constituency}
@@ -881,113 +844,190 @@ const validateForm = () => {
             </select>
           </div>
 
+          {/* WARD */}
+
           <div className="form-group">
             <label htmlFor="ward">
               Ward
               <span>*</span>
             </label>
 
-            <input
+            <select
               id="ward"
-              type="text"
               name="ward"
               value={form.ward}
               onChange={handleChange}
-              placeholder="Enter your ward"
               disabled={
                 loading ||
                 !form.constituency
               }
               required
-            />
+            >
+              <option value="">
+                {form.constituency
+                  ? "Select ward"
+                  : "Select constituency first"}
+              </option>
+
+              {wards.map((ward) => (
+                <option
+                  key={ward}
+                  value={ward}
+                >
+                  {ward}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </section>
 
-      {/* ======================================
-          MEMBERSHIP AND ACCOUNT
-      ====================================== */}
+      {/* ====================================================
+          04 — MEMBERSHIP
+      ==================================================== */}
 
       <section className="form-section">
         <div className="form-section-header">
-          <span>4</span>
+          <span>04</span>
 
           <div>
             <h3>
-              Membership and Account
+              Membership & Account
             </h3>
 
             <p>
-              Select your membership type
-              and enter your email address.
+              Choose how you want to
+              participate in JVP.
             </p>
           </div>
         </div>
 
-        <div className="form-grid">
-          <div className="form-group">
-            <label htmlFor="membershipType">
-              Membership Type
-              <span>*</span>
-            </label>
-
-            <select
-              id="membershipType"
+        <div className="membership-options">
+          <label
+            className={`membership-option ${
+              form.membershipType ===
+              "ordinary"
+                ? "selected"
+                : ""
+            }`}
+          >
+            <input
+              type="radio"
               name="membershipType"
-              value={
-                form.membershipType
+              value="ordinary"
+              checked={
+                form.membershipType ===
+                "ordinary"
               }
               onChange={handleChange}
               disabled={loading}
-              required
-            >
-              <option value="ordinary">
-                Ordinary Membership
-              </option>
-
-              <option value="leadership">
-                Leadership Membership
-              </option>
-            </select>
-
-            <small>
-              The membership fee is
-              confirmed during payment.
-            </small>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">
-              Email Address
-              <span>*</span>
-            </label>
-
-            <input
-              id="email"
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="example@email.com"
-              autoComplete="email"
-              disabled={loading}
-              required
             />
 
-            <small>
-              A verification code will be
-              sent to this email.
-            </small>
-          </div>
+            <div className="membership-option__content">
+              <div className="membership-option__top">
+                <span>
+                  Ordinary Membership
+                </span>
+
+                <strong>
+                  KES 50
+                </strong>
+              </div>
+
+              <p>
+                Participate in JVP programmes,
+                events, opportunities and
+                community activities.
+              </p>
+            </div>
+
+            <span className="membership-radio" />
+          </label>
+
+          <label
+            className={`membership-option ${
+              form.membershipType ===
+              "leadership"
+                ? "selected"
+                : ""
+            }`}
+          >
+            <input
+              type="radio"
+              name="membershipType"
+              value="leadership"
+              checked={
+                form.membershipType ===
+                "leadership"
+              }
+              onChange={handleChange}
+              disabled={loading}
+            />
+
+            <div className="membership-option__content">
+              <div className="membership-option__top">
+                <span>
+                  Leadership Membership
+                </span>
+
+                <strong>
+                  KES 100
+                </strong>
+              </div>
+
+              <p>
+                For members seeking deeper
+                involvement in leadership,
+                governance and representation.
+              </p>
+            </div>
+
+            <span className="membership-radio" />
+          </label>
+        </div>
+
+        <div className="form-group form-group-email">
+          <label htmlFor="email">
+            Email Address
+            <span>*</span>
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="you@example.com"
+            autoComplete="email"
+            disabled={loading}
+            required
+          />
+
+          <small>
+            A verification code will be
+            sent to this email.
+          </small>
         </div>
       </section>
 
+      {/* ====================================================
+          SUBMIT
+      ==================================================== */}
+
       <div className="register-submit-area">
-        <p>
-          By creating an account, you
-          confirm that the details provided
-          are accurate.
-        </p>
+        <div className="register-submit-info">
+          <div>
+            <ShieldCheck size={16} />
+          </div>
+
+          <p>
+            Your information is used to
+            create and manage your JVP
+            membership. You will verify
+            your email before continuing.
+          </p>
+        </div>
 
         <button
           type="submit"
@@ -997,7 +1037,7 @@ const validateForm = () => {
           {loading ? (
             <>
               <Loader2
-                size={20}
+                size={18}
                 className="register-spinner"
               />
 
@@ -1005,12 +1045,34 @@ const validateForm = () => {
             </>
           ) : (
             <>
-              <UserPlus size={20} />
+              <UserPlus size={18} />
 
-              Create Account
+              Create JVP Account
             </>
           )}
         </button>
+      </div>
+
+      {/* ====================================================
+          NEXT STEP
+      ==================================================== */}
+
+      <div className="register-next-step">
+        <div className="register-next-step__icon">
+          <CreditCard size={16} />
+        </div>
+
+        <div>
+          <strong>
+            What happens next?
+          </strong>
+
+          <span>
+            Verify your email, activate
+            your membership and enter
+            JVP Connect.
+          </span>
+        </div>
       </div>
     </form>
   );

@@ -1,0 +1,225 @@
+.contact-reply {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #edf0ee;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.contact-reply__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+}
+
+.contact-reply__header span {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #16825d;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.contact-reply__header h3 {
+  margin: 0;
+  color: #35433d;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.contact-reply__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #edf8f3;
+  color: #16825d;
+}
+
+/* ==========================================================================
+   FEEDBACK
+   ========================================================================== */
+
+.contact-reply__success,
+.contact-reply__error {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.65rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 7px;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.contact-reply__success {
+  border: 1px solid #cfe7dc;
+  background: #f1faf6;
+  color: #277858;
+}
+
+.contact-reply__error {
+  border: 1px solid #f0d1d1;
+  background: #fff7f7;
+  color: #a33e3e;
+}
+
+/* ==========================================================================
+   FIELD
+   ========================================================================== */
+
+.contact-reply__field {
+  position: relative;
+}
+
+.contact-reply textarea {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  box-sizing: border-box;
+  padding: 0.8rem;
+  border: 1px solid #dfe6e2;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: #33413b;
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.contact-reply textarea::placeholder {
+  color: #a4ada9;
+}
+
+.contact-reply textarea:focus {
+  border-color: #65a88d;
+  box-shadow: 0 0 0 3px rgba(22, 130, 93, 0.06);
+}
+
+.contact-reply textarea:disabled {
+  background: #f7f9f8;
+  cursor: not-allowed;
+}
+
+.contact-reply__counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.35rem;
+}
+
+.contact-reply__counter span {
+  color: #9aa39f;
+  font-size: 0.61rem;
+}
+
+.contact-reply__counter strong {
+  flex: 0 0 auto;
+  color: #9aa39f;
+  font-size: 0.61rem;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+
+.contact-reply__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.65rem;
+}
+
+.contact-reply__footer p {
+  max-width: 270px;
+  margin: 0;
+  color: #939d98;
+  font-size: 0.62rem;
+  line-height: 1.5;
+}
+
+.contact-reply__footer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 35px;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid #16825d;
+  border-radius: 7px;
+  background: #16825d;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.contact-reply__footer button:hover:not(:disabled) {
+  background: #126d4e;
+  box-shadow: 0 5px 14px rgba(22, 130, 93, 0.16);
+  transform: translateY(-1px);
+}
+
+.contact-reply__footer button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.contact-reply__spinner {
+  animation: contact-reply-spin 0.8s linear infinite;
+}
+
+@keyframes contact-reply-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   MOBILE
+   ========================================================================== */
+
+@media (max-width: 500px) {
+  .contact-reply__footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .contact-reply__footer p {
+    max-width: none;
+  }
+
+  .contact-reply__footer button {
+    width: 100%;
+  }
+
+  .contact-reply__counter {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+}

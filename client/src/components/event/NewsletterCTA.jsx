@@ -1,57 +1,78 @@
 import { Link } from "react-router-dom";
 import {
+  ArrowRight,
   CalendarPlus,
   Users,
-  ArrowRight,
 } from "lucide-react";
 
-const NewsletterCTA = () => {
+import "./NewsletterCTA.css";
+
+function NewsletterCTA() {
   return (
-    <section className="events-cta">
+    <section
+      className="events-newsletter"
+      aria-labelledby="events-newsletter-title"
+    >
+      <div className="events-newsletter__container">
+        <div className="events-newsletter__content">
+          <span className="events-newsletter__eyebrow">
+            STAY CONNECTED
+          </span>
 
-      <div className="events-cta__content">
-
-        <span className="events-cta__eyebrow">
-          NEVER MISS AN EVENT
-        </span>
-
-        <h2 className="events-cta__title">
-          Join the JVP Community
-        </h2>
-
-        <p className="events-cta__description">
-          Stay informed about conferences, summits,
-          trainings, youth forums, networking sessions,
-          community service activities, and leadership
-          opportunities taking place across the Coast
-          Region and beyond.
-        </p>
-
-        <div className="events-cta__actions">
-
-          <Link
-            to="/membership/register"
-            className="events-button events-button--primary"
+          <h2
+            id="events-newsletter-title"
+            className="events-newsletter__title"
           >
-            <Users size={20} />
-            Become a Member
+            Be part of the{" "}
+            <span>JVP movement.</span>
+          </h2>
+
+          <p className="events-newsletter__text">
+            Join young people across the Coast
+            Region and stay connected to events,
+            opportunities, trainings, forums and
+            activities shaping our communities.
+          </p>
+        </div>
+
+        <div className="events-newsletter__actions">
+          <Link
+            to="/register"
+            className="events-newsletter__primary"
+          >
+            <Users size={15} />
+
+            <span>Become a Member</span>
+
+            <ArrowRight size={14} />
           </Link>
 
           <Link
             to="/contact"
-            className="events-button events-button--secondary"
+            className="events-newsletter__secondary"
           >
-            <CalendarPlus size={20} />
-            Stay Connected
-            <ArrowRight size={18} />
+            <CalendarPlus size={14} />
+
+            <span>Stay Connected</span>
           </Link>
-
         </div>
-
       </div>
 
+      <div className="events-newsletter__bottom">
+        <span>
+          Jumuiya ya Vijana wa Pwani
+        </span>
+
+        <span className="events-newsletter__dot">
+          •
+        </span>
+
+        <span>
+          Leadership · Opportunity · Community · Impact
+        </span>
+      </div>
     </section>
   );
-};
+}
 
 export default NewsletterCTA;

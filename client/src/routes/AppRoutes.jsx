@@ -19,6 +19,7 @@ import Programs from "../pages/programs/Programs";
 import Events from "../pages/events/Events";
 import Event from "../pages/events/Event";
 import News from "../pages/news/News";
+import NewsArticle from "../pages/news/NewsArticle";
 import Membership from "../pages/membership/Membership";
 import Summit from "../pages/summit/SummitPage";
 import SummitRegistration from "../pages/summit/SummitRegistration";
@@ -125,6 +126,9 @@ import Members from "../pages/admin/Members";
 import MemberDetails from "../pages/admin/MemberDetails";
 import Payments from "../pages/admin/Payments";
 import LeadershipPage from "../pages/admin/leadership/LeadershipPage";
+import NewsAdmin from "../pages/admin/news/NewsAdmin";
+import NewsEditor from "../pages/admin/news/NewsEditor";
+import ContactInbox from "../pages/admin/contact/ContactInbox";
 
 /* ==========================================
    ADMIN EVENTS
@@ -212,6 +216,11 @@ function AppRoutes() {
           path="/news"
           element={<News />}
         />
+
+        <Route
+          path="/news/:slug"
+          element={<NewsArticle />}
+        />  
 
         <Route
           path="/membership"
@@ -598,6 +607,44 @@ function AppRoutes() {
               </PermissionRoute>
             }
           />
+
+          <Route
+            path="news"
+            element={
+              <PermissionRoute
+                permission={PERMISSIONS.VIEW_NEWS}
+              >
+                <NewsAdmin />
+              </PermissionRoute>
+            }
+          />
+
+          <Route
+            path="news/create"
+            element={
+              <PermissionRoute
+                permission={PERMISSIONS.CREATE_NEWS}
+              >
+                <NewsEditor />
+              </PermissionRoute>
+            }
+          />
+
+          <Route
+            path="news/:id/edit"
+            element={
+              <PermissionRoute
+                permission={PERMISSIONS.EDIT_NEWS}
+              >
+                <NewsEditor />
+              </PermissionRoute>
+            }
+          />  
+
+          <Route
+  path="/admin/contact"
+  element={<ContactInbox />}
+/>
 
           {/* =====================================
               PAYMENTS

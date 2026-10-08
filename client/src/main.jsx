@@ -16,13 +16,9 @@ import { PaymentProvider } from "./context/PaymentContext";
 import { EventProvider } from "./context/EventContext";
 import { LeaderProvider } from "./context/LeaderContext";
 import { LeadershipDashboardProvider } from "./context/LeadershipDashboardContext";
-import {
-  SummitProvider,
-} from "./context/SummitContext";
-
-/* ==========================================
-   GLOBAL PROFILE IMAGE FALLBACK
-========================================== */
+import { SummitProvider } from "./context/SummitContext";
+import { NewsProvider } from "./context/NewsContext";
+import { ContactProvider } from "./context/ContactContext";
 
 import {
   installProfileImageFallback,
@@ -35,6 +31,7 @@ import {
 
 installProfileImageFallback();
 
+
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(
@@ -42,35 +39,45 @@ ReactDOM.createRoot(
 
     <AuthProvider>
 
-  <DashboardProvider>
+      <DashboardProvider>
 
-    <LeadershipDashboardProvider>
+        <LeadershipDashboardProvider>
 
-      <ProfileProvider>
+          <ProfileProvider>
 
-        <PaymentProvider>
+            <PaymentProvider>
 
-          <EventProvider>
+              <EventProvider>
 
-            <LeaderProvider>
+                <LeaderProvider>
 
-               <SummitProvider>
-                  <App />
-               </SummitProvider>
+                  <SummitProvider>
 
-            </LeaderProvider>
+                    <NewsProvider>
 
-          </EventProvider>
+                      <ContactProvider>
 
-        </PaymentProvider>
+                        <App />
 
-      </ProfileProvider>
+                      </ContactProvider>
 
-    </LeadershipDashboardProvider>
+                    </NewsProvider>
 
-  </DashboardProvider>
+                  </SummitProvider>
 
-</AuthProvider>
+                </LeaderProvider>
+
+              </EventProvider>
+
+            </PaymentProvider>
+
+          </ProfileProvider>
+
+        </LeadershipDashboardProvider>
+
+      </DashboardProvider>
+
+    </AuthProvider>
 
   </React.StrictMode>
 );

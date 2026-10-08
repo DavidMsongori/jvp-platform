@@ -1,0 +1,293 @@
+.jvp-event-skeleton {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  overflow: hidden;
+
+  border: 1px solid #e3ebe6;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   SHIMMER
+========================================================= */
+
+.jvp-event-skeleton__image,
+.jvp-event-skeleton__badge,
+.jvp-event-skeleton__title,
+.jvp-event-skeleton__text,
+.jvp-event-skeleton__meta,
+.jvp-event-skeleton__price,
+.jvp-event-skeleton__capacity,
+.jvp-event-skeleton__status,
+.jvp-event-skeleton__button {
+  position: relative;
+  overflow: hidden;
+
+  background: #e9efec;
+}
+
+.jvp-event-skeleton__image::after,
+.jvp-event-skeleton__badge::after,
+.jvp-event-skeleton__title::after,
+.jvp-event-skeleton__text::after,
+.jvp-event-skeleton__meta::after,
+.jvp-event-skeleton__price::after,
+.jvp-event-skeleton__capacity::after,
+.jvp-event-skeleton__status::after,
+.jvp-event-skeleton__button::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  width: 45%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+
+  transform: translateX(-120%);
+
+  animation: jvp-event-skeleton-shimmer 1.45s ease-in-out infinite;
+}
+
+@keyframes jvp-event-skeleton-shimmer {
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.jvp-event-skeleton__image {
+  width: 100%;
+  height: 185px;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.jvp-event-skeleton__body {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  padding: 18px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   CATEGORY
+========================================================= */
+
+.jvp-event-skeleton__badge {
+  width: 66px;
+  height: 20px;
+
+  margin-bottom: 11px;
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.jvp-event-skeleton__title {
+  width: 92%;
+  height: 14px;
+
+  margin-bottom: 6px;
+
+  border-radius: 4px;
+}
+
+.jvp-event-skeleton__title--short {
+  width: 63%;
+  margin-bottom: 14px;
+}
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.jvp-event-skeleton__text {
+  width: 100%;
+  height: 7px;
+
+  margin-bottom: 6px;
+
+  border-radius: 3px;
+}
+
+.jvp-event-skeleton__text--short {
+  width: 70%;
+
+  margin-bottom: 17px;
+}
+
+/* =========================================================
+   META
+========================================================= */
+
+.jvp-event-skeleton__meta {
+  width: 82%;
+  height: 7px;
+
+  margin-bottom: 8px;
+
+  border-radius: 3px;
+}
+
+.jvp-event-skeleton__meta--short {
+  width: 61%;
+
+  margin-bottom: 17px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.jvp-event-skeleton__footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  min-height: 32px;
+
+  margin-top: auto;
+  padding-top: 13px;
+
+  border-top: 1px solid #edf1ef;
+
+  box-sizing: border-box;
+}
+
+.jvp-event-skeleton__registration {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  min-width: 0;
+}
+
+.jvp-event-skeleton__price {
+  width: 48px;
+  height: 10px;
+
+  border-radius: 3px;
+}
+
+.jvp-event-skeleton__capacity {
+  width: 72px;
+  height: 6px;
+
+  border-radius: 3px;
+}
+
+.jvp-event-skeleton__status {
+  width: 55px;
+  height: 22px;
+
+  flex-shrink: 0;
+
+  border-radius: 6px;
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.jvp-event-skeleton__button {
+  width: 100%;
+  height: 34px;
+
+  margin-top: 13px;
+
+  border-radius: 6px;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 980px) {
+  .jvp-event-skeleton__image {
+    height: 175px;
+  }
+
+  .jvp-event-skeleton__body {
+    padding: 16px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 680px) {
+  .jvp-event-skeleton {
+    border-radius: 10px;
+  }
+
+  .jvp-event-skeleton__image {
+    height: 165px;
+  }
+
+  .jvp-event-skeleton__body {
+    padding: 15px;
+  }
+
+  .jvp-event-skeleton__badge {
+    width: 58px;
+    height: 18px;
+    margin-bottom: 9px;
+  }
+
+  .jvp-event-skeleton__title {
+    height: 12px;
+  }
+
+  .jvp-event-skeleton__text {
+    height: 6px;
+  }
+
+  .jvp-event-skeleton__button {
+    height: 32px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 430px) {
+  .jvp-event-skeleton__image {
+    height: 180px;
+  }
+
+  .jvp-event-skeleton__body {
+    padding: 14px;
+  }
+}

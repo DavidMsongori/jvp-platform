@@ -2,6 +2,11 @@ import EventCard from "./EventCard";
 import EmptyState from "./EmptyState";
 import Skeleton from "./Skeleton";
 
+import "./Grid.css";
+
+const getEventId = (event, index) =>
+  event?._id || event?.id || event?.slug || `event-${index}`;
+
 const Grid = ({
   events = [],
   loading = false,
@@ -15,10 +20,19 @@ const Grid = ({
   if (loading) {
     return (
       <section className="events-grid-section">
-        <div className="events-grid">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Skeleton key={index} />
-          ))}
+        <div className="events-grid-container">
+          <div className="events-grid-heading events-grid-heading--loading">
+            <div>
+              <span className="events-grid-eyebrow">JVP CONNECT</span>
+              <h2>Upcoming Events</h2>
+            </div>
+          </div>
+
+          <div className="events-grid events-grid--loading">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <Skeleton key={`event-skeleton-${index}`} />
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -31,27 +45,34 @@ const Grid = ({
   if (error) {
     return (
       <section className="events-grid-section">
+        <div className="events-grid-container">
+          <div className="events-error">
+            <div className="events-error__icon">!</div>
 
-        <div className="events-error">
+            <div className="events-error__content">
+              <span className="events-grid-eyebrow">
+                EVENTS
+              </span>
 
-          <h3>
-            Unable to load events
-          </h3>
+              <h3>Unable to load events</h3>
 
-          <p>{error}</p>
+              <p>
+                {error ||
+                  "Something went wrong while loading JVP events. Please try again."}
+              </p>
 
-          {onRetry && (
-            <button
-              type="button"
-              className="events-button"
-              onClick={onRetry}
-            >
-              Try Again
-            </button>
-          )}
-
+              {onRetry && (
+                <button
+                  type="button"
+                  className="events-error__button"
+                  onClick={onRetry}
+                >
+                  Try Again
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-
       </section>
     );
   }
@@ -63,7 +84,22 @@ const Grid = ({
   if (!events.length) {
     return (
       <section className="events-grid-section">
-        <EmptyState />
+        <div className="events-grid-container">
+          <div className="events-grid-heading">
+            <div>
+              <span className="events-grid-eyebrow">
+                JVP CONNECT
+              </span>
+              <h2>Upcoming Events</h2>
+            </div>
+
+            <span className="events-grid-count">
+              0 events
+            </span>
+          </div>
+
+          <EmptyState />
+        </div>
       </section>
     );
   }
@@ -74,33 +110,31 @@ const Grid = ({
 
   return (
     <section className="events-grid-section">
+      <div className="events-grid-container">
+        <div className="events-grid-heading">
+          <div>
+            <span className="events-grid-eyebrow">
+              JVP CONNECT
+            </span>
 
-      <div className="events-grid-header">
+            <h2>Upcoming Events</h2>
+          </div>
 
-        <h2>
-          Upcoming Events
-        </h2>
+          <span className="events-grid-count">
+            {events.length}{" "}
+            {events.length === 1 ? "event" : "events"}
+          </span>
+        </div>
 
-        <span>
-          {events.length}{" "}
-          {events.length === 1
-            ? "event"
-            : "events"}
-        </span>
-
+        <div className="events-grid">
+          {events.map((event, index) => (
+            <EventCard
+              key={getEventId(event, index)}
+              event={event}
+            />
+          ))}
+        </div>
       </div>
-
-      <div className="events-grid">
-
-        {events.map((event) => (
-          <EventCard
-            key={event._id}
-            event={event}
-          />
-        ))}
-
-      </div>
-
     </section>
   );
 };

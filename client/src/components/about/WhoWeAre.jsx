@@ -1,122 +1,127 @@
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  CheckCircle2,
+  MapPin,
+  Users,
+} from "lucide-react";
+
 import "./WhoWeAre.css";
 
-import image1 from "../../assets/hero/hero1.jpg";
-import image2 from "../../assets/hero/hero2.jpg";
-import image3 from "../../assets/hero/hero3.jpg";
-import image4 from "../../assets/hero/hero4.jpg";
+import about1 from "../../assets/about/about1.jpg";
+import about2 from "../../assets/about/about2.jpg";
+import about3 from "../../assets/about/about3.jpg";
+import about4 from "../../assets/about/about4.jpg";
 
-import {
-  FaCheckCircle,
-} from "react-icons/fa";
+const focusAreas = [
+  "Youth Leadership",
+  "Entrepreneurship",
+  "Climate Action",
+  "Blue Economy",
+];
 
 function WhoWeAre() {
-
   return (
-
     <section className="who-we-are">
-
       <div className="who-container">
 
-        {/* LEFT */}
-
+        {/* Visual */}
         <div className="who-images">
+          <div className="who-image who-image--main">
+            <img
+              src={about1}
+              alt="Coastal youth participating in a JVP activity"
+            />
+          </div>
 
-          <img src={image1} alt="JVP" />
+          <div className="who-image who-image--top">
+            <img
+              src={about2}
+              alt="Young people engaged in a community activity"
+            />
+          </div>
 
-          <img src={image2} alt="JVP" className="tall" />
+          <div className="who-image who-image--bottom">
+            <img
+              src={about3}
+              alt="JVP youth leadership activity"
+            />
+          </div>
 
-          <img src={image3} alt="JVP" className="tall" />
+          <div className="who-image who-image--small">
+            <img
+              src={about4}
+              alt="Coastal youth working together"
+            />
+          </div>
 
-          <img src={image4} alt="JVP" />
-
+          <div className="who-badge">
+            <Users size={14} />
+            <div>
+              <strong>Youth-led</strong>
+              <span>Regional movement</span>
+            </div>
+          </div>
         </div>
 
-        {/* RIGHT */}
-
+        {/* Content */}
         <div className="who-content">
 
-          <span>
+          <span className="who-eyebrow">
             WHO WE ARE
           </span>
 
           <h2>
-
-            Empowering the Next Generation
-            of Coastal Leaders
-
+            One movement.
+            <span> Six counties.</span>
+            <br />
+            A shared future.
           </h2>
 
-          <p>
-
-            Jumuiya ya Vijana wa Pwani (JVP)
-            is a regional youth movement bringing
-            together young people from the six
-            coastal counties of Kenya to inspire
-            leadership, innovation, entrepreneurship,
-            climate action and sustainable development.
-
+          <p className="who-lead">
+            Jumuiya ya Vijana wa Pwani (JVP) is a
+            regional youth movement connecting young
+            people across Kenya's Coast Region.
           </p>
 
-          <p>
-
-            Through partnerships, mentorship,
-            advocacy and community-driven initiatives,
-            we empower young people to unlock their
-            potential while creating lasting impact
-            within their communities.
-
+          <p className="who-description">
+            We create opportunities for young people
+            to lead, innovate, build livelihoods and
+            contribute to the development of their
+            communities.
           </p>
 
-          <div className="who-list">
-
-            <div>
-
-              <FaCheckCircle />
-
-              Leadership Development
-
-            </div>
-
-            <div>
-
-              <FaCheckCircle />
-
-              Entrepreneurship
-
-            </div>
-
-            <div>
-
-              <FaCheckCircle />
-
-              Climate Action
-
-            </div>
-
-            <div>
-
-              <FaCheckCircle />
-
-              Blue Economy
-
-            </div>
-
+          <div className="who-location">
+            <MapPin size={14} />
+            <span>
+              Mombasa · Kilifi · Kwale · Lamu · Tana River · Taita Taveta
+            </span>
           </div>
 
-          <a href="/membership">
+          <div className="who-list">
+            {focusAreas.map((item) => (
+              <div
+                className="who-list__item"
+                key={item}
+              >
+                <CheckCircle2 size={15} />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
 
-            Become a Member
-
-          </a>
+          <Link
+            to="/register"
+            className="who-button"
+          >
+            Join the Movement
+            <ArrowRight size={15} />
+          </Link>
 
         </div>
-
       </div>
-
     </section>
-
   );
-
 }
 
 export default WhoWeAre;

@@ -1,149 +1,504 @@
-.leadership{
-
-padding:120px 0;
-
-background:#f8fafc;
-
+.leadership {
+  width: 100%;
+  padding: 68px 20px;
+  background: #f7f9f8;
+  box-sizing: border-box;
 }
 
-.leadership-container{
-
-width:min(1200px,90%);
-
-margin:auto;
-
+.leadership-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
 }
 
-.structure{
+/* ==========================================================
+   HEADER
+========================================================== */
 
-margin-top:70px;
-
-display:flex;
-
-flex-direction:column;
-
-gap:30px;
-
+.leadership-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.7fr);
+  align-items: end;
+  gap: 60px;
+  margin-bottom: 32px;
 }
 
-.structure-item{
-
-display:flex;
-
-align-items:flex-start;
-
-gap:30px;
-
-position:relative;
-
+.leadership-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 9px;
+  color: #16825d;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
 }
 
-.structure-item:not(:last-child)::after{
-
-content:"";
-
-position:absolute;
-
-left:35px;
-
-top:70px;
-
-width:3px;
-
-height:55px;
-
-background:#16a34a;
-
+.leadership-eyebrow::before {
+  content: "";
+  width: 21px;
+  height: 2px;
+  border-radius: 2px;
+  background: #16825d;
 }
 
-.structure-icon{
-
-width:70px;
-
-height:70px;
-
-border-radius:50%;
-
-background:#16a34a;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-color:white;
-
-font-size:28px;
-
-flex-shrink:0;
-
-z-index:2;
-
+.leadership-header h2 {
+  max-width: 560px;
+  margin: 0;
+  color: #17211d;
+  font-size: clamp(30px, 3.5vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
 }
 
-.structure-card{
-
-background:white;
-
-padding:28px;
-
-border-radius:18px;
-
-box-shadow:0 15px 35px rgba(0,0,0,.08);
-
-flex:1;
-
-transition:.3s;
-
+.leadership-header h2 span {
+  color: #16825d;
 }
 
-.structure-card:hover{
-
-transform:translateY(-5px);
-
+.leadership-header > p {
+  max-width: 450px;
+  margin: 0 0 2px;
+  color: #7b8781;
+  font-size: 11px;
+  line-height: 1.7;
 }
 
-.structure-card h3{
+/* ==========================================================
+   FEATURE GRID
+========================================================== */
 
-margin-bottom:12px;
-
-font-size:1.5rem;
-
+.leadership-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+  gap: 16px;
+  align-items: stretch;
 }
 
-.structure-card p{
+/* ==========================================================
+   PRESIDENT CARD
+========================================================== */
 
-line-height:1.8;
-
-color:#64748b;
-
+.leadership-president {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 270px;
+  overflow: hidden;
+  border: 1px solid #e0e9e4;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 6px 22px rgba(24, 48, 38, 0.04);
+  box-sizing: border-box;
 }
 
-@media(max-width:768px){
-
-.structure-item{
-
-gap:18px;
-
+.leadership-president__image {
+  position: relative;
+  width: 100%;
+  min-height: 270px;
+  overflow: hidden;
+  background: #e8efeb;
 }
 
-.structure-icon{
-
-width:50px;
-
-height:50px;
-
-font-size:20px;
-
+.leadership-president__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
 }
 
-.structure-item:not(:last-child)::after{
-
-left:24px;
-
-height:50px;
-
+.leadership-image-skeleton {
+  width: 100%;
+  height: 100%;
+  min-height: 270px;
+  background: #e8eeeb;
 }
 
+.leadership-president__content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.leadership-president__label {
+  display: block;
+  color: #16825d;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.leadership-president__content h3 {
+  margin: 8px 0 0;
+  color: #17211d;
+  font-size: 27px;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+.leadership-president__content p {
+  max-width: 390px;
+  margin: 11px 0 0;
+  color: #7c8882;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.leadership-president__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 18px;
+  color: #16825d;
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.leadership-president__link:hover {
+  color: #106a4b;
+}
+
+/* ==========================================================
+   STRUCTURE CARD
+========================================================== */
+
+.leadership-overview {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 30px;
+  border-radius: 12px;
+  background: #17211d;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.leadership-overview__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  margin-bottom: 20px;
+  border-radius: 9px;
+  background: rgba(98, 201, 157, 0.13);
+  color: #62c99d;
+}
+
+.leadership-overview__content {
+  min-width: 0;
+}
+
+.leadership-overview__label {
+  display: block;
+  color: #62c99d;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.leadership-overview h3 {
+  max-width: 330px;
+  margin: 9px 0 0;
+  color: #ffffff;
+  font-size: 23px;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.leadership-overview p {
+  max-width: 360px;
+  margin: 11px 0 0;
+  color: #9eaaa4;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.leadership-overview__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 19px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #496157;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.leadership-overview__link:hover {
+  color: #62c99d;
+  border-color: #62c99d;
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 1000px) {
+  .leadership {
+    padding: 58px 18px;
+  }
+
+  .leadership-header {
+    gap: 35px;
+  }
+
+  .leadership-feature {
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+  }
+
+  .leadership-president {
+    grid-template-columns: 190px minmax(0, 1fr);
+    min-height: 245px;
+  }
+
+  .leadership-president__image,
+  .leadership-image-skeleton {
+    min-height: 245px;
+  }
+
+  .leadership-president__content {
+    padding: 24px;
+  }
+
+  .leadership-president__content h3 {
+    font-size: 23px;
+  }
+
+  .leadership-overview {
+    padding: 24px;
+  }
+
+  .leadership-overview h3 {
+    font-size: 21px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 760px) {
+  .leadership {
+    padding: 50px 14px;
+  }
+
+  .leadership-header {
+    display: block;
+    margin-bottom: 26px;
+  }
+
+  .leadership-header h2 {
+    font-size: 29px;
+  }
+
+  .leadership-header > p {
+    max-width: 560px;
+    margin-top: 11px;
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .leadership-feature {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .leadership-president {
+    grid-template-columns: 180px minmax(0, 1fr);
+    min-height: 220px;
+  }
+
+  .leadership-president__image,
+  .leadership-image-skeleton {
+    min-height: 220px;
+  }
+
+  .leadership-president__content {
+    padding: 22px;
+  }
+
+  .leadership-president__content h3 {
+    font-size: 21px;
+  }
+
+  .leadership-president__content p {
+    margin-top: 9px;
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  .leadership-president__link {
+    margin-top: 14px;
+  }
+
+  .leadership-overview {
+    min-height: 210px;
+    padding: 23px;
+  }
+
+  .leadership-overview__icon {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 16px;
+  }
+
+  .leadership-overview h3 {
+    font-size: 21px;
+  }
+
+  .leadership-overview p {
+    font-size: 9px;
+  }
+}
+
+/* ==========================================================
+   SMALL PHONES
+========================================================== */
+
+@media (max-width: 480px) {
+  .leadership {
+    padding: 43px 12px;
+  }
+
+  .leadership-header {
+    margin-bottom: 22px;
+  }
+
+  .leadership-header h2 {
+    font-size: 25px;
+  }
+
+  .leadership-header > p {
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  .leadership-feature {
+    gap: 10px;
+  }
+
+  .leadership-president {
+    grid-template-columns: 120px minmax(0, 1fr);
+    min-height: 185px;
+    border-radius: 9px;
+  }
+
+  .leadership-president__image,
+  .leadership-image-skeleton {
+    min-height: 185px;
+  }
+
+  .leadership-president__content {
+    padding: 16px;
+  }
+
+  .leadership-president__label {
+    font-size: 7px;
+  }
+
+  .leadership-president__content h3 {
+    margin-top: 6px;
+    font-size: 18px;
+    line-height: 1.12;
+  }
+
+  .leadership-president__content p {
+    margin-top: 7px;
+    font-size: 8px;
+    line-height: 1.5;
+  }
+
+  .leadership-president__link {
+    margin-top: 11px;
+    font-size: 8px;
+  }
+
+  .leadership-overview {
+    min-height: 185px;
+    padding: 18px;
+    border-radius: 9px;
+  }
+
+  .leadership-overview__icon {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 13px;
+  }
+
+  .leadership-overview__icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .leadership-overview__label {
+    font-size: 7px;
+  }
+
+  .leadership-overview h3 {
+    margin-top: 7px;
+    font-size: 18px;
+  }
+
+  .leadership-overview p {
+    margin-top: 8px;
+    font-size: 8px;
+    line-height: 1.55;
+  }
+
+  .leadership-overview__link {
+    margin-top: 13px;
+    font-size: 8px;
+  }
+}
+
+/* ==========================================================
+   VERY SMALL PHONES
+========================================================== */
+
+@media (max-width: 360px) {
+  .leadership-president {
+    grid-template-columns: 105px minmax(0, 1fr);
+    min-height: 175px;
+  }
+
+  .leadership-president__image,
+  .leadership-image-skeleton {
+    min-height: 175px;
+  }
+
+  .leadership-president__content {
+    padding: 13px;
+  }
+
+  .leadership-president__content h3 {
+    font-size: 16px;
+  }
+
+  .leadership-president__content p {
+    font-size: 7px;
+  }
+
+  .leadership-overview {
+    min-height: 175px;
+    padding: 15px;
+  }
+
+  .leadership-overview h3 {
+    font-size: 16px;
+  }
+
+  .leadership-overview p {
+    font-size: 7px;
+  }
 }

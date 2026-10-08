@@ -1,55 +1,72 @@
+import {
+  ArrowRight,
+  LogIn,
+  Users,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
 import "./JoinMovement.css";
 
 function JoinMovement() {
-
   return (
-
     <section className="join-movement">
+      <div className="join-movement__container">
 
-      <div className="join-content">
+        <div className="join-movement__content">
 
-        <span>JOIN THE MOVEMENT</span>
+          <span className="join-movement__eyebrow">
+            JOIN THE MOVEMENT
+          </span>
 
-        <h2>
+          <h2>
+            Your voice belongs
+            <span> in the movement.</span>
+          </h2>
 
-          Ready to Make a Difference?
+          <p>
+            Join young people across the Coast who are
+            leading, creating opportunities, building
+            communities and shaping a better future.
+          </p>
 
-        </h2>
+        </div>
 
-        <p>
+        <div className="join-movement__actions">
 
-          Become part of a growing movement of young
-          leaders creating opportunities, protecting
-          the environment, promoting innovation and
-          transforming communities across Kenya's
-          Coast Region.
-
-        </p>
-
-        <div className="join-buttons">
-
-          <a
-            href="/register"
-            className="join-primary"
+          <Link
+            to="/register"
+            className="join-movement__primary"
           >
+            <Users size={16} />
             Become a Member
-          </a>
+            <ArrowRight size={15} />
+          </Link>
 
-          <a
-            href="/contact"
-            className="join-secondary"
+          <Link
+            to="/login"
+            className="join-movement__secondary"
           >
-            Partner With Us
-          </a>
+            <LogIn size={15} />
+            Member Login
+          </Link>
 
         </div>
 
       </div>
 
+      <div className="join-movement__footer">
+        <span>
+          Jumuiya ya Vijana wa Pwani
+        </span>
+
+        <span className="join-movement__dot" />
+
+        <span>
+          Mombasa · Kilifi · Kwale · Lamu · Tana River · Taita Taveta
+        </span>
+      </div>
     </section>
-
   );
-
 }
 
 export default JoinMovement;

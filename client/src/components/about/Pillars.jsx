@@ -1,124 +1,129 @@
 import {
-  FaUsers,
-  FaGraduationCap,
-  FaBriefcase,
-  FaWater,
-  FaLeaf,
-  FaLightbulb,
-  FaHandshake,
-  FaGlobeAfrica
-} from "react-icons/fa";
+  Users,
+  GraduationCap,
+  BriefcaseBusiness,
+  Waves,
+  Leaf,
+  Lightbulb,
+  Handshake,
+  Globe2,
+} from "lucide-react";
 
 import "./Pillars.css";
 
 const pillars = [
   {
-    icon: <FaUsers />,
-    title: "Leadership Development",
+    icon: Users,
+    number: "01",
+    title: "Youth Leadership",
     description:
-      "Building ethical, visionary and transformative youth leaders across the Coast Region."
+      "Developing ethical, confident and transformative young leaders.",
   },
   {
-    icon: <FaGraduationCap />,
+    icon: GraduationCap,
+    number: "02",
     title: "Education & Skills",
     description:
-      "Providing mentorship, scholarships, technical skills and lifelong learning opportunities."
+      "Creating pathways for learning, mentorship and practical skills.",
   },
   {
-    icon: <FaBriefcase />,
+    icon: BriefcaseBusiness,
+    number: "03",
     title: "Entrepreneurship",
     description:
-      "Supporting youth enterprises, MSMEs, innovation and sustainable economic empowerment."
+      "Supporting youth enterprise, innovation and economic opportunity.",
   },
   {
-    icon: <FaWater />,
+    icon: Waves,
+    number: "04",
     title: "Blue Economy",
     description:
-      "Unlocking opportunities in fisheries, marine conservation, tourism and coastal resources."
+      "Unlocking opportunities across fisheries, marine resources and tourism.",
   },
   {
-    icon: <FaLeaf />,
+    icon: Leaf,
+    number: "05",
     title: "Climate Action",
     description:
-      "Championing environmental conservation, tree planting and climate resilience."
+      "Advancing conservation, climate resilience and environmental action.",
   },
   {
-    icon: <FaLightbulb />,
+    icon: Lightbulb,
+    number: "06",
     title: "Innovation & Technology",
     description:
-      "Promoting digital inclusion, AI, innovation hubs and emerging technologies."
+      "Promoting digital inclusion, technology and youth-led innovation.",
   },
   {
-    icon: <FaHandshake />,
+    icon: Handshake,
+    number: "07",
     title: "Civic Engagement",
     description:
-      "Strengthening governance, volunteerism, advocacy and active youth participation."
+      "Strengthening advocacy, governance, volunteerism and participation.",
   },
   {
-    icon: <FaGlobeAfrica />,
+    icon: Globe2,
+    number: "08",
     title: "Partnerships",
     description:
-      "Building strategic collaborations that create opportunities for young people."
-  }
+      "Connecting young people with strategic opportunities and partners.",
+  },
 ];
 
 function Pillars() {
   return (
     <section className="pillars">
+      <div className="pillars-container">
 
-      <div className="container">
+        <div className="pillars-header">
+          <div>
+            <span className="pillars-eyebrow">
+              WHAT DRIVES US
+            </span>
 
-        <div className="section-title">
-
-          <span>OUR STRATEGIC PILLARS</span>
-
-          <h2>
-            Driving Youth Transformation
-          </h2>
+            <h2>
+              Our pillars for
+              <span> youth transformation.</span>
+            </h2>
+          </div>
 
           <p>
-            Everything JVP does is anchored on these eight pillars
-            that empower, connect and transform young people across
-            the Coast Region.
+            Our work is focused on creating the leadership,
+            skills, opportunities and connections young
+            people need to thrive.
           </p>
-
         </div>
 
         <div className="pillars-grid">
+          {pillars.map((pillar) => {
+            const Icon = pillar.icon;
 
-          {pillars.map((pillar, index) => (
+            return (
+              <article
+                className="pillar-card"
+                key={pillar.number}
+              >
+                <div className="pillar-card__top">
+                  <div className="pillar-icon">
+                    <Icon size={17} />
+                  </div>
 
-            <div
-              className="pillar-card"
-              key={index}
-            >
+                  <span className="pillar-number">
+                    {pillar.number}
+                  </span>
+                </div>
 
-              <div className="pillar-icon">
+                <h3>{pillar.title}</h3>
 
-                {pillar.icon}
+                <p>{pillar.description}</p>
 
-              </div>
-
-              <h3>
-
-                {pillar.title}
-
-              </h3>
-
-              <p>
-
-                {pillar.description}
-
-              </p>
-
-            </div>
-
-          ))}
-
+                <div className="pillar-card__line" />
+              </article>
+            );
+          })}
         </div>
 
       </div>
-
     </section>
   );
 }

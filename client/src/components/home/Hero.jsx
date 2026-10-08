@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import "./Hero.css";
-
-
-import hero1 from "../../assets/hero/hero3.jpg";
-import hero2 from "../../assets/images/coastal-hero.jpg";
-import hero3 from "../../assets/hero/hero6.jpg";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  ChevronRight,
+  Users,
+} from "lucide-react";
 
 import {
   FaFacebookF,
@@ -12,163 +12,210 @@ import {
   FaLinkedinIn,
   FaYoutube,
   FaWhatsapp,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaUsers,
 } from "react-icons/fa";
 
 import { FaXTwitter } from "react-icons/fa6";
 
+import "./Hero.css";
+
+import hero1 from "../../assets/hero/hero3.jpg";
+import hero2 from "../../assets/images/coastal-hero.jpg";
+import hero3 from "../../assets/hero/hero6.jpg";
+
 const slides = [
-  hero1,
-  hero2,
-  hero3,
+  {
+    image: hero1,
+    label: "Youth Leadership",
+  },
+  {
+    image: hero2,
+    label: "Coastal Communities",
+  },
+  {
+    image: hero3,
+    label: "Youth in Action",
+  },
+];
+
+const socialLinks = [
+  {
+    label: "Facebook",
+    icon: <FaFacebookF />,
+    href: "https://www.facebook.com/profile.php?id=61582648195839&sk",
+  },
+  {
+    label: "Instagram",
+    icon: <FaInstagram />,
+    href: "https://www.instagram.com/jumuiya_ya_vijana_wa_pwani?igsh=MTB5enkzcnJuYXZObw==/",
+  },
+  {
+    label: "X",
+    icon: <FaXTwitter />,
+    href: "https://x.com/vijanapwani001",
+  },
+  {
+    label: "LinkedIn",
+    icon: <FaLinkedinIn />,
+    href: "#",
+  },
+  {
+    label: "YouTube",
+    icon: <FaYoutube />,
+    href: "#",
+  },
+  {
+    label: "WhatsApp",
+    icon: <FaWhatsapp />,
+    href: "https://wa.me/254740504969",
+  },
 ];
 
 function Hero() {
-
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-
     const slider = setInterval(() => {
-
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-
-    }, 5000);
+      setCurrentSlide(
+        (previous) =>
+          (previous + 1) % slides.length
+      );
+    }, 6000);
 
     return () => clearInterval(slider);
-
   }, []);
 
   return (
+    <section className="home-hero">
 
-    <section className="hero">
+      {/* Background slides */}
+      <div className="home-hero__background">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.image}
+            className={`home-hero__slide ${
+              index === currentSlide
+                ? "is-active"
+                : ""
+            }`}
+            style={{
+              backgroundImage: `url(${slide.image})`,
+            }}
+          />
+        ))}
+      </div>
 
-      {/* ===========================
-          BACKGROUND SLIDES
-      =========================== */}
+      {/* Layered overlays */}
+      <div className="home-hero__overlay" />
+      <div className="home-hero__gradient" />
 
-      {slides.map((image, index) => (
+      <div className="home-hero__container">
 
-        <div
-          key={index}
-          className={`hero-slide ${
-            index === currentSlide ? "active" : ""
-          }`}
-          style={{
-            backgroundImage: `url(${image})`,
-          }}
-        />
+        {/* Main content */}
+        <div className="home-hero__content">
 
-      ))}
+      
 
-      {/* ===========================
-          OVERLAY
-      =========================== */}
-
-      <div className="hero-overlay"></div>
-
-      {/* ===========================
-          CONTAINER
-      =========================== */}
-
-      <div className="hero-container">
-
-        {/* ===========================
-            LEFT SIDE
-        =========================== */}
-
-        <div className="hero-left">
-
-          <span className="hero-tag">
-            Welcome to JVP Connect
-          </span>
+          <div className="home-hero__tag">
+            <Users size={13} />
+            <span>
+              A collective voice for coastal youth
+            </span>
+          </div>
 
           <h1>
-
             Empowering
-
             <br />
-
-            Coastal Youth.
-
-            <br />
-
-            <span>
-              Transforming Communities.
-            </span>
-
+            <span>Coastal Youth.</span>
           </h1>
 
-          <p>
-
-            Jumuiya ya Vijana wa Pwani (JVP)
-            brings together young people from
-            the six coastal counties to promote
-            leadership, entrepreneurship,
-            climate action, innovation,
-            community development and the
-            Blue Economy.
-
+          <p className="home-hero__lead">
+            Building a generation of young leaders,
+            entrepreneurs, innovators and changemakers
+            shaping a stronger future for the Coast.
           </p>
 
-          <div className="hero-buttons">
+          <div className="home-hero__actions">
 
-            <a
-              href="/register"
-              className="primary-btn"
+            <Link
+              to="/register"
+              className="home-hero__primary"
             >
-              Become a Member
-            </a>
+              Join JVP
+              <ArrowRight size={16} />
+            </Link>
 
-            <a
-              href="/about"
-              className="secondary-btn"
+            <Link
+              to="/about"
+              className="home-hero__secondary"
             >
-              Learn More
-            </a>
+              Discover JVP
+              <ChevronRight size={15} />
+            </Link>
 
           </div>
 
         </div>
 
-        {/* ===========================
-            RIGHT SIDE
-        =========================== */}
+        {/* Right social rail */}
+        <aside className="home-hero__social">
 
-        <div className="hero-right">
+          <span className="home-hero__social-label">
+            FOLLOW JVP
+          </span>
 
-          <div className="hero-social">
+          <div className="home-hero__social-line" />
 
+          <div className="home-hero__social-links">
+            {socialLinks.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                target={
+                  social.href.startsWith("http")
+                    ? "_blank"
+                    : undefined
+                }
+                rel={
+                  social.href.startsWith("http")
+                    ? "noreferrer"
+                    : undefined
+                }
+                aria-label={social.label}
+              >
+                {social.icon}
+              </a>
+            ))}
+          </div>
+
+        </aside>
+
+        {/* Bottom slide information */}
+        <div className="home-hero__bottom">
+
+          <div className="home-hero__slide-info">
             <span>
-              FOLLOW US
+              0{currentSlide + 1}
             </span>
 
-            <a href="https://www.facebook.com/profile.php?id=61582648195839&sk">
-              <FaFacebookF />
-            </a>
+            <div className="home-hero__progress">
+              <div
+                style={{
+                  width: `${
+                    ((currentSlide + 1) /
+                      slides.length) *
+                    100
+                  }%`,
+                }}
+              />
+            </div>
 
-            <a href="https://www.instagram.com/jumuiya_ya_vijana_wa_pwani?igsh=MTB5enkzcnJuYXZObw==/">
-              <FaInstagram />
-            </a>
+            <span>
+              0{slides.length}
+            </span>
+          </div>
 
-            <a href="https://x.com/vijanapwani001">
-              <FaXTwitter />
-            </a>
-
-            <a href="#">
-              <FaLinkedinIn />
-            </a>
-
-            <a href="#">
-              <FaYoutube />
-            </a>
-
-            <a href="https://wa.me/254740504969">
-              <FaWhatsapp />
-            </a>
-
+          <div className="home-hero__slide-label">
+            {slides[currentSlide].label}
           </div>
 
         </div>
@@ -176,9 +223,7 @@ function Hero() {
       </div>
 
     </section>
-
   );
-
 }
 
 export default Hero;

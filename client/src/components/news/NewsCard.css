@@ -1,0 +1,381 @@
+/* =========================================================
+   JVP NEWS — NEWS CARD
+   ========================================================= */
+
+.news-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+
+  overflow: hidden;
+
+  border: 1px solid #e3ebe7;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 5px 18px rgba(23, 33, 29, 0.045);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-3px);
+
+  border-color: #cbded4;
+
+  box-shadow:
+    0 12px 28px rgba(23, 33, 29, 0.08);
+}
+
+/* =========================================================
+   IMAGE
+   ========================================================= */
+
+.news-card__image {
+  position: relative;
+
+  display: block;
+
+  width: 100%;
+  height: 190px;
+
+  overflow: hidden;
+
+  background: #e9efec;
+
+  text-decoration: none;
+}
+
+.news-card__image img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform 0.35s ease;
+}
+
+.news-card:hover
+.news-card__image img {
+  transform: scale(1.035);
+}
+
+.news-card__image-overlay {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 20, 15, 0.28),
+      transparent 45%,
+      rgba(8, 20, 15, 0.25)
+    );
+}
+
+/* =========================================================
+   CATEGORY
+   ========================================================= */
+
+.news-card__category {
+  position: absolute;
+
+  top: 11px;
+  left: 11px;
+
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 23px;
+
+  padding: 0 9px;
+
+  border-radius: 999px;
+
+  background: rgba(23, 33, 29, 0.86);
+
+  color: #ffffff;
+
+  backdrop-filter: blur(5px);
+
+  font-size: 7px;
+  line-height: 1;
+  font-weight: 800;
+
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.news-card__content {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-width: 0;
+
+  padding: 16px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   META
+   ========================================================= */
+
+.news-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  min-width: 0;
+
+  color: #99a49f;
+
+  font-size: 7px;
+  line-height: 1.2;
+  font-weight: 650;
+}
+
+.news-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  min-width: 0;
+}
+
+.news-card__meta svg {
+  flex-shrink: 0;
+
+  color: #16825d;
+}
+
+.news-card__meta-divider {
+  width: 3px;
+  height: 3px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #cbd3cf;
+}
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.news-card__title {
+  display: -webkit-box;
+
+  overflow: hidden;
+
+  margin: 10px 0 0;
+
+  font-size: 15px;
+  line-height: 1.32;
+  font-weight: 800;
+
+  letter-spacing: -0.025em;
+
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.news-card__title a {
+  color: #17211d;
+
+  text-decoration: none;
+
+  transition: color 0.18s ease;
+}
+
+.news-card__title a:hover {
+  color: #16825d;
+}
+
+/* =========================================================
+   EXCERPT
+   ========================================================= */
+
+.news-card__excerpt {
+  display: -webkit-box;
+
+  overflow: hidden;
+
+  margin: 7px 0 0;
+
+  color: #78847e;
+
+  font-size: 9px;
+  line-height: 1.6;
+
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* =========================================================
+   READ LINK
+   ========================================================= */
+
+.news-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  width: fit-content;
+
+  margin-top: auto;
+  padding-top: 14px;
+
+  color: #16825d;
+
+  text-decoration: none;
+
+  font-size: 8px;
+  line-height: 1;
+  font-weight: 850;
+}
+
+.news-card__link svg {
+  transition:
+    transform 0.18s ease;
+}
+
+.news-card__link:hover {
+  color: #126d4e;
+}
+
+.news-card__link:hover svg {
+  transform: translateX(3px);
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 980px) {
+  .news-card__image {
+    height: 180px;
+  }
+
+  .news-card__content {
+    padding: 15px;
+  }
+
+  .news-card__title {
+    font-size: 14px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 680px) {
+  .news-card {
+    border-radius: 10px;
+  }
+
+  .news-card__image {
+    height: 185px;
+  }
+
+  .news-card__content {
+    padding: 14px;
+  }
+
+  .news-card__title {
+    font-size: 14px;
+  }
+
+  .news-card__excerpt {
+    font-size: 8.5px;
+    line-height: 1.55;
+  }
+
+  .news-card__meta {
+    font-size: 6.5px;
+  }
+
+  .news-card__link {
+    padding-top: 12px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 420px) {
+  .news-card__image {
+    height: 175px;
+  }
+
+  .news-card__category {
+    top: 9px;
+    left: 9px;
+
+    min-height: 21px;
+
+    padding: 0 8px;
+
+    font-size: 6.5px;
+  }
+
+  .news-card__content {
+    padding: 13px;
+  }
+
+  .news-card__meta {
+    gap: 6px;
+    font-size: 6px;
+  }
+
+  .news-card__title {
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  .news-card__excerpt {
+    font-size: 8px;
+  }
+
+  .news-card__link {
+    font-size: 7.5px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .news-card,
+  .news-card__image img,
+  .news-card__title a,
+  .news-card__link svg {
+    transition: none;
+  }
+}

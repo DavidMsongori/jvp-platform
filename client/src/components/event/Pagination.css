@@ -1,0 +1,252 @@
+.events-pagination {
+  width: 100%;
+  margin: 0;
+  padding: 0 0 52px;
+  background: #f7f9f8;
+  box-sizing: border-box;
+}
+
+.events-pagination__container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   INFORMATION
+========================================== */
+
+.events-pagination__info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #89948e;
+  font-size: 8px;
+  line-height: 1;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.events-pagination__info strong {
+  color: #4d5b54;
+  font-weight: 800;
+}
+
+/* ==========================================
+   CONTROLS
+========================================== */
+
+.events-pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.events-pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==========================================
+   NAVIGATION BUTTONS
+========================================== */
+
+.events-pagination__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 67px;
+  height: 32px;
+  padding: 0 9px;
+  border: 1px solid #dfe7e3;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #58665e;
+  font-family: inherit;
+  font-size: 7.5px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.events-pagination__nav:hover:not(:disabled) {
+  border-color: #b9d8ca;
+  background: #f2f9f5;
+  color: #16825d;
+}
+
+.events-pagination__nav:focus-visible,
+.events-pagination__page:focus-visible {
+  outline: 2px solid #8bcab0;
+  outline-offset: 2px;
+}
+
+.events-pagination__nav:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   PAGE BUTTONS
+========================================== */
+
+.events-pagination__page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #68756e;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.events-pagination__page:hover:not(.is-active) {
+  border-color: #dce6e1;
+  background: #ffffff;
+  color: #16825d;
+}
+
+.events-pagination__page.is-active {
+  border-color: #16825d;
+  background: #16825d;
+  color: #ffffff;
+  box-shadow: 0 5px 14px rgba(22, 130, 93, 0.16);
+}
+
+.events-pagination__ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 32px;
+  color: #9aa49f;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 760px) {
+  .events-pagination {
+    padding-bottom: 42px;
+  }
+
+  .events-pagination__container {
+    flex-direction: column;
+    align-items: center;
+    gap: 13px;
+    padding: 0 18px;
+  }
+
+  .events-pagination__info {
+    order: 2;
+    font-size: 7.5px;
+  }
+
+  .events-pagination__controls {
+    order: 1;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 520px) {
+  .events-pagination {
+    padding-bottom: 34px;
+  }
+
+  .events-pagination__container {
+    padding: 0 14px;
+  }
+
+  .events-pagination__controls {
+    width: 100%;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .events-pagination__nav {
+    min-width: 34px;
+    width: 34px;
+    height: 31px;
+    padding: 0;
+  }
+
+  .events-pagination__nav span {
+    display: none;
+  }
+
+  .events-pagination__pages {
+    gap: 3px;
+  }
+
+  .events-pagination__page {
+    width: 30px;
+    height: 31px;
+    font-size: 7.5px;
+  }
+
+  .events-pagination__ellipsis {
+    width: 21px;
+    height: 31px;
+  }
+
+  .events-pagination__info {
+    font-size: 7px;
+  }
+}
+
+/* ==========================================
+   SMALL PHONES
+========================================== */
+
+@media (max-width: 360px) {
+  .events-pagination__page:nth-child(n + 5):nth-last-child(n + 3) {
+    display: none;
+  }
+
+  .events-pagination__controls {
+    gap: 2px;
+  }
+
+  .events-pagination__pages {
+    gap: 2px;
+  }
+
+  .events-pagination__page {
+    width: 28px;
+    height: 29px;
+  }
+
+  .events-pagination__nav {
+    width: 31px;
+    min-width: 31px;
+    height: 29px;
+  }
+}

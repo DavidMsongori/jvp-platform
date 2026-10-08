@@ -1,0 +1,201 @@
+/* ==========================================================
+   REGISTER PAGE
+========================================================== */
+
+.register-page {
+  min-height: 100vh;
+
+  background: #f7f9f8;
+
+  color: #17211d;
+}
+
+/* ==========================================================
+   MAIN
+========================================================== */
+
+.register-main {
+  width: 100%;
+
+  padding: 105px 20px 55px;
+
+  box-sizing: border-box;
+}
+
+.register-container {
+  width: 100%;
+  max-width: 980px;
+
+  margin: 0 auto;
+}
+
+/* ==========================================================
+   INTRO
+========================================================== */
+
+.register-intro {
+  max-width: 700px;
+
+  margin: 0 auto 24px;
+
+  text-align: center;
+}
+
+.register-intro__eyebrow {
+  display: inline-flex;
+  align-items: center;
+
+  margin-bottom: 8px;
+
+  color: #16825d;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.register-intro h1 {
+  margin: 0;
+
+  color: #17211d;
+
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1.12;
+
+  letter-spacing: -0.04em;
+}
+
+.register-intro h1 span {
+  color: #16825d;
+}
+
+.register-intro p {
+  max-width: 590px;
+
+  margin: 10px auto 0;
+
+  color: #78847e;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ==========================================================
+   FORM CARD
+========================================================== */
+
+.register-card {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 28px 32px;
+
+  border: 1px solid #e4ebe7;
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 30px rgba(25, 45, 36, 0.05);
+}
+
+/* ==========================================================
+   LOGIN
+========================================================== */
+
+.register-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  margin-top: 17px;
+
+  color: #84908a;
+
+  font-size: 11px;
+}
+
+.register-login a {
+  color: #16825d;
+
+  font-weight: 800;
+
+  text-decoration: none;
+}
+
+.register-login a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 768px) {
+  .register-main {
+    padding: 92px 14px 40px;
+  }
+
+  .register-container {
+    max-width: 100%;
+  }
+
+  .register-intro {
+    margin-bottom: 18px;
+  }
+
+  .register-intro h1 {
+    font-size: 27px;
+  }
+
+  .register-intro p {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .register-card {
+    padding: 21px 18px;
+
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-main {
+    padding: 82px 10px 30px;
+  }
+
+  .register-intro {
+    margin-bottom: 15px;
+  }
+
+  .register-intro__eyebrow {
+    font-size: 9px;
+  }
+
+  .register-intro h1 {
+    font-size: 23px;
+  }
+
+  .register-intro p {
+    margin-top: 8px;
+
+    font-size: 11px;
+  }
+
+  .register-card {
+    padding: 17px 13px;
+
+    border-radius: 10px;
+  }
+
+  .register-login {
+    flex-direction: column;
+
+    gap: 3px;
+
+    font-size: 10px;
+  }
+}

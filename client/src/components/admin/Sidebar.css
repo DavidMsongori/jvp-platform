@@ -200,3 +200,72 @@
     font-size: 10px;
   }
 }
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ==========================================
+   SIDEBAR HEADER
+========================================== */
+
+.sidebar-header {
+  flex: 0 0 auto;
+}
+
+/* ==========================================
+   SCROLLABLE NAVIGATION
+========================================== */
+
+.sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+
+  /* Keep the scrollbar close to the edge */
+  scrollbar-gutter: stable;
+}
+
+/* Modern scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(22, 130, 93, 0.28);
+  border-radius: 999px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(22, 130, 93, 0.5);
+}
+
+/* Firefox */
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(22, 130, 93, 0.35) transparent;
+}
+
+/* ==========================================
+   SIDEBAR FOOTER
+========================================== */
+
+.sidebar-footer {
+  flex: 0 0 auto;
+}

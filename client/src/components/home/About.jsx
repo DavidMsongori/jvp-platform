@@ -1,3 +1,12 @@
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  Leaf,
+  Users,
+  Lightbulb,
+  Waves,
+} from "lucide-react";
+
 import "./About.css";
 
 import about1 from "../../assets/about/about1.jpg";
@@ -5,92 +14,150 @@ import about2 from "../../assets/about/about2.jpg";
 import about3 from "../../assets/about/about3.jpg";
 import about4 from "../../assets/about/about4.jpg";
 
-import {
-  FaLeaf,
-  FaUsers,
-  FaLightbulb,
-  FaGlobeAfrica,
-} from "react-icons/fa";
+const focusAreas = [
+  {
+    icon: Users,
+    title: "Youth Leadership",
+    description: "Building confident and responsible young leaders.",
+  },
+  {
+    icon: Leaf,
+    title: "Climate Action",
+    description: "Supporting youth-led environmental action.",
+  },
+  {
+    icon: Lightbulb,
+    title: "Innovation",
+    description: "Creating pathways for ideas and enterprise.",
+  },
+  {
+    icon: Waves,
+    title: "Blue Economy",
+    description: "Unlocking opportunities along our coast.",
+  },
+];
 
 function About() {
   return (
-    <section className="about" id="about">
+    <section className="home-about" id="about">
 
-      <div className="about-container">
+      <div className="home-about__container">
 
-        <div className="about-images">
+        {/* =========================
+            IMAGE COLLAGE
+        ========================= */}
 
-          <img src={about1} alt="" className="big"/>
+        <div className="home-about__visual">
 
-          <img src={about2} alt=""/>
+          <div className="home-about__image home-about__image--main">
+            <img
+              src={about1}
+              alt="Young people participating in a JVP activity"
+            />
+          </div>
 
-          <img src={about3} alt=""/>
+          <div className="home-about__image home-about__image--top">
+            <img
+              src={about2}
+              alt="JVP youth engagement activity"
+            />
+          </div>
 
-          <img src={about4} alt="" className="big"/>
+          <div className="home-about__image home-about__image--bottom">
+            <img
+              src={about3}
+              alt="Young people working together"
+            />
+          </div>
+
+          <div className="home-about__image home-about__image--small">
+            <img
+              src={about4}
+              alt="Coastal youth community activity"
+            />
+          </div>
+
+          <div className="home-about__badge">
+            <strong>6</strong>
+            <span>Coast<br />Counties</span>
+          </div>
 
         </div>
 
-        <div className="about-content">
+        {/* =========================
+            CONTENT
+        ========================= */}
 
-          <span>WHO WE ARE</span>
+        <div className="home-about__content">
+
+          <span className="home-about__eyebrow">
+            WHO WE ARE
+          </span>
 
           <h2>
-            Empowering Coastal Youth Through Leadership,
-            Innovation and Sustainable Development.
+            A collective voice for the
+            <span> young people of the Coast.</span>
           </h2>
 
-          <p>
-            Jumuiya ya Vijana wa Pwani (JVP) is a regional youth
-            movement bringing together young people from
-            Mombasa, Kilifi, Kwale, Lamu, Tana River and
-            Taita Taveta.
-
-            We connect youth with opportunities,
-            strengthen leadership, promote entrepreneurship,
-            climate action and community transformation.
+          <p className="home-about__lead">
+            Jumuiya ya Vijana wa Pwani (JVP) is a regional
+            youth movement bringing together young people
+            across Mombasa, Kilifi, Kwale, Lamu, Tana River
+            and Taita Taveta.
           </p>
 
-          <div className="about-features">
+          <p className="home-about__description">
+            We create spaces for young people to lead,
+            connect, innovate and contribute to the
+            development of their communities. Through
+            advocacy, leadership, entrepreneurship,
+            environmental action and opportunity creation,
+            JVP works to turn youth potential into
+            meaningful impact.
+          </p>
 
-            <div>
+          {/* =========================
+              FOCUS AREAS
+          ========================= */}
 
-              <FaUsers />
+          <div className="home-about__focus">
 
-              <h4>Youth Leadership</h4>
+            {focusAreas.map((item) => {
+              const Icon = item.icon;
 
-            </div>
+              return (
+                <div
+                  className="home-about__focus-item"
+                  key={item.title}
+                >
+                  <div className="home-about__focus-icon">
+                    <Icon size={16} />
+                  </div>
 
-            <div>
+                  <div>
+                    <h3>{item.title}</h3>
 
-              <FaLeaf />
-
-              <h4>Climate Action</h4>
-
-            </div>
-
-            <div>
-
-              <FaLightbulb />
-
-              <h4>Innovation</h4>
-
-            </div>
-
-            <div>
-
-              <FaGlobeAfrica />
-
-              <h4>Blue Economy</h4>
-
-            </div>
+                    <p>
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
 
           </div>
 
-          <a href="/about" className="about-btn">
+          {/* =========================
+              ACTION
+          ========================= */}
 
-            Learn More
-
-          </a>
+          <Link
+            to="/about"
+            className="home-about__button"
+          >
+            Discover JVP
+            <ArrowRight size={16} />
+          </Link>
 
         </div>
 

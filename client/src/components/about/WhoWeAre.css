@@ -1,171 +1,408 @@
-.who-we-are{
-
-    padding:120px 0;
-
-    background:white;
-
+.who-we-are {
+  width: 100%;
+  padding: 68px 20px;
+  background: #ffffff;
+  box-sizing: border-box;
 }
 
-.who-container{
-
-    width:min(1300px,90%);
-
-    margin:auto;
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:80px;
-
-    align-items:center;
-
+.who-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: 70px;
 }
 
-.who-images{
+/* Visual */
 
-    display:grid;
-
-    grid-template-columns:repeat(2,1fr);
-
-    gap:18px;
-
+.who-images {
+  position: relative;
+  width: 100%;
+  min-height: 405px;
 }
 
-.who-images img{
-
-    width:100%;
-
-    height:240px;
-
-    object-fit:cover;
-
-    border-radius:20px;
-
-    transition:.4s;
-
-    box-shadow:0 20px 40px rgba(0,0,0,.12);
-
+.who-image {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 11px;
+  background: #e7eeea;
+  box-shadow: 0 10px 28px rgba(24, 48, 38, 0.08);
 }
 
-.who-images img:hover{
-
-    transform:scale(1.04);
-
+.who-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.tall{
-
-    height:320px !important;
-
+.who-image--main {
+  top: 28px;
+  left: 0;
+  width: 62%;
+  height: 310px;
 }
 
-.who-content span{
-
-    color:#16a34a;
-
-    font-weight:700;
-
-    letter-spacing:2px;
-
+.who-image--top {
+  top: 0;
+  right: 0;
+  width: 31%;
+  height: 155px;
 }
 
-.who-content h2{
-
-    font-size:3rem;
-
-    margin:20px 0;
-
-    line-height:1.2;
-
+.who-image--bottom {
+  right: 0;
+  bottom: 0;
+  width: 40%;
+  height: 190px;
 }
 
-.who-content p{
-
-    color:#64748b;
-
-    line-height:1.9;
-
-    margin-bottom:25px;
-
+.who-image--small {
+  right: 29%;
+  bottom: 20px;
+  width: 27%;
+  height: 115px;
+  border: 5px solid #ffffff;
 }
 
-.who-list{
-
-    display:grid;
-
-    grid-template-columns:repeat(2,1fr);
-
-    gap:18px;
-
-    margin:40px 0;
-
+.who-badge {
+  position: absolute;
+  left: 42%;
+  top: 275px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #16825d;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(22, 130, 93, 0.2);
 }
 
-.who-list div{
-
-    display:flex;
-
-    gap:12px;
-
-    align-items:center;
-
-    font-weight:600;
-
+.who-badge svg {
+  flex-shrink: 0;
 }
 
-.who-list svg{
-
-    color:#16a34a;
-
+.who-badge div {
+  display: flex;
+  flex-direction: column;
 }
 
-.who-content a{
-
-    display:inline-block;
-
-    padding:16px 34px;
-
-    background:#16a34a;
-
-    color:white;
-
-    border-radius:14px;
-
-    text-decoration:none;
-
-    font-weight:700;
-
-    transition:.3s;
-
+.who-badge strong {
+  font-size: 9px;
+  line-height: 1.2;
 }
 
-.who-content a:hover{
-
-    transform:translateY(-4px);
-
-    background:#15803d;
-
+.who-badge span {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 7px;
 }
 
-@media(max-width:992px){
+/* Content */
 
-.who-container{
-
-grid-template-columns:1fr;
-
+.who-content {
+  max-width: 590px;
 }
 
-.who-content{
-
-text-align:center;
-
+.who-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 9px;
+  color: #16825d;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
 }
 
-.who-list{
-
-grid-template-columns:1fr;
-
+.who-eyebrow::before {
+  content: "";
+  width: 21px;
+  height: 2px;
+  border-radius: 2px;
+  background: #16825d;
 }
 
+.who-content h2 {
+  margin: 0;
+  color: #17211d;
+  font-size: clamp(30px, 3.4vw, 42px);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+}
+
+.who-content h2 span {
+  color: #16825d;
+}
+
+.who-lead {
+  max-width: 550px;
+  margin: 15px 0 0;
+  color: #435049;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.who-description {
+  max-width: 540px;
+  margin: 8px 0 0;
+  color: #7b8781;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+/* Location */
+
+.who-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  color: #16825d;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.who-location svg {
+  flex-shrink: 0;
+}
+
+/* Focus areas */
+
+.who-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 18px;
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid #e1e9e5;
+}
+
+.who-list__item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #34413b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.who-list__item svg {
+  flex-shrink: 0;
+  color: #16825d;
+}
+
+/* Button */
+
+.who-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 20px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #17211d;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.who-button:hover {
+  background: #16825d;
+  transform: translateY(-2px);
+}
+
+/* Tablet */
+
+@media (max-width: 950px) {
+  .who-we-are {
+    padding: 55px 18px;
+  }
+
+  .who-container {
+    gap: 45px;
+  }
+
+  .who-images {
+    min-height: 360px;
+  }
+
+  .who-image--main {
+    height: 275px;
+  }
+
+  .who-image--top {
+    height: 140px;
+  }
+
+  .who-image--bottom {
+    height: 170px;
+  }
+
+  .who-image--small {
+    height: 105px;
+  }
+
+  .who-badge {
+    top: 245px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 760px) {
+  .who-we-are {
+    padding: 48px 14px 52px;
+  }
+
+  .who-container {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .who-images {
+    min-height: 340px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .who-image--main {
+    top: 20px;
+    width: 63%;
+    height: 255px;
+  }
+
+  .who-image--top {
+    width: 31%;
+    height: 130px;
+  }
+
+  .who-image--bottom {
+    height: 160px;
+  }
+
+  .who-image--small {
+    height: 96px;
+    bottom: 18px;
+  }
+
+  .who-badge {
+    top: 225px;
+    left: 41%;
+  }
+
+  .who-content h2 {
+    font-size: 29px;
+  }
+
+  .who-lead {
+    font-size: 11px;
+  }
+
+  .who-description {
+    font-size: 10px;
+  }
+}
+
+/* Small phones */
+
+@media (max-width: 480px) {
+  .who-we-are {
+    padding: 42px 12px 46px;
+  }
+
+  .who-container {
+    gap: 29px;
+  }
+
+  .who-images {
+    min-height: 290px;
+  }
+
+  .who-image {
+    border-radius: 8px;
+  }
+
+  .who-image--main {
+    top: 16px;
+    height: 220px;
+  }
+
+  .who-image--top {
+    height: 108px;
+  }
+
+  .who-image--bottom {
+    height: 132px;
+  }
+
+  .who-image--small {
+    height: 78px;
+    border-width: 4px;
+  }
+
+  .who-badge {
+    top: 190px;
+    left: 39%;
+    padding: 7px 9px;
+  }
+
+  .who-badge svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .who-badge strong {
+    font-size: 8px;
+  }
+
+  .who-badge span {
+    font-size: 6px;
+  }
+
+  .who-content h2 {
+    font-size: 25px;
+  }
+
+  .who-lead {
+    margin-top: 12px;
+    font-size: 10px;
+  }
+
+  .who-description {
+    font-size: 9px;
+  }
+
+  .who-location {
+    font-size: 8px;
+    line-height: 1.4;
+  }
+
+  .who-list {
+    gap: 10px 8px;
+    margin-top: 16px;
+    padding-top: 13px;
+  }
+
+  .who-list__item {
+    font-size: 8px;
+  }
+
+  .who-list__item svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .who-button {
+    margin-top: 17px;
+  }
 }

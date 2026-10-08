@@ -16,6 +16,8 @@ import {
   FaSignOutAlt,
   FaTimes,
   FaVoteYea,
+  FaNewspaper,
+  FaEnvelope,
 } from "react-icons/fa";
 
 import { PERMISSIONS } from "../../utils/permissions";
@@ -35,7 +37,8 @@ function AdminSidebar({
     logout,
   } = useAuth();
 
-  const [pendingMpesaCount, setPendingMpesaCount] = useState(0);
+  const [pendingMpesaCount, setPendingMpesaCount] =
+    useState(0);
 
   /* ==========================================
      LOAD MANUAL M-PESA QUEUE COUNT
@@ -76,7 +79,9 @@ function AdminSidebar({
   ========================================== */
 
   useEffect(() => {
-    if (!hasPermission(PERMISSIONS.VIEW_PAYMENTS)) {
+    if (
+      !hasPermission(PERMISSIONS.VIEW_PAYMENTS)
+    ) {
       return;
     }
 
@@ -123,6 +128,24 @@ function AdminSidebar({
       icon: <FaUserTie />,
       path: "/admin/leadership",
       permission: PERMISSIONS.VIEW_MEMBERS,
+    },
+
+    {
+      name: "News",
+      icon: <FaNewspaper />,
+      path: "/admin/news",
+      permission: PERMISSIONS.VIEW_NEWS,
+    },
+
+    /* ========================================
+       CONTACT
+    ======================================== */
+
+    {
+      name: "Contact",
+      icon: <FaEnvelope />,
+      path: "/admin/contact",
+      permission: PERMISSIONS.VIEW_CONTACT,
     },
 
     /* ========================================

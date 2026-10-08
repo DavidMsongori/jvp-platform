@@ -10,115 +10,63 @@ import SecuritySettings from "../../components/profile/SecuritySettings";
 import "./Profile.css";
 
 function Profile() {
-
-  const {
-
-    loading,
-
-    error,
-
-  } = useProfile();
-
-  /* ==========================================
-     LOADING
-  ========================================== */
+  const { loading, error } = useProfile();
 
   if (loading) {
-
     return (
-
       <div className="profile-page">
-
-        <div className="profile-loading">
-
-          Loading profile...
-
+        <div className="profile-state">
+          <div className="profile-spinner" />
+          <span>Loading profile...</span>
         </div>
-
       </div>
-
     );
-
   }
-
-  /* ==========================================
-     ERROR
-  ========================================== */
 
   if (error) {
-
     return (
-
       <div className="profile-page">
-
-        <div className="profile-error">
-
-          {error}
-
+        <div className="profile-state profile-state-error">
+          <strong>Unable to load your profile</strong>
+          <span>{error}</span>
         </div>
-
       </div>
-
     );
-
   }
 
-  /* ==========================================
-     PAGE
-  ========================================== */
-
   return (
+    <main className="profile-page">
 
-    <div className="profile-page">
-
-      {/* ======================================
-          PROFILE HEADER
-      ====================================== */}
-
-      <ProfileHeader />
-
-      {/* ======================================
-          OVERVIEW
-      ====================================== */}
-
-      <div className="profile-overview">
-
-        <div>
-
-          <ProfileCompletion />
-
-        </div>
-
-        <div>
-
-          <MembershipInformation />
-
-        </div>
-
+      <div className="profile-hero">
+        <ProfileHeader />
       </div>
 
-      {/* ======================================
-          PERSONAL INFORMATION
-      ====================================== */}
+      <div className="profile-overview">
+        <div className="profile-overview-card">
+          <ProfileCompletion />
+        </div>
 
-      <PersonalInformation />
+        <div className="profile-overview-card">
+          <MembershipInformation />
+        </div>
+      </div>
 
-      {/* ======================================
-          CONTACT INFORMATION
-      ====================================== */}
+      <div className="profile-information-grid">
+        <div className="profile-section-card">
+          <PersonalInformation />
+        </div>
 
-      <ContactInformation />
+        <div className="profile-section-card">
+          <ContactInformation />
+        </div>
+      </div>
 
-      {/* ======================================
-          SECURITY
-      ====================================== */}
+      <div className="profile-security">
+        <SecuritySettings />
+      </div>
 
-      <SecuritySettings />
-
-    </div>
-
+    </main>
   );
-
 }
 
 export default Profile;

@@ -25,6 +25,8 @@ import intasendRoutes from "./routes/intasend.routes.js";
 import summitPosterRoutes from "./routes/summitPoster.routes.js";
 import geographyRoutes from "./routes/geography.routes.js";
 import electionRoutes from "./routes/election.routes.js";
+import newsRoutes from "./routes/news.routes.js";
+import contactRoutes from "./routes/contact.routes.js";
 
 const app = express();
 
@@ -125,6 +127,10 @@ app.use("/api/summit-exhibitors", summitExhibitorRoutes);
 app.use("/api/summit/posters", summitPosterRoutes);
 
 app.use("/api/geography", geographyRoutes);
+
+app.use("/api/news", newsRoutes);
+
+app.use("/api/contact", contactRoutes);
 
 /* 404 */
 app.use((req, res) => {

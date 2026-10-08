@@ -1,43 +1,78 @@
 import { Link } from "react-router-dom";
 import {
+  ArrowRight,
   CalendarDays,
   Clock3,
   MapPin,
-  Users,
   Monitor,
   Star,
-  ArrowRight,
+  Users,
 } from "lucide-react";
 
-const formatDate = (date) =>
-  new Date(date).toLocaleDateString("en-KE", {
+import "./EventCard.css";
+
+const formatDate = (date) => {
+  if (!date) return "Date TBA";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Date TBA";
+  }
+
+  return parsedDate.toLocaleDateString("en-KE", {
     weekday: "short",
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+};
 
-const formatTime = (date) =>
-  new Date(date).toLocaleTimeString("en-KE", {
+const formatTime = (date) => {
+  if (!date) return "Time TBA";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Time TBA";
+  }
+
+  return parsedDate.toLocaleTimeString("en-KE", {
     hour: "2-digit",
     minute: "2-digit",
   });
+};
 
 const formatCurrency = (
   amount = 0,
   currency = "KES"
 ) => {
-  if (!amount) return "Free";
+  if (!amount || Number(amount) <= 0) {
+    return "Free";
+  }
 
-  return new Intl.NumberFormat("en-KE", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(amount);
+  try {
+    return new Intl.NumberFormat("en-KE", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  } catch {
+    return `${currency} ${Number(amount).toLocaleString(
+      "en-KE"
+    )}`;
+  }
 };
 
-const capitalize = (text = "") =>
-  text.charAt(0).toUpperCase() + text.slice(1);
+const formatLabel = (value) => {
+  if (!value) return "";
+
+  return String(value)
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (character) =>
+      character.toUpperCase()
+    );
+};
 
 const EventCard = ({ event }) => {
   if (!event) return null;
@@ -45,149 +80,232 @@ const EventCard = ({ event }) => {
   const image =
     event.coverImage?.secureUrl ||
     event.coverImage?.url ||
+    event.image?.secureUrl ||
+    event.image?.url ||
     "/images/event-placeholder.jpg";
+
+  const title =
+    event.title || "JVP Event";
+
+  const summary =
+    event.summary ||
+    event.shortDescription ||
+    event.description ||
+    "Discover this JVP event and take part in an opportunity to connect, learn and make an impact.";
+
+  const category =
+    formatLabel(event.category) ||
+    "Event";
+
+  const eventType =
+    formatLabel(event.eventType) ||
+    "Format TBA";
+
+  const venueName =
+    event.venue?.name ||
+    event.location?.name ||
+    event.venue ||
+    event.location ||
+    "Location TBA";
 
   const availableSeats =
     event.availableSlots ??
-    (event.registration?.capacity > 0
-      ? event.registration.capacity -
-        (event.registeredParticipants || 0)
-      : null);
+    (
+      event.registration?.capacity > 0
+        ? Math.max(
+            0,
+            event.registration.capacity -
+              (event.registeredParticipants || 0)
+          )
+        : null
+    );
 
   const registrationOpen =
     event.isRegistrationOpen ??
-    event.registration?.enabled;
+    event.registration?.enabled ??
+    false;
+
+  const eventUrl = event.slug
+    ? `/events/${event.slug}`
+    : event._id
+      ? `/events/${event._id}`
+      : "/events";
 
   return (
     <article className="event-card">
-
       {/* IMAGE */}
-
       <div className="event-card__image">
-
         <img
           src={image}
           alt={
             event.coverImage?.alt ||
-            event.title
+            title
           }
           loading="lazy"
         />
 
-        {event.featured && (
-          <div className="event-card__featured">
-            <Star size={14} />
-            Featured
+        <div className="event-card__image-overlay" />
+
+        <div className="event-card__badges">
+          {event.featured && (
+            <span className="event-card__featured">
+              <Star size={11} />
+              Featured
+            </span>
+          )}
+
+          <span className="event-card__category">
+            {category}
+          </span>
+        </div>
+
+        {event.startDate && (
+          <div className="event-card__date">
+            <span>
+              {new Date(event.startDate)
+                .toLocaleDateString("en-KE", {
+                  month: "short",
+                })
+                .toUpperCase()}
+            </span>
+
+            <strong>
+              {new Date(event.startDate).getDate()}
+            </strong>
           </div>
         )}
-
-        <span className="event-card__category">
-          {capitalize(
-            event.category?.replaceAll("_", " ")
-          )}
-        </span>
-
       </div>
 
       {/* BODY */}
-
       <div className="event-card__body">
+        <div className="event-card__heading">
+          <h3 className="event-card__title">
+            {title}
+          </h3>
 
-        <h3 className="event-card__title">
-          {event.title}
-        </h3>
-
-        <p className="event-card__summary">
-          {event.summary ||
-            event.shortDescription}
-        </p>
-
-        <div className="event-card__meta">
-
-          <div>
-            <CalendarDays size={16} />
-            <span>
-              {formatDate(event.startDate)}
-            </span>
-          </div>
-
-          <div>
-            <Clock3 size={16} />
-            <span>
-              {formatTime(event.startDate)}
-            </span>
-          </div>
-
-          <div>
-            <MapPin size={16} />
-            <span>
-              {event.venue?.name}
-            </span>
-          </div>
-
-          <div>
-            <Monitor size={16} />
-            <span>
-              {capitalize(
-                event.eventType
-              )}
-            </span>
-          </div>
-
+          <p className="event-card__summary">
+            {summary}
+          </p>
         </div>
 
-        {/* REGISTRATION */}
+        {/* META */}
+        <div className="event-card__meta">
+          <div className="event-card__meta-item">
+            <span className="event-card__meta-icon">
+              <CalendarDays size={13} />
+            </span>
 
+            <div>
+              <span className="event-card__meta-label">
+                Date
+              </span>
+
+              <strong>
+                {formatDate(event.startDate)}
+              </strong>
+            </div>
+          </div>
+
+          <div className="event-card__meta-item">
+            <span className="event-card__meta-icon">
+              <Clock3 size={13} />
+            </span>
+
+            <div>
+              <span className="event-card__meta-label">
+                Time
+              </span>
+
+              <strong>
+                {formatTime(event.startDate)}
+              </strong>
+            </div>
+          </div>
+
+          <div className="event-card__meta-item">
+            <span className="event-card__meta-icon">
+              <MapPin size={13} />
+            </span>
+
+            <div>
+              <span className="event-card__meta-label">
+                Location
+              </span>
+
+              <strong title={venueName}>
+                {venueName}
+              </strong>
+            </div>
+          </div>
+
+          <div className="event-card__meta-item">
+            <span className="event-card__meta-icon">
+              <Monitor size={13} />
+            </span>
+
+            <div>
+              <span className="event-card__meta-label">
+                Format
+              </span>
+
+              <strong>
+                {eventType}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        {/* FOOTER */}
         <div className="event-card__footer">
+          <div className="event-card__registration">
+            <span className="event-card__price-label">
+              Registration
+            </span>
 
-          <div>
-
-            <div className="event-card__price">
+            <strong className="event-card__price">
               {formatCurrency(
                 event.registration
                   ?.registrationFee,
                 event.registration
                   ?.currency
               )}
-            </div>
+            </strong>
 
             {availableSeats !== null && (
-              <div className="event-card__capacity">
-                <Users size={15} />
+              <span className="event-card__capacity">
+                <Users size={12} />
 
-                {availableSeats} seats left
-              </div>
+                {availableSeats > 0
+                  ? `${availableSeats} seats left`
+                  : "Fully booked"}
+              </span>
             )}
-
           </div>
 
-          <div
+          <span
             className={`event-card__status ${
               registrationOpen
-                ? "open"
-                : "closed"
+                ? "is-open"
+                : "is-closed"
             }`}
           >
-            {registrationOpen
-              ? "Registration Open"
-              : "Registration Closed"}
-          </div>
+            <span className="event-card__status-dot" />
 
+            {registrationOpen
+              ? "Open"
+              : "Closed"}
+          </span>
         </div>
 
+        {/* ACTION */}
         <Link
-          to={`/events/${
-            event.slug || event._id
-          }`}
+          to={eventUrl}
           className="event-card__button"
         >
-          View Details
-
-          <ArrowRight size={18} />
+          <span>View Details</span>
+          <ArrowRight size={14} />
         </Link>
-
       </div>
-
     </article>
   );
 };

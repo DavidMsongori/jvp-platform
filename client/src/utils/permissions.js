@@ -18,10 +18,12 @@ export const PERMISSIONS = {
   RECORD_PAYMENT: "record_payment",
   REFUND_PAYMENT: "refund_payment",
 
+
   /* FINANCE */
 
-VIEW_FINANCE_DASHBOARD: "view_finance_dashboard",
-VIEW_FINANCE_REPORTS: "view_finance_reports",
+  VIEW_FINANCE_DASHBOARD: "view_finance_dashboard",
+  VIEW_FINANCE_REPORTS: "view_finance_reports",
+
 
   /* EVENTS */
 
@@ -40,6 +42,18 @@ VIEW_FINANCE_REPORTS: "view_finance_reports",
   /* ELECTIONS */
 
   MANAGE_ELECTIONS: "manage_elections",
+
+
+  /* NEWS */
+
+  VIEW_NEWS: "view_news",
+  CREATE_NEWS: "create_news",
+  EDIT_NEWS: "edit_news",
+  DELETE_NEWS: "delete_news",
+  PUBLISH_NEWS: "publish_news",
+  FEATURE_NEWS: "feature_news",
+  ARCHIVE_NEWS: "archive_news",
+  VIEW_NEWS_REPORTS: "view_news_reports",
 
 
   /* REPORTS */
@@ -113,6 +127,18 @@ export const ROLE_PERMISSIONS = {
     PERMISSIONS.MANAGE_ELECTIONS,
 
 
+    /* NEWS */
+
+    PERMISSIONS.VIEW_NEWS,
+    PERMISSIONS.CREATE_NEWS,
+    PERMISSIONS.EDIT_NEWS,
+    PERMISSIONS.DELETE_NEWS,
+    PERMISSIONS.PUBLISH_NEWS,
+    PERMISSIONS.FEATURE_NEWS,
+    PERMISSIONS.ARCHIVE_NEWS,
+    PERMISSIONS.VIEW_NEWS_REPORTS,
+
+
     /* REPORTS */
 
     PERMISSIONS.VIEW_REPORTS,
@@ -124,25 +150,26 @@ export const ROLE_PERMISSIONS = {
      FINANCE
   ======================================================== */
 
-finance: [
+  finance: [
 
-  /* FINANCE */
+    /* FINANCE */
 
-  PERMISSIONS.VIEW_FINANCE_DASHBOARD,
-  PERMISSIONS.VIEW_FINANCE_REPORTS,
+    PERMISSIONS.VIEW_FINANCE_DASHBOARD,
+    PERMISSIONS.VIEW_FINANCE_REPORTS,
 
 
-  /* PAYMENTS */
+    /* PAYMENTS */
 
-  PERMISSIONS.VIEW_PAYMENTS,
-  PERMISSIONS.RECORD_PAYMENT,
-  PERMISSIONS.REFUND_PAYMENT,
+    PERMISSIONS.VIEW_PAYMENTS,
+    PERMISSIONS.RECORD_PAYMENT,
+    PERMISSIONS.REFUND_PAYMENT,
 
-  /* REPORTS */
 
-  PERMISSIONS.VIEW_REPORTS,
+    /* REPORTS */
 
-],
+    PERMISSIONS.VIEW_REPORTS,
+
+  ],
 
 
   /* ========================================================

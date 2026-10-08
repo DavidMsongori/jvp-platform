@@ -1,149 +1,255 @@
-.join-movement{
-
-    padding:120px 20px;
-
-    background:
-    linear-gradient(
-        135deg,
-        #16a34a 0%,
-        #15803d 45%,
-        #0f766e 100%
-    );
-
-    color:white;
-
-    text-align:center;
-
+.join-movement {
+  width: 100%;
+  padding: 62px 20px 0;
+  background: #17211d;
+  color: #ffffff;
+  box-sizing: border-box;
 }
 
-.join-content{
-
-    width:min(900px,90%);
-
-    margin:auto;
-
+.join-movement__container {
+  width: 100%;
+  max-width: 1180px;
+  min-height: 230px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
 }
 
-.join-content span{
-
-    display:inline-block;
-
-    padding:12px 28px;
-
-    background:rgba(255,255,255,.18);
-
-    border-radius:999px;
-
-    font-weight:700;
-
-    letter-spacing:2px;
-
-    margin-bottom:28px;
-
+.join-movement__content {
+  max-width: 700px;
 }
 
-.join-content h2{
-
-    font-size:clamp(2.8rem,5vw,4.5rem);
-
-    margin-bottom:25px;
-
-    line-height:1.15;
-
+.join-movement__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 11px;
+  color: #69d0a5;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
 }
 
-.join-content p{
-
-    max-width:720px;
-
-    margin:auto;
-
-    line-height:1.9;
-
-    font-size:1.1rem;
-
-    color:rgba(255,255,255,.92);
-
-    margin-bottom:45px;
-
+.join-movement__eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: #69d0a5;
 }
 
-.join-buttons{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:20px;
-
-    flex-wrap:wrap;
-
+.join-movement__content h2 {
+  max-width: 650px;
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(32px, 4vw, 47px);
+  line-height: 1.06;
+  letter-spacing: -0.05em;
 }
 
-.join-buttons a{
-
-    text-decoration:none;
-
-    padding:18px 38px;
-
-    border-radius:16px;
-
-    font-weight:700;
-
-    transition:.35s;
-
+.join-movement__content h2 span {
+  color: #62c99d;
 }
 
-.join-primary{
-
-    background:white;
-
-    color:#16a34a;
-
+.join-movement__content p {
+  max-width: 590px;
+  margin: 13px 0 0;
+  color: #aab7b1;
+  font-size: 11px;
+  line-height: 1.7;
 }
 
-.join-primary:hover{
-
-    transform:translateY(-5px);
-
+.join-movement__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: 175px;
+  flex-shrink: 0;
 }
 
-.join-secondary{
-
-    border:2px solid white;
-
-    color:white;
-
+.join-movement__primary,
+.join-movement__secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 13px;
+  border-radius: 7px;
+  box-sizing: border-box;
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
-.join-secondary:hover{
-
-    background:white;
-
-    color:#16a34a;
-
-    transform:translateY(-5px);
-
+.join-movement__primary {
+  background: #ffffff;
+  color: #17211d;
 }
 
-@media(max-width:768px){
-
-.join-content h2{
-
-font-size:2.4rem;
-
+.join-movement__primary:hover {
+  background: #62c99d;
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
-.join-buttons{
-
-flex-direction:column;
-
+.join-movement__secondary {
+  border: 1px solid #3b4942;
+  background: transparent;
+  color: #dce5e1;
 }
 
-.join-buttons a{
-
-width:100%;
-
+.join-movement__secondary:hover {
+  border-color: #62c99d;
+  color: #62c99d;
+  transform: translateY(-2px);
 }
 
+/* ==========================================================
+   FOOTER STRIP
+========================================================== */
+
+.join-movement__footer {
+  width: 100%;
+  max-width: 1180px;
+  min-height: 48px;
+  margin: 30px auto 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-top: 1px solid #303c37;
+  color: #77847e;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.join-movement__dot {
+  width: 3px;
+  height: 3px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #62c99d;
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 850px) {
+  .join-movement {
+    padding: 54px 18px 0;
+  }
+
+  .join-movement__container {
+    gap: 40px;
+  }
+
+  .join-movement__content h2 {
+    font-size: 36px;
+  }
+
+  .join-movement__actions {
+    width: 160px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 680px) {
+  .join-movement {
+    padding: 48px 14px 0;
+  }
+
+  .join-movement__container {
+    min-height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .join-movement__content {
+    max-width: 100%;
+  }
+
+  .join-movement__eyebrow {
+    margin-bottom: 9px;
+    font-size: 8px;
+  }
+
+  .join-movement__content h2 {
+    font-size: 30px;
+  }
+
+  .join-movement__content p {
+    margin-top: 11px;
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .join-movement__actions {
+    width: 100%;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .join-movement__primary,
+  .join-movement__secondary {
+    flex: 1;
+    min-height: 41px;
+    font-size: 9px;
+  }
+
+  .join-movement__footer {
+    min-height: 55px;
+    margin-top: 28px;
+    padding: 10px 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 8px;
+  }
+}
+
+/* ==========================================================
+   SMALL PHONES
+========================================================== */
+
+@media (max-width: 420px) {
+  .join-movement {
+    padding: 43px 12px 0;
+  }
+
+  .join-movement__content h2 {
+    font-size: 26px;
+  }
+
+  .join-movement__content p {
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  .join-movement__actions {
+    gap: 6px;
+  }
+
+  .join-movement__primary,
+  .join-movement__secondary {
+    min-height: 39px;
+    padding: 0 9px;
+    font-size: 8px;
+  }
+
+  .join-movement__footer {
+    font-size: 7px;
+  }
 }

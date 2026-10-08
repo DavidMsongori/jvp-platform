@@ -1,108 +1,376 @@
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+
+import leaderService from "../../services/leader.service";
+
 import "./LeadershipStructure.css";
 
-import {
-  FaUserTie,
-  FaUsers,
-  FaBuilding,
-  FaSitemap,
-  FaPeopleArrows,
-} from "react-icons/fa";
+const FALLBACK_IMAGE = "/images/branding/jvp-logo.png";
 
-const structure = [
+/* ==========================================================
+   HELPERS
+========================================================== */
 
-{
-icon:<FaUserTie />,
-title:"President",
-description:"Provides strategic leadership and represents the organization regionally and nationally.",
-},
+function extractLeaders(response) {
+  const candidates = [
+    response?.data,
+    response?.data?.data,
+    response?.data?.leaders,
+    response?.data?.data?.leaders,
+    response?.leaders,
+  ];
 
-{
-icon:<FaBuilding />,
-title:"Regional Executive Committee",
-description:"Coordinates programmes, partnerships and strategic implementation across the Coast Region.",
-},
+  return candidates.find(Array.isArray) || [];
+}
 
-{
-icon:<FaSitemap />,
-title:"County Leadership",
-description:"Leads county chapters and ensures local implementation of JVP programmes and activities.",
-},
+function getText(...values) {
+  return (
+    values.find(
+      (value) =>
+        typeof value === "string" &&
+        value.trim()
+    )?.trim() || ""
+  );
+}
 
-{
-icon:<FaPeopleArrows />,
-title:"Youth Assembly",
-description:"Provides representation, participation and policy engagement for young people.",
-},
+function normalize(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ");
+}
 
-{
-icon:<FaUsers />,
-title:"General Membership",
-description:"The foundation of JVP, driving community impact through active participation and volunteerism.",
-},
+function isPresident(leader) {
+  const presidentialTitles = [
+    normalize(leader.office),
+    normalize(leader.title),
+    normalize(leader.position),
+    normalize(leader.designation),
+    normalize(leader.role),
+  ];
 
-];
+  return presidentialTitles.some(
+    (value) =>
+      value === "president" ||
+      value === "regional president" ||
+      value === "jvp president"
+  );
+}
 
-function LeadershipStructure(){
+function getLeaderName(leader) {
+  if (!leader) {
+    return "JVP President";
+  }
 
-return(
+  const directName = getText(
+    leader.name,
+    leader.fullName,
+    leader.full_name
+  );
 
-<section className="leadership">
+  if (directName) {
+    return directName;
+  }
 
-<div className="leadership-container">
+  return (
+    [
+      getText(leader.firstName, leader.first_name),
+      getText(leader.middleName, leader.middle_name),
+      getText(leader.lastName, leader.last_name),
+    ]
+      .filter(Boolean)
+      .join(" ") || "JVP President"
+  );
+}
 
-<div className="section-title">
+function getLeaderImage(leader) {
+  if (!leader) {
+    return FALLBACK_IMAGE;
+  }
 
-<span>OUR LEADERSHIP</span>
+  const possibleImages = [
+    /* Direct leadership fields */
+    leader.image,
+    leader.imageUrl,
+    leader.imageURL,
+    leader.profileImage,
+    leader.profileImageUrl,
+    leader.profilePhoto,
+    leader.photo,
+    leader.photoUrl,
+    leader.avatar,
+    leader.avatarUrl,
+    leader.picture,
 
-<h2>
+    /* Member/profile fields */
+    leader.member?.image,
+    leader.member?.imageUrl,
+    leader.member?.profileImage,
+    leader.member?.profileImageUrl,
+    leader.member?.profilePhoto,
+    leader.member?.photo,
+    leader.member?.photoUrl,
+    leader.member?.avatar,
+    leader.member?.avatarUrl,
 
-A Structure Built for
-Service & Impact
+    /* User fields */
+    leader.user?.image,
+    leader.user?.imageUrl,
+    leader.user?.profileImage,
+    leader.user?.profileImageUrl,
+    leader.user?.profilePhoto,
+    leader.user?.photo,
+    leader.user?.photoUrl,
+    leader.user?.avatar,
+    leader.user?.avatarUrl,
 
-</h2>
+    /* Cloudinary fields */
+    leader.cloudinaryUrl,
+    leader.cloudinaryImage,
+    leader.cloudinaryImageUrl,
+    leader.member?.cloudinaryUrl,
+    leader.user?.cloudinaryUrl,
 
-<p>
+    /* Nested image objects */
+    leader.image?.url,
+    leader.image?.secure_url,
+    leader.profileImage?.url,
+    leader.profileImage?.secure_url,
+    leader.photo?.url,
+    leader.photo?.secure_url,
+  ];
 
-JVP is built on transparent leadership,
-strong governance and active youth participation
-across Kenya's six coastal counties.
+  const image = possibleImages.find(
+    (value) =>
+      typeof value === "string" &&
+      value.trim().length > 0
+  );
 
-</p>
+  return image?.trim() || FALLBACK_IMAGE;
+}
 
-</div>
+/* ==========================================================
+   COMPONENT
+========================================================== */
 
-<div className="structure">
+function LeadershipStructure() {
+  const [leaders, setLeaders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
-{structure.map((item,index)=>(
+  /* ========================================================
+     LOAD PUBLIC LEADERSHIP
+  ======================================================== */
 
-<div className="structure-item" key={index}>
+  useEffect(() => {
+    let isMounted = true;
 
-<div className="structure-icon">
+    async function loadPublicLeadership() {
+      try {
+        setLoading(true);
+        setLoadError(false);
 
-{item.icon}
+        const response =
+          await leaderService.getPublicLeaders();
 
-</div>
+        const publicLeaders =
+          extractLeaders(response);
 
-<div className="structure-card">
+        if (isMounted) {
+          setLeaders(publicLeaders);
+        }
+      } catch (error) {
+        console.error(
+          "Failed to load About page leadership:",
+          error
+        );
 
-<h3>{item.title}</h3>
+        if (isMounted) {
+          setLeaders([]);
+          setLoadError(true);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
 
-<p>{item.description}</p>
+    loadPublicLeadership();
 
-</div>
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-</div>
+  /* ========================================================
+     FIND PRESIDENT
+  ======================================================== */
 
-))}
+  const president = useMemo(() => {
+    const regionalExecutives = leaders.filter(
+      (leader) =>
+        normalize(leader.level) ===
+          "regional cabinet" &&
+        normalize(leader.category) ===
+          "executive"
+    );
 
-</div>
+    const matchedPresident =
+      regionalExecutives.find(isPresident);
 
-</div>
+    if (matchedPresident) {
+      return matchedPresident;
+    }
 
-</section>
+    const anyPresident =
+      leaders.find(isPresident);
 
-);
+    if (anyPresident) {
+      return anyPresident;
+    }
 
+    return regionalExecutives[0] || null;
+  }, [leaders]);
+
+  /* ========================================================
+     RENDER
+  ======================================================== */
+
+  return (
+    <section className="leadership">
+      <div className="leadership-container">
+
+        {/* Section heading */}
+
+        <div className="leadership-header">
+          <div>
+            <span className="leadership-eyebrow">
+              OUR LEADERSHIP
+            </span>
+
+            <h2>
+              Leadership built around
+              <span> service.</span>
+            </h2>
+          </div>
+
+          <p>
+            JVP is guided by a youth-led leadership
+            structure designed to promote accountability,
+            participation and impact across the Coast Region.
+          </p>
+        </div>
+
+        {/* Main leadership feature */}
+
+        <div className="leadership-feature">
+
+          {/* President */}
+
+          <article className="leadership-president">
+
+            <div className="leadership-president__image">
+              {loading ? (
+                <div className="leadership-image-skeleton" />
+              ) : (
+                <img
+                  src={getLeaderImage(president)}
+                  alt={getLeaderName(president)}
+                  onError={(event) => {
+                    if (
+                      event.currentTarget.dataset
+                        .fallbackApplied === "true"
+                    ) {
+                      return;
+                    }
+
+                    event.currentTarget.dataset
+                      .fallbackApplied = "true";
+
+                    event.currentTarget.src =
+                      FALLBACK_IMAGE;
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="leadership-president__content">
+
+              <span className="leadership-president__label">
+                PRESIDENT
+              </span>
+
+              <h3>
+                {loading
+                  ? "Loading leadership..."
+                  : president
+                    ? getLeaderName(president)
+                    : loadError
+                      ? "Leadership unavailable"
+                      : "President's profile pending"}
+              </h3>
+
+              <p>
+                Provides strategic leadership and represents
+                Jumuiya ya Vijana wa Pwani across the Coast
+                Region and beyond.
+              </p>
+
+              <Link
+                to="/leadership"
+                className="leadership-president__link"
+              >
+                View full profile
+                <ArrowRight size={15} />
+              </Link>
+
+            </div>
+          </article>
+
+          {/* Leadership structure */}
+
+          <article className="leadership-overview">
+
+            <div className="leadership-overview__icon">
+              <Users size={20} />
+            </div>
+
+            <div className="leadership-overview__content">
+
+              <span className="leadership-overview__label">
+                LEADERSHIP STRUCTURE
+              </span>
+
+              <h3>
+                Explore our leadership
+                structures and teams.
+              </h3>
+
+              <p>
+                Discover the Regional Executive, Youth
+                Assembly, Council of Governors and County
+                Leadership teams.
+              </p>
+
+              <Link
+                to="/leadership"
+                className="leadership-overview__link"
+              >
+                Explore Leadership
+                <ArrowRight size={15} />
+              </Link>
+
+            </div>
+
+          </article>
+
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default LeadershipStructure;

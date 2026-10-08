@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import {
   Search,
-  Filter,
+  SlidersHorizontal,
   RotateCcw,
+  ChevronDown,
 } from "lucide-react";
+
+import "./Filters.css";
 
 const CATEGORIES = [
   { value: "", label: "All Categories" },
@@ -39,162 +42,337 @@ const SORT_OPTIONS = [
   { value: "featured", label: "Featured" },
 ];
 
-const Filters = ({
-  filters,
-  onChange,
-}) => {
-  const [values, setValues] = useState(filters);
+const DEFAULT_FILTERS = {
+  search: "",
+  category: "",
+  eventType: "",
+  featured: "",
+  sort: "",
+};
 
+function Filters({ filters = DEFAULT_FILTERS, onChange }) {
+  const [values, setValues] = useState({
+    ...DEFAULT_FILTERS,
+    ...filters,
+  });
+
+  /*
+   * Keep local controls synchronized when the parent resets
+   * or changes the filters.
+   */
   useEffect(() => {
-    setValues(filters);
-  }, [filters]);
+    setValues({
+      ...DEFAULT_FILTERS,
+      ...filters,
+    });
+  }, [
+    filters.search,
+    filters.category,
+    filters.eventType,
+    filters.featured,
+    filters.sort,
+  ]);
+
+  /*
+   * Debounce SEARCH.
+   *
+   * This prevents an API request on every single keystroke.
+   */
+  useEffect(() => {
+    const currentSearch = values.search ?? "";
+    const parentSearch = filters.search ?? "";
+
+    if (currentSearch === parentSearch) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      onChange?.({
+        ...values,
+        search: currentSearch,
+      });
+    }, 450);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [values.search]);
+
+  /* =========================================================
+     FIELD CHANGE
+     ========================================================= */
 
   const handleChange = (field, value) => {
-    const updated = {
+    setValues((previous) => ({
+      ...previous,
+      [field]: value,
+    }));
+
+    /*
+     * Search is handled by the debounce effect above.
+     */
+    if (field === "search") {
+      return;
+    }
+
+    onChange?.({
       ...values,
       [field]: value,
-    };
-
-    setValues(updated);
-    onChange(updated);
+    });
   };
+
+  /* =========================================================
+     RESET
+     ========================================================= */
 
   const handleReset = () => {
     const reset = {
-      search: "",
-      category: "",
-      eventType: "",
-      featured: "",
-      sort: "",
+      ...DEFAULT_FILTERS,
     };
 
     setValues(reset);
-    onChange(reset);
+    onChange?.(reset);
   };
+
+  /* =========================================================
+     ACTIVE FILTERS
+     ========================================================= */
+
+  const activeFilterCount = [
+    values.category,
+    values.eventType,
+    values.featured,
+    values.sort,
+  ].filter(Boolean).length;
+
+  const hasFilters =
+    Boolean(values.search) ||
+    activeFilterCount > 0;
 
   return (
     <section className="event-filters">
 
-      <div className="event-filters__header">
+      <div className="event-filters__container">
 
-        <div className="event-filters__title">
-          <Filter size={18} />
-          <span>Filter Events</span>
+        {/* =====================================================
+            HEADER
+            ===================================================== */}
+
+        <div className="event-filters__header">
+
+          <div className="event-filters__heading">
+
+            <div className="event-filters__icon">
+              <SlidersHorizontal size={15} />
+            </div>
+
+            <div>
+              <span className="event-filters__eyebrow">
+                EXPLORE
+              </span>
+
+              <h2>
+                Find an Event
+              </h2>
+            </div>
+
+          </div>
+
+          <div className="event-filters__header-actions">
+
+            {activeFilterCount > 0 && (
+              <span className="event-filters__count">
+                {activeFilterCount} active
+              </span>
+            )}
+
+            {hasFilters && (
+              <button
+                type="button"
+                className="event-filters__reset"
+                onClick={handleReset}
+              >
+                <RotateCcw size={13} />
+                <span>Reset</span>
+              </button>
+            )}
+
+          </div>
+
         </div>
 
-        <button
-          type="button"
-          className="event-filters__reset"
-          onClick={handleReset}
-        >
-          <RotateCcw size={16} />
-          Reset
-        </button>
+        {/* =====================================================
+            FILTER CONTROLS
+            ===================================================== */}
 
-      </div>
+        <div className="event-filters__controls">
 
-      <div className="event-filters__grid">
+          {/* Search */}
 
-        <div className="event-filter">
+          <div className="event-filter event-filter--search">
 
-          <Search
-            size={18}
-            className="event-filter__icon"
-          />
+            <Search
+              size={16}
+              className="event-filter__search-icon"
+            />
 
-          <input
-            type="text"
-            placeholder="Search events..."
-            value={values.search}
-            onChange={(e) =>
-              handleChange(
-                "search",
-                e.target.value
-              )
-            }
-          />
+            <input
+              type="search"
+              placeholder="Search events..."
+              value={values.search}
+              aria-label="Search events"
+              onChange={(event) =>
+                handleChange(
+                  "search",
+                  event.target.value
+                )
+              }
+            />
+
+            {values.search && (
+              <button
+                type="button"
+                className="event-filter__clear"
+                onClick={() =>
+                  handleChange("search", "")
+                }
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+
+          </div>
+
+          {/* Category */}
+
+          <div className="event-filter-select">
+
+            <select
+              value={values.category}
+              onChange={(event) =>
+                handleChange(
+                  "category",
+                  event.target.value
+                )
+              }
+              aria-label="Filter by category"
+            >
+              {CATEGORIES.map((item) => (
+                <option
+                  key={item.value}
+                  value={item.value}
+                >
+                  {item.label}
+                </option>
+              ))}
+            </select>
+
+            <ChevronDown
+              size={14}
+              className="event-filter-select__icon"
+            />
+
+          </div>
+
+          {/* Event Type */}
+
+          <div className="event-filter-select">
+
+            <select
+              value={values.eventType}
+              onChange={(event) =>
+                handleChange(
+                  "eventType",
+                  event.target.value
+                )
+              }
+              aria-label="Filter by event type"
+            >
+              {EVENT_TYPES.map((item) => (
+                <option
+                  key={item.value}
+                  value={item.value}
+                >
+                  {item.label}
+                </option>
+              ))}
+            </select>
+
+            <ChevronDown
+              size={14}
+              className="event-filter-select__icon"
+            />
+
+          </div>
+
+          {/* Featured */}
+
+          <div className="event-filter-select">
+
+            <select
+              value={values.featured}
+              onChange={(event) =>
+                handleChange(
+                  "featured",
+                  event.target.value
+                )
+              }
+              aria-label="Filter featured events"
+            >
+              <option value="">
+                All Events
+              </option>
+
+              <option value="true">
+                Featured Only
+              </option>
+            </select>
+
+            <ChevronDown
+              size={14}
+              className="event-filter-select__icon"
+            />
+
+          </div>
+
+          {/* Sort */}
+
+          <div className="event-filter-select">
+
+            <select
+              value={values.sort}
+              onChange={(event) =>
+                handleChange(
+                  "sort",
+                  event.target.value
+                )
+              }
+              aria-label="Sort events"
+            >
+              {SORT_OPTIONS.map((item) => (
+                <option
+                  key={item.value}
+                  value={item.value}
+                >
+                  {item.label}
+                </option>
+              ))}
+            </select>
+
+            <ChevronDown
+              size={14}
+              className="event-filter-select__icon"
+            />
+
+          </div>
 
         </div>
-
-        <select
-          value={values.category}
-          onChange={(e) =>
-            handleChange(
-              "category",
-              e.target.value
-            )
-          }
-        >
-          {CATEGORIES.map((item) => (
-            <option
-              key={item.value}
-              value={item.value}
-            >
-              {item.label}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={values.eventType}
-          onChange={(e) =>
-            handleChange(
-              "eventType",
-              e.target.value
-            )
-          }
-        >
-          {EVENT_TYPES.map((item) => (
-            <option
-              key={item.value}
-              value={item.value}
-            >
-              {item.label}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={values.featured}
-          onChange={(e) =>
-            handleChange(
-              "featured",
-              e.target.value
-            )
-          }
-        >
-          <option value="">
-            All Events
-          </option>
-
-          <option value="true">
-            Featured Only
-          </option>
-        </select>
-
-        <select
-          value={values.sort || ""}
-          onChange={(e) =>
-            handleChange(
-              "sort",
-              e.target.value
-            )
-          }
-        >
-          {SORT_OPTIONS.map((item) => (
-            <option
-              key={item.value}
-              value={item.value}
-            >
-              {item.label}
-            </option>
-          ))}
-        </select>
 
       </div>
 
     </section>
   );
-};
+}
 
 export default Filters;

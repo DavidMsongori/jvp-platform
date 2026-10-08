@@ -1,73 +1,269 @@
 /* ==========================================================
-   PROFILE PAGE
+   MEMBER PROFILE — COMPACT MODERN
 ========================================================== */
 
-.profile-page{
+.profile-page {
+  width: 100%;
+  min-height: 100%;
 
-    display:flex;
+  padding: 14px 18px;
 
-    flex-direction:column;
+  box-sizing: border-box;
 
-    gap:2rem;
-
+  background: #f8f9fb;
+  color: #172033;
 }
+
 
 /* ==========================================================
-   TOP GRID
+   PROFILE HEADER
 ========================================================== */
 
-.profile-overview{
+.profile-hero {
+  width: 100%;
+  margin-bottom: 10px;
 
-    display:grid;
+  background: #ffffff;
 
-    grid-template-columns:1fr 1fr;
+  border: 1px solid #e8eaee;
+  border-radius: 10px;
 
-    gap:2rem;
-
-    align-items:start;
-
+  overflow: hidden;
 }
+
 
 /* ==========================================================
-   STATES
+   OVERVIEW
 ========================================================== */
 
-.profile-loading,
+.profile-overview {
+  display: grid;
 
-.profile-error{
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
 
-    background:#ffffff;
+  gap: 10px;
 
-    border-radius:20px;
-
-    padding:3rem;
-
-    text-align:center;
-
-    font-size:1.05rem;
-
-    border:1px solid #e5e7eb;
-
-    box-shadow:0 10px 25px rgba(15,23,42,.05);
-
+  margin-bottom: 10px;
 }
 
-.profile-error{
+.profile-overview-card {
+  min-width: 0;
 
-    color:#dc2626;
+  background: #ffffff;
 
+  border: 1px solid #e8eaee;
+  border-radius: 10px;
+
+  overflow: hidden;
 }
+
 
 /* ==========================================================
-   RESPONSIVE
+   INFORMATION
 ========================================================== */
 
-@media (max-width:1100px){
+.profile-information-grid {
+  display: grid;
 
-    .profile-overview{
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
 
-        grid-template-columns:1fr;
+  gap: 10px;
 
-    }
+  margin-bottom: 10px;
+}
+
+.profile-section-card {
+  min-width: 0;
+
+  background: #ffffff;
+
+  border: 1px solid #e8eaee;
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+
+/* ==========================================================
+   SECURITY
+========================================================== */
+
+.profile-security {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #e8eaee;
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+
+/* ==========================================================
+   REMOVE EXCESSIVE CHILD SPACING
+========================================================== */
+
+.profile-overview-card > *,
+.profile-section-card > *,
+.profile-security > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   LOADING
+========================================================== */
+
+.profile-state {
+  min-height: 240px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 24px;
+
+  background: #ffffff;
+
+  border: 1px solid #e8eaee;
+  border-radius: 10px;
+
+  color: #667085;
+
+  font-size: 13px;
+
+  text-align: center;
+
+  box-sizing: border-box;
+}
+
+.profile-state strong {
+  color: #172033;
+  font-size: 14px;
+}
+
+.profile-state-error {
+  color: #b42318;
+  background: #fffafa;
+  border-color: #f1cccc;
+}
+
+
+/* ==========================================================
+   SPINNER
+========================================================== */
+
+.profile-spinner {
+  width: 20px;
+  height: 20px;
+
+  border: 2px solid #e5e7eb;
+  border-top-color: #0f766e;
+
+  border-radius: 50%;
+
+  animation: profile-spin 0.7s linear infinite;
+}
+
+@keyframes profile-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 900px) {
+
+  .profile-page {
+    padding: 12px 14px;
+  }
+
+  .profile-overview,
+  .profile-information-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
+
+  .profile-page {
+    padding: 8px 10px;
+  }
+
+  .profile-hero {
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+
+  .profile-overview {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .profile-information-grid {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .profile-overview-card,
+  .profile-section-card,
+  .profile-security {
+    border-radius: 8px;
+  }
+
+  .profile-state {
+    min-height: 220px;
+    padding: 20px 15px;
+    border-radius: 8px;
+  }
+
+}
+
+
+/* ==========================================================
+   VERY SMALL MOBILE
+========================================================== */
+
+@media (max-width: 380px) {
+
+  .profile-page {
+    padding: 6px 8px;
+  }
+
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .profile-page *,
+  .profile-page *::before,
+  .profile-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 
 }

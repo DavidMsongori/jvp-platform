@@ -1,213 +1,397 @@
-.journey{
-
-    padding:120px 0;
-
-    background:#f8fafc;
-
+.journey {
+  width: 100%;
+  padding: 68px 20px;
+  background: #f7f9f8;
+  box-sizing: border-box;
 }
 
-.journey-container{
-
-    width:min(1200px,90%);
-
-    margin:auto;
-
+.journey-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
 }
 
-.section-title{
+/* Header */
 
-    text-align:center;
-
-    max-width:750px;
-
-    margin:0 auto 70px;
-
+.journey-header {
+  display: grid;
+  grid-template-columns: 1fr 0.75fr;
+  align-items: end;
+  gap: 60px;
+  margin-bottom: 42px;
 }
 
-.section-title span{
-
-    color:#16a34a;
-
-    font-weight:700;
-
-    letter-spacing:2px;
-
+.journey-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 9px;
+  color: #16825d;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
 }
 
-.section-title h2{
-
-    font-size:3rem;
-
-    margin:20px 0;
-
+.journey-eyebrow::before {
+  content: "";
+  width: 21px;
+  height: 2px;
+  border-radius: 2px;
+  background: #16825d;
 }
 
-.section-title p{
-
-    color:#64748b;
-
-    line-height:1.8;
-
+.journey-header h2 {
+  max-width: 580px;
+  margin: 0;
+  color: #17211d;
+  font-size: clamp(30px, 3.6vw, 43px);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
 }
 
-.timeline{
-
-    position:relative;
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:40px;
-
+.journey-header h2 span {
+  color: #16825d;
 }
 
-.timeline::before{
-
-    content:"";
-
-    position:absolute;
-
-    left:28px;
-
-    top:0;
-
-    bottom:0;
-
-    width:4px;
-
-    background:#16a34a;
-
-    border-radius:10px;
-
+.journey-header > p {
+  max-width: 470px;
+  margin: 0 0 2px;
+  color: #7b8781;
+  font-size: 11px;
+  line-height: 1.7;
 }
 
-.timeline-item{
+/* Timeline */
 
-    display:flex;
-
-    gap:30px;
-
-    align-items:flex-start;
-
-    position:relative;
-
+.journey-timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.timeline-icon{
-
-    width:60px;
-
-    height:60px;
-
-    background:#16a34a;
-
-    color:white;
-
-    border-radius:50%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:22px;
-
-    flex-shrink:0;
-
-    z-index:2;
-
+.journey-line {
+  position: absolute;
+  top: 21px;
+  left: 7%;
+  right: 7%;
+  height: 1px;
+  background: #d7e2dc;
 }
 
-.timeline-card{
-
-    background:white;
-
-    border-radius:18px;
-
-    padding:28px;
-
-    box-shadow:0 15px 35px rgba(0,0,0,.08);
-
-    flex:1;
-
-    transition:.3s;
-
+.journey-item {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
 }
 
-.timeline-card:hover{
-
-    transform:translateY(-6px);
-
+.journey-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 17px;
+  border: 5px solid #f7f9f8;
+  border-radius: 50%;
+  background: #16825d;
+  color: #ffffff;
+  box-shadow: 0 0 0 1px #cfe0d8;
 }
 
-.timeline-card small{
-
-    color:#16a34a;
-
-    font-weight:700;
-
-    letter-spacing:1px;
-
+.journey-card {
+  padding: 17px;
+  border: 1px solid #e1e9e5;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 5px 18px rgba(24, 48, 38, 0.035);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.timeline-card h3{
-
-    margin:12px 0;
-
-    font-size:1.5rem;
-
+.journey-item:hover .journey-card {
+  transform: translateY(-3px);
+  border-color: #cfe0d8;
+  box-shadow: 0 9px 24px rgba(24, 48, 38, 0.07);
 }
 
-.timeline-card p{
-
-    color:#64748b;
-
-    line-height:1.8;
-
+.journey-year {
+  display: inline-block;
+  margin-bottom: 7px;
+  color: #16825d;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-@media(max-width:768px){
-
-.timeline::before{
-
-left:22px;
-
+.journey-card h3 {
+  margin: 0;
+  color: #26322d;
+  font-size: 12px;
+  line-height: 1.3;
 }
 
-.timeline{
-
-gap:28px;
-
+.journey-card p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 7px 0 0;
+  color: #818c87;
+  font-size: 9px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
-.timeline-item{
+/* Impact strip */
 
-gap:18px;
-
+.journey-impact {
+  display: grid;
+  grid-template-columns: 1.8fr repeat(3, 0.65fr) 1fr;
+  align-items: center;
+  gap: 20px;
+  margin-top: 28px;
+  padding: 18px 20px;
+  border-radius: 10px;
+  background: #17211d;
+  color: #ffffff;
 }
 
-.timeline-icon{
-
-width:45px;
-
-height:45px;
-
-font-size:18px;
-
+.journey-impact__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.timeline-card{
-
-padding:22px;
-
+.journey-impact__intro span {
+  color: #62c99d;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
 }
 
-.section-title h2{
-
-font-size:2.3rem;
-
+.journey-impact__intro strong {
+  color: #ffffff;
+  font-size: 12px;
 }
 
+.journey-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 18px;
+  border-left: 1px solid #34423b;
+}
+
+.journey-stat strong {
+  color: #ffffff;
+  font-size: 19px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.journey-stat span {
+  color: #899790;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.journey-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 35px;
+  padding: 0 10px;
+  border: 1px solid #3b4942;
+  border-radius: 6px;
+  color: #dbe4df;
+  font-size: 8px;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.journey-link:hover {
+  border-color: #62c99d;
+  background: #21312a;
+  color: #ffffff;
+}
+
+/* Tablet */
+
+@media (max-width: 1000px) {
+  .journey {
+    padding: 58px 18px;
+  }
+
+  .journey-header {
+    gap: 35px;
+    margin-bottom: 35px;
+  }
+
+  .journey-timeline {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .journey-line {
+    display: none;
+  }
+
+  .journey-marker {
+    margin-bottom: 11px;
+  }
+
+  .journey-impact {
+    grid-template-columns: 1.5fr repeat(3, 0.7fr);
+  }
+
+  .journey-link {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 680px) {
+  .journey {
+    padding: 50px 14px;
+  }
+
+  .journey-header {
+    display: block;
+    margin-bottom: 27px;
+  }
+
+  .journey-header h2 {
+    font-size: 29px;
+  }
+
+  .journey-header > p {
+    max-width: 520px;
+    margin-top: 11px;
+    font-size: 10px;
+  }
+
+  .journey-timeline {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .journey-item {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+  }
+
+  .journey-marker {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    border-width: 4px;
+  }
+
+  .journey-marker svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .journey-card {
+    padding: 13px 14px;
+  }
+
+  .journey-year {
+    margin-bottom: 5px;
+    font-size: 7px;
+  }
+
+  .journey-card h3 {
+    font-size: 11px;
+  }
+
+  .journey-card p {
+    margin-top: 5px;
+    font-size: 8px;
+    -webkit-line-clamp: 2;
+  }
+
+  .journey-impact {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 22px;
+    padding: 17px;
+  }
+
+  .journey-impact__intro {
+    grid-column: 1 / -1;
+  }
+
+  .journey-stat {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .journey-link {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Small phones */
+
+@media (max-width: 420px) {
+  .journey {
+    padding: 43px 12px;
+  }
+
+  .journey-header h2 {
+    font-size: 25px;
+  }
+
+  .journey-header > p {
+    font-size: 9px;
+  }
+
+  .journey-item {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .journey-marker {
+    width: 32px;
+    height: 32px;
+  }
+
+  .journey-card {
+    padding: 12px;
+  }
+
+  .journey-card h3 {
+    font-size: 10px;
+  }
+
+  .journey-card p {
+    font-size: 7px;
+  }
+
+  .journey-impact {
+    padding: 15px;
+  }
+
+  .journey-impact__intro strong {
+    font-size: 11px;
+  }
+
+  .journey-stat strong {
+    font-size: 17px;
+  }
+
+  .journey-stat span {
+    font-size: 6px;
+  }
 }
