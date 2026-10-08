@@ -1,0 +1,323 @@
+.county-leadership-hero {
+  position: relative;
+  min-height: 390px;
+
+  display: flex;
+  align-items: stretch;
+
+  overflow: hidden;
+
+  background-image: url("/images/leadership-hero.jpg");
+  background-position: center;
+  background-size: cover;
+
+  color: #ffffff;
+}
+
+.county-leadership-hero__overlay,
+.county-leadership-hero__gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.county-leadership-hero__overlay {
+  background: rgba(5, 18, 13, 0.48);
+}
+
+.county-leadership-hero__gradient {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 18, 13, 0.9) 0%,
+      rgba(5, 18, 13, 0.62) 48%,
+      rgba(5, 18, 13, 0.2) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(5, 18, 13, 0.72) 0%,
+      transparent 48%
+    );
+}
+
+.county-leadership-hero__container {
+  position: relative;
+  z-index: 1;
+
+  width: min(100% - 40px, 1180px);
+  min-height: 390px;
+
+  margin: 0 auto;
+  padding: 92px 0 48px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 50px;
+}
+
+.county-leadership-hero__content {
+  max-width: 690px;
+}
+
+.county-leadership-hero__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 20px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 9px;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition: color 180ms ease;
+}
+
+.county-leadership-hero__back:hover {
+  color: #ffffff;
+}
+
+.county-leadership-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 10px;
+
+  color: #69d0a5;
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.county-leadership-hero__title {
+  margin: 0;
+
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.county-leadership-hero__title span {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #69d0a5;
+}
+
+.county-leadership-hero__description {
+  max-width: 590px;
+
+  margin: 17px 0 0;
+
+  color: rgba(255, 255, 255, 0.76);
+
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.county-leadership-hero__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 22px;
+
+  color: rgba(255, 255, 255, 0.52);
+
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.county-leadership-hero__breadcrumb span:last-child {
+  color: #ffffff;
+}
+
+.county-leadership-hero__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  min-width: 120px;
+}
+
+.county-leadership-hero__stat {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  column-gap: 8px;
+  align-items: center;
+
+  padding: 9px 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.county-leadership-hero__stat svg {
+  grid-row: span 2;
+
+  color: #69d0a5;
+}
+
+.county-leadership-hero__stat strong {
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.county-leadership-hero__stat span {
+  margin-top: 3px;
+
+  color: rgba(255, 255, 255, 0.56);
+
+  font-size: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 800px) {
+  .county-leadership-hero {
+    min-height: 370px;
+  }
+
+  .county-leadership-hero__container {
+    width: min(100% - 32px, 680px);
+    min-height: 370px;
+
+    padding: 86px 0 42px;
+
+    gap: 30px;
+  }
+
+  .county-leadership-hero__stats {
+    min-width: 105px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
+  .county-leadership-hero {
+    min-height: 350px;
+  }
+
+  .county-leadership-hero__gradient {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(5, 18, 13, 0.88),
+        rgba(5, 18, 13, 0.58)
+      ),
+      linear-gradient(
+        0deg,
+        rgba(5, 18, 13, 0.8),
+        transparent 60%
+      );
+  }
+
+  .county-leadership-hero__container {
+    width: min(100% - 24px, 480px);
+    min-height: 350px;
+
+    padding: 78px 0 30px;
+
+    display: block;
+  }
+
+  .county-leadership-hero__back {
+    margin-bottom: 17px;
+  }
+
+  .county-leadership-hero__title {
+    font-size: clamp(34px, 11vw, 46px);
+  }
+
+  .county-leadership-hero__description {
+    max-width: 450px;
+    margin-top: 14px;
+
+    font-size: 11px;
+  }
+
+  .county-leadership-hero__breadcrumb {
+    margin-top: 17px;
+  }
+
+  .county-leadership-hero__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    margin-top: 24px;
+
+    min-width: 0;
+  }
+
+  .county-leadership-hero__stat {
+    padding: 8px;
+  }
+
+  .county-leadership-hero__stat strong {
+    font-size: 13px;
+  }
+
+  .county-leadership-hero__stat span {
+    font-size: 6px;
+  }
+}
+
+/* ==========================================================
+   SMALL MOBILE
+========================================================== */
+
+@media (max-width: 380px) {
+  .county-leadership-hero {
+    min-height: 335px;
+  }
+
+  .county-leadership-hero__container {
+    min-height: 335px;
+  }
+
+  .county-leadership-hero__title {
+    font-size: 32px;
+  }
+
+  .county-leadership-hero__description {
+    font-size: 10px;
+  }
+
+  .county-leadership-hero__stats {
+    margin-top: 18px;
+  }
+}
+
+/* ==========================================================
+   REDUCED MOTION
+========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .county-leadership-hero__back {
+    transition: none;
+  }
+}

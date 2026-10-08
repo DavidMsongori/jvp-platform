@@ -1,0 +1,151 @@
+/* ==========================================================
+   COUNTY LEADER CARD
+========================================================== */
+
+.county-leader-card {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 8px;
+
+  border: 1px solid #e3ebe7;
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.county-leader-card:hover {
+  border-color: #cbded5;
+  box-shadow: 0 5px 14px rgba(23, 33, 29, 0.06);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================
+   IMAGE
+========================================================== */
+
+.county-leader-card__media {
+  width: 48px;
+  height: 48px;
+
+  flex: 0 0 48px;
+
+  overflow: hidden;
+
+  border-radius: 7px;
+
+  background: #edf3f0;
+}
+
+.county-leader-card__media img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.county-leader-card__content {
+  min-width: 0;
+}
+
+.county-leader-card__name {
+  margin: 0 0 4px;
+
+  overflow: hidden;
+
+  color: #202c26;
+
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.county-leader-card__position,
+.county-leader-card__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  min-width: 0;
+
+  color: #77837d;
+
+  font-size: 7px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.county-leader-card__position {
+  color: #4f6259;
+}
+
+.county-leader-card__position span,
+.county-leader-card__location span {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.county-leader-card__position svg {
+  flex: 0 0 auto;
+  color: #55b98b;
+}
+
+.county-leader-card__location svg {
+  flex: 0 0 auto;
+  color: #8c9992;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 560px) {
+  .county-leader-card {
+    padding: 7px;
+    gap: 7px;
+  }
+
+  .county-leader-card__media {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
+
+  .county-leader-card__name {
+    font-size: 9px;
+  }
+
+  .county-leader-card__position,
+  .county-leader-card__location {
+    font-size: 6.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .county-leader-card {
+    transition: none;
+  }
+
+  .county-leader-card:hover {
+    transform: none;
+  }
+}

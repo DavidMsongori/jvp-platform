@@ -1,0 +1,479 @@
+/* =========================================================
+   ASSEMBLY SECTION
+   ========================================================= */
+
+.assembly-section {
+  background: #f7f9f8;
+  border-top: 1px solid #edf2ef;
+}
+
+.assembly-section__container {
+  width: min(100% - 40px, 1180px);
+  margin: 0 auto;
+
+  padding: 30px 0 38px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.assembly-section__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.assembly-section__heading {
+  min-width: 0;
+  max-width: 720px;
+}
+
+.assembly-section__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  margin-bottom: 6px;
+
+  color: #4fae83;
+
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.assembly-section__eyebrow svg {
+  flex: 0 0 auto;
+}
+
+.assembly-section__title {
+  margin: 0;
+
+  color: #1d2a24;
+
+  font-size: clamp(23px, 2.7vw, 31px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+
+.assembly-section__accent {
+  width: 30px;
+  height: 2px;
+
+  margin: 8px 0 10px;
+
+  background: #55b98b;
+  border-radius: 999px;
+}
+
+.assembly-section__description {
+  max-width: 650px;
+  margin: 0;
+
+  color: #6c7973;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   COUNT
+   ========================================================= */
+
+.assembly-section__count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  flex: 0 0 auto;
+
+  padding: 6px 9px;
+
+  color: #53635b;
+  background: #ffffff;
+
+  border: 1px solid #e1e9e5;
+  border-radius: 7px;
+
+  white-space: nowrap;
+}
+
+.assembly-section__count svg {
+  color: #55b98b;
+}
+
+.assembly-section__count strong {
+  color: #23332b;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.assembly-section__count span {
+  font-size: 7px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   DIRECTORY
+   ========================================================= */
+
+.assembly-section__directory {
+  padding-top: 18px;
+
+  border-top: 1px solid #e3ebe7;
+}
+
+.assembly-section__directory-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+  margin-bottom: 13px;
+}
+
+.assembly-section__directory-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  color: #35463e;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.assembly-section__directory-label svg {
+  color: #55b98b;
+}
+
+.assembly-section__preview {
+  color: #8a9690;
+
+  font-size: 8px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
+.assembly-section__grid {
+  display: grid;
+
+  /*
+   * Six leaders in one row on desktop.
+   */
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+
+/* =========================================================
+   COMPACT LEADER CARDS
+   ========================================================= */
+
+.assembly-section .leader-card {
+  border-radius: 9px;
+
+  box-shadow:
+    0 2px 8px rgba(23, 33, 29, 0.035);
+}
+
+.assembly-section .leader-card__media {
+  aspect-ratio: 1 / 0.84;
+}
+
+.assembly-section .leader-card__content {
+  padding: 8px 9px 9px;
+}
+
+.assembly-section .leader-card__name {
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.assembly-section .leader-card__position {
+  gap: 4px;
+  font-size: 7px;
+}
+
+.assembly-section .leader-card__position svg {
+  width: 10px;
+  height: 10px;
+}
+
+.assembly-section .leader-card__location {
+  gap: 3px;
+  margin-top: 3px;
+  font-size: 6.5px;
+}
+
+.assembly-section .leader-card__location svg {
+  width: 9px;
+  height: 9px;
+}
+
+.assembly-section .leader-card__category {
+  left: 6px;
+  bottom: 6px;
+
+  padding: 3px 5px;
+
+  font-size: 5.5px;
+}
+
+
+/* =========================================================
+   VIEW ALL
+   ========================================================= */
+
+.assembly-section__action {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 19px;
+}
+
+.assembly-section__view-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 8px 12px;
+
+  color: #ffffff;
+  background: #1f3028;
+
+  border: 1px solid #1f3028;
+  border-radius: 7px;
+
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+
+  text-decoration: none;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.assembly-section__view-all:hover {
+  background: #55b98b;
+  border-color: #55b98b;
+
+  transform: translateY(-1px);
+}
+
+.assembly-section__view-all svg {
+  transition: transform 180ms ease;
+}
+
+.assembly-section__view-all:hover svg {
+  transform: translateX(2px);
+}
+
+
+/* =========================================================
+   LARGE TABLET
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .assembly-section__grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .assembly-section .leader-card__name {
+    font-size: 11px;
+  }
+
+  .assembly-section .leader-card__position {
+    font-size: 7.5px;
+  }
+
+  .assembly-section .leader-card__location {
+    font-size: 7px;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .assembly-section__container {
+    padding: 27px 0 34px;
+  }
+
+  .assembly-section__header {
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .assembly-section__description {
+    font-size: 9px;
+  }
+
+  .assembly-section__grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 560px) {
+  .assembly-section__container {
+    width: min(100% - 28px, 560px);
+    padding: 24px 0 30px;
+  }
+
+  .assembly-section__header {
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .assembly-section__title {
+    font-size: 23px;
+  }
+
+  .assembly-section__description {
+    margin-top: 0;
+
+    font-size: 9px;
+    line-height: 1.5;
+  }
+
+  .assembly-section__count {
+    margin-top: 10px;
+  }
+
+  .assembly-section__directory {
+    padding-top: 15px;
+  }
+
+  .assembly-section__grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .assembly-section .leader-card__content {
+    padding: 7px 8px 8px;
+  }
+
+  .assembly-section .leader-card__name {
+    font-size: 9.5px;
+  }
+
+  .assembly-section .leader-card__position {
+    font-size: 6.8px;
+  }
+
+  .assembly-section .leader-card__location {
+    font-size: 6.2px;
+  }
+
+  .assembly-section__action {
+    margin-top: 17px;
+  }
+
+  .assembly-section__view-all {
+    width: 100%;
+    padding: 9px 12px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .assembly-section__container {
+    width: min(100% - 22px, 560px);
+    padding: 21px 0 27px;
+  }
+
+  .assembly-section__title {
+    font-size: 21px;
+  }
+
+  .assembly-section__grid {
+    gap: 7px;
+  }
+
+  .assembly-section .leader-card__content {
+    padding: 6px 7px 7px;
+  }
+
+  .assembly-section .leader-card__name {
+    font-size: 9px;
+  }
+
+  .assembly-section .leader-card__position {
+    font-size: 6.5px;
+  }
+
+  .assembly-section .leader-card__location {
+    font-size: 6px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .assembly-section .leader-card,
+  .assembly-section__view-all,
+  .assembly-section__view-all svg {
+    transition: none;
+  }
+
+  .assembly-section .leader-card:hover {
+    transform: none;
+  }
+
+  .assembly-section__view-all:hover {
+    transform: none;
+  }
+
+  .assembly-section__view-all:hover svg {
+    transform: none;
+  }
+}

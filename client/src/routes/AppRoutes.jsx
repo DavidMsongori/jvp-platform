@@ -32,6 +32,9 @@ import SummitPosterForm from "../pages/summit-poster/SummitPosterForm";
 import SummitPosterStatus from "../pages/summit-poster/SummitPosterStatus";
 import Contact from "../pages/contact/Contact";
 import Leadership from "../pages/leadership/Leadership";
+import ExecutiveTeam from "../pages/leadership/ExecutiveTeam";
+import YouthAssembly from "../pages/leadership/YouthAssembly";
+import CountyLeadership from "../pages/leadership/CountyLeadership";
 
 /* ==========================================
    PUBLIC ELECTIONS
@@ -231,6 +234,21 @@ function AppRoutes() {
           path="/leadership"
           element={<Leadership />}
         />
+
+        <Route
+          path="/leadership/executive"
+          element={<ExecutiveTeam />}
+        /> 
+
+        <Route
+  path="/leadership/assembly"
+  element={<YouthAssembly />}
+/>
+
+        <Route
+          path="/leadership/county/:countySlug"
+          element={<CountyLeadership />}
+        />  
 
         {/* =====================================
             PUBLIC ELECTIONS

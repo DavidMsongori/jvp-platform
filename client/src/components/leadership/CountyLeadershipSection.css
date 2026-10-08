@@ -1,0 +1,523 @@
+/* ==========================================================
+   COUNTY LEADERSHIP
+========================================================== */
+
+.county-leadership {
+  width: 100%;
+  background: #ffffff;
+}
+
+.county-leadership__container {
+  width: min(100% - 40px, 1180px);
+  margin: 0 auto;
+  padding: 72px 0;
+}
+
+/* ==========================================================
+   SECTION HEADER
+========================================================== */
+
+.county-leadership__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 42px;
+}
+
+.county-leadership__heading {
+  max-width: 760px;
+}
+
+.county-leadership__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 9px;
+
+  color: #4aa87d;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.county-leadership__title {
+  margin: 0;
+
+  color: #17211d;
+  font-size: clamp(25px, 3vw, 34px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+
+.county-leadership__accent {
+  width: 34px;
+  height: 3px;
+  margin: 14px 0 13px;
+
+  background: #62c99d;
+  border-radius: 999px;
+}
+
+.county-leadership__description {
+  max-width: 680px;
+  margin: 0;
+
+  color: #66736d;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ==========================================================
+   COUNTY COUNT
+========================================================== */
+
+.county-leadership__count {
+  flex: 0 0 auto;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  min-width: 112px;
+  padding: 9px 12px;
+
+  border: 1px solid #dfe9e4;
+  border-radius: 10px;
+
+  background: #f7f9f8;
+  color: #4e5c55;
+}
+
+.county-leadership__count svg {
+  color: #55b98b;
+}
+
+.county-leadership__count strong {
+  color: #17211d;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.county-leadership__count span {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* ==========================================================
+   COUNTY TEAMS
+========================================================== */
+
+.county-leadership__teams {
+  display: grid;
+  gap: 26px;
+}
+
+/* ==========================================================
+   COUNTY TEAM
+========================================================== */
+
+.county-team {
+  padding: 22px;
+
+  border: 1px solid #e1e9e5;
+  border-radius: 16px;
+
+  background: #f7f9f8;
+}
+
+/* ==========================================================
+   COUNTY HEADER
+========================================================== */
+
+.county-team__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+
+  border-bottom: 1px solid #e1e9e5;
+}
+
+.county-team__identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.county-team__icon {
+  width: 32px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 32px;
+
+  border: 1px solid #d6e7df;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #4eae84;
+}
+
+.county-team__title {
+  margin: 0;
+
+  color: #17211d;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.county-team__label {
+  display: block;
+  margin-top: 4px;
+
+  color: #7a8680;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.county-team__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 6px 9px;
+
+  border: 1px solid #dce7e2;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #64716b;
+}
+
+.county-team__count svg {
+  color: #55b98b;
+}
+
+.county-team__count span {
+  color: #17211d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.county-team__count small {
+  font-size: 8px;
+  font-weight: 600;
+}
+
+/* ==========================================================
+   COUNTY CATEGORY
+========================================================== */
+
+.county-category {
+  padding: 18px;
+
+  border: 1px solid #e0e9e4;
+  border-radius: 13px;
+
+  background: #ffffff;
+}
+
+.county-category + .county-category {
+  margin-top: 14px;
+}
+
+.county-category__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  margin-bottom: 15px;
+}
+
+.county-category__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.county-category__icon {
+  width: 29px;
+  height: 29px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 29px;
+
+  border-radius: 8px;
+
+  background: #edf7f2;
+  color: #4eae84;
+}
+
+.county-category__title {
+  margin: 0;
+
+  color: #25312b;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.county-category__subtitle {
+  display: block;
+  margin-top: 3px;
+
+  color: #8a948f;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.county-category__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 24px;
+  height: 22px;
+  padding: 0 6px;
+
+  border-radius: 7px;
+
+  background: #f0f4f2;
+  color: #4d5b54;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* ==========================================================
+   LEADER PREVIEW
+========================================================== */
+
+.county-category__content {
+  min-width: 0;
+}
+
+.county-category__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.county-category__more {
+  display: block;
+  margin-top: 9px;
+
+  color: #8a948f;
+  font-size: 8px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.county-category__empty {
+  min-height: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px dashed #dce6e1;
+  border-radius: 9px;
+
+  background: #fafcfb;
+  color: #929b96;
+
+  font-size: 9px;
+}
+
+/* ==========================================================
+   COUNTY ACTION
+========================================================== */
+
+.county-team__action {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: 17px;
+}
+
+.county-team__view {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  min-height: 34px;
+  padding: 0 13px;
+
+  border: 1px solid #cfe1d9;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #287b58;
+
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.county-team__view svg {
+  transition: transform 180ms ease;
+}
+
+.county-team__view:hover {
+  border-color: #b8d6c9;
+  background: #edf7f2;
+  color: #1f6b4b;
+  transform: translateY(-1px);
+}
+
+.county-team__view:hover svg {
+  transform: translateX(2px);
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 800px) {
+  .county-leadership__container {
+    width: min(100% - 32px, 680px);
+    padding: 58px 0;
+  }
+
+  .county-leadership__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 30px;
+  }
+
+  .county-leadership__count {
+    min-width: auto;
+  }
+
+  .county-team {
+    padding: 18px;
+  }
+
+  .county-category {
+    padding: 15px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 560px) {
+  .county-leadership__container {
+    width: min(100% - 24px, 480px);
+    padding: 48px 0;
+  }
+
+  .county-leadership__title {
+    font-size: 25px;
+  }
+
+  .county-leadership__description {
+    font-size: 11px;
+    line-height: 1.65;
+  }
+
+  .county-team {
+    padding: 14px;
+    border-radius: 13px;
+  }
+
+  .county-team__header {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+  }
+
+  .county-team__title {
+    font-size: 16px;
+  }
+
+  .county-team__count {
+    padding: 5px 7px;
+  }
+
+  .county-category {
+    padding: 13px;
+    border-radius: 11px;
+  }
+
+  .county-category__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .county-category__title {
+    font-size: 11px;
+  }
+
+  .county-category__subtitle {
+    font-size: 7px;
+  }
+
+  .county-team__action {
+    margin-top: 13px;
+  }
+
+  .county-team__view {
+    width: 100%;
+    min-height: 36px;
+  }
+}
+
+/* ==========================================================
+   SMALL MOBILE
+========================================================== */
+
+@media (max-width: 380px) {
+  .county-category__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .county-category__more {
+    text-align: left;
+  }
+}
+
+/* ==========================================================
+   REDUCED MOTION
+========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .county-team__view,
+  .county-team__view svg {
+    transition: none;
+  }
+
+  .county-team__view:hover {
+    transform: none;
+  }
+
+  .county-team__view:hover svg {
+    transform: none;
+  }
+}

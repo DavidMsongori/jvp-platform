@@ -19,6 +19,7 @@ import { LeadershipDashboardProvider } from "./context/LeadershipDashboardContex
 import { SummitProvider } from "./context/SummitContext";
 import { NewsProvider } from "./context/NewsContext";
 import { ContactProvider } from "./context/ContactContext";
+import { LeadershipProvider } from "./context/LeadershipContext";
 
 import {
   installProfileImageFallback,
@@ -57,7 +58,11 @@ ReactDOM.createRoot(
 
                       <ContactProvider>
 
+                        <LeadershipProvider>
+
                         <App />
+
+                        </LeadershipProvider>
 
                       </ContactProvider>
 

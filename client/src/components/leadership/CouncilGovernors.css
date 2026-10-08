@@ -1,0 +1,443 @@
+/* =========================================================
+   COUNCIL OF GOVERNORS
+   ========================================================= */
+
+.council-governors {
+  background: #ffffff;
+  border-top: 1px solid #edf2ef;
+}
+
+.council-governors__container {
+  width: min(100% - 40px, 1180px);
+  margin: 0 auto;
+  padding: 30px 0 38px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.council-governors__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-bottom: 18px;
+}
+
+.council-governors__heading {
+  min-width: 0;
+  max-width: 720px;
+}
+
+.council-governors__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  margin-bottom: 6px;
+
+  color: #4fae83;
+
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.council-governors__title {
+  margin: 0;
+
+  color: #1d2a24;
+
+  font-size: clamp(23px, 2.7vw, 31px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+
+.council-governors__description {
+  max-width: 650px;
+  margin: 8px 0 0;
+
+  color: #6c7973;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   COUNT
+   ========================================================= */
+
+.council-governors__count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  flex: 0 0 auto;
+
+  padding: 6px 9px;
+
+  color: #53635b;
+  background: #f7faf8;
+  border: 1px solid #e1e9e5;
+  border-radius: 7px;
+
+  white-space: nowrap;
+}
+
+.council-governors__count svg {
+  color: #55b98b;
+}
+
+.council-governors__count strong {
+  color: #23332b;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.council-governors__count span {
+  font-size: 7px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   GOVERNORS GRID
+   ========================================================= */
+
+.council-governors__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+
+/* =========================================================
+   GOVERNOR CARD
+   ========================================================= */
+
+.council-governors-card {
+  min-width: 0;
+  overflow: hidden;
+
+  background: #ffffff;
+  border: 1px solid #e2e9e5;
+  border-radius: 9px;
+
+  box-shadow: 0 2px 8px rgba(23, 33, 29, 0.035);
+
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.council-governors-card:hover {
+  border-color: #cbdcd4;
+  box-shadow: 0 5px 13px rgba(23, 33, 29, 0.065);
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   PHOTO
+   ========================================================= */
+
+.council-governors-card__media {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 1 / 1;
+
+  overflow: hidden;
+
+  background: #edf3f0;
+}
+
+.council-governors-card__media img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 240ms ease;
+}
+
+.council-governors-card:hover
+  .council-governors-card__media img {
+  transform: scale(1.025);
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+   ========================================================= */
+
+.council-governors-card__placeholder {
+  position: absolute;
+  inset: 0;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  color: #94a59d;
+  background: #edf3f0;
+}
+
+.council-governors-card__placeholder--visible {
+  display: flex;
+}
+
+
+/* =========================================================
+   POSITION BADGE
+   ========================================================= */
+
+.council-governors-card__badge {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+
+  display: block;
+
+  overflow: hidden;
+
+  padding: 4px 5px;
+
+  color: #ffffff;
+  background: rgba(23, 33, 29, 0.84);
+
+  border-radius: 4px;
+
+  font-size: 6px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  backdrop-filter: blur(4px);
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.council-governors-card__content {
+  min-width: 0;
+
+  padding: 8px 8px 9px;
+}
+
+.council-governors-card__name {
+  margin: 0 0 4px;
+
+  overflow: hidden;
+
+  color: #202c26;
+
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.council-governors-card__county {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  min-width: 0;
+
+  color: #77847d;
+
+  font-size: 7px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.council-governors-card__county svg {
+  flex: 0 0 auto;
+  color: #55b98b;
+}
+
+.council-governors-card__county span {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   REMARKS
+   ========================================================= */
+
+.council-governors-card__remarks {
+  display: none;
+}
+
+
+/* =========================================================
+   LARGE TABLET
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .council-governors__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 11px;
+  }
+
+  .council-governors-card__name {
+    font-size: 11px;
+  }
+
+  .council-governors-card__county {
+    font-size: 7.5px;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .council-governors__container {
+    padding: 27px 0 34px;
+  }
+
+  .council-governors__header {
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .council-governors__description {
+    font-size: 9px;
+  }
+
+  .council-governors__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 560px) {
+  .council-governors__container {
+    width: min(100% - 28px, 560px);
+    padding: 24px 0 30px;
+  }
+
+  .council-governors__header {
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .council-governors__title {
+    font-size: 23px;
+  }
+
+  .council-governors__description {
+    margin-top: 7px;
+    font-size: 9px;
+    line-height: 1.5;
+  }
+
+  .council-governors__count {
+    margin-top: 10px;
+  }
+
+  .council-governors__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .council-governors-card__content {
+    padding: 7px 8px 8px;
+  }
+
+  .council-governors-card__name {
+    font-size: 10px;
+  }
+
+  .council-governors-card__county {
+    font-size: 7px;
+  }
+
+  .council-governors-card__badge {
+    font-size: 5.5px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .council-governors__container {
+    width: min(100% - 22px, 560px);
+    padding: 21px 0 27px;
+  }
+
+  .council-governors__title {
+    font-size: 21px;
+  }
+
+  .council-governors-card__content {
+    padding: 6px 7px 7px;
+  }
+
+  .council-governors-card__name {
+    font-size: 9px;
+  }
+
+  .council-governors-card__county {
+    font-size: 6.5px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .council-governors-card,
+  .council-governors-card__media img {
+    transition: none;
+  }
+
+  .council-governors-card:hover {
+    transform: none;
+  }
+
+  .council-governors-card:hover
+    .council-governors-card__media img {
+    transform: none;
+  }
+}

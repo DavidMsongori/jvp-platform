@@ -1,0 +1,312 @@
+/* =========================================================
+   LEADERSHIP HERO
+========================================================= */
+
+.leadership-hero {
+  position: relative;
+  width: 100%;
+  min-height: 410px;
+  overflow: hidden;
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  color: #ffffff;
+}
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.leadership-hero__overlay {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(5, 18, 13, 0.38);
+}
+
+/* =========================================================
+   GRADIENT
+========================================================= */
+
+.leadership-hero__gradient {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7, 22, 16, 0.9) 0%,
+      rgba(7, 22, 16, 0.7) 42%,
+      rgba(7, 22, 16, 0.25) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(5, 15, 11, 0.7),
+      transparent 55%
+    );
+}
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.leadership-hero__container {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  max-width: 1180px;
+  min-height: 410px;
+
+  margin: 0 auto;
+  padding: 100px 20px 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.leadership-hero__content {
+  max-width: 700px;
+}
+
+.leadership-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  margin-bottom: 13px;
+
+  color: #69d0a5;
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+
+  text-transform: uppercase;
+}
+
+.leadership-hero__eyebrow svg {
+  color: #69d0a5;
+}
+
+.leadership-hero__title {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  font-weight: 800;
+}
+
+.leadership-hero__title span {
+  display: block;
+
+  color: #69d0a5;
+}
+
+.leadership-hero__description {
+  max-width: 560px;
+
+  margin: 16px 0 0;
+
+  color: rgba(239, 247, 243, 0.78);
+
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   BREADCRUMB
+========================================================= */
+
+.leadership-hero__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 22px;
+
+  color: rgba(255, 255, 255, 0.5);
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.leadership-hero__breadcrumb span:first-child {
+  color: #ffffff;
+}
+
+.leadership-hero__breadcrumb svg {
+  color: #69d0a5;
+}
+
+/* =========================================================
+   SIDE MARKER
+========================================================= */
+
+.leadership-hero__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+
+  padding-right: 5px;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.leadership-hero__side span {
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.leadership-hero__side strong {
+  color: #69d0a5;
+
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .leadership-hero,
+  .leadership-hero__container {
+    min-height: 380px;
+  }
+
+  .leadership-hero__container {
+    padding: 95px 18px 50px;
+  }
+
+  .leadership-hero__title {
+    font-size: clamp(36px, 6vw, 52px);
+  }
+
+  .leadership-hero__side {
+    padding-right: 0;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 680px) {
+  .leadership-hero,
+  .leadership-hero__container {
+    min-height: 360px;
+  }
+
+  .leadership-hero__gradient {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(7, 22, 16, 0.9),
+        rgba(7, 22, 16, 0.58)
+      ),
+      linear-gradient(
+        0deg,
+        rgba(5, 15, 11, 0.78),
+        transparent 60%
+      );
+  }
+
+  .leadership-hero__container {
+    padding: 94px 14px 42px;
+
+    align-items: flex-end;
+  }
+
+  .leadership-hero__content {
+    max-width: 100%;
+  }
+
+  .leadership-hero__eyebrow {
+    margin-bottom: 10px;
+    font-size: 8px;
+  }
+
+  .leadership-hero__title {
+    font-size: clamp(31px, 9vw, 43px);
+    line-height: 1.02;
+  }
+
+  .leadership-hero__description {
+    max-width: 470px;
+
+    margin-top: 13px;
+
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .leadership-hero__breadcrumb {
+    margin-top: 17px;
+    font-size: 8px;
+  }
+
+  .leadership-hero__side {
+    display: none;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 420px) {
+  .leadership-hero,
+  .leadership-hero__container {
+    min-height: 335px;
+  }
+
+  .leadership-hero__container {
+    padding: 88px 12px 35px;
+  }
+
+  .leadership-hero__title {
+    font-size: 29px;
+  }
+
+  .leadership-hero__description {
+    margin-top: 11px;
+
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  .leadership-hero__breadcrumb {
+    margin-top: 14px;
+    font-size: 7px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .leadership-hero {
+    scroll-behavior: auto;
+  }
+}

@@ -1,0 +1,304 @@
+.assembly-hero {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  overflow: hidden;
+
+  background-image: url("/images/leadership-hero.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  color: #ffffff;
+}
+
+.assembly-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 18, 13, 0.42);
+}
+
+.assembly-hero__gradient {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7, 22, 16, 0.92) 0%,
+      rgba(7, 22, 16, 0.72) 48%,
+      rgba(7, 22, 16, 0.28) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(5, 15, 11, 0.72),
+      transparent 65%
+    );
+}
+
+.assembly-hero__container {
+  position: relative;
+  z-index: 2;
+
+  width: min(1180px, calc(100% - 40px));
+  min-height: 360px;
+
+  margin: 0 auto;
+  padding: 88px 0 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+}
+
+.assembly-hero__content {
+  max-width: 700px;
+}
+
+/* =========================================================
+   BACK LINK
+========================================================= */
+
+.assembly-hero__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 22px;
+
+  color: rgba(255, 255, 255, 0.62);
+
+  font-size: 8px;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition: color 180ms ease;
+}
+
+.assembly-hero__back:hover {
+  color: #69d0a5;
+}
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.assembly-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  margin-bottom: 12px;
+
+  color: #69d0a5;
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.assembly-hero__eyebrow svg {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.assembly-hero__title {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(38px, 5vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  font-weight: 800;
+}
+
+.assembly-hero__title span {
+  display: block;
+  color: #69d0a5;
+}
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.assembly-hero__description {
+  max-width: 570px;
+
+  margin: 15px 0 0;
+
+  color: rgba(239, 247, 243, 0.78);
+
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   BREADCRUMB
+========================================================= */
+
+.assembly-hero__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 19px;
+
+  color: rgba(255, 255, 255, 0.48);
+
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.assembly-hero__breadcrumb span:first-child {
+  color: #ffffff;
+}
+
+.assembly-hero__breadcrumb svg {
+  color: #69d0a5;
+}
+
+/* =========================================================
+   STAT
+========================================================= */
+
+.assembly-hero__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+
+  padding-right: 4px;
+}
+
+.assembly-hero__stat strong {
+  color: #69d0a5;
+
+  font-size: 38px;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  font-weight: 800;
+}
+
+.assembly-hero__stat span {
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+  .assembly-hero {
+    min-height: 340px;
+  }
+
+  .assembly-hero__container {
+    min-height: 340px;
+
+    width: calc(100% - 36px);
+
+    padding: 86px 0 42px;
+  }
+
+  .assembly-hero__stat {
+    padding-right: 0;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 620px) {
+  .assembly-hero {
+    min-height: 335px;
+  }
+
+  .assembly-hero__container {
+    min-height: 335px;
+
+    width: calc(100% - 28px);
+
+    padding: 86px 0 36px;
+
+    align-items: flex-end;
+  }
+
+  .assembly-hero__back {
+    margin-bottom: 18px;
+    font-size: 7px;
+  }
+
+  .assembly-hero__eyebrow {
+    margin-bottom: 9px;
+    font-size: 8px;
+  }
+
+  .assembly-hero__title {
+    font-size: clamp(31px, 9vw, 43px);
+  }
+
+  .assembly-hero__description {
+    max-width: 470px;
+
+    margin-top: 12px;
+
+    font-size: 9.5px;
+    line-height: 1.65;
+  }
+
+  .assembly-hero__breadcrumb {
+    margin-top: 15px;
+    font-size: 7px;
+  }
+
+  .assembly-hero__stat {
+    display: none;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+  .assembly-hero {
+    min-height: 315px;
+  }
+
+  .assembly-hero__container {
+    min-height: 315px;
+    padding-bottom: 30px;
+  }
+
+  .assembly-hero__title {
+    font-size: 29px;
+  }
+
+  .assembly-hero__description {
+    font-size: 9px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .assembly-hero__back {
+    transition: none;
+  }
+}
