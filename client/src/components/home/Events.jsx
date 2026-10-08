@@ -6,6 +6,90 @@ import { useEvent } from "../../context/EventContext";
 
 import "./Events.css";
 
+function formatDate(event) {
+  const rawDate =
+    event?.startDate ||
+    event?.date ||
+    event?.startAt;
+
+  if (!rawDate) {
+    return {
+      month: "JVP",
+      day: "EVENT",
+    };
+  }
+
+  const date = new Date(rawDate);
+
+  if (Number.isNaN(date.getTime())) {
+    return {
+      month: "JVP",
+      day: "EVENT",
+    };
+  }
+
+  return {
+    month: date
+      .toLocaleDateString("en-US", {
+        month: "short",
+      })
+      .toUpperCase(),
+
+    day: date.toLocaleDateString("en-US", {
+      day: "2-digit",
+    }),
+  };
+}
+
+/**
+ * Safely converts both old string locations
+ * and the new structured location object.
+ */
+function getLocation(event) {
+  const location =
+    event?.location ||
+    event?.venue ||
+    event?.county;
+
+  if (!location) {
+    return "Coast Region";
+  }
+
+  // Old event format
+  if (typeof location === "string") {
+    return location;
+  }
+
+  // New event format
+  if (typeof location === "object") {
+    return (
+      location?.name ||
+      location?.address ||
+      location?.city ||
+      location?.county ||
+      "Coast Region"
+    );
+  }
+
+  return "Coast Region";
+}
+
+function getEventLink(event) {
+  if (event?.slug) {
+    return `/events/${event.slug}`;
+  }
+
+  if (event?._id) {
+    return `/events/${event._id}`;
+  }
+
+  if (event?.id) {
+    return `/events/${event.id}`;
+  }
+
+  return "/events";
+}
+
 function Events() {
   const {
     events,
@@ -13,8 +97,16 @@ function Events() {
     loadEvents,
   } = useEvent();
 
+  /*
+   * IMPORTANT:
+   * Keep this effect with an empty dependency array.
+   *
+   * loadEvents may be recreated by EventContext when its
+   * internal state changes. Including it in the dependency
+   * array can therefore cause an infinite fetch loop.
+   */
   useEffect(() => {
-    let cancelled = false;
+    let mounted = true;
 
     const fetchEvents = async () => {
       try {
@@ -28,7 +120,7 @@ function Events() {
           sort: "date_asc",
         });
       } catch (error) {
-        if (!cancelled) {
+        if (mounted) {
           console.error(
             "Unable to load homepage events:",
             error
@@ -40,8 +132,11 @@ function Events() {
     fetchEvents();
 
     return () => {
-      cancelled = true;
+      mounted = false;
     };
+
+    // Intentionally runs only once when the homepage mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const upcomingEvents = useMemo(() => {
@@ -54,73 +149,15 @@ function Events() {
       .slice(0, 3);
   }, [events]);
 
-  const formatDate = (event) => {
-    const rawDate =
-      event?.startDate ||
-      event?.date ||
-      event?.startAt;
-
-    if (!rawDate) {
-      return {
-        month: "JVP",
-        day: "EVENT",
-      };
-    }
-
-    const date = new Date(rawDate);
-
-    if (Number.isNaN(date.getTime())) {
-      return {
-        month: "JVP",
-        day: "EVENT",
-      };
-    }
-
-    return {
-      month: date
-        .toLocaleDateString("en-US", {
-          month: "short",
-        })
-        .toUpperCase(),
-
-      day: date.toLocaleDateString("en-US", {
-        day: "2-digit",
-      }),
-    };
-  };
-
-  const getLocation = (event) => {
-    return (
-      event?.location ||
-      event?.venue ||
-      event?.county ||
-      "Coast Region"
-    );
-  };
-
-  const getEventLink = (event) => {
-    if (event?.slug) {
-      return `/events/${event.slug}`;
-    }
-
-    if (event?._id) {
-      return `/events/${event._id}`;
-    }
-
-    if (event?.id) {
-      return `/events/${event.id}`;
-    }
-
-    return "/events";
-  };
-
   return (
-    <section className="home-events" id="events">
-
+    <section
+      className="home-events"
+      id="events"
+    >
       <div className="home-events__container">
 
+        {/* Header */}
         <div className="home-events__header">
-
           <div>
             <span className="home-events__eyebrow">
               WHAT'S HAPPENING
@@ -143,12 +180,14 @@ function Events() {
             View all events
             <ArrowRight size={16} />
           </Link>
-
         </div>
 
+        {/* Loading */}
         {loading ? (
-
-          <div className="home-events__loading">
+          <div
+            className="home-events__loading"
+            aria-label="Loading events"
+          >
             <span />
             <span />
             <span />
@@ -156,10 +195,9 @@ function Events() {
 
         ) : upcomingEvents.length > 0 ? (
 
+          /* Events */
           <div className="home-events__grid">
-
             {upcomingEvents.map((event, index) => {
-
               const date = formatDate(event);
 
               return (
@@ -173,10 +211,9 @@ function Events() {
                   }
                 >
 
+                  {/* Date / Featured */}
                   <div className="home-event-card__top">
-
                     <div className="home-event-card__date">
-
                       <span>
                         {date.month}
                       </span>
@@ -184,7 +221,6 @@ function Events() {
                       <strong>
                         {date.day}
                       </strong>
-
                     </div>
 
                     {event?.featured && (
@@ -192,11 +228,10 @@ function Events() {
                         Featured
                       </span>
                     )}
-
                   </div>
 
+                  {/* Content */}
                   <div className="home-event-card__content">
-
                     <h3>
                       {event?.title ||
                         event?.name ||
@@ -204,13 +239,11 @@ function Events() {
                     </h3>
 
                     <div className="home-event-card__location">
-
                       <MapPin size={14} />
 
                       <span>
                         {getLocation(event)}
                       </span>
-
                     </div>
 
                     {event?.description && (
@@ -218,9 +251,9 @@ function Events() {
                         {event.description}
                       </p>
                     )}
-
                   </div>
 
+                  {/* Link */}
                   <Link
                     to={getEventLink(event)}
                     className="home-event-card__link"
@@ -232,13 +265,12 @@ function Events() {
                 </article>
               );
             })}
-
           </div>
 
         ) : (
 
+          /* Empty */
           <div className="home-events__empty">
-
             <div className="home-events__empty-icon">
               <CalendarDays size={22} />
             </div>
@@ -258,13 +290,10 @@ function Events() {
               Explore events
               <ArrowRight size={15} />
             </Link>
-
           </div>
-
         )}
 
       </div>
-
     </section>
   );
 }
