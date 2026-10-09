@@ -10,19 +10,38 @@ import {
   Star,
   Eye,
   EyeOff,
+  Users,
+  Clock3,
+  Ticket,
+  Globe2,
+  Building2,
+  ExternalLink,
+  CheckCircle2,
+  XCircle,
+  UserRound,
+  Handshake,
+  Image as ImageIcon,
+  Search,
+  Database,
 } from "lucide-react";
 
 import eventService from "../../../services/event.service";
 import "./ViewEvent.css";
 
-/* ===========================================================
+/* =========================================================
    HELPERS
-=========================================================== */
+========================================================= */
 
 const formatDate = (date) => {
   if (!date) return "N/A";
 
-  return new Date(date).toLocaleString("en-KE", {
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "N/A";
+  }
+
+  return parsedDate.toLocaleString("en-KE", {
     dateStyle: "long",
     timeStyle: "short",
   });
@@ -31,14 +50,191 @@ const formatDate = (date) => {
 const formatDateOnly = (date) => {
   if (!date) return "N/A";
 
-  return new Date(date).toLocaleDateString("en-KE", {
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "N/A";
+  }
+
+  return parsedDate.toLocaleDateString("en-KE", {
     dateStyle: "long",
   });
 };
 
-/* ===========================================================
+const formatTime = (date) => {
+  if (!date) return "";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "";
+  }
+
+  return parsedDate.toLocaleTimeString("en-KE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+const formatCurrency = (amount) => {
+  const value = Number(amount);
+
+  if (!Number.isFinite(value) || value <= 0) {
+    return "FREE";
+  }
+
+  return `KES ${value.toLocaleString("en-KE")}`;
+};
+
+const getRegistrationCount = (event) => {
+  if (
+    typeof event?.registeredParticipants === "number"
+  ) {
+    return event.registeredParticipants;
+  }
+
+  if (
+    typeof event?.registration?.registeredCount === "number"
+  ) {
+    return event.registration.registeredCount;
+  }
+
+  return 0;
+};
+
+const getCapacity = (event) => {
+  const capacity = Number(
+    event?.registration?.capacity
+  );
+
+  if (!Number.isFinite(capacity) || capacity <= 0) {
+    return null;
+  }
+
+  return capacity;
+};
+
+const getAvailableSlots = (event) => {
+  const registered = getRegistrationCount(event);
+  const capacity = getCapacity(event);
+
+  if (!capacity) {
+    return null;
+  }
+
+  return Math.max(capacity - registered, 0);
+};
+
+const getRegistrationPercentage = (event) => {
+  const registered = getRegistrationCount(event);
+  const capacity = getCapacity(event);
+
+  if (!capacity) {
+    return 0;
+  }
+
+  return Math.min(
+    100,
+    Math.round((registered / capacity) * 100)
+  );
+};
+
+const getEventImage = (event) => {
+  return (
+    event?.coverImage?.secureUrl ||
+    event?.coverImage?.url ||
+    "/placeholder-event.jpg"
+  );
+};
+
+const getEventTypeLabel = (event) => {
+  if (event?.eventType === "virtual") {
+    return "Virtual";
+  }
+
+  if (event?.eventType === "physical") {
+    return "Physical";
+  }
+
+  return event?.eventType || "N/A";
+};
+
+const getLocationPrimary = (event) => {
+  if (event?.eventType === "virtual") {
+    return "Virtual Event";
+  }
+
+  return (
+    event?.venue?.name ||
+    "Venue not specified"
+  );
+};
+
+const getLocationSecondary = (event) => {
+  if (event?.eventType === "virtual") {
+    return (
+      event?.virtualPlatform ||
+      "Online"
+    );
+  }
+
+  return [
+    event?.venue?.city,
+    event?.venue?.county,
+  ]
+    .filter(Boolean)
+    .join(", ");
+};
+
+/* =========================================================
+   INFO ITEM
+========================================================= */
+
+const InfoItem = ({
+  label,
+  value,
+  icon: Icon,
+}) => {
+  return (
+    <div className="view-info-item">
+      <div className="view-info-label">
+        {Icon && <Icon size={14} />}
+        <span>{label}</span>
+      </div>
+
+      <p>{value || "N/A"}</p>
+    </div>
+  );
+};
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+const EmptyState = ({
+  icon: Icon = CalendarDays,
+  title,
+  message,
+}) => {
+  return (
+    <div className="view-empty-state">
+      <div className="view-empty-icon">
+        <Icon size={22} />
+      </div>
+
+      <div>
+        <strong>{title}</strong>
+
+        {message && <p>{message}</p>}
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
    COMPONENT
-=========================================================== */
+========================================================= */
 
 const ViewEvent = () => {
   const navigate = useNavigate();
@@ -48,9 +244,9 @@ const ViewEvent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  /* ===========================================================
+  /* =======================================================
      LOAD EVENT
-  =========================================================== */
+  ======================================================= */
 
   useEffect(() => {
     fetchEvent();
@@ -59,694 +255,1411 @@ const ViewEvent = () => {
   const fetchEvent = async () => {
     try {
       setLoading(true);
+      setError("");
 
       const response =
         await eventService.getEventById(id);
 
       setEvent(response.data);
-      setError("");
-
     } catch (err) {
-
       console.error(err);
 
       setError(
         err.response?.data?.message ||
           "Unable to load event."
       );
-
     } finally {
-
       setLoading(false);
-
     }
   };
 
-  /* ===========================================================
+  /* =======================================================
      LOADING
-  =========================================================== */
+  ======================================================= */
 
   if (loading) {
     return (
-      <div className="event-view-loading">
-        <Loader2
-          className="spinner"
-          size={42}
-        />
+      <div className="event-view-state">
+        <div className="event-view-state-icon">
+          <Loader2 className="spinner" size={28} />
+        </div>
 
-        <h2>Loading Event...</h2>
+        <h2>Loading Event</h2>
+
+        <p>
+          Please wait while the event details are
+          being loaded.
+        </p>
       </div>
     );
   }
 
-  /* ===========================================================
+  /* =======================================================
      ERROR
-  =========================================================== */
+  ======================================================= */
 
   if (error || !event) {
     return (
-      <div className="event-view-error">
-        <AlertTriangle size={50} />
+      <div className="event-view-state error">
+        <div className="event-view-state-icon">
+          <AlertTriangle size={28} />
+        </div>
 
-        <h2>{error || "Event not found."}</h2>
+        <h2>
+          {error || "Event not found."}
+        </h2>
+
+        <p>
+          The event could not be loaded or may no
+          longer exist.
+        </p>
 
         <button
-          className="primary-btn"
+          type="button"
+          className="view-primary-btn"
           onClick={() =>
             navigate("/admin/events")
           }
         >
+          <ArrowLeft size={16} />
           Back to Events
         </button>
       </div>
     );
   }
 
-  /* ===========================================================
+  /* =======================================================
+     DERIVED VALUES
+  ======================================================= */
+
+  const registered = getRegistrationCount(event);
+  const capacity = getCapacity(event);
+  const availableSlots = getAvailableSlots(event);
+  const registrationPercentage =
+    getRegistrationPercentage(event);
+
+  const eventImage = getEventImage(event);
+
+  const isPublished = Boolean(
+    event?.isPublished
+  );
+
+  const isArchived = Boolean(
+    event?.isArchived
+  );
+
+  const isFeatured = Boolean(
+    event?.isFeatured
+  );
+
+  const locationPrimary =
+    getLocationPrimary(event);
+
+  const locationSecondary =
+    getLocationSecondary(event);
+
+  /* =======================================================
      PAGE
-  =========================================================== */
+  ======================================================= */
 
   return (
     <div className="view-event-page">
 
-      {/* ==========================================
-          HEADER
-      ========================================== */}
+      {/* =================================================
+          PAGE HEADER
+      ================================================= */}
 
-      <div className="page-header">
+      <header className="view-event-header">
 
-        <button
-          className="back-button"
-          onClick={() =>
-            navigate("/admin/events")
-          }
-        >
-          <ArrowLeft size={18} />
-          Back
-        </button>
+        <div className="view-event-header-left">
 
-        <Link
-          to={`/admin/events/${id}/edit`}
-          className="primary-btn"
-        >
-          <Pencil size={18} />
-          Edit Event
-        </Link>
+          <button
+            type="button"
+            className="view-back-btn"
+            onClick={() =>
+              navigate("/admin/events")
+            }
+          >
+            <ArrowLeft size={17} />
+            <span>Events</span>
+          </button>
 
-      </div>
+          <div className="header-divider" />
 
-      {/* ==========================================
-          HERO
-      ========================================== */}
-
-      <section className="event-hero">
-
-        <img
-          src={
-            event.coverImage?.secureUrl ||
-            "/placeholder-event.jpg"
-          }
-          alt={event.title}
-        />
-
-        <div className="event-overlay">
-
-          <div className="event-badges">
-
-            <span className="badge">
-              {event.category}
+          <div>
+            <span className="header-eyebrow">
+              Event Management
             </span>
 
-            <span className="badge">
-              {event.eventType}
+            <h1>Event Details</h1>
+          </div>
+
+        </div>
+
+        <div className="view-event-header-actions">
+
+          <button
+            type="button"
+            className="secondary-btn"
+            onClick={fetchEvent}
+            disabled={loading}
+          >
+            <Search size={16} />
+            Refresh
+          </button>
+
+          <Link
+            to={`/admin/events/${id}/edit`}
+            className="view-primary-btn"
+          >
+            <Pencil size={16} />
+            Edit Event
+          </Link>
+
+        </div>
+
+      </header>
+
+      {/* =================================================
+          HERO
+      ================================================= */}
+
+      <section className="event-detail-hero">
+
+        <div className="event-hero-image">
+
+          <img
+            src={eventImage}
+            alt={event.title}
+          />
+
+          <div className="hero-image-overlay" />
+
+        </div>
+
+        <div className="event-hero-content">
+
+          {/* BADGES */}
+
+          <div className="event-detail-badges">
+
+            <span className="detail-badge category">
+              {event.category || "General"}
+            </span>
+
+            <span className="detail-badge type">
+              {event.eventType === "virtual" ? (
+                <Globe2 size={13} />
+              ) : (
+                <Building2 size={13} />
+              )}
+
+              {getEventTypeLabel(event)}
             </span>
 
             <span
-              className={
-                event.isPublished
-                  ? "badge success"
-                  : "badge warning"
-              }
+              className={`detail-badge ${
+                isArchived
+                  ? "archived"
+                  : isPublished
+                  ? "published"
+                  : "draft"
+              }`}
             >
-              {event.isPublished
+              <span className="badge-dot" />
+
+              {isArchived
+                ? "Archived"
+                : isPublished
                 ? "Published"
                 : "Draft"}
             </span>
 
-            {event.isFeatured && (
-              <span className="badge featured">
-                <Star size={14} />
+            {isFeatured && (
+              <span className="detail-badge featured">
+                <Star
+                  size={13}
+                  fill="currentColor"
+                />
                 Featured
               </span>
             )}
 
           </div>
 
-          <h1>{event.title}</h1>
+          {/* TITLE */}
 
-          <p className="event-summary">
-            {event.summary}
-          </p>
+          <h2>{event.title}</h2>
 
-          <div className="hero-meta">
+          {event.summary && (
+            <p className="event-detail-summary">
+              {event.summary}
+            </p>
+          )}
 
-            <span>
+          {/* HERO META */}
+
+          <div className="event-detail-meta">
+
+            <div className="hero-meta-item">
+
               <CalendarDays size={16} />
-              {formatDateOnly(
-                event.startDate
-              )}
-            </span>
 
-            <span>
-              <MapPin size={16} />
-              {event.venue?.name}
-            </span>
+              <div>
+                <span>Date</span>
 
-            <span>
-              {event.isPublished ? (
-                <>
-                  <Eye size={16} />
-                  Public
-                </>
+                <strong>
+                  {formatDateOnly(
+                    event.startDate
+                  )}
+                </strong>
+              </div>
+
+            </div>
+
+            <div className="hero-meta-item">
+
+              <Clock3 size={16} />
+
+              <div>
+                <span>Time</span>
+
+                <strong>
+                  {formatTime(
+                    event.startDate
+                  ) || "TBA"}
+                </strong>
+              </div>
+
+            </div>
+
+            <div className="hero-meta-item">
+
+              {event.eventType === "virtual" ? (
+                <Globe2 size={16} />
               ) : (
-                <>
-                  <EyeOff size={16} />
-                  Hidden
-                </>
+                <MapPin size={16} />
               )}
-            </span>
+
+              <div>
+                <span>Location</span>
+
+                <strong>
+                  {locationPrimary}
+                </strong>
+
+                {locationSecondary && (
+                  <small>
+                    {locationSecondary}
+                  </small>
+                )}
+              </div>
+
+            </div>
+
+            <div className="hero-meta-item">
+
+              {isPublished ? (
+                <Eye size={16} />
+              ) : (
+                <EyeOff size={16} />
+              )}
+
+              <div>
+                <span>Visibility</span>
+
+                <strong>
+                  {isPublished
+                    ? "Public"
+                    : "Hidden"}
+                </strong>
+              </div>
+
+            </div>
 
           </div>
 
         </div>
 
       </section>
-            {/* ==========================================
-          STATISTICS
-      ========================================== */}
+
+      {/* =================================================
+          QUICK STATISTICS
+      ================================================= */}
 
       <section className="view-stats">
 
-        <div className="stat-card">
-          <h3>
-            {event.registration?.registeredCount ?? 0}
-          </h3>
-          <span>Registered</span>
-        </div>
+        <div className="view-stat-card">
 
-        <div className="stat-card">
-          <h3>
-            {event.registration?.capacity || "Unlimited"}
-          </h3>
-          <span>Capacity</span>
-        </div>
-
-        <div className="stat-card">
-          <h3>
-            {event.registration?.availableSlots ??
-              "Unlimited"}
-          </h3>
-          <span>Available</span>
-        </div>
-
-        <div className="stat-card">
-          <h3>
-            {event.registration?.fee
-              ? `KES ${event.registration.fee.toLocaleString()}`
-              : "FREE"}
-          </h3>
-          <span>Registration Fee</span>
-        </div>
-
-      </section>
-
-      {/* ==========================================
-          EVENT OVERVIEW
-      ========================================== */}
-
-      <section className="view-section">
-
-        <h2>Event Overview</h2>
-
-        <div className="info-grid">
-
-          <div className="info-item">
-            <label>Title</label>
-            <p>{event.title}</p>
+          <div className="view-stat-icon registrations">
+            <Users size={18} />
           </div>
 
-          <div className="info-item">
-            <label>Slug</label>
-            <p>{event.slug}</p>
-          </div>
+          <div className="view-stat-content">
+            <span>Registered</span>
 
-          <div className="info-item">
-            <label>Category</label>
-            <p>{event.category}</p>
-          </div>
+            <strong>
+              {registered.toLocaleString()}
+            </strong>
 
-          <div className="info-item">
-            <label>Event Type</label>
-            <p>{event.eventType}</p>
-          </div>
-
-          <div className="info-item">
-            <label>Visibility</label>
-            <p>
-              {event.isPublished
-                ? "Published"
-                : "Draft"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>Featured</label>
-            <p>
-              {event.isFeatured
-                ? "Yes"
-                : "No"}
-            </p>
+            {capacity && (
+              <small>
+                of {capacity.toLocaleString()}
+              </small>
+            )}
           </div>
 
         </div>
 
-      </section>
+        <div className="view-stat-card">
 
-      {/* ==========================================
-          DESCRIPTION
-      ========================================== */}
+          <div className="view-stat-icon capacity">
+            <Ticket size={18} />
+          </div>
 
-      <section className="view-section">
+          <div className="view-stat-content">
+            <span>Capacity</span>
 
-        <h2>Description</h2>
+            <strong>
+              {capacity
+                ? capacity.toLocaleString()
+                : "∞"}
+            </strong>
 
-        <div className="description-box">
-
-          <p>{event.description}</p>
+            <small>
+              {capacity
+                ? "Maximum"
+                : "Unlimited"}
+            </small>
+          </div>
 
         </div>
 
-      </section>
+        <div className="view-stat-card">
 
-      {/* ==========================================
-          EVENT SCHEDULE
-      ========================================== */}
-
-      <section className="view-section">
-
-        <h2>Schedule</h2>
-
-        <div className="info-grid">
-
-          <div className="info-item">
-            <label>Start Date</label>
-            <p>
-              {formatDate(event.startDate)}
-            </p>
+          <div className="view-stat-icon available">
+            <CheckCircle2 size={18} />
           </div>
 
-          <div className="info-item">
-            <label>End Date</label>
-            <p>
-              {formatDate(event.endDate)}
-            </p>
+          <div className="view-stat-content">
+            <span>Available</span>
+
+            <strong>
+              {availableSlots !== null
+                ? availableSlots.toLocaleString()
+                : "∞"}
+            </strong>
+
+            <small>
+              {capacity
+                ? `${registrationPercentage}% filled`
+                : "No capacity limit"}
+            </small>
           </div>
 
-          <div className="info-item">
-            <label>Registration Opens</label>
-            <p>
-              {formatDate(
-                event.registration
-                  ?.registrationOpens
+        </div>
+
+        <div className="view-stat-card">
+
+          <div className="view-stat-icon fee">
+            <Ticket size={18} />
+          </div>
+
+          <div className="view-stat-content">
+            <span>Registration Fee</span>
+
+            <strong>
+              {formatCurrency(
+                event.registration?.fee
               )}
-            </p>
-          </div>
+            </strong>
 
-          <div className="info-item">
-            <label>Registration Closes</label>
-            <p>
-              {formatDate(
-                event.registration
-                  ?.registrationDeadline
-              )}
-            </p>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ==========================================
-          VENUE
-      ========================================== */}
-
-      <section className="view-section">
-
-        <h2>Venue</h2>
-
-        <div className="info-grid">
-
-          <div className="info-item">
-            <label>Venue Name</label>
-            <p>
-              {event.venue?.name ||
-                "Not specified"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>County</label>
-            <p>
-              {event.venue?.county ||
-                "N/A"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>City</label>
-            <p>
-              {event.venue?.city ||
-                "N/A"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>Address</label>
-            <p>
-              {event.venue?.address ||
-                "N/A"}
-            </p>
-          </div>
-
-        </div>
-
-        {event.venue?.googleMapsLink && (
-
-          <a
-            href={event.venue.googleMapsLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="primary-btn"
-          >
-            <MapPin size={18} />
-            Open in Google Maps
-          </a>
-
-        )}
-
-      </section>
-            {/* ==========================================
-          REGISTRATION
-      ========================================== */}
-
-      <section className="view-section">
-
-        <h2>Registration Settings</h2>
-
-        <div className="info-grid">
-
-          <div className="info-item">
-            <label>Registration Required</label>
-            <p>
+            <small>
               {event.registration?.required
-                ? "Yes"
-                : "No"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>Capacity</label>
-            <p>
-              {event.registration?.capacity ||
-                "Unlimited"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>Fee</label>
-            <p>
-              {event.registration?.fee
-                ? `KES ${event.registration.fee.toLocaleString()}`
-                : "Free"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>Walk-ins</label>
-            <p>
-              {event.registration?.allowWalkIns
-                ? "Allowed"
-                : "Not Allowed"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>Waiting List</label>
-            <p>
-              {event.registration?.allowWaitlist
-                ? "Enabled"
-                : "Disabled"}
-            </p>
-          </div>
-
-          <div className="info-item">
-            <label>Approval Required</label>
-            <p>
-              {event.registration?.requireApproval
-                ? "Yes"
-                : "No"}
-            </p>
+                ? "Registration required"
+                : "Registration optional"}
+            </small>
           </div>
 
         </div>
 
       </section>
 
-      {/* ==========================================
-          SPEAKERS
-      ========================================== */}
+      {/* =================================================
+          MAIN CONTENT
+      ================================================= */}
 
-      <section className="view-section">
+      <div className="view-event-content">
 
-        <h2>Speakers</h2>
+        {/* =================================================
+            LEFT COLUMN
+        ================================================= */}
 
-        {!event.speakers?.length ? (
+        <main className="view-event-main">
 
-          <div className="empty-state">
-            No speakers assigned.
-          </div>
+          {/* EVENT OVERVIEW */}
 
-        ) : (
+          <section className="view-section">
 
-          <div className="speaker-grid">
+            <div className="view-section-header">
 
-            {event.speakers.map((speaker) => (
+              <div>
+                <span className="section-eyebrow">
+                  Overview
+                </span>
 
-              <div
-                key={speaker._id}
-                className="speaker-card"
-              >
+                <h2>Event Information</h2>
+              </div>
 
-                {speaker.photo?.secureUrl && (
-                  <img
-                    src={speaker.photo.secureUrl}
-                    alt={speaker.name}
-                  />
-                )}
+            </div>
 
-                <h3>{speaker.name}</h3>
+            <div className="view-info-grid">
 
-                <p>{speaker.title}</p>
+              <InfoItem
+                label="Event Title"
+                value={event.title}
+              />
 
-                <small>
-                  {speaker.organization}
-                </small>
+              <InfoItem
+                label="Category"
+                value={event.category}
+              />
+
+              <InfoItem
+                label="Event Type"
+                value={getEventTypeLabel(event)}
+                icon={
+                  event.eventType ===
+                  "virtual"
+                    ? Globe2
+                    : Building2
+                }
+              />
+
+              <InfoItem
+                label="Visibility"
+                value={
+                  isArchived
+                    ? "Archived"
+                    : isPublished
+                    ? "Published"
+                    : "Draft"
+                }
+                icon={
+                  isPublished
+                    ? Eye
+                    : EyeOff
+                }
+              />
+
+              <InfoItem
+                label="Featured Event"
+                value={
+                  isFeatured
+                    ? "Yes"
+                    : "No"
+                }
+                icon={Star}
+              />
+
+              <InfoItem
+                label="Slug"
+                value={event.slug}
+              />
+
+            </div>
+
+          </section>
+
+          {/* DESCRIPTION */}
+
+          <section className="view-section">
+
+            <div className="view-section-header">
+
+              <div>
+                <span className="section-eyebrow">
+                  Content
+                </span>
+
+                <h2>Description</h2>
+              </div>
+
+            </div>
+
+            {event.description ? (
+              <div className="view-description">
+                <p>
+                  {event.description}
+                </p>
+              </div>
+            ) : (
+              <EmptyState
+                icon={CalendarDays}
+                title="No description"
+                message="No detailed event description has been added."
+              />
+            )}
+
+          </section>
+
+          {/* SCHEDULE */}
+
+          <section className="view-section">
+
+            <div className="view-section-header">
+
+              <div>
+                <span className="section-eyebrow">
+                  Timeline
+                </span>
+
+                <h2>Schedule</h2>
+              </div>
+
+            </div>
+
+            <div className="schedule-grid">
+
+              <div className="schedule-card">
+
+                <div className="schedule-icon">
+                  <CalendarDays size={18} />
+                </div>
+
+                <div>
+                  <span>Starts</span>
+
+                  <strong>
+                    {formatDateOnly(
+                      event.startDate
+                    )}
+                  </strong>
+
+                  <small>
+                    {formatTime(
+                      event.startDate
+                    ) || "Time TBA"}
+                  </small>
+                </div>
 
               </div>
 
-            ))}
+              <div className="schedule-card">
 
-          </div>
+                <div className="schedule-icon">
+                  <CalendarDays size={18} />
+                </div>
 
-        )}
+                <div>
+                  <span>Ends</span>
 
-      </section>
+                  <strong>
+                    {formatDateOnly(
+                      event.endDate
+                    )}
+                  </strong>
 
-      {/* ==========================================
-          PARTNERS
-      ========================================== */}
+                  <small>
+                    {formatTime(
+                      event.endDate
+                    ) || "Time TBA"}
+                  </small>
+                </div>
 
-      <section className="view-section">
+              </div>
 
-        <h2>Partners</h2>
+              <div className="schedule-card">
 
-        {!event.partners?.length ? (
+                <div className="schedule-icon">
+                  <Clock3 size={18} />
+                </div>
 
-          <div className="empty-state">
-            No partners assigned.
-          </div>
+                <div>
+                  <span>Registration Opens</span>
 
-        ) : (
+                  <strong>
+                    {formatDateOnly(
+                      event.registration
+                        ?.registrationOpens
+                    )}
+                  </strong>
 
-          <div className="partner-grid">
+                  <small>
+                    {formatTime(
+                      event.registration
+                        ?.registrationOpens
+                    ) || ""}
+                  </small>
+                </div>
 
-            {event.partners.map((partner) => (
+              </div>
 
-              <div
-                key={partner._id}
-                className="partner-card"
+              <div className="schedule-card">
+
+                <div className="schedule-icon">
+                  <Clock3 size={18} />
+                </div>
+
+                <div>
+                  <span>Registration Closes</span>
+
+                  <strong>
+                    {formatDateOnly(
+                      event.registration
+                        ?.registrationDeadline
+                    )}
+                  </strong>
+
+                  <small>
+                    {formatTime(
+                      event.registration
+                        ?.registrationDeadline
+                    ) || ""}
+                  </small>
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          {/* VENUE */}
+
+          <section className="view-section">
+
+            <div className="view-section-header">
+
+              <div>
+                <span className="section-eyebrow">
+                  Location
+                </span>
+
+                <h2>
+                  {event.eventType ===
+                  "virtual"
+                    ? "Virtual Event"
+                    : "Venue Details"}
+                </h2>
+              </div>
+
+            </div>
+
+            {event.eventType === "virtual" ? (
+
+              <div className="virtual-event-card">
+
+                <div className="virtual-icon">
+                  <Globe2 size={22} />
+                </div>
+
+                <div>
+                  <span>Online Platform</span>
+
+                  <strong>
+                    {event.virtualPlatform ||
+                      "Online"}
+                  </strong>
+                </div>
+
+              </div>
+
+            ) : (
+
+              <div className="view-info-grid">
+
+                <InfoItem
+                  label="Venue Name"
+                  value={
+                    event.venue?.name
+                  }
+                  icon={MapPin}
+                />
+
+                <InfoItem
+                  label="County"
+                  value={
+                    event.venue?.county
+                  }
+                />
+
+                <InfoItem
+                  label="City"
+                  value={
+                    event.venue?.city
+                  }
+                />
+
+                <InfoItem
+                  label="Address"
+                  value={
+                    event.venue?.address
+                  }
+                />
+
+              </div>
+
+            )}
+
+            {event.venue?.googleMapsLink && (
+              <a
+                href={
+                  event.venue.googleMapsLink
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="map-link"
               >
+                <MapPin size={15} />
+                Open in Google Maps
+                <ExternalLink size={13} />
+              </a>
+            )}
 
-                {partner.logo?.secureUrl && (
-                  <img
-                    src={partner.logo.secureUrl}
-                    alt={partner.name}
+          </section>
+
+          {/* REGISTRATION SETTINGS */}
+
+          <section className="view-section">
+
+            <div className="view-section-header">
+
+              <div>
+                <span className="section-eyebrow">
+                  Registration
+                </span>
+
+                <h2>Registration Settings</h2>
+              </div>
+
+            </div>
+
+            <div className="view-info-grid">
+
+              <InfoItem
+                label="Registration Required"
+                value={
+                  event.registration?.required
+                    ? "Yes"
+                    : "No"
+                }
+              />
+
+              <InfoItem
+                label="Capacity"
+                value={
+                  capacity
+                    ? capacity.toLocaleString()
+                    : "Unlimited"
+                }
+              />
+
+              <InfoItem
+                label="Registration Fee"
+                value={formatCurrency(
+                  event.registration?.fee
+                )}
+              />
+
+              <InfoItem
+                label="Walk-ins"
+                value={
+                  event.registration
+                    ?.allowWalkIns
+                    ? "Allowed"
+                    : "Not Allowed"
+                }
+              />
+
+              <InfoItem
+                label="Waiting List"
+                value={
+                  event.registration
+                    ?.allowWaitlist
+                    ? "Enabled"
+                    : "Disabled"
+                }
+              />
+
+              <InfoItem
+                label="Approval Required"
+                value={
+                  event.registration
+                    ?.requireApproval
+                    ? "Yes"
+                    : "No"
+                }
+              />
+
+            </div>
+
+            {/* REGISTRATION PROGRESS */}
+
+            {capacity && (
+              <div className="registration-progress-card">
+
+                <div className="registration-progress-header">
+
+                  <div>
+                    <span>
+                      Registration Capacity
+                    </span>
+
+                    <strong>
+                      {registered} of{" "}
+                      {capacity} registered
+                    </strong>
+                  </div>
+
+                  <strong>
+                    {registrationPercentage}%
+                  </strong>
+
+                </div>
+
+                <div className="registration-progress-track">
+
+                  <span
+                    style={{
+                      width: `${registrationPercentage}%`,
+                    }}
                   />
+
+                </div>
+
+              </div>
+            )}
+
+          </section>
+
+          {/* SPEAKERS */}
+
+          <section className="view-section">
+
+            <div className="view-section-header">
+
+              <div>
+                <span className="section-eyebrow">
+                  People
+                </span>
+
+                <h2>Speakers</h2>
+              </div>
+
+              {event.speakers?.length > 0 && (
+                <span className="section-count">
+                  {event.speakers.length}
+                </span>
+              )}
+
+            </div>
+
+            {!event.speakers?.length ? (
+
+              <EmptyState
+                icon={UserRound}
+                title="No speakers assigned"
+                message="Speakers will appear here once they are added to this event."
+              />
+
+            ) : (
+
+              <div className="speaker-grid">
+
+                {event.speakers.map(
+                  (speaker, index) => {
+
+                    const photo =
+                      speaker.photo?.secureUrl ||
+                      speaker.photo?.url;
+
+                    return (
+                      <div
+                        key={
+                          speaker._id ||
+                          speaker.id ||
+                          index
+                        }
+                        className="speaker-card"
+                      >
+
+                        <div className="speaker-photo">
+
+                          {photo ? (
+                            <img
+                              src={photo}
+                              alt={
+                                speaker.name
+                              }
+                              loading="lazy"
+                            />
+                          ) : (
+                            <UserRound
+                              size={24}
+                            />
+                          )}
+
+                        </div>
+
+                        <div className="speaker-info">
+
+                          <h3>
+                            {speaker.name ||
+                              "Unnamed Speaker"}
+                          </h3>
+
+                          {speaker.title && (
+                            <p>
+                              {speaker.title}
+                            </p>
+                          )}
+
+                          {speaker.organization && (
+                            <small>
+                              {
+                                speaker.organization
+                              }
+                            </small>
+                          )}
+
+                        </div>
+
+                      </div>
+                    );
+                  }
                 )}
 
-                <h3>{partner.name}</h3>
+              </div>
 
-                <span>
-                  {partner.category}
+            )}
+
+          </section>
+
+          {/* PARTNERS */}
+
+          <section className="view-section">
+
+            <div className="view-section-header">
+
+              <div>
+                <span className="section-eyebrow">
+                  Collaboration
+                </span>
+
+                <h2>Partners</h2>
+              </div>
+
+              {event.partners?.length > 0 && (
+                <span className="section-count">
+                  {event.partners.length}
+                </span>
+              )}
+
+            </div>
+
+            {!event.partners?.length ? (
+
+              <EmptyState
+                icon={Handshake}
+                title="No partners assigned"
+                message="Partner organizations will appear here once added."
+              />
+
+            ) : (
+
+              <div className="partner-grid">
+
+                {event.partners.map(
+                  (partner, index) => {
+
+                    const logo =
+                      partner.logo?.secureUrl ||
+                      partner.logo?.url;
+
+                    return (
+                      <div
+                        key={
+                          partner._id ||
+                          partner.id ||
+                          index
+                        }
+                        className="partner-card"
+                      >
+
+                        <div className="partner-logo">
+
+                          {logo ? (
+                            <img
+                              src={logo}
+                              alt={
+                                partner.name
+                              }
+                              loading="lazy"
+                            />
+                          ) : (
+                            <Handshake
+                              size={23}
+                            />
+                          )}
+
+                        </div>
+
+                        <div>
+                          <h3>
+                            {partner.name ||
+                              "Unnamed Partner"}
+                          </h3>
+
+                          {partner.category && (
+                            <span>
+                              {
+                                partner.category
+                              }
+                            </span>
+                          )}
+                        </div>
+
+                      </div>
+                    );
+                  }
+                )}
+
+              </div>
+
+            )}
+
+          </section>
+
+          {/* GALLERY */}
+
+          {!!event.gallery?.length && (
+            <section className="view-section">
+
+              <div className="view-section-header">
+
+                <div>
+                  <span className="section-eyebrow">
+                    Media
+                  </span>
+
+                  <h2>Gallery</h2>
+                </div>
+
+                <span className="section-count">
+                  {event.gallery.length}
                 </span>
 
               </div>
 
-            ))}
+              <div className="gallery-grid">
 
-          </div>
+                {event.gallery.map(
+                  (image, index) => {
 
-        )}
+                    const imageUrl =
+                      image?.secureUrl ||
+                      image?.url;
 
-      </section>
-
-      {/* ==========================================
-          GALLERY
-      ========================================== */}
-
-      {!!event.gallery?.length && (
-
-        <section className="view-section">
-
-          <h2>Gallery</h2>
-
-          <div className="gallery-grid">
-
-            {event.gallery.map(
-              (image, index) => (
-
-                <img
-                  key={
-                    image.publicId || index
+                    return (
+                      <div
+                        key={
+                          image?.publicId ||
+                          image?._id ||
+                          index
+                        }
+                        className="gallery-item"
+                      >
+                        {imageUrl && (
+                          <img
+                            src={imageUrl}
+                            alt={
+                              image?.alt ||
+                              `Event gallery ${
+                                index + 1
+                              }`
+                            }
+                            loading="lazy"
+                          />
+                        )}
+                      </div>
+                    );
                   }
-                  src={image.secureUrl}
-                  alt={
-                    image.alt ||
-                    `Gallery ${index + 1}`
-                  }
-                />
+                )}
 
-              )
-            )}
+              </div>
 
-          </div>
+            </section>
+          )}
 
-        </section>
+        </main>
 
-      )}
+        {/* =================================================
+            RIGHT SIDEBAR
+        ================================================= */}
 
-      {/* ==========================================
-          SEO
-      ========================================== */}
+        <aside className="view-event-sidebar">
 
-      {event.seo && (
+          {/* QUICK STATUS */}
 
-        <section className="view-section">
+          <section className="sidebar-card">
 
-          <h2>SEO</h2>
-
-          <div className="info-grid">
-
-            <div className="info-item">
-              <label>Meta Title</label>
-              <p>
-                {event.seo.metaTitle ||
-                  "Not set"}
-              </p>
+            <div className="sidebar-card-header">
+              <h3>Event Status</h3>
             </div>
 
-            <div className="info-item">
-              <label>Meta Description</label>
-              <p>
-                {event.seo.metaDescription ||
-                  "Not set"}
-              </p>
+            <div className="status-summary">
+
+              <div
+                className={`large-status ${
+                  isArchived
+                    ? "archived"
+                    : isPublished
+                    ? "published"
+                    : "draft"
+                }`}
+              >
+                <span className="large-status-dot" />
+
+                <div>
+                  <strong>
+                    {isArchived
+                      ? "Archived"
+                      : isPublished
+                      ? "Published"
+                      : "Draft"}
+                  </strong>
+
+                  <small>
+                    {isArchived
+                      ? "No longer active"
+                      : isPublished
+                      ? "Visible to the public"
+                      : "Not publicly visible"}
+                  </small>
+                </div>
+              </div>
+
+              <div className="sidebar-status-row">
+
+                <span>
+                  Featured
+                </span>
+
+                <strong>
+                  {isFeatured ? (
+                    <span className="yes-status">
+                      <CheckCircle2 size={14} />
+                      Yes
+                    </span>
+                  ) : (
+                    <span className="no-status">
+                      <XCircle size={14} />
+                      No
+                    </span>
+                  )}
+                </strong>
+
+              </div>
+
+              <div className="sidebar-status-row">
+
+                <span>
+                  Registration
+                </span>
+
+                <strong>
+                  {event.registration
+                    ?.required ? (
+                    <span className="yes-status">
+                      <CheckCircle2 size={14} />
+                      Open
+                    </span>
+                  ) : (
+                    <span className="no-status">
+                      Not Required
+                    </span>
+                  )}
+                </strong>
+
+              </div>
+
             </div>
 
-            <div className="info-item">
-              <label>Canonical URL</label>
-              <p>
-                {event.seo.canonicalUrl ||
-                  "Not set"}
-              </p>
+          </section>
+
+          {/* REGISTRATION SUMMARY */}
+
+          <section className="sidebar-card">
+
+            <div className="sidebar-card-header">
+
+              <h3>
+                Registration
+              </h3>
+
+              <Ticket size={17} />
+
             </div>
 
-            <div className="info-item">
-              <label>Index Page</label>
-              <p>
-                {event.seo.indexPage
-                  ? "Yes"
-                  : "No"}
-              </p>
+            <div className="sidebar-registration">
+
+              <div className="sidebar-registration-number">
+                <strong>
+                  {registered}
+                </strong>
+
+                <span>
+                  registered
+                </span>
+              </div>
+
+              <div className="sidebar-registration-detail">
+
+                <span>Capacity</span>
+
+                <strong>
+                  {capacity
+                    ? capacity
+                    : "Unlimited"}
+                </strong>
+
+              </div>
+
+              <div className="sidebar-registration-detail">
+
+                <span>Available</span>
+
+                <strong>
+                  {availableSlots !== null
+                    ? availableSlots
+                    : "Unlimited"}
+                </strong>
+
+              </div>
+
+              <div className="sidebar-registration-detail">
+
+                <span>Fee</span>
+
+                <strong>
+                  {formatCurrency(
+                    event.registration
+                      ?.fee
+                  )}
+                </strong>
+
+              </div>
+
             </div>
 
-          </div>
+          </section>
 
-        </section>
+          {/* SEO */}
 
-      )}
+          {event.seo && (
+            <section className="sidebar-card">
 
-      {/* ==========================================
-          SYSTEM INFORMATION
-      ========================================== */}
+              <div className="sidebar-card-header">
 
-      <section className="view-section">
+                <h3>SEO</h3>
 
-        <h2>System Information</h2>
+                <Search size={16} />
 
-        <div className="info-grid">
+              </div>
 
-          <div className="info-item">
-            <label>Created</label>
-            <p>
-              {formatDate(
-                event.createdAt
-              )}
-            </p>
-          </div>
+              <div className="sidebar-detail-list">
 
-          <div className="info-item">
-            <label>Last Updated</label>
-            <p>
-              {formatDate(
-                event.updatedAt
-              )}
-            </p>
-          </div>
+                <div>
+                  <span>
+                    Meta Title
+                  </span>
 
-          <div className="info-item">
-            <label>Slug</label>
-            <p>{event.slug}</p>
-          </div>
+                  <strong>
+                    {event.seo.metaTitle ||
+                      "Not set"}
+                  </strong>
+                </div>
 
-          <div className="info-item">
-            <label>ID</label>
-            <p>{event._id}</p>
-          </div>
+                <div>
+                  <span>
+                    Meta Description
+                  </span>
 
-        </div>
+                  <strong>
+                    {event.seo.metaDescription ||
+                      "Not set"}
+                  </strong>
+                </div>
 
-      </section>
+                <div>
+                  <span>
+                    Index Page
+                  </span>
+
+                  <strong>
+                    {event.seo.indexPage
+                      ? "Yes"
+                      : "No"}
+                  </strong>
+                </div>
+
+              </div>
+
+            </section>
+          )}
+
+          {/* SYSTEM INFORMATION */}
+
+          <section className="sidebar-card">
+
+            <div className="sidebar-card-header">
+
+              <h3>
+                System Information
+              </h3>
+
+              <Database size={16} />
+
+            </div>
+
+            <div className="sidebar-detail-list">
+
+              <div>
+                <span>Created</span>
+
+                <strong>
+                  {formatDate(
+                    event.createdAt
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>Updated</span>
+
+                <strong>
+                  {formatDate(
+                    event.updatedAt
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>Event ID</span>
+
+                <strong className="system-id">
+                  {event._id || "N/A"}
+                </strong>
+              </div>
+
+            </div>
+
+          </section>
+
+        </aside>
+
+      </div>
 
     </div>
   );

@@ -231,13 +231,14 @@ export const COAST_GEOGRAPHY = {
     code: "005",
 
     constituencies: {
-      Lamu: {
+      "Lamu West": {
         wards: [
           "HINDI",
           "MKUNUMBI",
           "SHELLA",
           "WITU",
           "MKUPE",
+          "HONGWE",
         ],
       },
 

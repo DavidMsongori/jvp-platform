@@ -1,26 +1,23 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
+  Archive,
   Calendar,
   CalendarDays,
-  Plus,
-  Search,
-  RefreshCw,
-  Download,
-  Eye,
-  Edit,
-  Trash2,
   CheckCircle,
-  Archive,
-  Users,
-  Star,
   Clock,
-  MapPin,
-  MoreHorizontal,
+  Download,
+  Plus,
+  RefreshCw,
+  Search,
+  Star,
+  X,
 } from "lucide-react";
 
 import { useEvent } from "../../../context/EventContext";
+
+import EventsTable from "./EventsTable";
 
 import "./Events.css";
 
@@ -39,11 +36,79 @@ const Events = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
-  useEffect(() => {
-    loadEvents();
+  /* =====================================================
+     LOAD EVENTS
+  ===================================================== */
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (typeof loadEvents === "function") {
+      loadEvents();
+    }
+  }, [loadEvents]);
+
+  /* =====================================================
+     DATE HELPERS
+  ===================================================== */
+
+  const isValidDate = useCallback((value) => {
+    if (!value) return false;
+
+    return !Number.isNaN(new Date(value).getTime());
   }, []);
+
+  const formatDate = useCallback(
+    (value) => {
+      if (!isValidDate(value)) return "Date TBA";
+
+      return new Date(value).toLocaleDateString("en-KE", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    },
+    [isValidDate]
+  );
+
+  const formatTime = useCallback(
+    (value) => {
+      if (!isValidDate(value)) return "";
+
+      return new Date(value).toLocaleTimeString("en-KE", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    },
+    [isValidDate]
+  );
+
+  /* =====================================================
+     EVENT HELPERS
+  ===================================================== */
+
+  const getCapacity = useCallback(
+    (event) => event.registration?.capacity ?? null,
+    []
+  );
+
+  const getRegistered = useCallback(
+    (event) => Number(event.registeredParticipants ?? 0),
+    []
+  );
+
+  const isCompleted = useCallback(
+    (event, now = new Date()) =>
+      isValidDate(event.endDate) &&
+      new Date(event.endDate) < now,
+    [isValidDate]
+  );
+
+  const isUpcoming = useCallback(
+    (event, now = new Date()) =>
+      isValidDate(event.startDate) &&
+      new Date(event.startDate) > now &&
+      !event.isArchived,
+    [isValidDate]
+  );
 
   /* =====================================================
      STATISTICS
@@ -68,52 +133,62 @@ const Events = () => {
       ).length,
 
       upcoming: events.filter(
-        (event) =>
-          event.startDate &&
-          new Date(event.startDate) > now &&
-          !event.isArchived
+        (event) => isUpcoming(event, now)
       ).length,
 
       completed: events.filter(
-        (event) =>
-          event.endDate &&
-          new Date(event.endDate) < now
+        (event) => isCompleted(event, now)
       ).length,
     };
-  }, [events]);
+  }, [events, isUpcoming, isCompleted]);
 
   /* =====================================================
-     CATEGORIES
+     CATEGORY OPTIONS
   ===================================================== */
 
   const categories = useMemo(() => {
     const values = events
-      .map((event) => event.category)
+      .map((event) => event.category?.trim())
       .filter(Boolean);
 
-    return ["all", ...new Set(values)];
+    return [
+      "all",
+      ...Array.from(new Set(values)).sort((a, b) =>
+        a.localeCompare(b)
+      ),
+    ];
   }, [events]);
 
   /* =====================================================
-     FILTER EVENTS
+     SEARCH & FILTER
   ===================================================== */
 
   const filteredEvents = useMemo(() => {
     const keyword = search.trim().toLowerCase();
 
     return events.filter((event) => {
+      const searchableFields = [
+        event.title,
+        event.summary,
+        event.category,
+        event.venue?.name,
+        event.venue?.county,
+        event.virtualPlatform,
+      ];
+
       const matchesSearch =
-        keyword === "" ||
-        event.title?.toLowerCase().includes(keyword) ||
-        event.summary?.toLowerCase().includes(keyword) ||
-        event.category?.toLowerCase().includes(keyword) ||
-        event.venue?.name?.toLowerCase().includes(keyword);
+        !keyword ||
+        searchableFields.some((value) =>
+          String(value || "")
+            .toLowerCase()
+            .includes(keyword)
+        );
 
       let matchesStatus = true;
 
       switch (statusFilter) {
         case "published":
-          matchesStatus = event.isPublished;
+          matchesStatus = Boolean(event.isPublished);
           break;
 
         case "draft":
@@ -121,11 +196,19 @@ const Events = () => {
           break;
 
         case "featured":
-          matchesStatus = event.isFeatured;
+          matchesStatus = Boolean(event.isFeatured);
           break;
 
         case "archived":
-          matchesStatus = event.isArchived;
+          matchesStatus = Boolean(event.isArchived);
+          break;
+
+        case "upcoming":
+          matchesStatus = isUpcoming(event);
+          break;
+
+        case "completed":
+          matchesStatus = isCompleted(event);
           break;
 
         default:
@@ -133,10 +216,9 @@ const Events = () => {
       }
 
       const matchesCategory =
-        categoryFilter === "all"
-          ? true
-          : event.category?.toLowerCase() ===
-            categoryFilter.toLowerCase();
+        categoryFilter === "all" ||
+        event.category?.toLowerCase() ===
+          categoryFilter.toLowerCase();
 
       return (
         matchesSearch &&
@@ -149,35 +231,50 @@ const Events = () => {
     search,
     statusFilter,
     categoryFilter,
+    isUpcoming,
+    isCompleted,
   ]);
 
   /* =====================================================
-     ACTIONS
+     REFRESH
   ===================================================== */
 
   const handleRefresh = useCallback(async () => {
     try {
-      await loadEvents();
+      await loadEvents?.();
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Failed to refresh events:",
+        error
+      );
     }
   }, [loadEvents]);
 
+  /* =====================================================
+     DELETE
+  ===================================================== */
+
   const handleDelete = useCallback(
-    async (id) => {
+    async (event) => {
       const confirmed = window.confirm(
-        "Are you sure you want to permanently delete this event?"
+        `Permanently delete "${
+          event.title || "this event"
+        }"? This action cannot be undone.`
       );
 
       if (!confirmed) return;
 
       try {
-        await deleteEvent(id);
+        await deleteEvent?.(event._id);
       } catch (error) {
-        console.error(error);
+        console.error(
+          "Failed to delete event:",
+          error
+        );
 
-        alert(
+        window.alert(
           error?.response?.data?.message ||
+            error?.message ||
             "Failed to delete event."
         );
       }
@@ -185,15 +282,23 @@ const Events = () => {
     [deleteEvent]
   );
 
-  const handlePublish = useCallback(
-    async (id) => {
-      try {
-        await publishEvent(id);
-      } catch (error) {
-        console.error(error);
+  /* =====================================================
+     PUBLISH
+  ===================================================== */
 
-        alert(
+  const handlePublish = useCallback(
+    async (event) => {
+      try {
+        await publishEvent?.(event._id);
+      } catch (error) {
+        console.error(
+          "Failed to publish event:",
+          error
+        );
+
+        window.alert(
           error?.response?.data?.message ||
+            error?.message ||
             "Failed to publish event."
         );
       }
@@ -201,15 +306,31 @@ const Events = () => {
     [publishEvent]
   );
 
-  const handleArchive = useCallback(
-    async (id) => {
-      try {
-        await archiveEvent(id);
-      } catch (error) {
-        console.error(error);
+  /* =====================================================
+     ARCHIVE
+  ===================================================== */
 
-        alert(
+  const handleArchive = useCallback(
+    async (event) => {
+      const confirmed = window.confirm(
+        `Archive "${
+          event.title || "this event"
+        }"?`
+      );
+
+      if (!confirmed) return;
+
+      try {
+        await archiveEvent?.(event._id);
+      } catch (error) {
+        console.error(
+          "Failed to archive event:",
+          error
+        );
+
+        window.alert(
           error?.response?.data?.message ||
+            error?.message ||
             "Failed to archive event."
         );
       }
@@ -218,64 +339,137 @@ const Events = () => {
   );
 
   /* =====================================================
-     HELPERS
+     CSV EXPORT
   ===================================================== */
 
-  const formatDate = (date) => {
-    if (!date) return "-";
+  const handleExport = useCallback(() => {
+    if (!filteredEvents.length) {
+      window.alert(
+        "There are no events to export."
+      );
 
-    return new Date(date).toLocaleDateString(
-      "en-KE",
-      {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }
-    );
-  };
+      return;
+    }
 
-  const formatTime = (date) => {
-    if (!date) return "";
+    const escapeCsv = (value) => {
+      const text = String(value ?? "");
 
-    return new Date(date).toLocaleTimeString(
-      "en-KE",
-      {
-        hour: "2-digit",
-        minute: "2-digit",
-      }
-    );
-  };
+      return `"${text.replace(/"/g, '""')}"`;
+    };
 
-  const getCapacity = (event) =>
-    event.registration?.capacity ?? null;
+    const headers = [
+      "Event",
+      "Category",
+      "Start Date",
+      "Start Time",
+      "End Date",
+      "End Time",
+      "Venue",
+      "County",
+      "Event Type",
+      "Registered Participants",
+      "Capacity",
+      "Published",
+      "Featured",
+      "Archived",
+    ];
 
-  const getRegistered = (event) =>
-    event.registeredParticipants ?? 0;
+    const rows = filteredEvents.map((event) => [
+      event.title,
+      event.category,
+      formatDate(event.startDate),
+      formatTime(event.startDate),
+      formatDate(event.endDate),
+      formatTime(event.endDate),
 
-  const getCapacityPercentage = (event) => {
-    const capacity = getCapacity(event);
+      event.eventType === "virtual"
+        ? event.virtualPlatform ||
+          "Virtual Event"
+        : event.venue?.name ||
+          "Venue TBA",
 
-    if (!capacity) return 0;
+      event.venue?.county || "",
 
-    return Math.min(
-      100,
-      Math.round(
-        (getRegistered(event) / capacity) * 100
+      event.eventType || "physical",
+
+      getRegistered(event),
+
+      getCapacity(event) ?? "Unlimited",
+
+      event.isPublished ? "Yes" : "No",
+
+      event.isFeatured ? "Yes" : "No",
+
+      event.isArchived ? "Yes" : "No",
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) =>
+        row.map(escapeCsv).join(",")
       )
+      .join("\r\n");
+
+    const blob = new Blob(
+      ["\uFEFF", csv],
+      {
+        type: "text/csv;charset=utf-8;",
+      }
     );
-  };
+
+    const url =
+      URL.createObjectURL(blob);
+
+    const anchor =
+      document.createElement("a");
+
+    anchor.href = url;
+
+    anchor.download = `jvp-events-${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+
+    document.body.appendChild(anchor);
+
+    anchor.click();
+
+    anchor.remove();
+
+    URL.revokeObjectURL(url);
+  }, [
+    filteredEvents,
+    formatDate,
+    formatTime,
+    getRegistered,
+    getCapacity,
+  ]);
+
+  /* =====================================================
+     CLEAR FILTERS
+  ===================================================== */
+
+  const clearFilters = useCallback(() => {
+    setSearch("");
+    setStatusFilter("all");
+    setCategoryFilter("all");
+  }, []);
+
+  const hasActiveFilters =
+    Boolean(search) ||
+    statusFilter !== "all" ||
+    categoryFilter !== "all";
+
+  /* =====================================================
+     PAGE
+  ===================================================== */
 
   return (
     <div className="events-page">
-
-      {/* =====================================================
+      {/* =================================================
           HEADER
-      ===================================================== */}
+      ================================================= */}
 
       <section className="events-header">
-
         <div className="events-header-main">
-
           <div className="events-breadcrumb">
             <span>Administration</span>
             <span>/</span>
@@ -283,235 +477,244 @@ const Events = () => {
           </div>
 
           <div className="events-title-row">
-
             <div className="events-title-icon">
-              <CalendarDays size={25} />
+              <CalendarDays size={22} />
             </div>
 
             <div>
               <h1>Events</h1>
 
               <p>
-                Create, manage, publish and monitor
+                Create, manage and monitor
                 JVP Connect events.
               </p>
             </div>
-
           </div>
-
         </div>
 
         <div className="events-header-actions">
-
           <button
             type="button"
             className="events-btn events-btn-secondary"
             onClick={handleRefresh}
-            disabled={loading}
+            disabled={
+              loading || submitting
+            }
           >
             <RefreshCw
-              size={17}
-              className={loading ? "spin" : ""}
+              size={15}
+              className={
+                loading ? "spin" : ""
+              }
             />
+
             Refresh
           </button>
 
           <button
             type="button"
             className="events-btn events-btn-secondary"
+            onClick={handleExport}
+            disabled={
+              !filteredEvents.length
+            }
           >
-            <Download size={17} />
-            Export
+            <Download size={15} />
+
+            Export CSV
           </button>
 
           <Link
             to="/admin/events/create"
             className="events-btn events-btn-primary"
           >
-            <Plus size={18} />
+            <Plus size={17} />
+
             Create Event
           </Link>
-
         </div>
-
       </section>
 
-      {/* =====================================================
+      {/* =================================================
           STATISTICS
-      ===================================================== */}
+      ================================================= */}
 
       <section className="events-stat-grid">
-
         <article className="events-stat-card">
-
           <div className="events-stat-icon green">
-            <CalendarDays size={20} />
+            <CalendarDays size={18} />
           </div>
 
-          <div>
+          <div className="events-stat-content">
             <span>Total Events</span>
-            <strong>{statistics.total}</strong>
+            <strong>
+              {statistics.total}
+            </strong>
           </div>
 
-          <div className="events-stat-trend">
+          <span className="events-stat-trend">
             All events
-          </div>
-
+          </span>
         </article>
 
         <article className="events-stat-card">
-
           <div className="events-stat-icon blue">
-            <CheckCircle size={20} />
+            <CheckCircle size={18} />
           </div>
 
-          <div>
+          <div className="events-stat-content">
             <span>Published</span>
-            <strong>{statistics.published}</strong>
+            <strong>
+              {statistics.published}
+            </strong>
           </div>
 
-          <div className="events-stat-trend">
+          <span className="events-stat-trend">
             Live
-          </div>
-
+          </span>
         </article>
 
         <article className="events-stat-card">
-
           <div className="events-stat-icon amber">
-            <Clock size={20} />
+            <Clock size={18} />
           </div>
 
-          <div>
+          <div className="events-stat-content">
             <span>Drafts</span>
-            <strong>{statistics.drafts}</strong>
+            <strong>
+              {statistics.drafts}
+            </strong>
           </div>
 
-          <div className="events-stat-trend">
-            Pending
-          </div>
-
+          <span className="events-stat-trend">
+            Unpublished
+          </span>
         </article>
 
         <article className="events-stat-card">
-
           <div className="events-stat-icon purple">
-            <Star size={20} />
+            <Star size={18} />
           </div>
 
-          <div>
+          <div className="events-stat-content">
             <span>Featured</span>
-            <strong>{statistics.featured}</strong>
+            <strong>
+              {statistics.featured}
+            </strong>
           </div>
 
-          <div className="events-stat-trend">
+          <span className="events-stat-trend">
             Highlighted
-          </div>
-
+          </span>
         </article>
 
         <article className="events-stat-card">
-
           <div className="events-stat-icon teal">
-            <Calendar size={20} />
+            <Calendar size={18} />
           </div>
 
-          <div>
+          <div className="events-stat-content">
             <span>Upcoming</span>
-            <strong>{statistics.upcoming}</strong>
+            <strong>
+              {statistics.upcoming}
+            </strong>
           </div>
 
-          <div className="events-stat-trend">
+          <span className="events-stat-trend">
             Scheduled
-          </div>
-
+          </span>
         </article>
 
         <article className="events-stat-card">
-
           <div className="events-stat-icon slate">
-            <Archive size={20} />
+            <Archive size={18} />
           </div>
 
-          <div>
+          <div className="events-stat-content">
             <span>Completed</span>
-            <strong>{statistics.completed}</strong>
+            <strong>
+              {statistics.completed}
+            </strong>
           </div>
 
-          <div className="events-stat-trend">
+          <span className="events-stat-trend">
             Finished
-          </div>
-
+          </span>
         </article>
-
       </section>
 
-      {/* =====================================================
-          MANAGEMENT CARD
-      ===================================================== */}
+      {/* =================================================
+          EVENT MANAGEMENT
+      ================================================= */}
 
       <section className="events-management-card">
-
         <div className="events-management-header">
-
           <div>
             <h2>Event Management</h2>
 
             <p>
-              Manage your organization's events,
-              registrations and publication status.
+              Manage events, schedules,
+              registrations and publication.
             </p>
           </div>
 
           <div className="events-count">
-            <strong>{filteredEvents.length}</strong>
-            <span>events</span>
-          </div>
+            <strong>
+              {filteredEvents.length}
+            </strong>
 
+            <span>
+              {filteredEvents.length === 1
+                ? "event"
+                : "events"}
+            </span>
+          </div>
         </div>
 
-        {/* =====================================================
+        {/* =================================================
             TOOLBAR
-        ===================================================== */}
+        ================================================= */}
 
         <div className="events-toolbar">
-
           <div className="events-search">
-
-            <Search size={18} />
+            <Search size={16} />
 
             <input
-              type="text"
+              type="search"
               placeholder="Search events, categories or venues..."
               value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
+              onChange={(event) =>
+                setSearch(event.target.value)
               }
+              aria-label="Search events"
             />
 
             {search && (
               <button
                 type="button"
-                onClick={() => setSearch("")}
                 className="events-search-clear"
+                onClick={() =>
+                  setSearch("")
+                }
                 aria-label="Clear search"
               >
-                ×
+                <X size={15} />
               </button>
             )}
-
           </div>
 
           <div className="events-filters">
-
             <select
               value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value)
+              onChange={(event) =>
+                setStatusFilter(
+                  event.target.value
+                )
               }
+              aria-label="Filter events by status"
             >
               <option value="all">
-                All Status
+                All Statuses
               </option>
 
               <option value="published">
@@ -519,7 +722,7 @@ const Events = () => {
               </option>
 
               <option value="draft">
-                Draft
+                Drafts
               </option>
 
               <option value="featured">
@@ -529,37 +732,47 @@ const Events = () => {
               <option value="archived">
                 Archived
               </option>
+
+              <option value="upcoming">
+                Upcoming
+              </option>
+
+              <option value="completed">
+                Completed
+              </option>
             </select>
 
             <select
               value={categoryFilter}
-              onChange={(e) =>
-                setCategoryFilter(e.target.value)
+              onChange={(event) =>
+                setCategoryFilter(
+                  event.target.value
+                )
               }
+              aria-label="Filter events by category"
             >
-              {categories.map((category) => (
-                <option
-                  key={category}
-                  value={category}
-                >
-                  {category === "all"
-                    ? "All Categories"
-                    : category}
-                </option>
-              ))}
+              {categories.map(
+                (category) => (
+                  <option
+                    key={category}
+                    value={category}
+                  >
+                    {category === "all"
+                      ? "All Categories"
+                      : category}
+                  </option>
+                )
+              )}
             </select>
-
           </div>
-
         </div>
 
-        {/* =====================================================
+        {/* =================================================
             RESULTS META
-        ===================================================== */}
+        ================================================= */}
 
         <div className="events-results-meta">
-
-          <div>
+          <span>
             Showing{" "}
             <strong>
               {filteredEvents.length}
@@ -569,420 +782,71 @@ const Events = () => {
               {events.length}
             </strong>{" "}
             events
-          </div>
+          </span>
 
-          {(search ||
-            statusFilter !== "all" ||
-            categoryFilter !== "all") && (
+          {hasActiveFilters && (
             <button
               type="button"
               className="clear-filters"
-              onClick={() => {
-                setSearch("");
-                setStatusFilter("all");
-                setCategoryFilter("all");
-              }}
+              onClick={clearFilters}
             >
               Clear filters
             </button>
           )}
-
         </div>
 
-        {/* =====================================================
-            TABLE
-        ===================================================== */}
-
-        <div className="events-table-wrapper">
-
-          <table className="events-table">
-
-            <thead>
-              <tr>
-                <th>Event</th>
-                <th>Date & Time</th>
-                <th>Venue</th>
-                <th>Registrations</th>
-                <th>Status</th>
-                <th className="actions-column">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="events-table-state"
-                  >
-                    <div className="table-loading">
-                      <RefreshCw
-                        size={22}
-                        className="spin"
-                      />
-                      <span>
-                        Loading events...
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredEvents.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="events-table-state"
-                  >
-                    <div className="empty-events">
-
-                      <div className="empty-events-icon">
-                        <CalendarDays size={28} />
-                      </div>
-
-                      <h3>
-                        No events found
-                      </h3>
-
-                      <p>
-                        Try adjusting your filters
-                        or create a new event.
-                      </p>
-
-                      <Link
-                        to="/admin/events/create"
-                        className="events-btn events-btn-primary"
-                      >
-                        <Plus size={17} />
-                        Create Event
-                      </Link>
-
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filteredEvents.map((event) => {
-
-                  const capacity =
-                    getCapacity(event);
-
-                  const registered =
-                    getRegistered(event);
-
-                  const percentage =
-                    getCapacityPercentage(event);
-
-                  const isArchived =
-                    Boolean(event.isArchived);
-
-                  const isPublished =
-                    Boolean(event.isPublished);
-
-                  const isFeatured =
-                    Boolean(event.isFeatured);
-
-                  return (
-                    <tr key={event._id}>
-
-                      {/* EVENT */}
-
-                      <td>
-
-                        <div className="event-cell">
-
-                          <div className="event-cover">
-
-                            {event.coverImage?.url ? (
-                              <img
-                                src={event.coverImage.url}
-                                alt={event.title}
-                              />
-                            ) : (
-                              <div className="event-cover-placeholder">
-                                <Calendar size={21} />
-                              </div>
-                            )}
-
-                          </div>
-
-                          <div className="event-details">
-
-                            <div className="event-title-row-small">
-
-                              <h4>
-                                {event.title}
-                              </h4>
-
-                              {isFeatured && (
-                                <span className="event-featured-badge">
-                                  <Star size={11} />
-                                  Featured
-                                </span>
-                              )}
-
-                            </div>
-
-                            <p>
-                              {event.summary ||
-                                "No event summary available."}
-                            </p>
-
-                            <span className="event-category">
-                              {event.category ||
-                                "General"}
-                            </span>
-
-                          </div>
-
-                        </div>
-
-                      </td>
-
-                      {/* DATE */}
-
-                      <td>
-
-                        <div className="event-date-cell">
-
-                          <strong>
-                            {formatDate(
-                              event.startDate
-                            )}
-                          </strong>
-
-                          <span>
-                            {formatTime(
-                              event.startDate
-                            )}
-                          </span>
-
-                          <div className="date-divider">
-                            →
-                          </div>
-
-                          <strong>
-                            {formatDate(
-                              event.endDate
-                            )}
-                          </strong>
-
-                          <span>
-                            {formatTime(
-                              event.endDate
-                            )}
-                          </span>
-
-                        </div>
-
-                      </td>
-
-                      {/* VENUE */}
-
-                      <td>
-
-                        <div className="event-venue">
-
-                          <div className="venue-icon">
-                            <MapPin size={15} />
-                          </div>
-
-                          <div>
-                            <strong>
-                              {event.eventType ===
-                              "virtual"
-                                ? "Virtual Event"
-                                : event.venue?.name ||
-                                  "Venue TBA"}
-                            </strong>
-
-                            <span>
-                              {event.eventType ===
-                              "virtual"
-                                ? event.virtualPlatform ||
-                                  "Online"
-                                : event.venue?.county ||
-                                  ""}
-                            </span>
-                          </div>
-
-                        </div>
-
-                      </td>
-
-                      {/* REGISTRATIONS */}
-
-                      <td>
-
-                        <div className="registration-cell">
-
-                          <div className="registration-top">
-
-                            <strong>
-                              {registered}
-                            </strong>
-
-                            <span>
-                              {capacity
-                                ? ` / ${capacity}`
-                                : " / Unlimited"}
-                            </span>
-
-                          </div>
-
-                          {capacity && (
-                            <div className="capacity-bar">
-                              <div
-                                className="capacity-progress"
-                                style={{
-                                  width: `${percentage}%`,
-                                }}
-                              />
-                            </div>
-                          )}
-
-                          <small>
-                            {capacity
-                              ? `${percentage}% full`
-                              : "Open registration"}
-                          </small>
-
-                        </div>
-
-                      </td>
-
-                      {/* STATUS */}
-
-                      <td>
-
-                        <div className="event-status-stack">
-
-                          {isPublished ? (
-                            <span className="status-badge published">
-                              <span />
-                              Published
-                            </span>
-                          ) : (
-                            <span className="status-badge draft">
-                              <span />
-                              Draft
-                            </span>
-                          )}
-
-                          {isArchived && (
-                            <span className="status-badge archived">
-                              <span />
-                              Archived
-                            </span>
-                          )}
-
-                        </div>
-
-                      </td>
-
-                      {/* ACTIONS */}
-
-                      <td>
-
-                        <div className="event-actions">
-
-                          <Link
-                            to={`/admin/events/${event._id}`}
-                            className="event-action-btn"
-                            title="View Event"
-                            aria-label="View Event"
-                          >
-                            <Eye size={17} />
-                          </Link>
-
-                          <Link
-                            to={`/admin/events/edit/${event._id}`}
-                            className="event-action-btn"
-                            title="Edit Event"
-                            aria-label="Edit Event"
-                          >
-                            <Edit size={17} />
-                          </Link>
-
-                          {!isPublished && (
-                            <button
-                              type="button"
-                              className="event-action-btn success"
-                              onClick={() =>
-                                handlePublish(
-                                  event._id
-                                )
-                              }
-                              disabled={submitting}
-                              title="Publish Event"
-                              aria-label="Publish Event"
-                            >
-                              <CheckCircle
-                                size={17}
-                              />
-                            </button>
-                          )}
-
-                          {!isArchived && (
-                            <button
-                              type="button"
-                              className="event-action-btn warning"
-                              onClick={() =>
-                                handleArchive(
-                                  event._id
-                                )
-                              }
-                              disabled={submitting}
-                              title="Archive Event"
-                              aria-label="Archive Event"
-                            >
-                              <Archive size={17} />
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            className="event-action-btn danger"
-                            onClick={() =>
-                              handleDelete(
-                                event._id
-                              )
-                            }
-                            disabled={submitting}
-                            title="Delete Event"
-                            aria-label="Delete Event"
-                          >
-                            <Trash2 size={17} />
-                          </button>
-
-                          <button
-                            type="button"
-                            className="event-action-btn more"
-                            title="More Actions"
-                            aria-label="More Actions"
-                          >
-                            <MoreHorizontal
-                              size={17}
-                            />
-                          </button>
-
-                        </div>
-
-                      </td>
-
-                    </tr>
-                  );
-                })
-              )}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
+        {/* =================================================
+            EVENTS TABLE COMPONENT
+        ================================================= */}
+
+        <EventsTable
+          events={filteredEvents}
+          loading={loading}
+          onView={(event) => {
+            window.location.href =
+              `/admin/events/${event._id}`;
+          }}
+          onEdit={(event) => {
+            window.location.href =
+              `/admin/events/edit/${event._id}`;
+          }}
+          onDelete={handleDelete}
+          onPublish={handlePublish}
+          onArchive={handleArchive}
+          submitting={submitting}
+        />
+
+        {/* =================================================
+            FOOTER
+        ================================================= */}
+
+        {!loading &&
+          filteredEvents.length > 0 && (
+            <div className="events-table-footer">
+              <span>
+                Displaying{" "}
+                {filteredEvents.length}{" "}
+                {filteredEvents.length === 1
+                  ? "event"
+                  : "events"}
+              </span>
+
+              <button
+                type="button"
+                className="events-footer-refresh"
+                onClick={handleRefresh}
+                disabled={
+                  loading ||
+                  submitting
+                }
+              >
+                <RefreshCw size={14} />
+
+                Refresh list
+              </button>
+            </div>
+          )}
       </section>
-
     </div>
   );
 };
