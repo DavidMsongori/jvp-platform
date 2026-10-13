@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -18,6 +19,7 @@ import {
   FaVoteYea,
   FaNewspaper,
   FaEnvelope,
+  FaBullseye,
 } from "react-icons/fa";
 
 import { PERMISSIONS } from "../../utils/permissions";
@@ -28,14 +30,8 @@ import {
 
 import "./Sidebar.css";
 
-function AdminSidebar({
-  isOpen,
-  onClose,
-}) {
-  const {
-    hasPermission,
-    logout,
-  } = useAuth();
+function AdminSidebar({ isOpen, onClose }) {
+  const { hasPermission, logout } = useAuth();
 
   const [pendingMpesaCount, setPendingMpesaCount] =
     useState(0);
@@ -47,7 +43,6 @@ function AdminSidebar({
   const loadPendingMpesaCount = async () => {
     try {
       const response = await getManualMpesaQueue();
-
       const data = response?.data || response;
 
       let queue = [];
@@ -69,7 +64,6 @@ function AdminSidebar({
         error
       );
 
-      // Do not disturb the sidebar if the queue request fails.
       setPendingMpesaCount(0);
     }
   };
@@ -79,9 +73,7 @@ function AdminSidebar({
   ========================================== */
 
   useEffect(() => {
-    if (
-      !hasPermission(PERMISSIONS.VIEW_PAYMENTS)
-    ) {
+    if (!hasPermission(PERMISSIONS.VIEW_PAYMENTS)) {
       return;
     }
 
@@ -91,9 +83,7 @@ function AdminSidebar({
       loadPendingMpesaCount();
     }, 30000);
 
-    return () => {
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, [isOpen]);
 
   /* ==========================================
@@ -115,50 +105,42 @@ function AdminSidebar({
       path: "/admin",
       permission: PERMISSIONS.VIEW_REPORTS,
     },
-
     {
       name: "Members",
       icon: <FaUsers />,
       path: "/admin/members",
       permission: PERMISSIONS.VIEW_MEMBERS,
     },
-
     {
       name: "Leadership",
       icon: <FaUserTie />,
       path: "/admin/leadership",
       permission: PERMISSIONS.VIEW_MEMBERS,
     },
-
     {
       name: "News",
       icon: <FaNewspaper />,
       path: "/admin/news",
       permission: PERMISSIONS.VIEW_NEWS,
     },
-
-    /* ========================================
-       CONTACT
-    ======================================== */
-
+    {
+      name: "Programs",
+      icon: <FaBullseye />,
+      path: "/admin/programs",
+      permission: PERMISSIONS.VIEW_PROGRAMS,
+    },
     {
       name: "Contact",
       icon: <FaEnvelope />,
       path: "/admin/contact",
       permission: PERMISSIONS.VIEW_CONTACT,
     },
-
-    /* ========================================
-       ELECTIONS
-    ======================================== */
-
     {
       name: "Elections",
       icon: <FaVoteYea />,
       path: "/admin/elections",
       permission: PERMISSIONS.MANAGE_ELECTIONS,
     },
-
     {
       name: "Payments",
       icon: <FaMoneyBillWave />,
@@ -166,49 +148,42 @@ function AdminSidebar({
       permission: PERMISSIONS.VIEW_PAYMENTS,
       badge: pendingMpesaCount,
     },
-
     {
       name: "Events",
       icon: <FaCalendarAlt />,
       path: "/admin/events",
       permission: PERMISSIONS.VIEW_EVENTS,
     },
-
     {
       name: "Summit",
       icon: <FaTicketAlt />,
       path: "/admin/summit",
       permission: PERMISSIONS.VIEW_EVENTS,
     },
-
     {
       name: "Summit Posters",
       icon: <FaTicketAlt />,
       path: "/admin/summit/posters",
       permission: PERMISSIONS.VIEW_EVENTS,
     },
-
     {
       name: "Reports",
       icon: <FaClipboardList />,
       path: "/admin/reports",
       permission: PERMISSIONS.VIEW_REPORTS,
     },
-
     {
       name: "Activity Logs",
       icon: <FaHistory />,
       path: "/admin/activity-logs",
       permission: PERMISSIONS.VIEW_REPORTS,
     },
-
     {
       name: "Settings",
       icon: <FaCog />,
       path: "/admin/settings",
       permission: PERMISSIONS.MANAGE_SETTINGS,
     },
-
     {
       name: "Profile",
       icon: <FaUserCircle />,
@@ -218,15 +193,8 @@ function AdminSidebar({
   ];
 
   return (
-    <aside
-      className={`sidebar ${
-        isOpen ? "open" : ""
-      }`}
-    >
-      {/* ======================================
-          HEADER
-      ======================================= */}
-
+    <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+      {/* HEADER */}
       <div className="sidebar-header">
         <div>
           <h2>JVP Connect</h2>
@@ -242,10 +210,7 @@ function AdminSidebar({
         </button>
       </div>
 
-      {/* ======================================
-          NAVIGATION
-      ======================================= */}
-
+      {/* NAVIGATION */}
       <nav className="sidebar-nav">
         {menuItems
           .filter((item) => {
@@ -286,20 +251,14 @@ function AdminSidebar({
           ))}
       </nav>
 
-      {/* ======================================
-          FOOTER
-      ======================================= */}
-
+      {/* FOOTER */}
       <div className="sidebar-footer">
         <button
           className="logout-btn"
           onClick={handleLogout}
         >
           <FaSignOutAlt />
-
-          <span>
-            Logout
-          </span>
+          <span>Logout</span>
         </button>
       </div>
     </aside>
