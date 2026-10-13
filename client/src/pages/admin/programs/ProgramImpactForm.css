@@ -1,0 +1,787 @@
+
+/* =========================================================
+   JVP CONNECT — PROGRAM IMPACT FORM
+========================================================= */
+
+.program-impact-page {
+  --pi-primary: #087f5b;
+  --pi-primary-dark: #066647;
+  --pi-primary-soft: #eaf6f0;
+  --pi-text: #1b3025;
+  --pi-muted: #77857c;
+  --pi-border: #e2e9e3;
+  --pi-background: #f6f8f6;
+  --pi-danger: #b93838;
+
+  width: 100%;
+  min-width: 0;
+  padding: 24px;
+  color: var(--pi-text);
+  background: var(--pi-background);
+  font-size: 13px;
+}
+
+.program-impact-page *,
+.program-impact-page *::before,
+.program-impact-page *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.program-impact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.program-impact-header-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.program-impact-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  color: var(--pi-primary);
+  background: var(--pi-primary-soft);
+  border: 1px solid #d9ebdf;
+  border-radius: 12px;
+}
+
+.program-impact-eyebrow {
+  margin: 0 0 5px;
+  color: var(--pi-primary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.program-impact-header h1 {
+  margin: 0;
+  color: var(--pi-text);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 750;
+  letter-spacing: -0.6px;
+  line-height: 1.25;
+}
+
+.program-impact-subtitle {
+  margin: 6px 0 0;
+  color: var(--pi-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.program-impact-back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 7px;
+  min-height: 38px;
+  padding: 9px 12px;
+  color: #415348;
+  background: #fff;
+  border: 1px solid var(--pi-border);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.program-impact-back-link:hover {
+  color: var(--pi-primary);
+  background: var(--pi-primary-soft);
+  border-color: #b9ddca;
+}
+
+/* =========================================================
+   RECORD SUMMARY
+========================================================= */
+
+.program-impact-record {
+  padding: 19px 21px;
+  margin-bottom: 16px;
+  background: #fff;
+  border: 1px solid var(--pi-border);
+  border-left: 4px solid var(--pi-primary);
+  border-radius: 11px;
+  box-shadow: 0 2px 7px rgb(25 50 35 / 3%);
+}
+
+.program-impact-record-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  margin-bottom: 9px;
+  color: #126b4a;
+  background: var(--pi-primary-soft);
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.program-impact-record h2 {
+  margin: 0;
+  color: var(--pi-text);
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.program-impact-record p {
+  margin: 6px 0 0;
+  color: var(--pi-muted);
+  font-size: 11px;
+  line-height: 1.5;
+  text-transform: capitalize;
+}
+
+/* =========================================================
+   METRIC CARDS
+========================================================= */
+
+.program-impact-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.program-impact-metric {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 19px;
+  background: #fff;
+  border: 1px solid var(--pi-border);
+  border-radius: 11px;
+  box-shadow: 0 2px 7px rgb(25 50 35 / 3%);
+}
+
+.program-impact-metric-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+}
+
+.program-impact-metric-icon.attended {
+  color: #2769b1;
+  background: #eaf2fc;
+}
+
+.program-impact-metric-icon.benefited {
+  color: #087f5b;
+  background: #e7f6ee;
+}
+
+.program-impact-metric > div:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.program-impact-metric span {
+  color: #63746a;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.program-impact-metric strong {
+  margin-top: 5px;
+  color: var(--pi-text);
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.program-impact-metric small {
+  margin-top: 5px;
+  color: #849087;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   FORM CONTAINER
+========================================================= */
+
+.program-impact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 0;
+}
+
+.program-impact-section {
+  min-width: 0;
+  padding: 21px;
+  background: #fff;
+  border: 1px solid var(--pi-border);
+  border-radius: 11px;
+  box-shadow: 0 2px 7px rgb(25 50 35 / 3%);
+}
+
+.program-impact-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.program-impact-section-heading h3 {
+  margin: 0;
+  color: var(--pi-text);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.program-impact-section-heading p {
+  max-width: 620px;
+  margin: 5px 0 0;
+  color: var(--pi-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   IMPACT NUMBER FIELDS
+========================================================= */
+
+.program-impact-number-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.program-impact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.program-impact-field label {
+  color: #34473c;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.program-impact-field label span,
+.program-impact-form-footer > p span {
+  color: #d14343;
+}
+
+.program-impact-field input,
+.program-impact-field textarea,
+.program-impact-achievement-row input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  color: var(--pi-text);
+  background: #fff;
+  border: 1px solid #dce5de;
+  border-radius: 8px;
+  outline: none;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.program-impact-field input {
+  min-height: 44px;
+}
+
+.program-impact-field textarea {
+  min-height: 125px;
+  resize: vertical;
+}
+
+.program-impact-field input:focus,
+.program-impact-field textarea:focus,
+.program-impact-achievement-row input:focus {
+  border-color: #55a987;
+  box-shadow: 0 0 0 3px rgb(8 127 91 / 9%);
+}
+
+.program-impact-field input::placeholder,
+.program-impact-field textarea::placeholder,
+.program-impact-achievement-row input::placeholder {
+  color: #9aa69e;
+  opacity: 1;
+}
+
+.program-impact-field small {
+  color: #819087;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.program-impact-inline-note {
+  padding: 11px 12px;
+  margin-top: 14px;
+  color: #815d1d;
+  background: #fff8e9;
+  border: 1px solid #f0dfb5;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   ACHIEVEMENTS
+========================================================= */
+
+.program-impact-achievements-heading {
+  align-items: center;
+}
+
+.program-impact-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 34px;
+  padding: 7px 10px;
+  color: var(--pi-primary);
+  background: #f0f8f3;
+  border: 1px solid #d8eadf;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.program-impact-add-button:hover {
+  background: #e2f3e8;
+  border-color: #bdddc8;
+}
+
+.program-impact-achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.program-impact-achievement-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.program-impact-achievement-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  color: #527060;
+  background: #eff5f0;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.program-impact-achievement-row input {
+  min-height: 40px;
+}
+
+.program-impact-remove-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 33px;
+  height: 33px;
+  padding: 0;
+  color: #a24e4e;
+  background: #fff7f6;
+  border: 1px solid #f0dedb;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.program-impact-remove-button:hover {
+  color: #b82f2f;
+  background: #ffebea;
+}
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.program-impact-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.program-impact-alert.error {
+  color: #a12e2e;
+  background: #fff1f0;
+  border-color: #f3cecb;
+}
+
+.program-impact-alert.success {
+  align-items: center;
+  color: #176b46;
+  background: #eaf8ef;
+  border-color: #c7e8d2;
+}
+
+.program-impact-alert button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  margin: -3px -4px -3px auto;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   FOOTER ACTIONS
+========================================================= */
+
+.program-impact-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 15px 0 3px;
+}
+
+.program-impact-form-footer > p {
+  margin: 0;
+  color: #839087;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.program-impact-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.program-impact-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.program-impact-button-primary {
+  color: #fff;
+  background: var(--pi-primary);
+  border-color: var(--pi-primary);
+}
+
+.program-impact-button-primary:hover:not(:disabled) {
+  background: var(--pi-primary-dark);
+  border-color: var(--pi-primary-dark);
+}
+
+.program-impact-button-secondary {
+  color: #45574b;
+  background: #fff;
+  border-color: #dce5de;
+}
+
+.program-impact-button-secondary:hover:not(:disabled) {
+  color: var(--pi-primary);
+  background: #f7fbf8;
+  border-color: #b8d9c5;
+}
+
+.program-impact-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   LOADING AND EMPTY STATES
+========================================================= */
+
+.program-impact-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  padding: 32px 20px;
+  color: var(--pi-muted);
+  text-align: center;
+}
+
+.program-impact-state > svg {
+  color: #96a99b;
+}
+
+.program-impact-state h2 {
+  margin: 15px 0 0;
+  color: var(--pi-text);
+  font-size: 20px;
+}
+
+.program-impact-state p {
+  margin: 10px 0 0;
+  font-size: 12px;
+}
+
+.program-impact-state .program-impact-button {
+  margin-top: 20px;
+}
+
+.program-impact-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #dce8df;
+  border-top-color: var(--pi-primary);
+  border-radius: 50%;
+  animation: program-impact-spin 0.75s linear infinite;
+}
+
+@keyframes program-impact-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 850px) {
+  .program-impact-page {
+    padding: 20px;
+  }
+
+  .program-impact-section {
+    padding: 18px;
+  }
+
+  .program-impact-metric {
+    padding: 16px;
+    gap: 11px;
+  }
+
+  .program-impact-metric-icon {
+    width: 39px;
+    height: 39px;
+  }
+
+  .program-impact-metric strong {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .program-impact-page {
+    padding: 15px 12px 24px;
+  }
+
+  .program-impact-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .program-impact-header-title {
+    gap: 11px;
+  }
+
+  .program-impact-header-icon {
+    width: 39px;
+    height: 39px;
+  }
+
+  .program-impact-header h1 {
+    font-size: 23px;
+  }
+
+  .program-impact-subtitle {
+    font-size: 11px;
+  }
+
+  .program-impact-back-link {
+    min-height: 34px;
+    padding: 7px 10px;
+  }
+
+  .program-impact-record {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .program-impact-record h2 {
+    font-size: 15px;
+  }
+
+  .program-impact-metrics {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    margin-bottom: 13px;
+  }
+
+  .program-impact-metric {
+    padding: 14px;
+  }
+
+  .program-impact-metric strong {
+    font-size: 23px;
+  }
+
+  .program-impact-form {
+    gap: 12px;
+  }
+
+  .program-impact-section {
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .program-impact-section-heading {
+    flex-direction: column;
+    gap: 11px;
+    margin-bottom: 15px;
+  }
+
+  .program-impact-section-heading h3 {
+    font-size: 13px;
+  }
+
+  .program-impact-number-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 17px;
+  }
+
+  .program-impact-achievements-heading {
+    align-items: flex-start;
+  }
+
+  .program-impact-add-button {
+    align-self: flex-start;
+  }
+
+  .program-impact-achievement-row {
+    grid-template-columns: 25px minmax(0, 1fr) 30px;
+    gap: 6px;
+  }
+
+  .program-impact-achievement-number {
+    width: 24px;
+    height: 24px;
+  }
+
+  .program-impact-remove-button {
+    width: 30px;
+    height: 32px;
+  }
+
+  .program-impact-form-footer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 5px;
+  }
+
+  .program-impact-footer-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 8px;
+  }
+
+  .program-impact-button {
+    min-height: 42px;
+    padding: 9px 10px;
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program-impact-page *,
+  .program-impact-page *::before,
+  .program-impact-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -20,6 +20,7 @@ import { SummitProvider } from "./context/SummitContext";
 import { NewsProvider } from "./context/NewsContext";
 import { ContactProvider } from "./context/ContactContext";
 import { LeadershipProvider } from "./context/LeadershipContext";
+import { ProgramProvider } from "./context/ProgramContext";
 
 import {
   installProfileImageFallback,
@@ -50,6 +51,8 @@ ReactDOM.createRoot(
 
               <EventProvider>
 
+              <ProgramProvider> 
+
                 <LeaderProvider>
 
                   <SummitProvider>
@@ -71,6 +74,8 @@ ReactDOM.createRoot(
                   </SummitProvider>
 
                 </LeaderProvider>
+
+              </ProgramProvider>  
 
               </EventProvider>
 

@@ -35,6 +35,7 @@ import Leadership from "../pages/leadership/Leadership";
 import ExecutiveTeam from "../pages/leadership/ExecutiveTeam";
 import YouthAssembly from "../pages/leadership/YouthAssembly";
 import CountyLeadership from "../pages/leadership/CountyLeadership";
+import ProgramDetails from "../pages/programs/ProgramDetails";
 
 /* ==========================================
    PUBLIC ELECTIONS
@@ -165,6 +166,10 @@ import ElectionApplications from "../pages/admin/elections/ElectionApplications"
 import ElectionAspirants from "../pages/admin/elections/ElectionAspirants";
 import ElectionResults from "../pages/admin/elections/ElectionResults";
 
+import AdminPrograms from "../pages/admin/programs/Programs";
+import ProgramForm from "../pages/admin/programs/ProgramForm";
+import ProgramImpactForm from "../pages/admin/programs/ProgramImpactForm";
+
 /* ==========================================
    FINANCE WORKSPACE
 ========================================== */
@@ -200,10 +205,9 @@ function AppRoutes() {
           element={<About />}
         />
 
-        <Route
-          path="/programs"
-          element={<Programs />}
-        />
+        <Route path="/programs" element={<Programs />} />
+        <Route path="/program/:slug" element={<ProgramDetails />} />
+        <Route path="/programs/:slug" element={<ProgramDetails />} />
 
         <Route
           path="/events"
@@ -865,6 +869,49 @@ function AppRoutes() {
               </PermissionRoute>
             }
           />
+
+
+       <Route
+  path="programs"
+  element={
+    <PermissionRoute
+      permission={PERMISSIONS.VIEW_EVENTS}
+    >
+      <AdminPrograms />
+    </PermissionRoute>
+  }
+/>
+
+        <Route
+  path="programs/create"
+  element={
+    <PermissionRoute
+      permission={PERMISSIONS.CREATE_EVENT}
+    >
+      <ProgramForm />
+    </PermissionRoute>
+  }
+/>  
+
+<Route
+  path="programs/edit/:id"
+  element={
+    <PermissionRoute permission={PERMISSIONS.VIEW_EVENTS}>
+      <ProgramForm mode="edit" />
+    </PermissionRoute>
+  }
+/>
+
+
+<Route
+  path="programs/:id/impact"
+  element={
+    <PermissionRoute permission={PERMISSIONS.VIEW_EVENTS}>
+      <ProgramImpactForm />
+    </PermissionRoute>
+  }
+/>
+
 
         </Route>
 

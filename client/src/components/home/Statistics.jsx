@@ -10,7 +10,7 @@ import {
 const statistics = [
   {
     icon: <FaUsers />,
-    value: "20,000+",
+    value: "50,000+",
     label: "Youth Reached",
   },
   {
@@ -25,8 +25,8 @@ const statistics = [
   },
   {
     icon: <FaHandshake />,
-    value: "500+",
-    label: "Volunteers",
+    value: "250+",
+    label: "Leaders",
   },
 ];
 

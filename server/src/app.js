@@ -27,6 +27,7 @@ import geographyRoutes from "./routes/geography.routes.js";
 import electionRoutes from "./routes/election.routes.js";
 import newsRoutes from "./routes/news.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
+import programRoutes from "./routes/program.routes.js";
 
 const app = express();
 
@@ -131,6 +132,8 @@ app.use("/api/geography", geographyRoutes);
 app.use("/api/news", newsRoutes);
 
 app.use("/api/contact", contactRoutes);
+
+app.use("/api/programs", programRoutes);
 
 /* 404 */
 app.use((req, res) => {

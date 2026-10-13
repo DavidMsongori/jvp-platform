@@ -1,0 +1,448 @@
+
+/* =========================================================
+   PROGRAM CARD — COMPACT DESIGN
+========================================================= */
+
+.program-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e7edf0;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgb(15 45 35 / 4%);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.program-card:hover {
+  transform: translateY(-3px);
+  border-color: #cbded5;
+  box-shadow: 0 8px 20px rgb(15 45 35 / 8%);
+}
+
+.program-card__image-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.program-card__image-wrapper {
+  position: relative;
+  height: 165px;
+  overflow: hidden;
+  background: #e9f1ec;
+}
+
+.program-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.program-card:hover .program-card__image {
+  transform: scale(1.035);
+}
+
+.program-card__image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(0 0 0 / 24%) 0%,
+    transparent 32%,
+    transparent 55%,
+    rgb(0 0 0 / 38%) 100%
+  );
+  pointer-events: none;
+}
+
+/* =========================================================
+   IMAGE PLACEHOLDER
+========================================================= */
+
+.program-card__image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e0f2e8, #c7e4d5);
+  color: #176447;
+}
+
+.program-card__placeholder-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgb(23 100 71 / 25%);
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.program-card__placeholder-text {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   IMAGE BADGES
+========================================================= */
+
+.program-card__image-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.program-card__category,
+.program-card__featured-badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 70%;
+  overflow: hidden;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.program-card__category {
+  background: rgb(255 255 255 / 94%);
+  color: #176447;
+}
+
+.program-card__featured-badge {
+  max-width: 40%;
+  background: #d8f3a5;
+  color: #245b28;
+}
+
+.program-card__status {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 5px;
+  background: rgb(255 255 255 / 94%);
+  color: #334155;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.program-card__status-dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.program-card__status--upcoming .program-card__status-dot {
+  background: #2563eb;
+}
+
+.program-card__status--ongoing .program-card__status-dot {
+  background: #16a34a;
+}
+
+.program-card__status--completed .program-card__status-dot {
+  background: #64748b;
+}
+
+.program-card__status--cancelled .program-card__status-dot {
+  background: #dc2626;
+}
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.program-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 13px;
+}
+
+.program-card__type-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.program-card__type {
+  color: #087f5b;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  line-height: 1.4;
+}
+
+.program-card__county {
+  max-width: 48%;
+  overflow: hidden;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.program-card__title {
+  margin: 0 0 7px;
+  color: #17372e;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.25px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.program-card__title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.program-card__title a:hover {
+  color: #087f5b;
+}
+
+.program-card__description {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0 0 12px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* =========================================================
+   LOCATION AND DATE
+========================================================= */
+
+.program-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.program-card__detail {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.program-card__detail svg {
+  flex-shrink: 0;
+  color: #087f5b;
+}
+
+.program-card__detail span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   IMPACT STATISTICS
+========================================================= */
+
+.program-card__impact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 11px 0;
+  border-top: 1px solid #edf1f3;
+  border-bottom: 1px solid #edf1f3;
+}
+
+.program-card__impact-item {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.program-card__impact-icon {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 7px;
+}
+
+.program-card__impact-icon--attended {
+  background: #e8f2ff;
+  color: #2563eb;
+}
+
+.program-card__impact-icon--benefited {
+  background: #e5f7ed;
+  color: #087f5b;
+}
+
+.program-card__impact-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.program-card__impact-copy strong {
+  color: #17372e;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.program-card__impact-copy > span {
+  color: #94a3b8;
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.program-card__impact-divider {
+  width: 1px;
+  align-self: stretch;
+  background: #e8edf0;
+}
+
+/* =========================================================
+   CARD ACTION
+========================================================= */
+
+.program-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 11px;
+}
+
+.program-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #087f5b;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.4;
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    gap 0.2s ease;
+}
+
+.program-card__link:hover {
+  gap: 9px;
+  color: #065f46;
+}
+
+.program-card__link svg {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   FEATURED CARD VARIANT
+========================================================= */
+
+.program-card--featured .program-card__image-wrapper {
+  height: 180px;
+}
+
+/* =========================================================
+   RESPONSIVE DESIGN
+========================================================= */
+
+@media (max-width: 900px) {
+  .program-card__image-wrapper {
+    height: 155px;
+  }
+
+  .program-card--featured .program-card__image-wrapper {
+    height: 165px;
+  }
+
+  .program-card__body {
+    padding: 12px;
+  }
+
+  .program-card__title {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .program-card {
+    border-radius: 9px;
+  }
+
+  .program-card__image-wrapper,
+  .program-card--featured .program-card__image-wrapper {
+    height: 175px;
+  }
+
+  .program-card__body {
+    padding: 13px;
+  }
+
+  .program-card__title {
+    font-size: 16px;
+  }
+
+  .program-card__description {
+    font-size: 11px;
+    -webkit-line-clamp: 3;
+  }
+
+  .program-card__impact {
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program-card,
+  .program-card__image,
+  .program-card__title a,
+  .program-card__link {
+    transition: none;
+  }
+}

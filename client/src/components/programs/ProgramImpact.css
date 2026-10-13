@@ -1,0 +1,382 @@
+
+/* =========================================================
+   PROGRAM IMPACT SECTION
+========================================================= */
+
+.program-impact {
+  --impact-green: #075e46;
+  --impact-green-dark: #063e30;
+  --impact-gold: #d9ad4c;
+  --impact-text: #18362c;
+  --impact-muted: #687b71;
+
+  position: relative;
+  overflow: hidden;
+  padding: 76px 24px 65px;
+  background: #ffffff;
+}
+
+.program-impact__container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.program-impact__intro {
+  max-width: 670px;
+  margin-bottom: 36px;
+}
+
+.program-impact__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 17px;
+  color: var(--impact-green);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.program-impact__eyebrow-line {
+  display: inline-block;
+  width: 27px;
+  height: 2px;
+  background: var(--impact-gold);
+}
+
+.program-impact__heading {
+  margin: 0;
+  color: var(--impact-text);
+  font-size: clamp(2rem, 3.7vw, 3.15rem);
+  font-weight: 800;
+  line-height: 1.14;
+  letter-spacing: -0.05em;
+}
+
+.program-impact__heading span {
+  color: var(--impact-green);
+}
+
+.program-impact__description {
+  max-width: 590px;
+  margin: 16px 0 0;
+  color: var(--impact-muted);
+  font-size: 0.96rem;
+  line-height: 1.8;
+}
+
+/* =========================================================
+   METRIC CARDS
+========================================================= */
+
+.program-impact__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.program-impact__metric {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 225px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 23px 24px 22px;
+  overflow: hidden;
+  border: 1px solid #e5ece7;
+  border-radius: 14px;
+  background: #fbfcfb;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.program-impact__metric::after {
+  position: absolute;
+  right: -37px;
+  bottom: -57px;
+  width: 125px;
+  height: 125px;
+  border: 1px solid rgb(7 94 70 / 7%);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.program-impact__metric:hover {
+  transform: translateY(-3px);
+  border-color: #cedfd3;
+  box-shadow: 0 12px 27px rgb(24 54 44 / 7%);
+}
+
+.program-impact__metric-top {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.program-impact__icon {
+  display: inline-flex;
+  width: 43px;
+  height: 43px;
+  flex: 0 0 43px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e1ece4;
+  border-radius: 11px;
+  color: var(--impact-green);
+  background: #edf5ef;
+}
+
+.program-impact__metric--attendance .program-impact__icon {
+  color: #876319;
+  border-color: #f0e4c7;
+  background: #faf3e4;
+}
+
+.program-impact__metric--beneficiaries .program-impact__icon {
+  color: #245a85;
+  border-color: #dce8f3;
+  background: #edf4fa;
+}
+
+.program-impact__metric-arrow {
+  color: #9aa99f;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.program-impact__metric:hover .program-impact__metric-arrow {
+  transform: translate(2px, -2px);
+  color: var(--impact-green);
+}
+
+.program-impact__metric-value {
+  display: flex;
+  min-height: 47px;
+  align-items: center;
+  color: var(--impact-text);
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: -0.055em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.program-impact__metric-label {
+  margin: 12px 0 0;
+  color: #304a3d;
+  font-size: 0.91rem;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.program-impact__metric-description {
+  margin: 6px 0 0;
+  color: var(--impact-muted);
+  font-size: 0.77rem;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   LOADING STATE
+========================================================= */
+
+.program-impact__skeleton {
+  display: block;
+  width: 125px;
+  max-width: 100%;
+  height: 35px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    #e8eee9 25%,
+    #f4f7f4 50%,
+    #e8eee9 75%
+  );
+  background-size: 200% 100%;
+  animation: program-impact-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes program-impact-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* =========================================================
+   FOOTER MESSAGE
+========================================================= */
+
+.program-impact__footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 27px;
+  padding-top: 22px;
+  border-top: 1px solid #edf1ee;
+}
+
+.program-impact__footer-mark {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: var(--impact-green);
+  background: #edf5ef;
+}
+
+.program-impact__footer p {
+  margin: 0;
+  color: #536b5e;
+  font-size: 0.82rem;
+  font-weight: 550;
+  line-height: 1.6;
+}
+
+.program-impact__footer-line {
+  width: 45px;
+  height: 2px;
+  flex: 0 0 45px;
+  margin-left: auto;
+  background: var(--impact-gold);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+  .program-impact {
+    padding: 62px 22px 52px;
+  }
+
+  .program-impact__metrics {
+    gap: 12px;
+  }
+
+  .program-impact__metric {
+    min-height: 215px;
+    padding: 20px 18px;
+  }
+
+  .program-impact__metric-value {
+    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  }
+
+  .program-impact__metric-label {
+    font-size: 0.84rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .program-impact {
+    padding: 48px 18px 43px;
+  }
+
+  .program-impact__intro {
+    margin-bottom: 25px;
+  }
+
+  .program-impact__heading {
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+  }
+
+  .program-impact__description {
+    margin-top: 13px;
+    font-size: 0.89rem;
+  }
+
+  .program-impact__metrics {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 11px;
+  }
+
+  .program-impact__metric {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    column-gap: 15px;
+    min-height: 0;
+    padding: 17px;
+  }
+
+  .program-impact__metric-top {
+    grid-row: 1 / 4;
+    align-self: start;
+    margin: 0;
+  }
+
+  .program-impact__icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .program-impact__metric-arrow {
+    display: none;
+  }
+
+  .program-impact__metric-value {
+    min-height: 0;
+    font-size: 1.95rem;
+  }
+
+  .program-impact__metric-label {
+    margin-top: 5px;
+    font-size: 0.86rem;
+  }
+
+  .program-impact__metric-description {
+    margin-top: 4px;
+    font-size: 0.75rem;
+  }
+
+  .program-impact__footer {
+    align-items: flex-start;
+    margin-top: 22px;
+    padding-top: 18px;
+  }
+
+  .program-impact__footer p {
+    font-size: 0.78rem;
+  }
+
+  .program-impact__footer-line {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program-impact__metric,
+  .program-impact__metric-arrow {
+    transition: none;
+  }
+
+  .program-impact__metric:hover,
+  .program-impact__metric:hover .program-impact__metric-arrow {
+    transform: none;
+  }
+
+  .program-impact__skeleton {
+    animation: none;
+  }
+}

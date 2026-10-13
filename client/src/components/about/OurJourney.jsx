@@ -113,7 +113,7 @@ function OurJourney() {
           </div>
 
           <div className="journey-stat">
-            <strong>20K+</strong>
+            <strong>50K+</strong>
             <span>Youth Reached</span>
           </div>
 

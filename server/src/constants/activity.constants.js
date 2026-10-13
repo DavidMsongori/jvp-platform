@@ -16,6 +16,7 @@ export const ACTIVITY_MODULES = {
   SETTINGS: "settings",
   REPORTS: "reports",
   SYSTEM: "system",
+  PROGRAMS: "programs",
 };
 
 /* ==========================================================
@@ -36,6 +37,7 @@ export const TARGET_TYPES = {
   SETTING: "Setting",
   REPORT: "Report",
   SYSTEM: "System",
+  PROGRAM: "Program",
 };
 
 /* ==========================================================
@@ -151,4 +153,15 @@ export const ACTIVITY = {
     RESTORE: "system_restore",
     MAINTENANCE: "system_maintenance",
   },
+
+  PROGRAM: {
+  CREATED: "program_created",
+  UPDATED: "program_updated",
+  PUBLISHED: "program_published",
+  UNPUBLISHED: "program_unpublished",
+  DELETED: "program_deleted",
+  FEATURED: "program_featured",
+  UNFEATURED: "program_unfeatured",
+  IMPACT_UPDATED: "program_impact_updated",
+},
 };
