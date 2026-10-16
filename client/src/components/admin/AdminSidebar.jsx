@@ -7,6 +7,7 @@ import {
   FaChartPie,
   FaUsers,
   FaUserTie,
+  FaBriefcase,
   FaMoneyBillWave,
   FaTicketAlt,
   FaCalendarAlt,
@@ -117,6 +118,12 @@ function AdminSidebar({ isOpen, onClose }) {
       path: "/admin/leadership",
       permission: PERMISSIONS.VIEW_MEMBERS,
     },
+    {
+  name: "Assign Office",
+  icon: <FaBriefcase />,
+  path: "/admin/office-assignments",
+  permission: PERMISSIONS.VIEW_MEMBERS,
+},
     {
       name: "News",
       icon: <FaNewspaper />,

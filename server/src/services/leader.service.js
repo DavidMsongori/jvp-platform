@@ -1,4041 +1,1924 @@
 import mongoose from "mongoose";
+
 import Leader from "../models/leader.model.js";
-import AppError from "../utils/AppError.js";
 import Member from "../models/Member.js";
+import AppError from "../utils/AppError.js";
 
 import {
   LEADERSHIP_LEVELS,
   LEADERSHIP_CATEGORIES,
-  LEADERSHIP_DEPARTMENTS,
-  LEADERSHIP_SCOPE,
   LEADERSHIP_STATUS,
   LEADERSHIP_OFFICES,
   LEADERSHIP_OFFICE_VALUES,
   REPORT_VISIBILITY,
-} from "../constants/leadership.constants.js";
-
-import {
-  normalizeCounty,
-  normalizeConstituency,
-  normalizeWard,
-  isValidCounty,
-  isValidConstituency,
-  isValidWard,
-} from "../utils/geography.utils.js";
-
-import {
+  REGIONAL_CABINET_PORTFOLIOS,
+  getOfficeConfiguration,
+  getRegionalCabinetPortfolio,
   normalizePosition,
   isValidOffice,
-  getOfficeConfiguration,
-} from "../utils/leadership.utils.js";
+} from "../constants/leadership.constants.js";
 
+/*
+|--------------------------------------------------------------------------
+| CONFIGURATION
+|--------------------------------------------------------------------------
+| Adjust the constants import path above if your project stores the file
+| somewhere other than ../constants/leadership.constants.js.
+|--------------------------------------------------------------------------
+*/
 
-/* ========================================================================
-   MEMBER POPULATE
-======================================================================== */
+const MEMBER_POPULATE = {
+  path: "member",
+  select: [
+    "memberNumber",
+    "firstName",
+    "middleName",
+    "lastName",
+    "profilePhoto",
+    "county",
+    "constituency",
+    "ward",
+    "gender",
+    "membershipStatus",
+    "membershipType",
+    "user",
+  ].join(" "),
+};
 
-const MEMBER_POPULATE = `
-  memberNumber
-  firstName
-  middleName
-  lastName
-  profilePhoto
-  county
-  constituency
-  ward
-  gender
-  membershipStatus
-  membershipType
-`;
+const ACTIVE_STATUS = LEADERSHIP_STATUS.ACTIVE || "active";
+const INACTIVE_STATUS = LEADERSHIP_STATUS.INACTIVE || "inactive";
+const COMPLETED_STATUS = LEADERSHIP_STATUS.COMPLETED || "completed";
+const SUSPENDED_STATUS = LEADERSHIP_STATUS.SUSPENDED || "suspended";
 
+const ALL_COUNTIES = [
+  "Mombasa",
+  "Kwale",
+  "Kilifi",
+  "Tana River",
+  "Lamu",
+  "Taita Taveta",
+];
 
-/* ========================================================================
-   LEADER SERVICE
-======================================================================== */
+/*
+|--------------------------------------------------------------------------
+| GENERAL HELPERS
+|--------------------------------------------------------------------------
+*/
 
-class LeaderService {
+const hasValue = (value) =>
+  value !== undefined && value !== null && String(value).trim() !== "";
 
-  /* ======================================================================
-     PRIVATE HELPERS
-  ====================================================================== */
+const cleanString = (value) =>
+  hasValue(value) ? String(value).trim() : undefined;
 
-  /**
-   * Populate a leadership record with member details.
-   *
-   * Patron records may not have a Member account.
-   */
-  async populateLeader(id) {
+const normalizeLocation = (value) =>
+  cleanString(value)
+    ?.replace(/\s+/g, " ")
+    .replace(/[-_]+/g, " ");
 
-    return Leader.findById(id)
-      .populate("member", MEMBER_POPULATE);
+const escapeRegex = (value) =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+const toObjectId = (value) => {
+  if (!value || !mongoose.Types.ObjectId.isValid(value)) {
+    return null;
   }
 
+  return new mongoose.Types.ObjectId(value);
+};
 
-  /**
-   * Find a leader or throw a 404 error.
-   */
-  async findLeader(id) {
-
-    this.validateObjectId(id, "leader ID");
-
-    const leader =
-      await Leader.findById(id);
-
-    if (!leader) {
-
-      throw new AppError(
-        404,
-        "Leader not found."
-      );
-
-    }
-
-    return leader;
-
+const assertObjectId = (value, label = "ID") => {
+  if (!toObjectId(value)) {
+    throw new AppError(`A valid ${label} is required.`, 400);
   }
+};
 
+const normalizeBoolean = (value) => {
+  if (typeof value === "boolean") return value;
+  if (value === "true" || value === "1" || value === 1) return true;
+  if (value === "false" || value === "0" || value === 0) return false;
 
-  /**
-   * Validate MongoDB ObjectId.
-   */
-  validateObjectId(id, field = "ID") {
+  return undefined;
+};
 
-    if (
-      !id ||
-      !mongoose.isValidObjectId(id)
-    ) {
+const normalizePagination = (query = {}) => {
+  const page = Math.max(
+    1,
+    Number.parseInt(query.page, 10) || DEFAULT_PAGE
+  );
 
-      throw new AppError(
-        400,
-        `Invalid ${field}.`
-      );
+  const limit = Math.min(
+    MAX_LIMIT,
+    Math.max(1, Number.parseInt(query.limit, 10) || DEFAULT_LIMIT)
+  );
 
-    }
+  return {
+    page,
+    limit,
+    skip: (page - 1) * limit,
+  };
+};
 
-    return true;
+const normalizeStatus = (value) => {
+  if (!hasValue(value)) return undefined;
 
-  }
+  const normalized = String(value).trim().toLowerCase();
 
+  const allowed = [
+    ACTIVE_STATUS,
+    INACTIVE_STATUS,
+    COMPLETED_STATUS,
+    SUSPENDED_STATUS,
+  ];
 
-  /**
-   * Determine whether the office is Patronage.
-   */
-  isPatronPosition(position) {
-
-    const office =
-      this.getOffice(position);
-
-    return (
-      office.category ===
-      LEADERSHIP_CATEGORIES.PATRONAGE
+  if (!allowed.includes(normalized)) {
+    throw new AppError(
+      `Invalid leadership status "${value}". Allowed values: ${allowed.join(", ")}.`,
+      400
     );
-
   }
 
+  return normalized;
+};
 
-  /**
-   * Ensure a member does not already hold
-   * another active leadership assignment.
-   *
-   * Patron does not require a Member.
-   */
-  async validateMemberAssignment(
-    memberId,
-    ignoreLeaderId = null
-  ) {
+const getCurrentUserId = (userOrId) => {
+  if (!userOrId) return undefined;
 
-    if (!memberId) {
-      return;
-    }
+  if (typeof userOrId === "string") return userOrId;
 
-    this.validateObjectId(
-      memberId,
-      "member ID"
+  return (
+    userOrId._id ||
+    userOrId.id ||
+    userOrId.userId ||
+    userOrId.createdBy ||
+    undefined
+  );
+};
+
+const getOfficeConfig = (position) => {
+  const normalizedPosition = normalizePosition(position);
+
+  if (!normalizedPosition || !isValidOffice(normalizedPosition)) {
+    throw new AppError(
+      `Invalid leadership office "${position}".`,
+      400
     );
+  }
 
-    const query = {
+  const config = getOfficeConfiguration(normalizedPosition);
 
-      member: memberId,
+  if (!config) {
+    throw new AppError(
+      `No configuration exists for leadership office "${normalizedPosition}".`,
+      400
+    );
+  }
 
-      isActive: true,
+  return {
+    position: normalizedPosition,
+    config,
+  };
+};
 
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
+const getMemberName = (member) => {
+  if (!member) return "";
 
+  return [
+    member.firstName,
+    member.middleName,
+    member.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+};
+
+const getLeaderName = (leader) => {
+  if (!leader) return "";
+
+  if (leader.patron?.fullName) {
+    return leader.patron.fullName;
+  }
+
+  return getMemberName(leader.member);
+};
+
+const isPatronPosition = (position) => {
+  const normalized = normalizePosition(position);
+
+  return normalized === LEADERSHIP_OFFICES.PATRON ||
+    normalized === "patron";
+};
+
+const isPatronLeader = (leader) =>
+  leader?.category === LEADERSHIP_CATEGORIES.PATRONAGE ||
+  isPatronPosition(leader?.position);
+
+const isActiveLeader = (leader) =>
+  leader?.status === ACTIVE_STATUS && leader?.isActive !== false;
+
+const isRegionalOffice = (position) => {
+  const { config } = getOfficeConfig(position);
+
+  return config.scope === "regional_cabinet" ||
+    config.scope === "regional_youth_assembly" ||
+    config.level === "regional_cabinet" ||
+    config.level === "regional_youth_assembly";
+};
+
+const getLeaderPortfolioKey = (leader) =>
+  leader?.portfolioKey ||
+  leader?.portfolio?.key ||
+  leader?.portfolio ||
+  undefined;
+
+const serializeLeader = (leader) => {
+  if (!leader) return null;
+
+  const result =
+    typeof leader.toObject === "function"
+      ? leader.toObject({ virtuals: true })
+      : { ...leader };
+
+  result.fullName = getLeaderName(leader);
+
+  if (leader.member) {
+    result.member = {
+      ...(
+        typeof leader.member.toObject === "function"
+          ? leader.member.toObject()
+          : leader.member
+      ),
+      fullName: getMemberName(leader.member),
     };
-
-
-    if (ignoreLeaderId) {
-
-      query._id = {
-        $ne: ignoreLeaderId,
-      };
-
-    }
-
-
-    const existing =
-      await Leader.findOne(query);
-
-
-    if (existing) {
-
-      throw new AppError(
-        409,
-        "This member already has an active leadership assignment."
-      );
-
-    }
-
   }
 
+  return result;
+};
 
-  /**
-   * Validate leadership office.
-   */
-  validateOffice(position) {
+const serializeLeaders = (leaders = []) =>
+  leaders.map(serializeLeader);
 
-    const office =
-      normalizePosition(position);
+/*
+|--------------------------------------------------------------------------
+| MEMBER AND OFFICE VALIDATION
+|--------------------------------------------------------------------------
+*/
 
-    if (!isValidOffice(office)) {
+const validateMember = async (memberId) => {
+  assertObjectId(memberId, "member ID");
 
-      throw new AppError(
-        400,
-        "Invalid leadership office."
-      );
+  const member = await Member.findById(memberId);
 
-    }
-
-    return office;
-
+  if (!member) {
+    throw new AppError("The selected member does not exist.", 404);
   }
 
+  return member;
+};
 
-  /**
-   * Get office configuration.
-   */
-  getOffice(position) {
-
-    const office =
-      normalizePosition(position);
-
-    const configuration =
-      getOfficeConfiguration(office);
-
-    if (!configuration) {
-
-      throw new AppError(
-        400,
-        "Unknown leadership office."
-      );
-
-    }
-
-    return configuration;
-
+const validateMemberEligibility = (member) => {
+  if (!member) {
+    throw new AppError("A valid JVP member is required.", 400);
   }
 
+  if (member.isActive === false) {
+    throw new AppError(
+      "This member is not active and cannot be assigned to leadership.",
+      400
+    );
+  }
 
-  /**
-   * Validate geographic jurisdiction according
-   * to report visibility.
-   *
-   * Structural scope and geographic visibility
-   * are intentionally separate.
-   */
-  validateLocation(
-    position,
+  if (
+    member.membershipStatus &&
+    !["active", "approved", "verified"].includes(
+      String(member.membershipStatus).toLowerCase()
+    )
+  ) {
+    throw new AppError(
+      "Only eligible members can be assigned to leadership.",
+      400
+    );
+  }
+};
+
+const validatePortfolio = (position, portfolioValue) => {
+  const { config } = getOfficeConfig(position);
+
+  if (config.requiresPortfolio && !hasValue(portfolioValue)) {
+    throw new AppError(
+      "A portfolio must be selected for this leadership office.",
+      400
+    );
+  }
+
+  if (!config.requiresPortfolio) {
+    return null;
+  }
+
+  const portfolio = getRegionalCabinetPortfolio(portfolioValue);
+
+  if (!portfolio) {
+    throw new AppError(
+      `Invalid Cabinet Secretary portfolio "${portfolioValue}".`,
+      400
+    );
+  }
+
+  return portfolio;
+};
+
+const validateLocation = (position, data = {}) => {
+  const { config } = getOfficeConfig(position);
+
+  const county = normalizeLocation(data.county);
+  const constituency = normalizeLocation(data.constituency);
+  const ward = normalizeLocation(data.ward);
+
+  if (config.requiresCounty && !county) {
+    throw new AppError(
+      `${config.title || position} requires a county.`,
+      400
+    );
+  }
+
+  if (config.requiresConstituency && !constituency) {
+    throw new AppError(
+      `${config.title || position} requires a constituency.`,
+      400
+    );
+  }
+
+  if (config.requiresWard && !ward) {
+    throw new AppError(
+      `${config.title || position} requires a ward.`,
+      400
+    );
+  }
+
+  if (
+    county &&
+    !ALL_COUNTIES.some(
+      (item) => item.toLowerCase() === county.toLowerCase()
+    )
+  ) {
+    throw new AppError(
+      `The county "${county}" is not a recognized Coast region county.`,
+      400
+    );
+  }
+
+  if (config.scope === "regional_cabinet" ||
+      config.scope === "regional_youth_assembly") {
+    return {
+      county: undefined,
+      constituency: undefined,
+      ward: undefined,
+    };
+  }
+
+  return {
     county,
     constituency,
-    ward
-  ) {
-
-    const office =
-      this.getOffice(position);
-
-
-    switch (
-      office.reportVisibility
-    ) {
-
-      /* ================================================================
-         PRIVATE
-      ================================================================ */
-
-      case REPORT_VISIBILITY.PRIVATE:
-
-        return {
-
-          county: null,
-
-          constituency: null,
-
-          ward: null,
-
-        };
-
-
-      /* ================================================================
-         REGIONAL
-      ================================================================ */
-
-      case REPORT_VISIBILITY.REGIONAL:
-
-        return {
-
-          county: null,
-
-          constituency: null,
-
-          ward: null,
-
-        };
-
-
-      /* ================================================================
-         COUNTY
-      ================================================================ */
-
-      case REPORT_VISIBILITY.COUNTY:
-
-        if (!isValidCounty(county)) {
-
-          throw new AppError(
-            400,
-            "Valid county is required for this leadership office."
-          );
-
-        }
-
-        return {
-
-          county:
-            normalizeCounty(county),
-
-          constituency: null,
-
-          ward: null,
-
-        };
-
-
-      /* ================================================================
-         CONSTITUENCY
-      ================================================================ */
-
-      case REPORT_VISIBILITY.CONSTITUENCY:
-
-        if (!isValidCounty(county)) {
-
-          throw new AppError(
-            400,
-            "Valid county is required."
-          );
-
-        }
-
-
-        if (
-          !isValidConstituency(
-            county,
-            constituency
-          )
-        ) {
-
-          throw new AppError(
-            400,
-            "Valid constituency is required."
-          );
-
-        }
-
-
-        return {
-
-          county:
-            normalizeCounty(county),
-
-          constituency:
-            normalizeConstituency(
-              county,
-              constituency
-            ),
-
-          ward: null,
-
-        };
-
-
-      /* ================================================================
-         WARD
-      ================================================================ */
-
-      case REPORT_VISIBILITY.WARD:
-
-        if (!isValidCounty(county)) {
-
-          throw new AppError(
-            400,
-            "Valid county is required."
-          );
-
-        }
-
-
-        if (
-          !isValidConstituency(
-            county,
-            constituency
-          )
-        ) {
-
-          throw new AppError(
-            400,
-            "Valid constituency is required."
-          );
-
-        }
-
-
-        if (
-          !isValidWard(
-            county,
-            constituency,
-            ward
-          )
-        ) {
-
-          throw new AppError(
-            400,
-            "Valid ward is required."
-          );
-
-        }
-
-
-        return {
-
-          county:
-            normalizeCounty(county),
-
-          constituency:
-            normalizeConstituency(
-              county,
-              constituency
-            ),
-
-          ward:
-            normalizeWard(
-              county,
-              constituency,
-              ward
-            ),
-
-        };
-
-
-      /* ================================================================
-         INVALID
-      ================================================================ */
-
-      default:
-
-        throw new AppError(
-          400,
-          "Invalid leadership reporting visibility."
-        );
-
-    }
-
+    ward,
+  };
+};
+
+const buildOfficeFields = (position, data = {}) => {
+  const { config } = getOfficeConfig(position);
+  const location = validateLocation(position, data);
+
+  return {
+    position,
+    level: config.level ?? null,
+    category: config.category,
+    department: config.department ?? null,
+    scope: config.scope ?? null,
+    reportVisibility: config.reportVisibility,
+    appointmentType: data.appointmentType || config.appointmentType,
+    county: location.county,
+    constituency: location.constituency,
+    ward: location.ward,
+  };
+};
+
+/*
+|--------------------------------------------------------------------------
+| ACTIVE ASSIGNMENT VALIDATION
+|--------------------------------------------------------------------------
+*/
+
+const officeAllowsMultiple = (position) => {
+  const { config } = getOfficeConfig(position);
+
+  return config.allowMultiple === true;
+};
+
+const buildOfficeJurisdictionQuery = (leader) => {
+  const query = {
+    position: leader.position,
+    status: ACTIVE_STATUS,
+    isActive: true,
+  };
+
+  if (leader.position === LEADERSHIP_OFFICES.CABINET_SECRETARY) {
+    query.portfolioKey = leader.portfolioKey;
   }
 
-
-  /**
-   * Build all derived leadership fields from
-   * the central office configuration.
-   *
-   * The client should not be trusted to define
-   * category, level, department, scope, visibility,
-   * or appointment type independently.
-   */
-  buildOfficeFields(position) {
-
-    const normalizedPosition =
-      this.validateOffice(position);
-
-    const office =
-      this.getOffice(
-        normalizedPosition
-      );
-
-
-    return {
-
-      position:
-        normalizedPosition,
-
-      category:
-        office.category,
-
-      level:
-        office.level,
-
-      department:
-        office.department,
-
-      scope:
-        office.scope,
-
-      reportVisibility:
-        office.reportVisibility,
-
-      appointmentType:
-        office.appointmentType,
-
-    };
-
-  }
-
-
-  /**
-   * Build geographic access filters from
-   * the leader's report visibility.
-   */
-  buildJurisdictionFilter(leader) {
-
-    if (!leader) {
-
-      throw new AppError(
-        403,
-        "Leadership record not found."
-      );
-
-    }
-
-
-    switch (
-      leader.reportVisibility
-    ) {
-
-      case REPORT_VISIBILITY.REGIONAL:
-
-        return {};
-
-
-      case REPORT_VISIBILITY.COUNTY:
-
-        if (!leader.county) {
-
-          throw new AppError(
-            403,
-            "Leader does not have a county jurisdiction."
-          );
-
-        }
-
-        return {
-
-          county:
-            leader.county,
-
-        };
-
-
-      case REPORT_VISIBILITY.CONSTITUENCY:
-
-        if (
-          !leader.county ||
-          !leader.constituency
-        ) {
-
-          throw new AppError(
-            403,
-            "Leader does not have a constituency jurisdiction."
-          );
-
-        }
-
-        return {
-
-          county:
-            leader.county,
-
-          constituency:
-            leader.constituency,
-
-        };
-
-
-      case REPORT_VISIBILITY.WARD:
-
-        if (
-          !leader.county ||
-          !leader.constituency ||
-          !leader.ward
-        ) {
-
-          throw new AppError(
-            403,
-            "Leader does not have a ward jurisdiction."
-          );
-
-        }
-
-        return {
-
-          county:
-            leader.county,
-
-          constituency:
-            leader.constituency,
-
-          ward:
-            leader.ward,
-
-        };
-
-
-      case REPORT_VISIBILITY.PRIVATE:
-
-        /*
-         * No member records should be returned.
-         */
-        return {
-
-          _id: {
-            $exists: false,
-          },
-
-        };
-
-
-      default:
-
-        throw new AppError(
-          403,
-          "Invalid leadership reporting visibility."
-        );
-
-    }
-
-  }
-
-
-  /**
-   * Determine whether an office can have
-   * multiple active holders.
-   *
-   * These offices are portfolio/administrative
-   * offices rather than single-seat offices.
-   */
-  officeAllowsMultiple(position) {
-
-    return [
-
-      LEADERSHIP_OFFICES.CABINET_SECRETARY,
-
-      LEADERSHIP_OFFICES.COUNTY_CABINET_SECRETARY,
-
-      LEADERSHIP_OFFICES.REGIONAL_CLERK,
-
-      LEADERSHIP_OFFICES.REGIONAL_DEPUTY_CLERK,
-
-      LEADERSHIP_OFFICES.COUNTY_CLERK,
-
-      LEADERSHIP_OFFICES.COUNTY_DEPUTY_CLERK,
-
-      LEADERSHIP_OFFICES.NOMINATED_MCA,
-
-    ].includes(position);
-
-  }
-
-
-  /**
-   * Build the jurisdiction portion of an
-   * office uniqueness query.
-   */
-  buildOfficeJurisdictionQuery(
-    location,
-    reportVisibility
-  ) {
-
-    switch (reportVisibility) {
-
-      case REPORT_VISIBILITY.REGIONAL:
-
-      case REPORT_VISIBILITY.PRIVATE:
-
-        return {
-
-          county: null,
-
-          constituency: null,
-
-          ward: null,
-
-        };
-
-
-      case REPORT_VISIBILITY.COUNTY:
-
-        return {
-
-          county:
-            location.county,
-
-          constituency: null,
-
-          ward: null,
-
-        };
-
-
-      case REPORT_VISIBILITY.CONSTITUENCY:
-
-        return {
-
-          county:
-            location.county,
-
-          constituency:
-            location.constituency,
-
-          ward: null,
-
-        };
-
-
-      case REPORT_VISIBILITY.WARD:
-
-        return {
-
-          county:
-            location.county,
-
-          constituency:
-            location.constituency,
-
-          ward:
-            location.ward,
-
-        };
-
-
-      default:
-
-        return {
-
-          county:
-            location.county || null,
-
-          constituency:
-            location.constituency || null,
-
-          ward:
-            location.ward || null,
-
-        };
-
-    }
-
-  }
-
-
-  /**
- * Prevent duplicate active office assignments
- * within the same jurisdiction.
- *
- * Regional offices are globally unique.
- * County offices are unique per county.
- * Constituency offices are unique per constituency.
- * Ward offices are unique per ward.
- *
- * Offices that legally allow multiple holders
- * are excluded from duplicate validation.
- */
-async validateOfficeAssignment(
-  position,
-  location,
+  if (leader.county) query.county = leader.county;
+  if (leader.constituency) query.constituency = leader.constituency;
+  if (leader.ward) query.ward = leader.ward;
+
+  return query;
+};
+
+const validateUniqueMemberAssignment = async (
+  memberId,
   ignoreLeaderId = null
-) {
-  const office = this.getOffice(position);
-
-  /*
-   * Some offices may legitimately have
-   * multiple holders within the same jurisdiction.
-   *
-   * Example:
-   * - Nominated MCA
-   */
-  if (this.officeAllowsMultiple(position)) {
-    return;
-  }
+) => {
+  if (!memberId) return;
 
   const query = {
-    position,
-
+    member: memberId,
+    status: ACTIVE_STATUS,
     isActive: true,
-
-    status: LEADERSHIP_STATUS.ACTIVE,
   };
 
   if (ignoreLeaderId) {
-    query._id = {
-      $ne: ignoreLeaderId,
-    };
+    query._id = { $ne: ignoreLeaderId };
   }
 
-  Object.assign(
-    query,
-    this.buildOfficeJurisdictionQuery(
-      location,
-      office.reportVisibility
-    )
-  );
-
-  const existing = await Leader.findOne(query);
+  const existing = await Leader.findOne(query)
+    .select("_id position status");
 
   if (existing) {
-    const jurisdiction =
-      this.getJurisdictionLabel(existing);
+    throw new AppError(
+      "This member already holds an active leadership appointment. Deactivate or complete the existing appointment before assigning another.",
+      409
+    );
+  }
+};
+
+const validateOfficeAssignment = async (
+  leaderData,
+  ignoreLeaderId = null
+) => {
+  if (isPatronLeader(leaderData)) return;
+
+  if (officeAllowsMultiple(leaderData.position)) {
+    // Multiple holders are permitted by the office configuration.
+    // Cabinet Secretary uniqueness is checked per portfolio below.
+  }
+
+  const query = buildOfficeJurisdictionQuery(leaderData);
+
+  if (ignoreLeaderId) {
+    query._id = { $ne: ignoreLeaderId };
+  }
+
+  const existing = await Leader.findOne(query)
+    .select("_id position portfolioKey county constituency ward");
+
+  if (existing) {
+    const portfolio = leaderData.portfolioKey
+      ? ` for the "${leaderData.portfolioTitle || leaderData.portfolioKey}" portfolio`
+      : "";
 
     throw new AppError(
-      409,
-      `The ${position} office is already occupied${jurisdiction}.`
+      `An active holder already exists for ${leaderData.position}${portfolio} in the specified jurisdiction.`,
+      409
     );
   }
-}
-
-
-  /**
-   * Generate a readable jurisdiction label
-   * for duplicate-office errors.
-   */
-  getJurisdictionLabel(leader) {
-
-    switch (
-      leader.reportVisibility
-    ) {
-
-      case REPORT_VISIBILITY.REGIONAL:
-
-        return " at the regional level";
-
-
-      case REPORT_VISIBILITY.COUNTY:
-
-        return ` in ${leader.county}`;
-
-
-      case REPORT_VISIBILITY.CONSTITUENCY:
-
-        return ` in ${leader.constituency}, ${leader.county}`;
-
-
-      case REPORT_VISIBILITY.WARD:
-
-        return ` in ${leader.ward}, ${leader.constituency}, ${leader.county}`;
-
-
-      default:
-
-        return "";
-
-    }
-
-  }
-
-
-  /* ======================================================================
-     CREATE LEADER
-  ====================================================================== */
-
-  async createLeader(
-    data,
-    userId
-  ) {
-
-    const position =
-      this.validateOffice(
-        data.position
-      );
-
-    const office =
-      this.getOffice(position);
-
-
-    /*
-     * Patron:
-     *
-     * - no Member required
-     * - no geography
-     * - special model handling
-     */
-    if (
-      office.category !==
-      LEADERSHIP_CATEGORIES.PATRONAGE
-    ) {
-
-      if (!data.member) {
-
-        throw new AppError(
-          400,
-          "A member is required for this leadership office."
-        );
-
-      }
-
-
-      await this.validateMemberAssignment(
-        data.member
-      );
-
-    }
-
-
-    const location =
-      this.validateLocation(
-
-        position,
-
-        data.county,
-
-        data.constituency,
-
-        data.ward
-
-      );
-
-
-    await this.validateOfficeAssignment(
-
-      position,
-
-      location
-
-    );
-
-
-    const officeFields =
-      this.buildOfficeFields(
-        position
-      );
-
-
-    const leader =
-      await Leader.create({
-
-        ...data,
-
-        ...officeFields,
-
-        county:
-          location.county,
-
-        constituency:
-          location.constituency,
-
-        ward:
-          location.ward,
-
-        status:
-          data.status ||
-          LEADERSHIP_STATUS.ACTIVE,
-
-        isActive:
-          data.isActive !== undefined
-            ? data.isActive
-            : true,
-
-        createdBy:
-          userId,
-
-        updatedBy:
-          userId,
-
-      });
-
-
-    return this.populateLeader(
-      leader._id
-    );
-
-  }
-
-
-  /* ======================================================================
-     GET ALL LEADERS
-  ====================================================================== */
-
-  async getLeaders(
-    filters = {}
-  ) {
-
-    const query = {};
-
-
-    /* --------------------------------------------------------------------
-       CATEGORY
-    -------------------------------------------------------------------- */
-
-    if (filters.category) {
-
-      query.category =
-        filters.category;
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       LEVEL
-    -------------------------------------------------------------------- */
-
-    if (filters.level) {
-
-      query.level =
-        filters.level;
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       DEPARTMENT
-    -------------------------------------------------------------------- */
-
-    if (filters.department) {
-
-      query.department =
-        filters.department;
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       STRUCTURAL SCOPE
-    -------------------------------------------------------------------- */
-
-    if (filters.scope) {
-
-      query.scope =
-        filters.scope;
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       REPORT VISIBILITY
-    -------------------------------------------------------------------- */
-
-    if (filters.reportVisibility) {
-
-      query.reportVisibility =
-        filters.reportVisibility;
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       POSITION
-    -------------------------------------------------------------------- */
-
-    if (filters.position) {
-
-      query.position =
-        normalizePosition(
-          filters.position
-        );
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       COUNTY
-    -------------------------------------------------------------------- */
-
-    if (filters.county) {
-
-      query.county =
-        normalizeCounty(
-          filters.county
-        );
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       CONSTITUENCY
-    -------------------------------------------------------------------- */
-
-    if (
-      filters.constituency &&
-      filters.county
-    ) {
-
-      query.constituency =
-        normalizeConstituency(
-
-          filters.county,
-
-          filters.constituency
-
-        );
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       WARD
-    -------------------------------------------------------------------- */
-
-    if (
-      filters.ward &&
-      filters.county &&
-      filters.constituency
-    ) {
-
-      query.ward =
-        normalizeWard(
-
-          filters.county,
-
-          filters.constituency,
-
-          filters.ward
-
-        );
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       MEMBER
-    -------------------------------------------------------------------- */
-
-    if (filters.member) {
-
-      query.member =
-        filters.member;
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       STATUS
-    -------------------------------------------------------------------- */
-
-    if (filters.status) {
-
-      query.status =
-        filters.status;
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       ACTIVE
-    -------------------------------------------------------------------- */
-
-    if (
-      filters.active !== undefined
-    ) {
-
-      query.isActive =
-        filters.active === true ||
-        filters.active === "true";
-
-    }
-
-
-    return Leader.find(query)
-
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      )
-
-      .sort({
-
-        level: 1,
-
-        scope: 1,
-
-        county: 1,
-
-        displayOrder: 1,
-
-        position: 1,
-
-      });
-
-  }
-
-
-  /* ======================================================================
-     GET LEADER BY ID
-  ====================================================================== */
-
-  async getLeaderById(id) {
-
-    this.validateObjectId(
-      id,
-      "leader ID"
-    );
-
-
-    const leader =
-      await this.populateLeader(id);
-
-
-    if (!leader) {
-
+};
+
+const validateAppointment = async ({
+  position,
+  memberId,
+  portfolioKey,
+  county,
+  constituency,
+  ward,
+  status = ACTIVE_STATUS,
+  isActive = true,
+  ignoreLeaderId = null,
+  patron,
+}) => {
+  const normalizedPosition = normalizePosition(position);
+
+  if (isPatronPosition(normalizedPosition)) {
+    if (!patron?.fullName?.trim()) {
       throw new AppError(
-        404,
-        "Leader not found."
+        "The patron's full name is required.",
+        400
       );
-
     }
-
-
-    return leader;
-
-  }
-
-
-  /* ======================================================================
-     GET LEADER BY MEMBER
-  ====================================================================== */
-
-  async getLeaderByMember(
-    memberId
-  ) {
-
-    this.validateObjectId(
-      memberId,
-      "member ID"
-    );
-
-
-    return Leader.findOne({
-
-      member:
-        memberId,
-
-      isActive:
-        true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    })
-
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      );
-
-  }
-
-
-  /* ======================================================================
-     GET LEADERSHIP MEMBERS
-  ====================================================================== */
-
-  async getLeadershipMembers(
-    userId,
-    query = {}
-  ) {
-
-    const {
-
-      page = 1,
-
-      limit = 20,
-
-      search = "",
-
-      membershipStatus,
-
-      membershipType,
-
-      sort = "-createdAt",
-
-    } = query;
-
-
-    const member =
-      await Member.findOne({
-        user: userId,
-      });
-
-
-    if (!member) {
-
-      throw new AppError(
-        404,
-        "Member account not found."
-      );
-
-    }
-
-
-    const leader =
-      await Leader.findOne({
-
-        member:
-          member._id,
-
-        isActive:
-          true,
-
-        status:
-          LEADERSHIP_STATUS.ACTIVE,
-
-      });
-
-
-    if (!leader) {
-
-      throw new AppError(
-        403,
-        "You are not an active leader."
-      );
-
-    }
-
-
-    const filter = {
-
-      accountActivated:
-        true,
-
-    };
-
-
-    /*
-     * Geographic access is controlled by
-     * reportVisibility.
-     */
-    const jurisdiction =
-      this.buildJurisdictionFilter(
-        leader
-      );
-
-
-    Object.assign(
-      filter,
-      jurisdiction
-    );
-
-
-    /* --------------------------------------------------------------------
-       ADDITIONAL FILTERS
-    -------------------------------------------------------------------- */
-
-    if (membershipStatus) {
-
-      filter.membershipStatus =
-        membershipStatus;
-
-    }
-
-
-    if (membershipType) {
-
-      filter.membershipType =
-        membershipType;
-
-    }
-
-
-    if (
-      search &&
-      search.trim()
-    ) {
-
-      const regex =
-        new RegExp(
-          search.trim(),
-          "i"
-        );
-
-
-      filter.$or = [
-
-        {
-          memberNumber:
-            regex,
-        },
-
-        {
-          firstName:
-            regex,
-        },
-
-        {
-          middleName:
-            regex,
-        },
-
-        {
-          lastName:
-            regex,
-        },
-
-        {
-          phone:
-            regex,
-        },
-
-      ];
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       SUMMARY
-    -------------------------------------------------------------------- */
-
-    const [
-
-      totalMembers,
-
-      activeMembers,
-
-      maleMembers,
-
-      femaleMembers,
-
-    ] = await Promise.all([
-
-      Member.countDocuments(
-        filter
-      ),
-
-      Member.countDocuments({
-
-        ...filter,
-
-        membershipStatus:
-          "active",
-
-      }),
-
-      Member.countDocuments({
-
-        ...filter,
-
-        gender:
-          "male",
-
-      }),
-
-      Member.countDocuments({
-
-        ...filter,
-
-        gender:
-          "female",
-
-      }),
-
-    ]);
-
-
-    const startOfMonth =
-      new Date();
-
-    startOfMonth.setDate(1);
-
-    startOfMonth.setHours(
-      0,
-      0,
-      0,
-      0
-    );
-
-
-    const newMembersThisMonth =
-      await Member.countDocuments({
-
-        ...filter,
-
-        createdAt: {
-          $gte:
-            startOfMonth,
-        },
-
-      });
-
-
-    const summary = {
-
-      totalMembers,
-
-      activeMembers,
-
-      maleMembers,
-
-      femaleMembers,
-
-      newMembersThisMonth,
-
-    };
-
-
-    /* --------------------------------------------------------------------
-       DISTRIBUTION
-    -------------------------------------------------------------------- */
-
-    let distribution = null;
-
-    let groupField = null;
-
-    let title = "";
-
-
-    switch (
-      leader.reportVisibility
-    ) {
-
-      case REPORT_VISIBILITY.REGIONAL:
-
-        groupField =
-          "$county";
-
-        title =
-          "County Distribution";
-
-        break;
-
-
-      case REPORT_VISIBILITY.COUNTY:
-
-        groupField =
-          "$constituency";
-
-        title =
-          "Constituency Distribution";
-
-        break;
-
-
-      case REPORT_VISIBILITY.CONSTITUENCY:
-
-        groupField =
-          "$ward";
-
-        title =
-          "Ward Distribution";
-
-        break;
-
-
-      case REPORT_VISIBILITY.WARD:
-
-      case REPORT_VISIBILITY.PRIVATE:
-
-        groupField =
-          null;
-
-        break;
-
-    }
-
-
-    if (groupField) {
-
-      const graph =
-        await Member.aggregate([
-
-          {
-            $match:
-              filter,
-          },
-
-          {
-            $group: {
-
-              _id:
-                groupField,
-
-              members: {
-                $sum: 1,
-              },
-
-            },
-          },
-
-          {
-            $sort: {
-
-              _id: 1,
-
-            },
-
-          },
-
-        ]);
-
-
-      distribution = {
-
-        title,
-
-        data:
-          graph.map(
-            (item) => ({
-
-              name:
-                item._id ||
-                "Unknown",
-
-              members:
-                item.members,
-
-            })
-          ),
-
-      };
-
-    }
-
-
-    /* --------------------------------------------------------------------
-       PAGINATION
-    -------------------------------------------------------------------- */
-
-    const currentPage =
-      Math.max(
-        Number(page) || 1,
-        1
-      );
-
-
-    const pageSize =
-      Math.max(
-        Number(limit) || 20,
-        1
-      );
-
-
-    const skip =
-      (currentPage - 1) *
-      pageSize;
-
-
-    const members =
-      await Member.find(filter)
-
-        .sort(sort)
-
-        .skip(skip)
-
-        .limit(pageSize)
-
-        .select([
-
-          "memberNumber",
-
-          "firstName",
-
-          "middleName",
-
-          "lastName",
-
-          "gender",
-
-          "phone",
-
-          "county",
-
-          "constituency",
-
-          "ward",
-
-          "membershipType",
-
-          "membershipStatus",
-
-          "membershipFeePaid",
-
-          "profilePhoto",
-
-          "profileCompletion",
-
-          "joinedAt",
-
-          "createdAt",
-
-        ].join(" "))
-
-        .lean();
-
-
-    const totalPages =
-      Math.ceil(
-        totalMembers /
-        pageSize
-      );
-
-
-    const pagination = {
-
-      page:
-        currentPage,
-
-      limit:
-        pageSize,
-
-      total:
-        totalMembers,
-
-      totalPages,
-
-      hasNextPage:
-        currentPage <
-        totalPages,
-
-      hasPreviousPage:
-        currentPage > 1,
-
-    };
-
 
     return {
-
-      summary,
-
-      distribution,
-
-      members,
-
-      pagination,
-
-      leader: {
-
-        position:
-          leader.position,
-
-        category:
-          leader.category,
-
-        level:
-          leader.level,
-
-        department:
-          leader.department,
-
-        scope:
-          leader.scope,
-
-        reportVisibility:
-          leader.reportVisibility,
-
-        county:
-          leader.county,
-
-        constituency:
-          leader.constituency,
-
-        ward:
-          leader.ward,
-
-      },
-
+      position: normalizedPosition,
+      category: LEADERSHIP_CATEGORIES.PATRONAGE,
+      level: null,
+      department: null,
+      scope: null,
+      reportVisibility: REPORT_VISIBILITY.REGIONAL || "regional",
+      appointmentType: "appointed",
+      member: null,
+      county: undefined,
+      constituency: undefined,
+      ward: undefined,
+      portfolioKey: undefined,
+      portfolioTitle: undefined,
+      portfolioSlug: undefined,
     };
-
   }
 
+  const { config } = getOfficeConfig(normalizedPosition);
+  const portfolio = validatePortfolio(normalizedPosition, portfolioKey);
 
-  /* ======================================================================
-     GET ACTIVE LEADERS
-  ====================================================================== */
+  const officeFields = buildOfficeFields(normalizedPosition, {
+    county,
+    constituency,
+    ward,
+    appointmentType: undefined,
+  });
 
-  async getActiveLeaders() {
+  const appointment = {
+    position: normalizedPosition,
+    ...officeFields,
+    portfolioKey: portfolio?.key,
+    portfolioTitle: portfolio?.title,
+    portfolioSlug: portfolio?.slug,
+    status,
+    isActive,
+  };
 
-    return this.getLeaders({
-
-      active:
-        true,
-
-    });
-
+  if (config.requiresMember !== false) {
+    const member = await validateMember(memberId);
+    validateMemberEligibility(member);
+    appointment.member = member._id;
+  } else {
+    appointment.member = null;
   }
 
-
-  /* ======================================================================
-     GET INACTIVE LEADERS
-  ====================================================================== */
-
-  async getInactiveLeaders() {
-
-    return this.getLeaders({
-
-      active:
-        false,
-
-    });
-
-  }
-
-
-  /* ======================================================================
-     GET LEADERS BY CATEGORY
-  ====================================================================== */
-
-  async getLeadersByCategory(
-    category
-  ) {
-
-    return this.getLeaders({
-
-      category,
-
-      active:
-        true,
-
-    });
-
-  }
-
-
-  /* ======================================================================
-     GET LEADERS BY LEVEL
-  ====================================================================== */
-
-  async getLeadersByLevel(
-    level
-  ) {
-
-    return this.getLeaders({
-
-      level,
-
-      active:
-        true,
-
-    });
-
-  }
-
-
-  /* ======================================================================
-     GET LEADERS BY DEPARTMENT
-  ====================================================================== */
-
-  async getLeadersByDepartment(
-    department
-  ) {
-
-    return this.getLeaders({
-
-      department,
-
-      active:
-        true,
-
-    });
-
-  }
-
-
-  /* ======================================================================
-     GET LEADERS BY STRUCTURAL SCOPE
-  ====================================================================== */
-
-  async getLeadersByScope(
-    scope
-  ) {
-
-    return this.getLeaders({
-
-      scope,
-
-      active:
-        true,
-
-    });
-
-  }
-
-
-  /* ======================================================================
-     GET LEADERS BY REPORT VISIBILITY
-  ====================================================================== */
-
-  async getLeadersByReportVisibility(
-    reportVisibility
-  ) {
-
-    return this.getLeaders({
-
-      reportVisibility,
-
-      active:
-        true,
-
-    });
-
-  }
-
-
-  /* ======================================================================
-     GET COUNTY LEADERS
-  ====================================================================== */
-
-  async getCountyLeaders(
-    county
-  ) {
-
-    county =
-      normalizeCounty(county);
-
-
-    return this.getLeaders({
-
-      county,
-
-      active:
-        true,
-
-    });
-
-  }
-
-
-  /* ======================================================================
-     GET PUBLIC LEADERS
-  ====================================================================== */
-
-  async getPublicLeaders() {
-
-    return Leader.find({
-
-      isActive:
-        true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    })
-
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      )
-
-      .sort({
-
-        category: 1,
-
-        level: 1,
-
-        scope: 1,
-
-        county: 1,
-
-        displayOrder: 1,
-
-        position: 1,
-
-      });
-
-  }
-
-
-  /* ======================================================================
-     SEARCH LEADERS
-  ====================================================================== */
-
-  async searchLeaders(
-    search = ""
-  ) {
-
-    const term =
-      String(search).trim();
-
-
-    if (!term) {
-
-      return this.getLeaders();
-
+  if (isActive && status === ACTIVE_STATUS) {
+    if (appointment.member) {
+      await validateUniqueMemberAssignment(
+        appointment.member,
+        ignoreLeaderId
+      );
     }
 
+    await validateOfficeAssignment(
+      appointment,
+      ignoreLeaderId
+    );
+  }
 
-    const regex =
-      new RegExp(
-        term,
+  return appointment;
+};
+
+/*
+|--------------------------------------------------------------------------
+| QUERY HELPERS
+|--------------------------------------------------------------------------
+*/
+
+const buildLeaderFilter = (filters = {}) => {
+  const query = {};
+
+  const directFields = [
+    "category",
+    "level",
+    "department",
+    "scope",
+    "reportVisibility",
+    "position",
+    "portfolioKey",
+    "county",
+    "constituency",
+    "ward",
+    "member",
+  ];
+
+  for (const field of directFields) {
+    if (!hasValue(filters[field])) continue;
+
+    if (field === "position") {
+      query.position = normalizePosition(filters.position);
+    } else if (
+      ["county", "constituency", "ward"].includes(field)
+    ) {
+      query[field] = normalizeLocation(filters[field]);
+    } else {
+      query[field] = filters[field];
+    }
+  }
+
+  if (hasValue(filters.status)) {
+    query.status = normalizeStatus(filters.status);
+  }
+
+  const active = normalizeBoolean(filters.active);
+  const isActive = normalizeBoolean(filters.isActive);
+
+  if (active !== undefined) query.isActive = active;
+  if (isActive !== undefined) query.isActive = isActive;
+
+  if (filters.verified !== undefined) {
+    const verified = normalizeBoolean(filters.verified);
+
+    if (verified !== undefined) {
+      query.verified = verified;
+    }
+  }
+
+  if (filters.featured !== undefined) {
+    const featured = normalizeBoolean(filters.featured);
+
+    if (featured !== undefined) {
+      query.featured = featured;
+    }
+  }
+
+  if (hasValue(filters.search)) {
+    const expression = new RegExp(
+      escapeRegex(filters.search.trim()),
+      "i"
+    );
+
+    query.$or = [
+      { position: expression },
+      { portfolioTitle: expression },
+      { portfolioKey: expression },
+      { portfolioSlug: expression },
+      { county: expression },
+      { constituency: expression },
+      { ward: expression },
+      { "patron.fullName": expression },
+      { "patron.title": expression },
+      { "patron.organization": expression },
+    ];
+  }
+
+  return query;
+};
+
+const buildSort = (sortBy, sortOrder) => {
+  const field = [
+    "displayOrder",
+    "createdAt",
+    "updatedAt",
+    "position",
+    "county",
+    "termStart",
+    "termEnd",
+  ].includes(sortBy)
+    ? sortBy
+    : "displayOrder";
+
+  const direction =
+    String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
+
+  return {
+    [field]: direction,
+    createdAt: -1,
+  };
+};
+
+const paginateQuery = async ({
+  query,
+  filters = {},
+  populate = true,
+  sort = null,
+}) => {
+  const filter = buildLeaderFilter(filters);
+
+  let databaseQuery = query
+    .find(filter)
+    .sort(sort || buildSort(filters.sortBy, filters.sortOrder));
+
+  if (populate) {
+    databaseQuery = databaseQuery.populate(MEMBER_POPULATE);
+  }
+
+  const items = await databaseQuery.lean({ virtuals: true });
+
+  return {
+    items: serializeLeaders(items),
+  };
+};
+
+const getActiveQuery = () => ({
+  status: ACTIVE_STATUS,
+  isActive: true,
+});
+
+const countBy = async (field, baseQuery = {}) =>
+  Leader.aggregate([
+    { $match: baseQuery },
+    {
+      $group: {
+        _id: `$${field}`,
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { count: -1, _id: 1 } },
+  ]);
+
+const asCountMap = (rows = []) =>
+  rows.reduce((result, row) => {
+    result[row._id ?? "unspecified"] = row.count;
+    return result;
+  }, {});
+
+/*
+|--------------------------------------------------------------------------
+| SERVICE
+|--------------------------------------------------------------------------
+*/
+
+class LeaderService {
+  /*
+  |--------------------------------------------------------------------------
+  | CREATE
+  |--------------------------------------------------------------------------
+  */
+
+  async createLeader(data = {}, userOrId = null) {
+    if (!data.position) {
+      throw new AppError("Leadership position is required.", 400);
+    }
+
+    const position = normalizePosition(data.position);
+    const patron = isPatronPosition(position);
+
+    const appointment = await validateAppointment({
+      ...data,
+      position,
+      patron: data.patron,
+      memberId: data.member,
+      portfolioKey:
+        data.portfolioKey ||
+        data.portfolio ||
+        data.docketKey ||
+        data.docket ||
+        data.ministry,
+      status: data.status || ACTIVE_STATUS,
+      isActive: data.isActive !== false,
+    });
+
+    const userId = getCurrentUserId(userOrId);
+
+    const payload = {
+      ...data,
+      ...appointment,
+      position,
+      createdBy: userId,
+      updatedBy: userId,
+    };
+
+    if (patron) {
+      payload.member = null;
+      payload.patron = {
+        fullName: data.patron?.fullName?.trim(),
+        title: cleanString(data.patron?.title),
+        organization: cleanString(data.patron?.organization),
+        photo: cleanString(data.patron?.photo),
+        bio: cleanString(data.patron?.bio),
+      };
+    } else {
+      delete payload.patron;
+    }
+
+    const leader = await Leader.create(payload);
+
+    return Leader.findById(leader._id)
+      .populate(MEMBER_POPULATE);
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | READ / LIST
+  |--------------------------------------------------------------------------
+  */
+
+ async getLeaders(filters = {}) {
+  const result = await paginateQuery({
+    query: Leader,
+    filters,
+  });
+
+  return {
+    leaders: result.items,
+  };
+}
+
+async getPublicLeaders(filters = {}) {
+  const publicFilters = {
+    ...filters,
+    status: ACTIVE_STATUS,
+    active: true,
+  };
+
+  const result = await paginateQuery({
+    query: Leader,
+    filters: publicFilters,
+  });
+
+  return {
+    leaders: result.items,
+  };
+}
+
+  async getLeader(id) {
+    assertObjectId(id, "leader ID");
+
+    const leader = await Leader.findById(id)
+      .populate(MEMBER_POPULATE);
+
+    if (!leader) {
+      throw new AppError("Leadership record not found.", 404);
+    }
+
+    return leader;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | LEADERSHIP MEMBERS DASHBOARD
+  |--------------------------------------------------------------------------
+  */
+
+  async getLeadershipMembers(userOrId, filters = {}) {
+    const userId = getCurrentUserId(userOrId);
+
+    if (!userId || !toObjectId(userId)) {
+      throw new AppError(
+        "A valid authenticated user is required.",
+        401
+      );
+    }
+
+    const member = await Member.findOne({ user: userId });
+
+    if (!member) {
+      throw new AppError(
+        "No JVP membership record is linked to this user.",
+        404
+      );
+    }
+
+    const leader = await Leader.findOne({
+      member: member._id,
+      status: ACTIVE_STATUS,
+      isActive: true,
+    }).populate(MEMBER_POPULATE);
+
+    if (!leader) {
+      throw new AppError(
+        "You do not currently hold an active JVP leadership position.",
+        403
+      );
+    }
+
+    const jurisdiction = {};
+
+    if (leader.scope === "county_cabinet" ||
+        leader.scope === "county_youth_assembly" ||
+        leader.position === LEADERSHIP_OFFICES.COUNCIL_GOVERNOR) {
+      jurisdiction.county = leader.county;
+    }
+
+    if (leader.reportVisibility === "constituency") {
+      jurisdiction.county = leader.county;
+      jurisdiction.constituency = leader.constituency;
+    }
+
+    if (leader.reportVisibility === "ward") {
+      jurisdiction.county = leader.county;
+      jurisdiction.constituency = leader.constituency;
+      jurisdiction.ward = leader.ward;
+    }
+
+    const memberFilter = {};
+
+    for (const field of ["county", "constituency", "ward"]) {
+      if (jurisdiction[field]) {
+        memberFilter[field] = jurisdiction[field];
+      }
+    }
+
+    if (hasValue(filters.county) &&
+        jurisdiction.county &&
+        normalizeLocation(filters.county).toLowerCase() !==
+          String(jurisdiction.county).toLowerCase()) {
+      throw new AppError(
+        "You cannot view membership data outside your county jurisdiction.",
+        403
+      );
+    }
+
+    if (hasValue(filters.constituency) &&
+        jurisdiction.constituency &&
+        normalizeLocation(filters.constituency).toLowerCase() !==
+          String(jurisdiction.constituency).toLowerCase()) {
+      throw new AppError(
+        "You cannot view membership data outside your constituency jurisdiction.",
+        403
+      );
+    }
+
+    if (hasValue(filters.ward) &&
+        jurisdiction.ward &&
+        normalizeLocation(filters.ward).toLowerCase() !==
+          String(jurisdiction.ward).toLowerCase()) {
+      throw new AppError(
+        "You cannot view membership data outside your ward jurisdiction.",
+        403
+      );
+    }
+
+    if (hasValue(filters.county) && !jurisdiction.county) {
+      memberFilter.county = normalizeLocation(filters.county);
+    }
+
+    if (hasValue(filters.constituency) && !jurisdiction.constituency) {
+      memberFilter.constituency =
+        normalizeLocation(filters.constituency);
+    }
+
+    if (hasValue(filters.ward) && !jurisdiction.ward) {
+      memberFilter.ward = normalizeLocation(filters.ward);
+    }
+
+    if (hasValue(filters.membershipStatus)) {
+      memberFilter.membershipStatus = filters.membershipStatus;
+    }
+
+    if (hasValue(filters.membershipType)) {
+      memberFilter.membershipType = filters.membershipType;
+    }
+
+    if (hasValue(filters.search)) {
+      const expression = new RegExp(
+        escapeRegex(filters.search.trim()),
         "i"
       );
 
+      memberFilter.$or = [
+        { firstName: expression },
+        { middleName: expression },
+        { lastName: expression },
+        { memberNumber: expression },
+        { county: expression },
+        { constituency: expression },
+        { ward: expression },
+      ];
+    }
 
-    return Leader.find({
 
-      $or: [
+    const [members, total, countyDistribution, membershipDistribution] =
+      await Promise.all([
+        Member.find(memberFilter)
+  .select(
+    "memberNumber firstName middleName lastName profilePhoto county constituency ward gender membershipStatus membershipType createdAt"
+  )
+  .sort({ createdAt: -1 })
+  .lean(),
 
-        {
-          position:
-            regex,
-        },
+        Member.countDocuments(memberFilter),
 
-        {
-          category:
-            regex,
-        },
+        Member.aggregate([
+          { $match: memberFilter },
+          {
+            $group: {
+              _id: "$county",
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { count: -1, _id: 1 } },
+        ]),
 
-        {
-          level:
-            regex,
-        },
+        Member.aggregate([
+          { $match: memberFilter },
+          {
+            $group: {
+              _id: "$membershipType",
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { count: -1, _id: 1 } },
+        ]),
+      ]);
 
-        {
-          department:
-            regex,
-        },
+    return {
+      leadership: serializeLeader(leader),
+      jurisdiction,
+     summary: {
+  totalMembers: total,
+  activeMembers: await Member.countDocuments({
+    ...memberFilter,
+    membershipStatus: "active",
+  }),
+},
+      distribution: {
+        byCounty: countyDistribution,
+        byMembershipType: membershipDistribution,
+      },
+      members: members.map((item) => ({
+        ...item,
+        fullName: getMemberName(item),
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
 
-        {
-          scope:
-            regex,
-        },
+  /*
+  |--------------------------------------------------------------------------
+  | UPDATE
+  |--------------------------------------------------------------------------
+  */
 
-        {
-          reportVisibility:
-            regex,
-        },
+  async updateLeader(id, data = {}, userOrId = null) {
+    assertObjectId(id, "leader ID");
 
-        {
-          county:
-            regex,
-        },
+    const existing = await Leader.findById(id);
 
-        {
-          constituency:
-            regex,
-        },
+    if (!existing) {
+      throw new AppError("Leadership record not found.", 404);
+    }
 
-        {
-          ward:
-            regex,
-        },
+    const position = normalizePosition(
+      data.position || existing.position
+    );
 
-        {
-          "patron.fullName":
-            regex,
-        },
+    const patron = isPatronPosition(position);
 
-      ],
+    const merged = {
+      ...existing.toObject(),
+      ...data,
+      position,
+      member: data.member ?? existing.member,
+      patron: data.patron ?? existing.patron,
+      portfolioKey:
+        data.portfolioKey ??
+        data.portfolio ??
+        data.docketKey ??
+        data.docket ??
+        data.ministry ??
+        existing.portfolioKey,
+      county: data.county ?? existing.county,
+      constituency: data.constituency ?? existing.constituency,
+      ward: data.ward ?? existing.ward,
+      status: data.status ?? existing.status,
+      isActive: data.isActive ?? existing.isActive,
+    };
 
-    })
+    const appointment = await validateAppointment({
+      ...merged,
+      position,
+      memberId: merged.member?._id || merged.member,
+      patron: merged.patron,
+      ignoreLeaderId: existing._id,
+    });
 
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      )
+    const userId = getCurrentUserId(userOrId);
 
-      .sort({
+    const protectedFields = [
+      "_id",
+      "id",
+      "createdAt",
+      "updatedAt",
+      "createdBy",
+      "__v",
+    ];
 
-        level: 1,
+    const updates = {};
 
-        scope: 1,
+    for (const [key, value] of Object.entries(data)) {
+      if (!protectedFields.includes(key)) {
+        updates[key] = value;
+      }
+    }
 
-        county: 1,
+    Object.assign(updates, appointment, {
+      updatedBy: userId,
+    });
 
-        displayOrder: 1,
+    if (patron) {
+      updates.member = null;
+      updates.patron = {
+        fullName: merged.patron?.fullName?.trim(),
+        title: cleanString(merged.patron?.title),
+        organization: cleanString(merged.patron?.organization),
+        photo: cleanString(merged.patron?.photo),
+        bio: cleanString(merged.patron?.bio),
+      };
+    } else {
+      updates.patron = undefined;
+    }
 
-        position: 1,
+    Object.assign(existing, updates);
 
+    await existing.save();
+
+    return Leader.findById(existing._id)
+      .populate(MEMBER_POPULATE);
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | ACTIVATION / DEACTIVATION
+  |--------------------------------------------------------------------------
+  */
+
+  async activateLeader(id, userOrId = null) {
+    assertObjectId(id, "leader ID");
+
+    const leader = await Leader.findById(id);
+
+    if (!leader) {
+      throw new AppError("Leadership record not found.", 404);
+    }
+
+    if (leader.status === COMPLETED_STATUS) {
+      throw new AppError(
+        "A completed leadership term cannot be reactivated. Create a new appointment instead.",
+        409
+      );
+    }
+
+    if (!isPatronLeader(leader)) {
+      const appointment = await validateAppointment({
+        position: leader.position,
+        memberId: leader.member?._id || leader.member,
+        portfolioKey: leader.portfolioKey,
+        county: leader.county,
+        constituency: leader.constituency,
+        ward: leader.ward,
+        status: ACTIVE_STATUS,
+        isActive: true,
+        ignoreLeaderId: leader._id,
       });
 
+      Object.assign(leader, appointment);
+    }
+
+    leader.status = ACTIVE_STATUS;
+    leader.isActive = true;
+    leader.deactivatedAt = undefined;
+    leader.updatedBy = getCurrentUserId(userOrId);
+
+    await leader.save();
+
+    return Leader.findById(leader._id)
+      .populate(MEMBER_POPULATE);
   }
 
-
-  /* ======================================================================
-     UPDATE LEADER
-  ====================================================================== */
-
-  async updateLeader(
-    id,
-    updates,
-    userId
-  ) {
-
-    const leader =
-      await this.findLeader(id);
-
-
-    const currentPosition =
-      leader.position;
-
-
-    /*
-     * Determine the resulting position.
-     */
-    const nextPosition =
-      updates.position
-        ? this.validateOffice(
-            updates.position
-          )
-        : currentPosition;
-
-
-    const nextOffice =
-      this.getOffice(
-        nextPosition
+  async activateMany(ids = [], userOrId = null) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new AppError(
+        "Provide at least one leadership record ID.",
+        400
       );
+    }
 
+    const uniqueIds = [...new Set(ids.map(String))];
 
-    /*
-     * Prevent Patron from accidentally
-     * becoming a member-based office
-     * without explicit position change.
-     */
-    if (
-      leader.category ===
-      LEADERSHIP_CATEGORIES.PATRONAGE &&
-      nextOffice.category !==
-        LEADERSHIP_CATEGORIES.PATRONAGE
-    ) {
+    uniqueIds.forEach((id) => assertObjectId(id, "leader ID"));
 
-      if (!updates.member) {
+    const leaders = await Leader.find({
+      _id: { $in: uniqueIds },
+    });
 
-        throw new AppError(
-          400,
-          "A member is required when converting the Patron record to another leadership office."
+    if (leaders.length !== uniqueIds.length) {
+      throw new AppError(
+        "One or more leadership records could not be found.",
+        404
+      );
+    }
+
+    const activated = [];
+    const failed = [];
+
+    for (const leader of leaders) {
+      try {
+        await this.activateLeader(
+          leader._id,
+          userOrId
         );
 
+        activated.push(String(leader._id));
+      } catch (error) {
+        failed.push({
+          id: String(leader._id),
+          position: leader.position,
+          message: error.message,
+        });
       }
-
     }
 
+    return {
+      requested: uniqueIds.length,
+      activated: activated.length,
+      failed: failed.length,
+      activatedIds: activated,
+      failures: failed,
+    };
+  }
 
-    /*
-     * Member change.
-     */
-    if (
-      updates.member &&
-      updates.member.toString() !==
-        leader.member?.toString()
-    ) {
+  async deactivateLeader(id, userOrId = null) {
+    assertObjectId(id, "leader ID");
 
-      await this.validateMemberAssignment(
+    const leader = await Leader.findById(id);
 
-        updates.member,
-
-        leader._id
-
-      );
-
+    if (!leader) {
+      throw new AppError("Leadership record not found.", 404);
     }
 
-
-    /*
-     * Non-Patron offices require
-     * a member.
-     */
-    if (
-      nextOffice.category !==
-      LEADERSHIP_CATEGORIES.PATRONAGE
-    ) {
-
-      const resultingMember =
-        updates.member !== undefined
-          ? updates.member
-          : leader.member;
-
-
-      if (!resultingMember) {
-
-        throw new AppError(
-          400,
-          "A member is required for this leadership office."
-        );
-
-      }
-
-    }
-
-
-    /*
-     * Resolve resulting geography.
-     */
-    const location =
-      this.validateLocation(
-
-        nextPosition,
-
-        updates.county !== undefined
-          ? updates.county
-          : leader.county,
-
-        updates.constituency !== undefined
-          ? updates.constituency
-          : leader.constituency,
-
-        updates.ward !== undefined
-          ? updates.ward
-          : leader.ward
-
-      );
-
-
-    /*
-     * Prevent duplicate office assignment.
-     */
-    await this.validateOfficeAssignment(
-
-      nextPosition,
-
-      location,
-
-      leader._id
-
-    );
-
-
-    /*
-     * Always rebuild derived office fields.
-     */
-    const officeFields =
-      this.buildOfficeFields(
-        nextPosition
-      );
-
-
-    Object.assign(
-
-      updates,
-
-      officeFields,
-
-      {
-
-        county:
-          location.county,
-
-        constituency:
-          location.constituency,
-
-        ward:
-          location.ward,
-
-      }
-
-    );
-
-
-    /*
-     * Patron records cannot retain
-     * member or geographic data.
-     */
-    if (
-      nextOffice.category ===
-      LEADERSHIP_CATEGORIES.PATRONAGE
-    ) {
-
-      updates.member =
-        null;
-
-      updates.county =
-        null;
-
-      updates.constituency =
-        null;
-
-      updates.ward =
-        null;
-
-    }
-
-
-    /*
-     * Prevent clients from changing
-     * system-derived fields independently.
-     */
-    delete updates.category;
-    delete updates.level;
-    delete updates.department;
-    delete updates.scope;
-    delete updates.reportVisibility;
-    delete updates.appointmentType;
-
-
-    /*
-     * Reapply trusted office fields.
-     */
-    Object.assign(
-      updates,
-      officeFields
-    );
-
-
-    /*
-     * Reapply trusted geography.
-     */
-    Object.assign(
-
-      updates,
-
-      {
-
-        county:
-          location.county,
-
-        constituency:
-          location.constituency,
-
-        ward:
-          location.ward,
-
-      }
-
-    );
-
-
-    Object.assign(
-      leader,
-      updates
-    );
-
-
-    leader.updatedBy =
-      userId;
-
+    leader.status = INACTIVE_STATUS;
+    leader.isActive = false;
+    leader.deactivatedAt = new Date();
+    leader.updatedBy = getCurrentUserId(userOrId);
 
     await leader.save();
 
-
-    return this.populateLeader(
-      leader._id
-    );
-
+    return Leader.findById(leader._id)
+      .populate(MEMBER_POPULATE);
   }
 
+  async deleteLeader(id, userOrId = null) {
+    assertObjectId(id, "leader ID");
 
-  /* ======================================================================
-     ACTIVATE LEADER
-  ====================================================================== */
+    const leader = await Leader.findById(id);
 
-  async activateLeader(
-    id,
-    userId
-  ) {
-
-    const leader =
-      await this.findLeader(id);
-
-
-    await this.validateOfficeAssignment(
-
-      leader.position,
-
-      {
-
-        county:
-          leader.county,
-
-        constituency:
-          leader.constituency,
-
-        ward:
-          leader.ward,
-
-      },
-
-      leader._id
-
-    );
-
-
-    if (leader.member) {
-
-      await this.validateMemberAssignment(
-
-        leader.member,
-
-        leader._id
-
-      );
-
+    if (!leader) {
+      throw new AppError("Leadership record not found.", 404);
     }
 
+    await Leader.deleteOne({ _id: leader._id });
 
-    leader.isActive =
-      true;
-
-    leader.status =
-      LEADERSHIP_STATUS.ACTIVE;
-
-    leader.updatedBy =
-      userId;
-
-
-    await leader.save();
-
-
-    return this.populateLeader(
-      leader._id
-    );
-
+    return {
+      success: true,
+      message: "Leadership record deleted successfully.",
+      id: String(leader._id),
+      deletedBy: getCurrentUserId(userOrId),
+    };
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | TERM AND STATUS MANAGEMENT
+  |--------------------------------------------------------------------------
+  */
 
-  /* ======================================================================
-     DEACTIVATE LEADER
-  ====================================================================== */
+  async completeTerm(id, userOrId = null) {
+    assertObjectId(id, "leader ID");
 
-  async deactivateLeader(
-    id,
-    userId
-  ) {
+    const leader = await Leader.findById(id);
 
-    const leader =
-      await this.findLeader(id);
-
-
-    leader.isActive =
-      false;
-
-    leader.status =
-      LEADERSHIP_STATUS.INACTIVE;
-
-    leader.updatedBy =
-      userId;
-
-
-    await leader.save();
-
-
-    return this.populateLeader(
-      leader._id
-    );
-
-  }
-
-
-  /* ======================================================================
-     COMPLETE LEADER TERM
-  ====================================================================== */
-
-  async completeLeaderTerm(
-    id,
-    userId
-  ) {
-
-    const leader =
-      await this.findLeader(id);
-
-
-    leader.status =
-      LEADERSHIP_STATUS.COMPLETED;
-
-    leader.isActive =
-      false;
-
-    leader.updatedBy =
-      userId;
-
-
-    await leader.save();
-
-
-    return this.populateLeader(
-      leader._id
-    );
-
-  }
-
-
-  /* ======================================================================
-     SUSPEND LEADER
-  ====================================================================== */
-
-  async suspendLeader(
-    id,
-    userId
-  ) {
-
-    const leader =
-      await this.findLeader(id);
-
-
-    leader.status =
-      LEADERSHIP_STATUS.SUSPENDED;
-
-    leader.isActive =
-      false;
-
-    leader.updatedBy =
-      userId;
-
-
-    await leader.save();
-
-
-    return this.populateLeader(
-      leader._id
-    );
-
-  }
-
-
-  /* ======================================================================
-     REINSTATE LEADER
-  ====================================================================== */
-
-  async reinstateLeader(
-    id,
-    userId
-  ) {
-
-    const leader =
-      await this.findLeader(id);
-
-
-    await this.validateOfficeAssignment(
-
-      leader.position,
-
-      {
-
-        county:
-          leader.county,
-
-        constituency:
-          leader.constituency,
-
-        ward:
-          leader.ward,
-
-      },
-
-      leader._id
-
-    );
-
-
-    if (leader.member) {
-
-      await this.validateMemberAssignment(
-
-        leader.member,
-
-        leader._id
-
-      );
-
+    if (!leader) {
+      throw new AppError("Leadership record not found.", 404);
     }
 
-
-    leader.status =
-      LEADERSHIP_STATUS.ACTIVE;
-
-    leader.isActive =
-      true;
-
-    leader.updatedBy =
-      userId;
-
+    leader.status = COMPLETED_STATUS;
+    leader.isActive = false;
+    leader.completedAt = new Date();
+    leader.deactivatedAt = new Date();
+    leader.updatedBy = getCurrentUserId(userOrId);
 
     await leader.save();
 
-
-    return this.populateLeader(
-      leader._id
-    );
-
+    return Leader.findById(leader._id)
+      .populate(MEMBER_POPULATE);
   }
 
+  async suspendLeader(id, reason = "", userOrId = null) {
+    assertObjectId(id, "leader ID");
 
-  /* ======================================================================
-     DELETE LEADER
-  ====================================================================== */
+    const leader = await Leader.findById(id);
 
-  async deleteLeader(id) {
+    if (!leader) {
+      throw new AppError("Leadership record not found.", 404);
+    }
 
-    const leader =
-      await this.findLeader(id);
+    leader.status = SUSPENDED_STATUS;
+    leader.isActive = false;
+    leader.deactivatedAt = new Date();
 
+    if (hasValue(reason)) {
+      leader.remarks = reason.trim();
+    }
 
-    await leader.deleteOne();
+    leader.updatedBy = getCurrentUserId(userOrId);
 
+    await leader.save();
 
-    return true;
-
+    return Leader.findById(leader._id)
+      .populate(MEMBER_POPULATE);
   }
 
+  async reinstateLeader(id, userOrId = null) {
+    return this.activateLeader(id, userOrId);
+  }
 
-  /* ======================================================================
-     BULK ACTIVATE
-  ====================================================================== */
+  /*
+  |--------------------------------------------------------------------------
+  | BULK DEACTIVATION
+  |--------------------------------------------------------------------------
+  */
 
-  async activateMany(
-    ids = [],
-    userId
-  ) {
-
-    if (
-      !Array.isArray(ids) ||
-      ids.length === 0
-    ) {
-
+  async deactivateMany(ids = [], userOrId = null) {
+    if (!Array.isArray(ids) || ids.length === 0) {
       throw new AppError(
-        400,
-        "No leadership records were provided."
+        "Provide at least one leadership record ID.",
+        400
       );
-
     }
 
+    const uniqueIds = [...new Set(ids.map(String))];
 
-    const validIds =
-      ids.filter(
-        (id) =>
-          mongoose.isValidObjectId(id)
-      );
+    uniqueIds.forEach((id) => assertObjectId(id, "leader ID"));
 
-
-    if (
-      validIds.length !==
-      ids.length
-    ) {
-
-      throw new AppError(
-        400,
-        "One or more leadership IDs are invalid."
-      );
-
-    }
-
-
-    await Leader.updateMany(
-
+    const result = await Leader.updateMany(
+      { _id: { $in: uniqueIds } },
       {
-
-        _id: {
-          $in:
-            validIds,
-        },
-
-      },
-
-      {
-
         $set: {
-
-          isActive:
-            true,
-
-          status:
-            LEADERSHIP_STATUS.ACTIVE,
-
-          updatedBy:
-            userId,
-
+          status: INACTIVE_STATUS,
+          isActive: false,
+          deactivatedAt: new Date(),
+          updatedBy: getCurrentUserId(userOrId),
         },
-
       }
-
     );
 
-
-    return true;
-
+    return {
+      requested: uniqueIds.length,
+      modified: result.modifiedCount ?? result.nModified ?? 0,
+    };
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | STATISTICS
+  |--------------------------------------------------------------------------
+  */
 
-  /* ======================================================================
-     BULK DEACTIVATE
-  ====================================================================== */
-
-  async deactivateMany(
-    ids = [],
-    userId
-  ) {
-
-    if (
-      !Array.isArray(ids) ||
-      ids.length === 0
-    ) {
-
-      throw new AppError(
-        400,
-        "No leadership records were provided."
-      );
-
-    }
-
-
-    const validIds =
-      ids.filter(
-        (id) =>
-          mongoose.isValidObjectId(id)
-      );
-
-
-    if (
-      validIds.length !==
-      ids.length
-    ) {
-
-      throw new AppError(
-        400,
-        "One or more leadership IDs are invalid."
-      );
-
-    }
-
-
-    await Leader.updateMany(
-
-      {
-
-        _id: {
-          $in:
-            validIds,
-        },
-
-      },
-
-      {
-
-        $set: {
-
-          isActive:
-            false,
-
-          status:
-            LEADERSHIP_STATUS.INACTIVE,
-
-          updatedBy:
-            userId,
-
-        },
-
-      }
-
-    );
-
-
-    return true;
-
-  }
-
-
-  /* ======================================================================
-     LEADERSHIP STATISTICS
-  ====================================================================== */
-
-  async getStatistics() {
+  async getStatistics(filters = {}) {
+    const baseFilter = buildLeaderFilter(filters);
 
     const [
-
       total,
-
       active,
-
       inactive,
-
       completed,
-
       suspended,
-
-      regionalCabinet,
-
-      regionalYouthAssembly,
-
-      councilOfGovernors,
-
-      countyCabinet,
-
-      countyYouthAssembly,
-
-      executive,
-
-      legislative,
-
-      secretariat,
-
-      patronage,
-
+      byPosition,
+      byCategory,
+      byLevel,
+      byCounty,
+      byDepartment,
+      byPortfolio,
     ] = await Promise.all([
-
-      Leader.countDocuments(),
+      Leader.countDocuments(baseFilter),
 
       Leader.countDocuments({
+        ...baseFilter,
+        status: ACTIVE_STATUS,
         isActive: true,
       }),
 
       Leader.countDocuments({
-        isActive: false,
+        ...baseFilter,
+        status: INACTIVE_STATUS,
       }),
 
       Leader.countDocuments({
-        status:
-          LEADERSHIP_STATUS.COMPLETED,
+        ...baseFilter,
+        status: COMPLETED_STATUS,
       }),
 
       Leader.countDocuments({
-        status:
-          LEADERSHIP_STATUS.SUSPENDED,
+        ...baseFilter,
+        status: SUSPENDED_STATUS,
       }),
 
-      Leader.countDocuments({
-        level:
-          LEADERSHIP_LEVELS.REGIONAL_CABINET,
-      }),
-
-      Leader.countDocuments({
-        level:
-          LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
-      }),
-
-      Leader.countDocuments({
-        level:
-          LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
-      }),
-
-      Leader.countDocuments({
-        level:
-          LEADERSHIP_LEVELS.COUNTY_CABINET,
-      }),
-
-      Leader.countDocuments({
-        level:
-          LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
-      }),
-
-      Leader.countDocuments({
-        category:
-          LEADERSHIP_CATEGORIES.EXECUTIVE,
-      }),
-
-      Leader.countDocuments({
-        category:
-          LEADERSHIP_CATEGORIES.LEGISLATIVE,
-      }),
-
-      Leader.countDocuments({
-        category:
-          LEADERSHIP_CATEGORIES.SECRETARIAT,
-      }),
-
-      Leader.countDocuments({
-        category:
-          LEADERSHIP_CATEGORIES.PATRONAGE,
-      }),
-
+      countBy("position", baseFilter),
+      countBy("category", baseFilter),
+      countBy("level", baseFilter),
+      countBy("county", baseFilter),
+      countBy("department", baseFilter),
+      countBy("portfolioKey", baseFilter),
     ]);
 
+    const regionalCabinet = await Leader.countDocuments({
+      ...getActiveQuery(),
+      level: LEADERSHIP_LEVELS.REGIONAL_CABINET ||
+        "regional_cabinet",
+    });
+
+    const regionalYouthAssembly = await Leader.countDocuments({
+      ...getActiveQuery(),
+      level: LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY ||
+        "regional_youth_assembly",
+    });
+
+    const councilOfGovernors = await Leader.countDocuments({
+      ...getActiveQuery(),
+      position: LEADERSHIP_OFFICES.COUNCIL_GOVERNOR ||
+        "council_governor",
+    });
+
+    const countyCabinet = await Leader.countDocuments({
+      ...getActiveQuery(),
+      level: LEADERSHIP_LEVELS.COUNTY_CABINET ||
+        "county_cabinet",
+    });
+
+    const countyYouthAssembly = await Leader.countDocuments({
+      ...getActiveQuery(),
+      level: LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY ||
+        "county_youth_assembly",
+    });
 
     return {
-
-      overview: {
-
-        total,
-
-        active,
-
-        inactive,
-
-        completed,
-
-        suspended,
-
-      },
-
-
-      levels: {
-
+      total,
+      active,
+      inactive,
+      completed,
+      suspended,
+      inactiveOrUnavailable: total - active,
+      activePercentage: total
+        ? Number(((active / total) * 100).toFixed(2))
+        : 0,
+      structure: {
         regionalCabinet,
-
         regionalYouthAssembly,
-
         councilOfGovernors,
-
         countyCabinet,
-
         countyYouthAssembly,
-
       },
-
-
-      categories: {
-
-        executive,
-
-        legislative,
-
-        secretariat,
-
-        patronage,
-
+      distribution: {
+        byPosition,
+        byCategory,
+        byLevel,
+        byCounty,
+        byDepartment,
+        byPortfolio,
       },
-
-    };
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY COUNTY
-  ====================================================================== */
-
-  async getCountyStatistics() {
-
-    return Leader.aggregate([
-
-      {
-        $match: {
-
-          isActive:
-            true,
-
-          county: {
-            $ne:
-              null,
-          },
-
-        },
-
-      },
-
-      {
-        $group: {
-
-          _id:
-            "$county",
-
-          total: {
-            $sum:
-              1,
-          },
-
-        },
-
-      },
-
-      {
-        $sort: {
-
-          _id:
-            1,
-
-        },
-
-      },
-
-    ]);
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY POSITION
-  ====================================================================== */
-
-  async getPositionStatistics() {
-
-    return Leader.aggregate([
-
-      {
-        $match: {
-
-          isActive:
-            true,
-
-        },
-
-      },
-
-      {
-        $group: {
-
-          _id:
-            "$position",
-
-          total: {
-            $sum:
-              1,
-          },
-
-        },
-
-      },
-
-      {
-        $sort: {
-
-          total:
-            -1,
-
-        },
-
-      },
-
-    ]);
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY LEVEL
-  ====================================================================== */
-
-  async getLevelStatistics() {
-
-    return Leader.aggregate([
-
-      {
-        $group: {
-
-          _id:
-            "$level",
-
-          total: {
-            $sum:
-              1,
-          },
-
-        },
-
-      },
-
-      {
-        $sort: {
-
-          total:
-            -1,
-
-        },
-
-      },
-
-    ]);
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY CATEGORY
-  ====================================================================== */
-
-  async getCategoryStatistics() {
-
-    return Leader.aggregate([
-
-      {
-        $group: {
-
-          _id:
-            "$category",
-
-          total: {
-            $sum:
-              1,
-          },
-
-        },
-
-      },
-
-      {
-        $sort: {
-
-          total:
-            -1,
-
-        },
-
-      },
-
-    ]);
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY SCOPE
-  ====================================================================== */
-
-  async getScopeStatistics() {
-
-    return Leader.aggregate([
-
-      {
-        $group: {
-
-          _id:
-            "$scope",
-
-          total: {
-            $sum:
-              1,
-
-          },
-
-        },
-
-      },
-
-      {
-        $sort: {
-
-          total:
-            -1,
-
-        },
-
-      },
-
-    ]);
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY REPORT VISIBILITY
-  ====================================================================== */
-
-  async getReportVisibilityStatistics() {
-
-    return Leader.aggregate([
-
-      {
-        $group: {
-
-          _id:
-            "$reportVisibility",
-
-          total: {
-            $sum:
-              1,
-
-          },
-
-        },
-
-      },
-
-      {
-        $sort: {
-
-          total:
-            -1,
-
-        },
-
-      },
-
-    ]);
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY GENDER
-  ====================================================================== */
-
-  async getGenderStatistics() {
-
-    return Leader.aggregate([
-
-      {
-        $match: {
-
-          isActive:
-            true,
-
-          member: {
-            $ne:
-              null,
-          },
-
-        },
-
-      },
-
-      {
-        $lookup: {
-
-          from:
-            "members",
-
-          localField:
-            "member",
-
-          foreignField:
-            "_id",
-
-          as:
-            "member",
-
-        },
-
-      },
-
-      {
-        $unwind:
-          "$member",
-
-      },
-
-      {
-        $group: {
-
-          _id:
-            "$member.gender",
-
-          total: {
-            $sum:
-              1,
-          },
-
-        },
-
-      },
-
-      {
-        $sort: {
-
-          total:
-            -1,
-
-        },
-
-      },
-
-    ]);
-
-  }
-
-
-  /* ======================================================================
-     COMPLETE DASHBOARD
-  ====================================================================== */
-
-  async getDashboardStatistics() {
-
-    const [
-
-      statistics,
-
-      counties,
-
-      positions,
-
-      levels,
-
-      categories,
-
-      scopes,
-
-      reportVisibility,
-
-      gender,
-
-    ] = await Promise.all([
-
-      this.getStatistics(),
-
-      this.getCountyStatistics(),
-
-      this.getPositionStatistics(),
-
-      this.getLevelStatistics(),
-
-      this.getCategoryStatistics(),
-
-      this.getScopeStatistics(),
-
-      this.getReportVisibilityStatistics(),
-
-      this.getGenderStatistics(),
-
-    ]);
-
-
-    return {
-
-      statistics,
-
       charts: {
-
-        counties,
-
-        positions,
-
-        levels,
-
-        categories,
-
-        scopes,
-
-        reportVisibility,
-
-        gender,
-
+        positions: byPosition.map((item) => ({
+          label: item._id || "Unspecified",
+          value: item.count,
+        })),
+        categories: byCategory.map((item) => ({
+          label: item._id || "Unspecified",
+          value: item.count,
+        })),
+        counties: byCounty.map((item) => ({
+          label: item._id || "Unspecified",
+          value: item.count,
+        })),
       },
-
     };
-
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | STRUCTURAL QUERIES
+  |--------------------------------------------------------------------------
+  */
 
-  /* ======================================================================
-     REGIONAL CABINET
-  ====================================================================== */
-
-  async getRegionalCabinet() {
-
+  async getRegionalCabinet(filters = {}) {
     return this.getLeaders({
-
-      level:
-        LEADERSHIP_LEVELS.REGIONAL_CABINET,
-
-      active:
-        true,
-
+      ...filters,
+      level: LEADERSHIP_LEVELS.REGIONAL_CABINET ||
+        "regional_cabinet",
     });
-
   }
 
-
-  /* ======================================================================
-     REGIONAL YOUTH ASSEMBLY
-  ====================================================================== */
-
-  async getRegionalYouthAssembly() {
-
+  async getRegionalYouthAssembly(filters = {}) {
     return this.getLeaders({
-
-      level:
-        LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
-
-      active:
-        true,
-
+      ...filters,
+      level: LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY ||
+        "regional_youth_assembly",
     });
-
   }
 
-
-  /* ======================================================================
-     COUNCIL OF GOVERNORS
-  ====================================================================== */
-
-  async getCouncilOfGovernors() {
-
+  async getCouncilOfGovernors(filters = {}) {
     return this.getLeaders({
-
-      level:
-        LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
-
-      active:
-        true,
-
+      ...filters,
+      position: LEADERSHIP_OFFICES.COUNCIL_GOVERNOR ||
+        "council_governor",
     });
-
   }
 
-
-  /* ======================================================================
-     COUNTY CABINET
-  ====================================================================== */
-
-  async getCountyCabinet(
-    county = null
-  ) {
-
-    const filters = {
-
-      level:
-        LEADERSHIP_LEVELS.COUNTY_CABINET,
-
-      active:
-        true,
-
-    };
-
-
-    if (county) {
-
-      filters.county =
-        normalizeCounty(
-          county
-        );
-
-    }
-
-
-    return this.getLeaders(
-      filters
-    );
-
+  async getCountyCabinet(filters = {}) {
+    return this.getLeaders({
+      ...filters,
+      level: LEADERSHIP_LEVELS.COUNTY_CABINET ||
+        "county_cabinet",
+    });
   }
 
-
-  /* ======================================================================
-     COUNTY YOUTH ASSEMBLY
-  ====================================================================== */
-
-  async getCountyYouthAssembly(
-    county = null
-  ) {
-
-    const filters = {
-
-      level:
-        LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
-
-      active:
-        true,
-
-    };
-
-
-    if (county) {
-
-      filters.county =
-        normalizeCounty(
-          county
-        );
-
-    }
-
-
-    return this.getLeaders(
-      filters
-    );
-
+  async getCountyYouthAssembly(filters = {}) {
+    return this.getLeaders({
+      ...filters,
+      level: LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY ||
+        "county_youth_assembly",
+    });
   }
-
-
-  /* ======================================================================
-     REGIONAL EXECUTIVE — LEGACY COMPATIBILITY
-  ====================================================================== */
-
-  async getRegionalExecutive() {
-
-    return this.getRegionalCabinet();
-
-  }
-
-
-  /* ======================================================================
-     YOUTH ASSEMBLY — LEGACY COMPATIBILITY
-  ====================================================================== */
-
-  async getYouthAssembly() {
-
-    return this.getRegionalYouthAssembly();
-
-  }
-
-
-  /* ======================================================================
-     COUNTY LEADERSHIP — LEGACY COMPATIBILITY
-  ====================================================================== */
-
-  async getCountyLeadership(
-    county = null
-  ) {
-
-    return this.getCountyCabinet(
-      county
-    );
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY COUNTY
-  ====================================================================== */
-
-  async getLeadershipByCounty(
-    county
-  ) {
-
-    county =
-      normalizeCounty(
-        county
-      );
-
-
-    return Leader.find({
-
-      county,
-
-      isActive:
-        true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    })
-
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      )
-
-      .sort({
-
-        level: 1,
-
-        scope: 1,
-
-        displayOrder: 1,
-
-        position: 1,
-
-      });
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY CONSTITUENCY
-  ====================================================================== */
-
-  async getLeadershipByConstituency(
-    county,
-    constituency
-  ) {
-
-    county =
-      normalizeCounty(
-        county
-      );
-
-
-    constituency =
-      normalizeConstituency(
-        county,
-        constituency
-      );
-
-
-    return Leader.find({
-
-      county,
-
-      constituency,
-
-      isActive:
-        true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    })
-
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      )
-
-      .sort({
-
-        level: 1,
-
-        displayOrder: 1,
-
-        position: 1,
-
-      });
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY WARD
-  ====================================================================== */
-
-  async getLeadershipByWard(
-    county,
-    constituency,
-    ward
-  ) {
-
-    county =
-      normalizeCounty(
-        county
-      );
-
-
-    constituency =
-      normalizeConstituency(
-        county,
-        constituency
-      );
-
-
-    ward =
-      normalizeWard(
-        county,
-        constituency,
-        ward
-      );
-
-
-    return Leader.find({
-
-      county,
-
-      constituency,
-
-      ward,
-
-      isActive:
-        true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    })
-
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      )
-
-      .sort({
-
-        level: 1,
-
-        displayOrder: 1,
-
-        position: 1,
-
-      });
-
-  }
-
-
-  /* ======================================================================
-     LEADERS BY POSITION
-  ====================================================================== */
-
-  async getLeadersByPosition(
-    position
-  ) {
-
-    position =
-      normalizePosition(
-        position
-      );
-
-
-    if (!isValidOffice(position)) {
-
-      throw new AppError(
-        400,
-        "Invalid leadership office."
-      );
-
-    }
-
-
-    return Leader.find({
-
-      position,
-
-      isActive:
-        true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    })
-
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      )
-
-      .sort({
-
-        displayOrder:
-          1,
-
-        county:
-          1,
-
-        constituency:
-          1,
-
-        ward:
-          1,
-
-      });
-
-  }
-
-
-  /* ======================================================================
-     LEADERSHIP DIRECTORY
-  ====================================================================== */
-
-  async getLeadershipDirectory() {
-
-    return Leader.find({
-
-      isActive:
-        true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    })
-
-      .populate(
-        "member",
-        MEMBER_POPULATE
-      )
-
-      .sort({
-
-        category: 1,
-
-        level: 1,
-
-        scope: 1,
-
-        county: 1,
-
-        displayOrder: 1,
-
-        position: 1,
-
-      });
-
-  }
-
-
-  /* ======================================================================
-     PATRON
-  ====================================================================== */
 
   async getPatron() {
+    return Leader.findOne({
+      $or: [
+        { position: LEADERSHIP_OFFICES.PATRON || "patron" },
+        { category: LEADERSHIP_CATEGORIES.PATRONAGE || "patronage" },
+      ],
+      status: ACTIVE_STATUS,
+      isActive: true,
+    }).populate(MEMBER_POPULATE);
+  }
+
+  async getLeadersByScope(scope, filters = {}) {
+    if (!hasValue(scope)) {
+      throw new AppError("Leadership scope is required.", 400);
+    }
+
+    return this.getLeaders({
+      ...filters,
+      scope,
+    });
+  }
+
+  async getLeadersByReportVisibility(visibility, filters = {}) {
+    if (!hasValue(visibility)) {
+      throw new AppError(
+        "Report visibility is required.",
+        400
+      );
+    }
+
+    return this.getLeaders({
+      ...filters,
+      reportVisibility: visibility,
+    });
+  }
+
+  async getLeadersByCounty(county, filters = {}) {
+    if (!hasValue(county)) {
+      throw new AppError("County is required.", 400);
+    }
+
+    return this.getLeaders({
+      ...filters,
+      county: normalizeLocation(county),
+    });
+  }
+
+  async getLeadersByConstituency(
+    county,
+    constituency,
+    filters = {}
+  ) {
+    if (!hasValue(constituency)) {
+      throw new AppError("Constituency is required.", 400);
+    }
+
+    return this.getLeaders({
+      ...filters,
+      ...(hasValue(county)
+        ? { county: normalizeLocation(county) }
+        : {}),
+      constituency: normalizeLocation(constituency),
+    });
+  }
+
+  async getLeadersByWard(
+    county,
+    constituency,
+    ward,
+    filters = {}
+  ) {
+    if (!hasValue(ward)) {
+      throw new AppError("Ward is required.", 400);
+    }
+
+    return this.getLeaders({
+      ...filters,
+      ...(hasValue(county)
+        ? { county: normalizeLocation(county) }
+        : {}),
+      ...(hasValue(constituency)
+        ? { constituency: normalizeLocation(constituency) }
+        : {}),
+      ward: normalizeLocation(ward),
+    });
+  }
+
+  async getLeadersByPosition(position, filters = {}) {
+    if (!hasValue(position)) {
+      throw new AppError(
+        "Leadership position is required.",
+        400
+      );
+    }
+
+    const normalized = normalizePosition(position);
+
+    if (!isValidOffice(normalized)) {
+      throw new AppError(
+        `Invalid leadership position "${position}".`,
+        400
+      );
+    }
+
+    return this.getLeaders({
+      ...filters,
+      position: normalized,
+    });
+  }
+
+  async getCabinetSecretaryByPortfolio(portfolioValue) {
+    if (!hasValue(portfolioValue)) {
+      throw new AppError(
+        "Cabinet Secretary portfolio is required.",
+        400
+      );
+    }
+
+    const portfolio = getRegionalCabinetPortfolio(portfolioValue);
+
+    if (!portfolio) {
+      throw new AppError(
+        `No Cabinet Secretary portfolio matches "${portfolioValue}".`,
+        404
+      );
+    }
 
     return Leader.findOne({
-
-      position:
-        LEADERSHIP_OFFICES.PATRON,
-
-      category:
-        LEADERSHIP_CATEGORIES.PATRONAGE,
-
-      isActive:
-        true,
-
-      status:
-        LEADERSHIP_STATUS.ACTIVE,
-
-    });
-
+      position: LEADERSHIP_OFFICES.CABINET_SECRETARY ||
+        "cabinet_secretary",
+      portfolioKey: portfolio.key,
+      status: ACTIVE_STATUS,
+      isActive: true,
+    }).populate(MEMBER_POPULATE);
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | VACANCIES
+  |--------------------------------------------------------------------------
+  */
 
-  /* ======================================================================
-     VACANT POSITIONS
-  ====================================================================== */
+  async getVacantPositions(filters = {}) {
+    const vacancies = [];
 
-  async getVacantPositions() {
+    const activeLeaders = await Leader.find(getActiveQuery())
+      .select(
+        "position portfolioKey portfolioTitle county constituency ward scope level"
+      )
+      .lean();
 
-    const occupied =
-      await Leader.find({
+    const allOffices = Array.isArray(LEADERSHIP_OFFICE_VALUES)
+      ? LEADERSHIP_OFFICE_VALUES
+      : Object.values(LEADERSHIP_OFFICES);
 
-        isActive:
-          true,
+    const seen = new Set();
 
-        status:
-          LEADERSHIP_STATUS.ACTIVE,
+    for (const rawPosition of allOffices) {
+      const position = normalizePosition(rawPosition);
 
-      })
+      if (!position || seen.has(position)) continue;
 
-        .select(
-          "position reportVisibility county constituency ward"
-        )
+      seen.add(position);
 
-        .lean();
+      const config = getOfficeConfiguration(position);
 
+      if (!config) continue;
 
-    const vacant = [];
-
-
-    for (
-      const office
-      of LEADERSHIP_OFFICE_VALUES
-    ) {
-
-      /*
-       * Portfolio offices may have
-       * multiple active holders.
-       */
-      if (
-        this.officeAllowsMultiple(
-          office
-        )
-      ) {
-
-        continue;
-
-      }
-
-
-      const configuration =
-        getOfficeConfiguration(
-          office
+      if (isPatronPosition(position)) {
+        const patronExists = activeLeaders.some(
+          (leader) => isPatronPosition(leader.position)
         );
 
+        if (!patronExists) {
+          vacancies.push({
+            position,
+            title: config.title || "Patron",
+            scope: null,
+            level: null,
+            vacancyType: "office",
+          });
+        }
 
-      if (!configuration) {
         continue;
       }
 
-
-      /*
-       * Patron is not treated as an
-       * ordinary vacant office.
-       */
-      if (
-        office ===
-        LEADERSHIP_OFFICES.PATRON
-      ) {
-
-        const exists =
-          occupied.some(
+      if (config.requiresPortfolio) {
+        for (const portfolio of REGIONAL_CABINET_PORTFOLIOS) {
+          const exists = activeLeaders.some(
             (leader) =>
-              leader.position ===
-              office
+              normalizePosition(leader.position) === position &&
+              leader.portfolioKey === portfolio.key
           );
 
-
-        if (!exists) {
-
-          vacant.push({
-
-            position:
-              office,
-
-            ...configuration,
-
-          });
-
+          if (!exists) {
+            vacancies.push({
+              position,
+              title: config.title || "Cabinet Secretary",
+              portfolioKey: portfolio.key,
+              portfolioTitle: portfolio.title,
+              portfolioSlug: portfolio.slug,
+              scope: config.scope,
+              level: config.level,
+              vacancyType: "portfolio",
+            });
+          }
         }
-
 
         continue;
-
       }
 
-
-      /*
-       * Regional office.
-       */
-      if (
-        configuration.reportVisibility ===
-        REPORT_VISIBILITY.REGIONAL
-      ) {
-
-        const exists =
-          occupied.some(
-            (leader) =>
-              leader.position ===
-              office
-          );
-
-
-        if (!exists) {
-
-          vacant.push({
-
-            position:
-              office,
-
-            ...configuration,
-
-          });
-
-        }
-
-
+      if (config.allowMultiple === true) {
         continue;
-
       }
 
-
-      /*
-       * County, constituency and ward
-       * offices require jurisdiction-specific
-       * vacancy calculations.
-       *
-       * We therefore return the office definition
-       * only when there are currently no holders
-       * anywhere.
-       */
-      if (
-
-        configuration.reportVisibility ===
-          REPORT_VISIBILITY.COUNTY ||
-
-        configuration.reportVisibility ===
-          REPORT_VISIBILITY.CONSTITUENCY ||
-
-        configuration.reportVisibility ===
-          REPORT_VISIBILITY.WARD
-
-      ) {
-
-        const occupiedCount =
-          occupied.filter(
-            (leader) =>
-              leader.position ===
-              office
-          ).length;
-
-
-        if (occupiedCount === 0) {
-
-          vacant.push({
-
-            position:
-              office,
-
-            ...configuration,
-
-          });
-
-        }
-
-      }
-
-    }
-
-
-    return vacant;
-
-  }
-
-
-  /* ======================================================================
-     VERIFY LEADERSHIP CARD
-  ====================================================================== */
-
-  async verifyLeadershipCard(
-    id
-  ) {
-
-    this.validateObjectId(
-      id,
-      "leader ID"
-    );
-
-
-    const leader =
-      await Leader.findById(id)
-
-        .populate(
-          "member",
-          MEMBER_POPULATE
-        );
-
-
-    if (!leader) {
-
-      throw new AppError(
-        404,
-        "Leadership record not found."
+      const existing = activeLeaders.some(
+        (leader) =>
+          normalizePosition(leader.position) === position
       );
 
+      if (!existing) {
+        vacancies.push({
+          position,
+          title: config.title || position.replace(/_/g, " "),
+          scope: config.scope ?? null,
+          level: config.level ?? null,
+          vacancyType: "office",
+        });
+      }
     }
 
+    let filtered = vacancies;
+
+    if (hasValue(filters.level)) {
+      filtered = filtered.filter(
+        (item) => item.level === filters.level
+      );
+    }
+
+    if (hasValue(filters.scope)) {
+      filtered = filtered.filter(
+        (item) => item.scope === filters.scope
+      );
+    }
+
+    if (hasValue(filters.position)) {
+      const position = normalizePosition(filters.position);
+
+      filtered = filtered.filter(
+        (item) => item.position === position
+      );
+    }
 
     return {
-
-      valid:
-
-        leader.isActive === true &&
-
-        leader.status ===
-          LEADERSHIP_STATUS.ACTIVE,
-
-      leader,
-
+      total: filtered.length,
+      vacancies: filtered,
     };
-
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | VERIFICATION
+  |--------------------------------------------------------------------------
+  */
 
-  /* ======================================================================
-     LEADERSHIP HIERARCHY
-  ====================================================================== */
+  async verifyLeader(id, verified = true, userOrId = null) {
+    assertObjectId(id, "leader ID");
 
-  async getLeadershipHierarchy() {
+    const leader = await Leader.findById(id);
 
-    const [
+    if (!leader) {
+      throw new AppError("Leadership record not found.", 404);
+    }
 
-      patron,
+    leader.verified = normalizeBoolean(verified) ?? true;
+    leader.updatedBy = getCurrentUserId(userOrId);
 
-      regionalCabinet,
+    await leader.save();
 
-      regionalAssembly,
+    return Leader.findById(leader._id)
+      .populate(MEMBER_POPULATE);
+  }
 
-      governors,
+  /*
+  |--------------------------------------------------------------------------
+  | LEADERSHIP HIERARCHY
+  |--------------------------------------------------------------------------
+  */
 
-      countyCabinet,
+  async getLeadershipHierarchy(filters = {}) {
+    const base = {
+      ...getActiveQuery(),
+    };
 
-      countyAssemblies,
+    if (hasValue(filters.county)) {
+      base.county = normalizeLocation(filters.county);
+    }
 
-    ] = await Promise.all([
+    const leaders = await Leader.find(base)
+      .populate(MEMBER_POPULATE)
+      .sort({ displayOrder: 1, createdAt: 1 });
 
-      this.getPatron(),
+    const patronage = leaders.filter(isPatronLeader);
 
-      this.getRegionalCabinet(),
+    const regionalCabinet = leaders.filter(
+      (leader) =>
+        leader.level ===
+        (LEADERSHIP_LEVELS.REGIONAL_CABINET || "regional_cabinet")
+    );
 
-      this.getRegionalYouthAssembly(),
+    const regionalYouthAssembly = leaders.filter(
+      (leader) =>
+        leader.level ===
+        (LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY ||
+          "regional_youth_assembly")
+    );
 
-      this.getCouncilOfGovernors(),
+    const councilOfGovernors = leaders.filter(
+      (leader) =>
+        normalizePosition(leader.position) ===
+        (LEADERSHIP_OFFICES.COUNCIL_GOVERNOR ||
+          "council_governor")
+    );
 
-      this.getCountyCabinet(),
+    const countyCabinet = leaders.filter(
+      (leader) =>
+        leader.level ===
+        (LEADERSHIP_LEVELS.COUNTY_CABINET || "county_cabinet")
+    );
 
-      this.getCountyYouthAssembly(),
+    const countyYouthAssembly = leaders.filter(
+      (leader) =>
+        leader.level ===
+        (LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY ||
+          "county_youth_assembly")
+    );
 
-    ]);
+    const countyGroups = ALL_COUNTIES.reduce((result, county) => {
+      result[county] = {
+        county,
+        cabinet: countyCabinet.filter(
+          (leader) =>
+            String(leader.county || "").toLowerCase() ===
+            county.toLowerCase()
+        ),
+        youthAssembly: countyYouthAssembly.filter(
+          (leader) =>
+            String(leader.county || "").toLowerCase() ===
+            county.toLowerCase()
+        ),
+        councilOfGovernors: councilOfGovernors.filter(
+          (leader) =>
+            String(leader.county || "").toLowerCase() ===
+            county.toLowerCase()
+        ),
+      };
 
+      return result;
+    }, {});
 
     return {
-
-      patronage:
-        patron
-          ? [patron]
-          : [],
-
-      regionalCabinet,
-
-      regionalYouthAssembly:
-        regionalAssembly,
-
-      councilOfGovernors:
-        governors,
-
-      countyCabinet,
-
-      countyYouthAssembly:
-        countyAssemblies,
-
+      patronage: serializeLeaders(patronage),
+      regionalCabinet: serializeLeaders(regionalCabinet),
+      regionalYouthAssembly: serializeLeaders(regionalYouthAssembly),
+      councilOfGovernors: serializeLeaders(councilOfGovernors),
+      countyCabinet: serializeLeaders(countyCabinet),
+      countyYouthAssembly: serializeLeaders(countyYouthAssembly),
+      counties: countyGroups,
+      summary: {
+        totalActiveLeaders: leaders.length,
+        patronage: patronage.length,
+        regionalCabinet: regionalCabinet.length,
+        regionalYouthAssembly: regionalYouthAssembly.length,
+        councilOfGovernors: councilOfGovernors.length,
+        countyCabinet: countyCabinet.length,
+        countyYouthAssembly: countyYouthAssembly.length,
+      },
     };
-
   }
 
+  // Compatibility alias for the controller's existing method call.
+  async getHierarchy(filters = {}) {
+    return this.getLeadershipHierarchy(filters);
+  }
 }
-
-
-/* ========================================================================
-   EXPORT SERVICE
-======================================================================== */
 
 export default new LeaderService();

@@ -1,35 +1,28 @@
+
 import mongoose from "mongoose";
 
 import {
   LEADERSHIP_STATUS,
   LEADERSHIP_STATUS_VALUES,
-
   LEADERSHIP_OFFICE_VALUES,
   LEADERSHIP_OFFICES,
   LEGACY_LEADERSHIP_OFFICE_ALIASES,
-
   LEADERSHIP_CATEGORY_VALUES,
   LEADERSHIP_CATEGORIES,
-
   LEADERSHIP_LEVEL_VALUES,
   LEADERSHIP_LEVELS,
-
   LEADERSHIP_DEPARTMENT_VALUES,
   LEADERSHIP_DEPARTMENTS,
-
   LEADERSHIP_SCOPE_VALUES,
-  LEADERSHIP_SCOPE,
-
   REPORT_VISIBILITY_VALUES,
   REPORT_VISIBILITY,
-
   APPOINTMENT_TYPE_VALUES,
-
   COAST_COUNTIES,
+  REGIONAL_CABINET_PORTFOLIOS,
+  getRegionalCabinetPortfolio,
 } from "../constants/leadership.constants.js";
 
 const { Schema } = mongoose;
-
 
 /* ============================================================
    NORMALIZATION HELPERS
@@ -41,9 +34,7 @@ const normalizePosition = (position = "") => {
     .toLowerCase()
     .replace(/[\s-]+/g, "_");
 
-  if (!normalized) {
-    return "";
-  }
+  if (!normalized) return "";
 
   return (
     LEGACY_LEADERSHIP_OFFICE_ALIASES[normalized] ||
@@ -51,6 +42,18 @@ const normalizePosition = (position = "") => {
   );
 };
 
+const REGIONAL_PORTFOLIO_KEYS =
+  REGIONAL_CABINET_PORTFOLIOS.map(
+    (portfolio) => portfolio.key
+  );
+
+const isPatronRecord = (leader) =>
+  leader.position === LEADERSHIP_OFFICES.PATRON ||
+  leader.category === LEADERSHIP_CATEGORIES.PATRONAGE;
+
+const isRegionalCabinetSecretary = (leader) =>
+  leader.position === LEADERSHIP_OFFICES.CABINET_SECRETARY &&
+  leader.level === LEADERSHIP_LEVELS.REGIONAL_CABINET;
 
 /* ============================================================
    LEADER SCHEMA
@@ -58,9 +61,7 @@ const normalizePosition = (position = "") => {
 
 const leaderSchema = new Schema(
   {
-    /* ========================================================
-       MEMBER
-    ======================================================== */
+    /* MEMBER */
 
     member: {
       type: Schema.Types.ObjectId,
@@ -69,10 +70,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       PATRON PROFILE
-    ======================================================== */
+    /* PATRON PROFILE */
 
     patron: {
       fullName: {
@@ -81,27 +79,23 @@ const leaderSchema = new Schema(
         default: "",
         maxlength: 150,
       },
-
       title: {
         type: String,
         trim: true,
         default: "",
         maxlength: 150,
       },
-
       organization: {
         type: String,
         trim: true,
         default: "",
         maxlength: 200,
       },
-
       photo: {
         type: String,
         trim: true,
         default: "",
       },
-
       bio: {
         type: String,
         trim: true,
@@ -110,10 +104,7 @@ const leaderSchema = new Schema(
       },
     },
 
-
-    /* ========================================================
-       CATEGORY
-    ======================================================== */
+    /* CATEGORY */
 
     category: {
       type: String,
@@ -122,10 +113,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       LEADERSHIP LEVEL
-    ======================================================== */
+    /* LEVEL */
 
     level: {
       type: String,
@@ -134,10 +122,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       POSITION / OFFICE
-    ======================================================== */
+    /* OFFICE */
 
     position: {
       type: String,
@@ -146,10 +131,31 @@ const leaderSchema = new Schema(
       index: true,
     },
 
+    /* REGIONAL CABINET PORTFOLIO */
 
-    /* ========================================================
-       DEPARTMENT
-    ======================================================== */
+    portfolioKey: {
+      type: String,
+      enum: REGIONAL_PORTFOLIO_KEYS,
+      default: null,
+      index: true,
+    },
+
+    portfolioTitle: {
+      type: String,
+      trim: true,
+      default: null,
+      maxlength: 200,
+    },
+
+    portfolioSlug: {
+      type: String,
+      trim: true,
+      default: null,
+      maxlength: 120,
+      index: true,
+    },
+
+    /* DEPARTMENT */
 
     department: {
       type: String,
@@ -158,10 +164,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       STRUCTURAL SCOPE
-    ======================================================== */
+    /* STRUCTURAL SCOPE */
 
     scope: {
       type: String,
@@ -170,10 +173,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       REPORT VISIBILITY
-    ======================================================== */
+    /* REPORT VISIBILITY */
 
     reportVisibility: {
       type: String,
@@ -182,10 +182,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       APPOINTMENT TYPE
-    ======================================================== */
+    /* APPOINTMENT TYPE */
 
     appointmentType: {
       type: String,
@@ -194,10 +191,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       GEOGRAPHY
-    ======================================================== */
+    /* GEOGRAPHY */
 
     county: {
       type: String,
@@ -220,10 +214,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       DISPLAY
-    ======================================================== */
+    /* DISPLAY */
 
     displayOrder: {
       type: Number,
@@ -238,10 +229,7 @@ const leaderSchema = new Schema(
       index: true,
     },
 
-
-    /* ========================================================
-       TERM
-    ======================================================== */
+    /* TERM */
 
     termStart: {
       type: Date,
@@ -254,10 +242,7 @@ const leaderSchema = new Schema(
       default: null,
     },
 
-
-    /* ========================================================
-       STATUS
-    ======================================================== */
+    /* STATUS */
 
     status: {
       type: String,
@@ -285,10 +270,7 @@ const leaderSchema = new Schema(
       default: "",
     },
 
-
-    /* ========================================================
-       LIFECYCLE
-    ======================================================== */
+    /* LIFECYCLE */
 
     activatedAt: {
       type: Date,
@@ -305,10 +287,7 @@ const leaderSchema = new Schema(
       default: null,
     },
 
-
-    /* ========================================================
-       AUDIT
-    ======================================================== */
+    /* AUDIT */
 
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -322,13 +301,11 @@ const leaderSchema = new Schema(
       required: true,
     },
   },
-
   {
     timestamps: true,
     versionKey: false,
   }
 );
-
 
 /* ============================================================
    INDEXES
@@ -405,85 +382,78 @@ leaderSchema.index({
   displayOrder: 1,
 });
 
+leaderSchema.index({
+  level: 1,
+  position: 1,
+  portfolioKey: 1,
+  isActive: 1,
+});
+
+leaderSchema.index({
+  portfolioSlug: 1,
+  isActive: 1,
+});
+
+/*
+ * Enforce one active Regional Cabinet Secretary per portfolio.
+ *
+ * Resolve existing duplicate active assignments before allowing
+ * MongoDB to build this unique index.
+ */
+leaderSchema.index(
+  {
+    portfolioKey: 1,
+  },
+  {
+    name: "unique_active_regional_cs_portfolio",
+    unique: true,
+    partialFilterExpression: {
+      position: LEADERSHIP_OFFICES.CABINET_SECRETARY,
+      level: LEADERSHIP_LEVELS.REGIONAL_CABINET,
+      isActive: true,
+      status: LEADERSHIP_STATUS.ACTIVE,
+      portfolioKey: { $type: "string" },
+    },
+  }
+);
 
 /* ============================================================
    PRE-VALIDATE
-   ------------------------------------------------------------
-   IMPORTANT:
-   This middleware intentionally uses async/promise style.
-
-   Do NOT use `next()` here.
-   Throwing an Error causes Mongoose validation to reject
-   correctly and prevents the "next is not a function" error.
 ============================================================ */
 
 leaderSchema.pre("validate", async function () {
+  const normalizedPosition = normalizePosition(this.position);
 
-  const normalizedPosition =
-    normalizePosition(this.position);
-
-
-  /* ==========================================================
-     NORMALIZE POSITION
-  ========================================================== */
-
-  if (
-    normalizedPosition &&
-    normalizedPosition !== this.position
-  ) {
+  if (normalizedPosition && normalizedPosition !== this.position) {
     this.position = normalizedPosition;
   }
 
+  /* PATRON */
 
-  /* ==========================================================
-     IDENTIFY PATRON
-  ========================================================== */
-
-  const isPatron =
-    normalizedPosition ===
-      LEADERSHIP_OFFICES.PATRON ||
-    this.category ===
-      LEADERSHIP_CATEGORIES.PATRONAGE;
-
-
-  /* ==========================================================
-     PATRON
-  ========================================================== */
-
-  if (isPatron) {
-
-    this.position =
-      LEADERSHIP_OFFICES.PATRON;
-
-    this.category =
-      LEADERSHIP_CATEGORIES.PATRONAGE;
+  if (isPatronRecord(this)) {
+    this.position = LEADERSHIP_OFFICES.PATRON;
+    this.category = LEADERSHIP_CATEGORIES.PATRONAGE;
 
     this.level = null;
-
     this.department = null;
-
     this.scope = null;
 
-    this.reportVisibility =
-      REPORT_VISIBILITY.REGIONAL;
-
-    this.appointmentType =
-      this.appointmentType || "appointed";
+    this.reportVisibility = REPORT_VISIBILITY.REGIONAL;
+    this.appointmentType = this.appointmentType || "appointed";
 
     this.member = null;
 
     this.county = null;
-
     this.constituency = null;
-
     this.ward = null;
 
+    this.portfolioKey = null;
+    this.portfolioTitle = null;
+    this.portfolioSlug = null;
 
-    if (
-      !this.patron?.fullName ||
-      !this.patron.fullName.trim()
-    ) {
-      throw new Error(
+    if (!this.patron?.fullName?.trim()) {
+      this.invalidate(
+        "patron.fullName",
         "Patron full name is required."
       );
     }
@@ -491,121 +461,123 @@ leaderSchema.pre("validate", async function () {
     return;
   }
 
-
-  /* ==========================================================
-     NORMAL LEADER — MEMBER REQUIRED
-  ========================================================== */
+  /* MEMBER */
 
   if (!this.member) {
-    throw new Error(
+    this.invalidate(
+      "member",
       "A Member is required for non-patron leadership positions."
     );
   }
 
-
-  /* ==========================================================
-     NORMAL LEADER — LEVEL REQUIRED
-  ========================================================== */
+  /* LEVEL */
 
   if (!this.level) {
-    throw new Error(
+    this.invalidate(
+      "level",
       "Leadership level is required."
     );
   }
 
-
-  /* ==========================================================
-     NORMAL LEADER — CATEGORY REQUIRED
-  ========================================================== */
+  /* CATEGORY */
 
   if (!this.category) {
-    throw new Error(
+    this.invalidate(
+      "category",
       "Leadership category is required."
     );
   }
 
+  /* REGIONAL CABINET SECRETARY PORTFOLIO */
 
-  /* ==========================================================
-     COUNCIL OF GOVERNORS
-  ========================================================== */
+  if (isRegionalCabinetSecretary(this)) {
+    const portfolioWasChanged =
+      this.isNew ||
+      this.isModified("position") ||
+      this.isModified("level") ||
+      this.isModified("portfolioKey");
 
-  if (
-    this.level ===
-    LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS
-  ) {
+    if (!this.portfolioKey) {
+      if (portfolioWasChanged) {
+        this.invalidate(
+          "portfolioKey",
+          "A ministry docket is required for a Regional Cabinet Secretary."
+        );
+      }
 
-    this.category =
-      LEADERSHIP_CATEGORIES.SECRETARIAT;
+      this.portfolioTitle = null;
+      this.portfolioSlug = null;
+    } else {
+      const portfolio = getRegionalCabinetPortfolio(
+        this.portfolioKey
+      );
 
-    this.department =
-      LEADERSHIP_DEPARTMENTS.SECRETARIAT;
-
-    this.scope = null;
-
-    this.reportVisibility =
-      REPORT_VISIBILITY.COUNTY;
+      if (!portfolio) {
+        this.invalidate(
+          "portfolioKey",
+          `Invalid Regional Cabinet Secretary portfolio: ${this.portfolioKey}`
+        );
+      } else {
+        this.portfolioKey = portfolio.key;
+        this.portfolioTitle = portfolio.title;
+        this.portfolioSlug = portfolio.slug;
+      }
+    }
+  } else {
+    this.portfolioKey = null;
+    this.portfolioTitle = null;
+    this.portfolioSlug = null;
   }
 
+  /* COUNCIL OF GOVERNORS */
 
-  /* ==========================================================
-     STRUCTURAL SCOPE VALIDATION
-  ========================================================== */
+  if (
+    this.level === LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS
+  ) {
+    this.category = LEADERSHIP_CATEGORIES.SECRETARIAT;
+    this.department = LEADERSHIP_DEPARTMENTS.SECRETARIAT;
+    this.scope = null;
+    this.reportVisibility = REPORT_VISIBILITY.COUNTY;
+  }
 
-  const validScopes = new Set(
-    LEADERSHIP_SCOPE_VALUES
-  );
+  /* STRUCTURAL SCOPE */
 
   if (
     this.scope &&
-    !validScopes.has(this.scope)
+    !LEADERSHIP_SCOPE_VALUES.includes(this.scope)
   ) {
-    throw new Error(
+    this.invalidate(
+      "scope",
       `Invalid leadership structural scope: ${this.scope}`
     );
   }
 
-
-  /* ==========================================================
-     REPORT VISIBILITY VALIDATION
-  ========================================================== */
+  /* REPORT VISIBILITY */
 
   if (
-    !REPORT_VISIBILITY_VALUES.includes(
-      this.reportVisibility
-    )
+    !REPORT_VISIBILITY_VALUES.includes(this.reportVisibility)
   ) {
-    throw new Error(
+    this.invalidate(
+      "reportVisibility",
       `Invalid report visibility: ${this.reportVisibility}`
     );
+    return;
   }
 
+  /* REGIONAL */
 
-  /* ==========================================================
-     REGIONAL REPORTING
-  ========================================================== */
-
-  if (
-    this.reportVisibility ===
-    REPORT_VISIBILITY.REGIONAL
-  ) {
-
+  if (this.reportVisibility === REPORT_VISIBILITY.REGIONAL) {
     this.county = null;
     this.constituency = null;
     this.ward = null;
   }
 
+  /* COUNTY */
 
-  /* ==========================================================
-     COUNTY REPORTING
-  ========================================================== */
-
-  if (
-    this.reportVisibility ===
-    REPORT_VISIBILITY.COUNTY
-  ) {
-
+  if (this.reportVisibility === REPORT_VISIBILITY.COUNTY) {
     if (!this.county) {
-      throw new Error(
+      this.invalidate(
+        "county",
         "County is required for county-level leadership."
       );
     }
@@ -614,24 +586,21 @@ leaderSchema.pre("validate", async function () {
     this.ward = null;
   }
 
-
-  /* ==========================================================
-     CONSTITUENCY REPORTING
-  ========================================================== */
+  /* CONSTITUENCY */
 
   if (
-    this.reportVisibility ===
-    REPORT_VISIBILITY.CONSTITUENCY
+    this.reportVisibility === REPORT_VISIBILITY.CONSTITUENCY
   ) {
-
     if (!this.county) {
-      throw new Error(
+      this.invalidate(
+        "county",
         "County is required for constituency-level leadership."
       );
     }
 
     if (!this.constituency) {
-      throw new Error(
+      this.invalidate(
+        "constituency",
         "Constituency is required for constituency-level leadership."
       );
     }
@@ -639,210 +608,104 @@ leaderSchema.pre("validate", async function () {
     this.ward = null;
   }
 
+  /* WARD */
 
-  /* ==========================================================
-     WARD REPORTING
-  ========================================================== */
-
-  if (
-    this.reportVisibility ===
-    REPORT_VISIBILITY.WARD
-  ) {
-
+  if (this.reportVisibility === REPORT_VISIBILITY.WARD) {
     if (!this.county) {
-      throw new Error(
+      this.invalidate(
+        "county",
         "County is required for ward-level leadership."
       );
     }
 
     if (!this.constituency) {
-      throw new Error(
+      this.invalidate(
+        "constituency",
         "Constituency is required for ward-level leadership."
       );
     }
 
     if (!this.ward) {
-      throw new Error(
+      this.invalidate(
+        "ward",
         "Ward is required for ward-level leadership."
       );
     }
   }
-
-
-  /* ==========================================================
-     PRIVATE REPORTING
-     ----------------------------------------------------------
-     Private reporting does not require geography.
-  ========================================================== */
-
-  if (
-    this.reportVisibility ===
-    REPORT_VISIBILITY.PRIVATE
-  ) {
-    /*
-     * Geography is intentionally preserved.
-     */
-  }
 });
 
-
 /* ============================================================
-   PRE-SAVE
-   ------------------------------------------------------------
-   Also uses async/promise style.
+   PRE-SAVE LIFECYCLE NORMALIZATION
 ============================================================ */
 
 leaderSchema.pre("save", async function () {
-
-  /* ==========================================================
-     PATRON NORMALIZATION
-  ========================================================== */
-
-  if (
-    this.position ===
-      LEADERSHIP_OFFICES.PATRON ||
-    this.category ===
-      LEADERSHIP_CATEGORIES.PATRONAGE
-  ) {
-
-    this.position =
-      LEADERSHIP_OFFICES.PATRON;
-
-    this.category =
-      LEADERSHIP_CATEGORIES.PATRONAGE;
-
+  if (isPatronRecord(this)) {
+    this.position = LEADERSHIP_OFFICES.PATRON;
+    this.category = LEADERSHIP_CATEGORIES.PATRONAGE;
     this.member = null;
 
     this.level = null;
-
     this.department = null;
-
     this.scope = null;
 
-    this.reportVisibility =
-      REPORT_VISIBILITY.REGIONAL;
+    this.reportVisibility = REPORT_VISIBILITY.REGIONAL;
 
     this.county = null;
-
     this.constituency = null;
-
     this.ward = null;
+
+    this.portfolioKey = null;
+    this.portfolioTitle = null;
+    this.portfolioSlug = null;
   }
 
+  /*
+   * Keep isActive and status synchronized.
+   * This also handles status-only lifecycle changes.
+   */
 
-  /* ==========================================================
-     ACTIVATION
-  ========================================================== */
-
-  if (
-    this.isModified("isActive") &&
-    this.isActive
-  ) {
-
-    this.activatedAt =
-      this.activatedAt ||
-      new Date();
-
+  if (this.status === LEADERSHIP_STATUS.COMPLETED) {
+    this.isActive = false;
+    this.completedAt = this.completedAt || new Date();
+    this.deactivatedAt = this.deactivatedAt || new Date();
+  } else if (this.status === LEADERSHIP_STATUS.SUSPENDED) {
+    this.isActive = false;
+    this.deactivatedAt = this.deactivatedAt || new Date();
+  } else if (this.status === LEADERSHIP_STATUS.INACTIVE) {
+    this.isActive = false;
+    this.deactivatedAt = this.deactivatedAt || new Date();
+  } else if (this.status === LEADERSHIP_STATUS.ACTIVE) {
+    this.isActive = true;
     this.deactivatedAt = null;
-
-    if (
-      this.status ===
-      LEADERSHIP_STATUS.INACTIVE
-    ) {
-
-      this.status =
-        LEADERSHIP_STATUS.ACTIVE;
-    }
   }
 
-
-  /* ==========================================================
-     DEACTIVATION
-  ========================================================== */
-
+  /*
+   * Record activation when a previously persisted record
+   * transitions from inactive to active.
+   */
   if (
-    this.isModified("isActive") &&
-    !this.isActive
+    this.isActive &&
+    (
+      this.isNew ||
+      this.isModified("isActive") ||
+      this.isModified("status")
+    )
   ) {
-
-    this.deactivatedAt =
-      this.deactivatedAt ||
-      new Date();
-  }
-
-
-  /* ==========================================================
-     COMPLETED TERM
-  ========================================================== */
-
-  if (
-    this.status ===
-    LEADERSHIP_STATUS.COMPLETED
-  ) {
-
-    this.isActive = false;
-
-    this.completedAt =
-      this.completedAt ||
-      new Date();
-
-    this.deactivatedAt =
-      this.deactivatedAt ||
-      new Date();
-  }
-
-
-  /* ==========================================================
-     SUSPENDED
-  ========================================================== */
-
-  if (
-    this.status ===
-    LEADERSHIP_STATUS.SUSPENDED
-  ) {
-
-    this.isActive = false;
-
-    this.deactivatedAt =
-      this.deactivatedAt ||
-      new Date();
+    this.activatedAt = new Date();
+    this.deactivatedAt = null;
   }
 });
-
 
 /* ============================================================
    VIRTUALS
 ============================================================ */
 
-
-/* ============================================================
-   IS PATRON
-============================================================ */
-
 leaderSchema.virtual("isPatron").get(function () {
-
-  return (
-    this.category ===
-      LEADERSHIP_CATEGORIES.PATRONAGE ||
-    this.position ===
-      LEADERSHIP_OFFICES.PATRON ||
-    !this.member
-  );
-
+  return isPatronRecord(this);
 });
 
-
-/* ============================================================
-   FULL NAME
-============================================================ */
-
 leaderSchema.virtual("fullName").get(function () {
-
-  if (
-    this.member &&
-    typeof this.member === "object"
-  ) {
-
+  if (this.member && typeof this.member === "object") {
     return [
       this.member.firstName,
       this.member.middleName,
@@ -852,40 +715,17 @@ leaderSchema.virtual("fullName").get(function () {
       .join(" ");
   }
 
-  return (
-    this.patron?.fullName ||
-    ""
-  );
+  return this.patron?.fullName || "";
 });
 
-
-/* ============================================================
-   PROFILE
-============================================================ */
-
 leaderSchema.virtual("profile").get(function () {
-
-  if (
-    this.member &&
-    typeof this.member === "object"
-  ) {
-
+  if (this.member && typeof this.member === "object") {
     return {
-      _id:
-        this.member._id,
-
-      memberNumber:
-        this.member.memberNumber,
-
-      firstName:
-        this.member.firstName,
-
-      middleName:
-        this.member.middleName,
-
-      lastName:
-        this.member.lastName,
-
+      _id: this.member._id,
+      memberNumber: this.member.memberNumber,
+      firstName: this.member.firstName,
+      middleName: this.member.middleName,
+      lastName: this.member.lastName,
       fullName: [
         this.member.firstName,
         this.member.middleName,
@@ -893,551 +733,351 @@ leaderSchema.virtual("profile").get(function () {
       ]
         .filter(Boolean)
         .join(" "),
-
-      profilePhoto:
-        this.member.profilePhoto,
-
-      county:
-        this.member.county,
-
-      constituency:
-        this.member.constituency,
-
-      ward:
-        this.member.ward,
-
-      membershipStatus:
-        this.member.membershipStatus,
-
-      gender:
-        this.member.gender,
-
+      profilePhoto: this.member.profilePhoto,
+      county: this.member.county,
+      constituency: this.member.constituency,
+      ward: this.member.ward,
+      membershipStatus: this.member.membershipStatus,
+      gender: this.member.gender,
       isMember: true,
     };
   }
 
-
   return {
-    fullName:
-      this.patron?.fullName || "",
-
-    firstName:
-      this.patron?.fullName || "",
-
-    middleName:
-      "",
-
-    lastName:
-      "",
-
-    profilePhoto:
-      this.patron?.photo || "",
-
-    county:
-      null,
-
-    constituency:
-      null,
-
-    ward:
-      null,
-
-    organization:
-      this.patron?.organization || "",
-
-    title:
-      this.patron?.title || "",
-
-    bio:
-      this.patron?.bio || "",
-
+    fullName: this.patron?.fullName || "",
+    firstName: this.patron?.fullName || "",
+    middleName: "",
+    lastName: "",
+    profilePhoto: this.patron?.photo || "",
+    county: null,
+    constituency: null,
+    ward: null,
+    organization: this.patron?.organization || "",
+    title: this.patron?.title || "",
+    bio: this.patron?.bio || "",
     isMember: false,
   };
 });
 
+leaderSchema.virtual("portfolio").get(function () {
+  if (!this.portfolioKey) return null;
 
-/* ============================================================
-   IS CURRENT
-============================================================ */
+  return getRegionalCabinetPortfolio(this.portfolioKey);
+});
+
+leaderSchema.virtual("officeDisplayTitle").get(function () {
+  if (this.position === LEADERSHIP_OFFICES.CABINET_SECRETARY) {
+    return this.portfolioTitle
+      ? `Cabinet Secretary — ${this.portfolioTitle}`
+      : "Cabinet Secretary";
+  }
+
+  if (
+    this.position === LEADERSHIP_OFFICES.SECRETARY_TO_CABINET
+  ) {
+    return "Secretary to the Cabinet";
+  }
+
+  return this.position
+    ? this.position
+        .split("_")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+    : "";
+});
 
 leaderSchema.virtual("isCurrent").get(function () {
-
   return (
     this.isActive &&
-    this.status ===
-      LEADERSHIP_STATUS.ACTIVE
+    this.status === LEADERSHIP_STATUS.ACTIVE
   );
-
 });
-
-
-/* ============================================================
-   APPOINTMENT VIRTUALS
-============================================================ */
 
 leaderSchema.virtual("isElected").get(function () {
-
   return this.appointmentType === "elected";
-
 });
-
 
 leaderSchema.virtual("isAppointed").get(function () {
-
   return this.appointmentType === "appointed";
-
 });
-
 
 leaderSchema.virtual("isNominated").get(function () {
-
   return this.appointmentType === "nominated";
-
 });
-
-
-/* ============================================================
-   STRUCTURAL VIRTUALS
-============================================================ */
 
 leaderSchema.virtual("isRegionalCabinet").get(function () {
-
-  return (
-    this.level ===
-    LEADERSHIP_LEVELS.REGIONAL_CABINET
-  );
-
+  return this.level === LEADERSHIP_LEVELS.REGIONAL_CABINET;
 });
-
 
 leaderSchema.virtual("isRegionalYouthAssembly").get(function () {
-
   return (
-    this.level ===
-    LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY
+    this.level === LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY
   );
-
 });
-
 
 leaderSchema.virtual("isCouncilOfGovernors").get(function () {
-
-  return (
-    this.level ===
-    LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS
-  );
-
+  return this.level === LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS;
 });
-
 
 leaderSchema.virtual("isCountyCabinet").get(function () {
-
-  return (
-    this.level ===
-    LEADERSHIP_LEVELS.COUNTY_CABINET
-  );
-
+  return this.level === LEADERSHIP_LEVELS.COUNTY_CABINET;
 });
-
 
 leaderSchema.virtual("isCountyYouthAssembly").get(function () {
-
   return (
-    this.level ===
-    LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY
+    this.level === LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY
   );
-
 });
-
 
 /* ============================================================
    INSTANCE METHODS
 ============================================================ */
 
 leaderSchema.methods.activate = function () {
-
   this.isActive = true;
-
-  this.status =
-    LEADERSHIP_STATUS.ACTIVE;
-
-  this.activatedAt =
-    new Date();
-
-  this.deactivatedAt =
-    null;
+  this.status = LEADERSHIP_STATUS.ACTIVE;
+  this.activatedAt = new Date();
+  this.deactivatedAt = null;
+  this.completedAt = null;
 };
-
 
 leaderSchema.methods.deactivate = function () {
-
   this.isActive = false;
-
-  this.status =
-    LEADERSHIP_STATUS.INACTIVE;
-
-  this.deactivatedAt =
-    new Date();
+  this.status = LEADERSHIP_STATUS.INACTIVE;
+  this.deactivatedAt = new Date();
 };
-
 
 leaderSchema.methods.completeTerm = function () {
-
-  this.status =
-    LEADERSHIP_STATUS.COMPLETED;
-
+  this.status = LEADERSHIP_STATUS.COMPLETED;
   this.isActive = false;
-
-  this.completedAt =
-    new Date();
-
-  this.deactivatedAt =
-    new Date();
+  this.completedAt = new Date();
+  this.deactivatedAt = new Date();
 };
-
 
 leaderSchema.methods.suspend = function () {
-
-  this.status =
-    LEADERSHIP_STATUS.SUSPENDED;
-
+  this.status = LEADERSHIP_STATUS.SUSPENDED;
   this.isActive = false;
-
-  this.deactivatedAt =
-    new Date();
+  this.deactivatedAt = new Date();
 };
-
 
 leaderSchema.methods.reinstate = function () {
-
-  this.status =
-    LEADERSHIP_STATUS.ACTIVE;
-
+  this.status = LEADERSHIP_STATUS.ACTIVE;
   this.isActive = true;
-
-  this.deactivatedAt =
-    null;
-
-  this.completedAt =
-    null;
+  this.activatedAt = new Date();
+  this.deactivatedAt = null;
+  this.completedAt = null;
 };
-
 
 /* ============================================================
    STATIC METHODS
 ============================================================ */
 
-leaderSchema.statics.getActive = function () {
-
-  return this.find({
-    isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+const activeSort = {
+  displayOrder: 1,
+  createdAt: 1,
 };
 
+leaderSchema.statics.getActive = function () {
+  return this.find({ isActive: true }).sort(activeSort);
+};
 
 leaderSchema.statics.getInactive = function () {
-
-  return this.find({
-    isActive: false,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  return this.find({ isActive: false }).sort(activeSort);
 };
 
-
 leaderSchema.statics.getCurrent = function () {
-
   return this.find({
     isActive: true,
     status: LEADERSHIP_STATUS.ACTIVE,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  }).sort(activeSort);
 };
-
 
 leaderSchema.statics.getByCategory = function (category) {
-
-  return this.find({
-    category,
-    isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  return this.find({ category, isActive: true }).sort(activeSort);
 };
-
 
 leaderSchema.statics.getByLevel = function (level) {
-
-  return this.find({
-    level,
-    isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  return this.find({ level, isActive: true }).sort(activeSort);
 };
 
-
 leaderSchema.statics.getByPosition = function (position) {
-
   return this.find({
     position: normalizePosition(position),
     isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  }).sort(activeSort);
 };
-
 
 leaderSchema.statics.getByCounty = function (county) {
-
-  return this.find({
-    county,
-    isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  return this.find({ county, isActive: true }).sort(activeSort);
 };
 
-
-leaderSchema.statics.getByConstituency =
-function (county, constituency) {
-
+leaderSchema.statics.getByConstituency = function (
+  county,
+  constituency
+) {
   return this.find({
     county,
     constituency,
     isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  }).sort(activeSort);
 };
 
-
-leaderSchema.statics.getByWard =
-function (county, constituency, ward) {
-
+leaderSchema.statics.getByWard = function (
+  county,
+  constituency,
+  ward
+) {
   return this.find({
     county,
     constituency,
     ward,
     isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  }).sort(activeSort);
 };
 
-
-leaderSchema.statics.getByReportVisibility =
-function (reportVisibility) {
-
+leaderSchema.statics.getByReportVisibility = function (
+  reportVisibility
+) {
   return this.find({
     reportVisibility,
     isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  }).sort(activeSort);
 };
 
-
-leaderSchema.statics.getByScope =
-function (scope) {
-
-  return this.find({
-    scope,
-    isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+leaderSchema.statics.getByScope = function (scope) {
+  return this.find({ scope, isActive: true }).sort(activeSort);
 };
 
-
-leaderSchema.statics.getByDepartment =
-function (department) {
-
+leaderSchema.statics.getByDepartment = function (department) {
   return this.find({
     department,
     isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  }).sort(activeSort);
 };
 
+/* REGIONAL CABINET */
 
-/* ============================================================
-   REGIONAL CABINET
-============================================================ */
-
-leaderSchema.statics.getRegionalCabinet =
-function () {
-
+leaderSchema.statics.getRegionalCabinet = function () {
   return this.find({
-    level:
-      LEADERSHIP_LEVELS.REGIONAL_CABINET,
+    level: LEADERSHIP_LEVELS.REGIONAL_CABINET,
     isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  }).sort(activeSort);
 };
 
-
-/* ============================================================
-   REGIONAL YOUTH ASSEMBLY
-============================================================ */
-
-leaderSchema.statics.getRegionalYouthAssembly =
-function () {
-
+leaderSchema.statics.getRegionalCabinetSecretaries = function () {
   return this.find({
-    level:
-      LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
+    level: LEADERSHIP_LEVELS.REGIONAL_CABINET,
+    position: LEADERSHIP_OFFICES.CABINET_SECRETARY,
     isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
+  }).sort(activeSort);
 };
 
-
-/* ============================================================
-   COUNCIL OF GOVERNORS
-============================================================ */
-
-leaderSchema.statics.getCouncilOfGovernors =
-function () {
-
-  return this.find({
-    level:
-      LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
-    isActive: true,
-  })
-    .sort({
-      displayOrder: 1,
-      createdAt: 1,
-    });
-};
-
-
-/* ============================================================
-   COUNTY CABINET
-============================================================ */
-
-leaderSchema.statics.getCountyCabinet =
-function (county = null) {
-
-  const query = {
-    level:
-      LEADERSHIP_LEVELS.COUNTY_CABINET,
-    isActive: true,
-  };
-
-  if (county) {
-    query.county = county;
+leaderSchema.statics.getByPortfolioKey = function (portfolioKey) {
+  if (!REGIONAL_PORTFOLIO_KEYS.includes(portfolioKey)) {
+    return Promise.resolve(null);
   }
-
-  return this.find(query)
-    .sort({
-      county: 1,
-      displayOrder: 1,
-      createdAt: 1,
-    });
-};
-
-
-/* ============================================================
-   COUNTY YOUTH ASSEMBLY
-============================================================ */
-
-leaderSchema.statics.getCountyYouthAssembly =
-function (county = null) {
-
-  const query = {
-    level:
-      LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
-    isActive: true,
-  };
-
-  if (county) {
-    query.county = county;
-  }
-
-  return this.find(query)
-    .sort({
-      county: 1,
-      displayOrder: 1,
-      createdAt: 1,
-    });
-};
-
-
-/* ============================================================
-   PATRON
-============================================================ */
-
-leaderSchema.statics.getPatron =
-function () {
 
   return this.findOne({
-    position:
-      LEADERSHIP_OFFICES.PATRON,
+    level: LEADERSHIP_LEVELS.REGIONAL_CABINET,
+    position: LEADERSHIP_OFFICES.CABINET_SECRETARY,
+    portfolioKey,
     isActive: true,
-  });
-
+    status: LEADERSHIP_STATUS.ACTIVE,
+  }).sort(activeSort);
 };
 
+leaderSchema.statics.getByPortfolioSlug = function (portfolioSlug) {
+  const portfolio = REGIONAL_CABINET_PORTFOLIOS.find(
+    (item) => item.slug === portfolioSlug
+  );
+
+  if (!portfolio) return Promise.resolve(null);
+
+  return this.findOne({
+    level: LEADERSHIP_LEVELS.REGIONAL_CABINET,
+    position: LEADERSHIP_OFFICES.CABINET_SECRETARY,
+    portfolioKey: portfolio.key,
+    isActive: true,
+    status: LEADERSHIP_STATUS.ACTIVE,
+  }).sort(activeSort);
+};
+
+/* REGIONAL YOUTH ASSEMBLY */
+
+leaderSchema.statics.getRegionalYouthAssembly = function () {
+  return this.find({
+    level: LEADERSHIP_LEVELS.REGIONAL_YOUTH_ASSEMBLY,
+    isActive: true,
+  }).sort(activeSort);
+};
+
+/* COUNCIL OF GOVERNORS */
+
+leaderSchema.statics.getCouncilOfGovernors = function () {
+  return this.find({
+    level: LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS,
+    isActive: true,
+  }).sort(activeSort);
+};
+
+/* COUNTY CABINET */
+
+leaderSchema.statics.getCountyCabinet = function (county = null) {
+  const query = {
+    level: LEADERSHIP_LEVELS.COUNTY_CABINET,
+    isActive: true,
+  };
+
+  if (county) query.county = county;
+
+  return this.find(query).sort({
+    county: 1,
+    ...activeSort,
+  });
+};
+
+/* COUNTY YOUTH ASSEMBLY */
+
+leaderSchema.statics.getCountyYouthAssembly = function (
+  county = null
+) {
+  const query = {
+    level: LEADERSHIP_LEVELS.COUNTY_YOUTH_ASSEMBLY,
+    isActive: true,
+  };
+
+  if (county) query.county = county;
+
+  return this.find(query).sort({
+    county: 1,
+    ...activeSort,
+  });
+};
+
+/* PATRON */
+
+leaderSchema.statics.getPatron = function () {
+  return this.findOne({
+    position: LEADERSHIP_OFFICES.PATRON,
+    isActive: true,
+    status: LEADERSHIP_STATUS.ACTIVE,
+  });
+};
 
 /* ============================================================
    SERIALIZATION
 ============================================================ */
 
-leaderSchema.set(
-  "toJSON",
-  {
-    virtuals: true,
-  }
-);
+leaderSchema.set("toJSON", {
+  virtuals: true,
+});
 
-leaderSchema.set(
-  "toObject",
-  {
-    virtuals: true,
-  }
-);
-
+leaderSchema.set("toObject", {
+  virtuals: true,
+});
 
 /* ============================================================
    MODEL
 ============================================================ */
 
-export default mongoose.model(
-  "Leader",
-  leaderSchema
-);
+export default mongoose.model("Leader", leaderSchema);

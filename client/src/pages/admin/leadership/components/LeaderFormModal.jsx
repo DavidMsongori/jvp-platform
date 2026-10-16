@@ -1,4 +1,6 @@
+
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -25,8 +27,13 @@ import {
   LEADERSHIP_CATEGORIES,
   LEADERSHIP_DEPARTMENTS,
   LEADERSHIP_SCOPE,
+  LEADERSHIP_OFFICES,
   APPOINTMENT_TYPES,
+  REPORT_VISIBILITY,
   OFFICE_CONFIGURATION,
+  REGIONAL_CABINET_PORTFOLIOS,
+  COAST_COUNTIES,
+  getOfficeConfiguration,
 } from "../../../../constants/leadership.constants";
 
 /* ============================================================
@@ -41,10 +48,6 @@ const ELECTED_TERM_END = "2028-12-22";
 ============================================================ */
 
 const CATEGORIES = [
-  {
-    label: "Patron",
-    value: "patron",
-  },
   {
     label: "Executive",
     value: LEADERSHIP_CATEGORIES.EXECUTIVE,
@@ -107,16 +110,10 @@ const DEPARTMENTS = [
     label: "Secretariat",
     value: LEADERSHIP_DEPARTMENTS.SECRETARIAT,
   },
-  {
-    label: "Patronage",
-    value:
-      LEADERSHIP_DEPARTMENTS.PATRONAGE ||
-      "patronage",
-  },
 ];
 
 /* ============================================================
-   SCOPES
+   STRUCTURAL SCOPES
 ============================================================ */
 
 const SCOPES = [
@@ -139,6 +136,33 @@ const SCOPES = [
 ];
 
 /* ============================================================
+   REPORT VISIBILITY
+============================================================ */
+
+const REPORT_VISIBILITY_OPTIONS = [
+  {
+    label: "Private",
+    value: REPORT_VISIBILITY.PRIVATE,
+  },
+  {
+    label: "Ward",
+    value: REPORT_VISIBILITY.WARD,
+  },
+  {
+    label: "Constituency",
+    value: REPORT_VISIBILITY.CONSTITUENCY,
+  },
+  {
+    label: "County",
+    value: REPORT_VISIBILITY.COUNTY,
+  },
+  {
+    label: "Regional",
+    value: REPORT_VISIBILITY.REGIONAL,
+  },
+];
+
+/* ============================================================
    APPOINTMENT TYPES
 ============================================================ */
 
@@ -155,19 +179,13 @@ const APPOINTMENT_TYPE_OPTIONS = [
     label: "Appointed",
     value: APPOINTMENT_TYPES.APPOINTED,
   },
-  {
-    label: "Honorary",
-    value: "honorary",
-  },
 ];
 
 /* ============================================================
-   POSITIONS
+   POSITIONS FROM OFFICE CONFIGURATION
 ============================================================ */
 
-const POSITIONS = Object.entries(
-  OFFICE_CONFIGURATION
-).map(
+const POSITIONS = Object.entries(OFFICE_CONFIGURATION).map(
   ([value, configuration]) => ({
     value,
     label: configuration.title,
@@ -186,9 +204,13 @@ const DEFAULT_FORM = {
   level: "",
   position: "",
 
+  portfolioKey: "",
+
   department: "",
   scope: "",
   appointmentType: "",
+
+  reportVisibility: REPORT_VISIBILITY.PRIVATE,
 
   county: "",
   constituency: "",
@@ -216,9 +238,23 @@ const DEFAULT_FORM = {
    HELPERS
 ============================================================ */
 
+const getLocalDateString = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
 const formatDateForInput = (date) => {
-  if (!date) {
-    return "";
+  if (!date) return "";
+
+  if (
+    typeof date === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(date)
+  ) {
+    return date;
   }
 
   const parsedDate = new Date(date);
@@ -227,15 +263,21 @@ const formatDateForInput = (date) => {
     return "";
   }
 
-  return parsedDate
-    .toISOString()
-    .split("T")[0];
+  return parsedDate.toISOString().split("T")[0];
+};
+
+const getMemberId = (member) => {
+  if (!member) return "";
+
+  if (typeof member === "string") {
+    return member;
+  }
+
+  return member._id || member.id || "";
 };
 
 const getMemberName = (member) => {
-  if (!member) {
-    return "";
-  }
+  if (!member) return "";
 
   return [
     member.firstName,
@@ -249,9 +291,7 @@ const getMemberName = (member) => {
 };
 
 const getMemberLocation = (member) => {
-  if (!member) {
-    return "";
-  }
+  if (!member) return "";
 
   return [
     member.county,
@@ -261,6 +301,43 @@ const getMemberLocation = (member) => {
     .filter(Boolean)
     .join(" · ");
 };
+
+const unwrapResponse = (response) => {
+  let result = response?.data ?? response;
+
+  if (
+    result &&
+    typeof result === "object" &&
+    !Array.isArray(result) &&
+    Object.prototype.hasOwnProperty.call(result, "data")
+  ) {
+    result = result.data;
+  }
+
+  return result;
+};
+
+const getMemberResults = (response) => {
+  const data = unwrapResponse(response);
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.members)) return data.members;
+  if (Array.isArray(data?.results)) return data.results;
+  if (Array.isArray(data?.items)) return data.items;
+
+  return [];
+};
+
+const getLeaderPatron = (leader) => ({
+  fullName: leader?.patron?.fullName || "",
+  title: leader?.patron?.title || "",
+  organization: leader?.patron?.organization || "",
+  photo: leader?.patron?.photo || "",
+  bio: leader?.patron?.bio || "",
+});
+
+const isPatronPosition = (position) =>
+  position === LEADERSHIP_OFFICES.PATRON;
 
 /* ============================================================
    COMPONENT
@@ -273,142 +350,171 @@ export default function LeaderFormModal({
   onClose,
   onSave,
 }) {
-  const [form, setForm] = useState(
-    DEFAULT_FORM
-  );
+  const [form, setForm] = useState({
+    ...DEFAULT_FORM,
+    patron: { ...DEFAULT_FORM.patron },
+  });
 
   const [members, setMembers] = useState([]);
-
-  const [selectedMember, setSelectedMember] =
-    useState(null);
-
-  const [memberSearch, setMemberSearch] =
-    useState("");
-
-  const [membersLoading, setMembersLoading] =
-    useState(false);
-
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [memberSearch, setMemberSearch] = useState("");
+  const [membersLoading, setMembersLoading] = useState(false);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  /* ==========================================================
-     DERIVED VALUES
-  ========================================================== */
+  const isSaving = loading || saving;
 
   const isPatron =
-    form.category === "patron" ||
-    form.category ===
-      LEADERSHIP_CATEGORIES.PATRONAGE;
+    form.category === LEADERSHIP_CATEGORIES.PATRONAGE ||
+    isPatronPosition(form.position);
 
   const isElected =
-    form.appointmentType ===
-    APPOINTMENT_TYPES.ELECTED;
+    form.appointmentType === APPOINTMENT_TYPES.ELECTED;
+
+  const selectedOffice = useMemo(
+    () => getOfficeConfiguration(form.position),
+    [form.position]
+  );
+
+  const requiresPortfolio = Boolean(
+    selectedOffice?.requiresPortfolio &&
+      form.level === LEADERSHIP_LEVELS.REGIONAL_CABINET
+  );
+
+  const requiresCounty =
+    form.reportVisibility === REPORT_VISIBILITY.COUNTY ||
+    form.reportVisibility === REPORT_VISIBILITY.CONSTITUENCY ||
+    form.reportVisibility === REPORT_VISIBILITY.WARD;
+
+  const requiresConstituency =
+    form.reportVisibility === REPORT_VISIBILITY.CONSTITUENCY ||
+    form.reportVisibility === REPORT_VISIBILITY.WARD;
+
+  const requiresWard =
+    form.reportVisibility === REPORT_VISIBILITY.WARD;
 
   /* ==========================================================
-     FILTER POSITIONS
+     FILTER AVAILABLE OFFICES
   ========================================================== */
 
   const filteredPositions = useMemo(() => {
-    let positions = POSITIONS;
+    return POSITIONS.filter(({ value, configuration }) => {
+      if (isPatron) {
+        return value === LEADERSHIP_OFFICES.PATRON;
+      }
 
-    if (form.level) {
-      positions = positions.filter(
-        (position) =>
-          position.configuration?.level ===
-          form.level
-      );
+      if (value === LEADERSHIP_OFFICES.PATRON) {
+        return false;
+      }
+
+      if (
+        form.category &&
+        configuration.category !== form.category
+      ) {
+        return false;
+      }
+
+      if (
+        form.level &&
+        configuration.level !== form.level
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [form.category, form.level, isPatron]);
+
+  /* ==========================================================
+     FILTER AVAILABLE LEVELS
+  ========================================================== */
+
+  const filteredLevels = useMemo(() => {
+    if (!form.category) {
+      return LEADERSHIP_LEVEL_OPTIONS;
     }
 
-    if (
-      form.category &&
-      !isPatron
-    ) {
-      positions = positions.filter(
-        (position) =>
-          position.configuration?.category ===
-          form.category
-      );
-    }
+    const availableLevels = new Set(
+      POSITIONS.filter(
+        ({ value, configuration }) =>
+          value !== LEADERSHIP_OFFICES.PATRON &&
+          configuration.category === form.category &&
+          configuration.level
+      ).map(({ configuration }) => configuration.level)
+    );
 
-    if (isPatron) {
-      positions = positions.filter(
-        (position) =>
-          position.value === "patron"
-      );
-    }
-
-    return positions;
-  }, [
-    form.level,
-    form.category,
-    isPatron,
-  ]);
+    return LEADERSHIP_LEVEL_OPTIONS.filter((level) =>
+      availableLevels.has(level.value)
+    );
+  }, [form.category]);
 
   /* ==========================================================
      INITIALIZE FORM
   ========================================================== */
 
   useEffect(() => {
-    if (!open) {
-      return;
-    }
+    if (!open) return;
+
+    setError("");
+    setMembers([]);
 
     if (leader) {
       const leaderMember =
-        leader.member &&
-        typeof leader.member === "object"
+        leader.member && typeof leader.member === "object"
           ? leader.member
           : null;
 
-      const configuration =
-        OFFICE_CONFIGURATION[
-          leader.position
-        ];
+      const position = leader.position || "";
+      const configuration = getOfficeConfiguration(position);
+
+      const category =
+        leader.category || configuration?.category || "";
+
+      const level =
+        leader.level || configuration?.level || "";
 
       const appointmentType =
         leader.appointmentType ||
         configuration?.appointmentType ||
-        "";
+        APPOINTMENT_TYPES.APPOINTED;
 
-      const isLeaderElected =
-        appointmentType ===
-        APPOINTMENT_TYPES.ELECTED;
+      const patronRecord =
+        category === LEADERSHIP_CATEGORIES.PATRONAGE ||
+        position === LEADERSHIP_OFFICES.PATRON;
 
       setForm({
-        member:
-          leader.member?._id ||
-          leader.member ||
-          "",
+        ...DEFAULT_FORM,
 
-        category:
-          leader.category ||
-          configuration?.category ||
-          "",
+        member: getMemberId(leader.member),
 
-        level:
-          leader.level ||
-          configuration?.level ||
-          "",
+        category: patronRecord
+          ? LEADERSHIP_CATEGORIES.PATRONAGE
+          : category,
 
-        position:
-          leader.position ||
-          "",
+        level: patronRecord ? "" : level,
+        position,
 
-        department:
-          leader.department ||
-          configuration?.department ||
-          "",
+        portfolioKey: leader.portfolioKey || "",
 
-        scope:
-          leader.scope ??
-          configuration?.scope ??
-          "",
+        department: patronRecord
+          ? ""
+          : leader.department || configuration?.department || "",
+
+        scope: patronRecord
+          ? ""
+          : leader.scope ?? configuration?.scope ?? "",
 
         appointmentType,
 
+        reportVisibility:
+          leader.reportVisibility ||
+          configuration?.reportVisibility ||
+          (patronRecord
+            ? REPORT_VISIBILITY.REGIONAL
+            : REPORT_VISIBILITY.PRIVATE),
+
         county:
-          leader.county ||
-          leaderMember?.county ||
-          "",
+          leader.county || leaderMember?.county || "",
 
         constituency:
           leader.constituency ||
@@ -416,127 +522,65 @@ export default function LeaderFormModal({
           "",
 
         ward:
-          leader.ward ||
-          leaderMember?.ward ||
-          "",
+          leader.ward || leaderMember?.ward || "",
 
-        displayOrder:
-          leader.displayOrder ?? 999,
+        displayOrder: leader.displayOrder ?? 999,
+        featured: leader.featured ?? false,
 
-        featured:
-          leader.featured ?? false,
-
-        /*
-         * Existing elected leaders with
-         * missing dates receive the standard
-         * elected term.
-         *
-         * Existing stored dates remain
-         * unchanged.
-         */
-        termStart:
-          isLeaderElected
-            ? formatDateForInput(
-                leader.termStart
-              ) || ELECTED_TERM_START
-            : formatDateForInput(
-                leader.termStart
-              ),
+        termStart: isPatronPosition(position)
+          ? formatDateForInput(leader.termStart) ||
+            getLocalDateString()
+          : appointmentType === APPOINTMENT_TYPES.ELECTED
+            ? formatDateForInput(leader.termStart) ||
+              ELECTED_TERM_START
+            : formatDateForInput(leader.termStart) ||
+              getLocalDateString(),
 
         termEnd:
-          isLeaderElected
-            ? formatDateForInput(
-                leader.termEnd
-              ) || ELECTED_TERM_END
-            : formatDateForInput(
-                leader.termEnd
-              ),
+          appointmentType === APPOINTMENT_TYPES.ELECTED
+            ? formatDateForInput(leader.termEnd) ||
+              ELECTED_TERM_END
+            : formatDateForInput(leader.termEnd),
 
-        verified:
-          leader.verified ?? true,
+        verified: leader.verified ?? true,
+        remarks: leader.remarks || "",
 
-        remarks:
-          leader.remarks || "",
-
-        patron: {
-          fullName:
-            leader.patron?.fullName ||
-            "",
-
-          title:
-            leader.patron?.title ||
-            "",
-
-          organization:
-            leader.patron?.organization ||
-            "",
-
-          photo:
-            leader.patron?.photo ||
-            "",
-
-          bio:
-            leader.patron?.bio ||
-            "",
-        },
+        patron: getLeaderPatron(leader),
       });
 
-      setSelectedMember(
-        leaderMember
-      );
-
+      setSelectedMember(leaderMember);
       setMemberSearch(
-        leaderMember
-          ? getMemberName(
-              leaderMember
-            )
-          : ""
+        leaderMember ? getMemberName(leaderMember) : ""
       );
     } else {
       setForm({
         ...DEFAULT_FORM,
-
-        patron: {
-          ...DEFAULT_FORM.patron,
-        },
-
-        termStart: "",
-        termEnd: "",
+        termStart: getLocalDateString(),
+        patron: { ...DEFAULT_FORM.patron },
       });
 
       setSelectedMember(null);
       setMemberSearch("");
     }
-
-    setMembers([]);
-    setError("");
-  }, [
-    open,
-    leader,
-  ]);
+  }, [open, leader]);
 
   /* ==========================================================
      SEARCH MEMBERS
   ========================================================== */
 
   useEffect(() => {
-    if (
-      !open ||
-      isPatron
-    ) {
+    if (!open || isPatron || form.member) {
       setMembers([]);
-      return;
+      setMembersLoading(false);
+      return undefined;
     }
 
-    const searchValue =
-      memberSearch.trim();
+    const query = memberSearch.trim();
 
-    if (
-      !searchValue ||
-      form.member
-    ) {
+    if (query.length < 2) {
       setMembers([]);
-      return;
+      setMembersLoading(false);
+      return undefined;
     }
 
     let active = true;
@@ -545,29 +589,14 @@ export default function LeaderFormModal({
       try {
         setMembersLoading(true);
 
-        const response =
-          await memberService.searchMembers(
-            searchValue
-          );
-
-        const results =
-          response?.data ||
-          response?.members ||
-          response ||
-          [];
+        const response = await memberService.searchMembers(query);
+        const results = getMemberResults(response);
 
         if (active) {
-          setMembers(
-            Array.isArray(results)
-              ? results
-              : []
-          );
+          setMembers(results);
         }
       } catch (requestError) {
-        console.error(
-          "Member search failed:",
-          requestError
-        );
+        console.error("Member search failed:", requestError);
 
         if (active) {
           setMembers([]);
@@ -579,177 +608,71 @@ export default function LeaderFormModal({
       }
     };
 
-    const timer = setTimeout(
-      loadMembers,
-      350
-    );
+    const timer = setTimeout(loadMembers, 350);
 
     return () => {
       active = false;
       clearTimeout(timer);
     };
-  }, [
-    open,
-    memberSearch,
-    form.member,
-    isPatron,
-  ]);
+  }, [open, isPatron, form.member, memberSearch]);
 
   /* ==========================================================
-     FIELD HELPERS
+     UPDATE BASIC FIELD
   ========================================================== */
 
-  const updateField = (
-    field,
-    value
-  ) => {
-    setForm((previous) => {
-      /*
-       * Elected leaders always use the
-       * standard JVP elected term.
-       */
-      if (
-        field === "appointmentType" &&
-        value ===
-          APPOINTMENT_TYPES.ELECTED
-      ) {
-        return {
-          ...previous,
-
-          appointmentType: value,
-
-          termStart:
-            ELECTED_TERM_START,
-
-          termEnd:
-            ELECTED_TERM_END,
-        };
-      }
-
-      /*
-       * If appointment type changes away
-       * from Elected, clear the automatic
-       * elected dates.
-       */
-      if (
-        field === "appointmentType" &&
-        value !==
-          APPOINTMENT_TYPES.ELECTED &&
-        previous.appointmentType ===
-          APPOINTMENT_TYPES.ELECTED
-      ) {
-        return {
-          ...previous,
-
-          appointmentType: value,
-
-          termStart: "",
-
-          termEnd: "",
-        };
-      }
-
-      return {
-        ...previous,
-        [field]: value,
-      };
-    });
-  };
-
-  const updatePatronField = (
-    field,
-    value
-  ) => {
+  const updateField = useCallback((field, value) => {
     setForm((previous) => ({
       ...previous,
+      [field]: value,
+    }));
+  }, []);
 
+  const updatePatronField = useCallback((field, value) => {
+    setForm((previous) => ({
+      ...previous,
       patron: {
         ...previous.patron,
         [field]: value,
       },
     }));
-  };
-
-  /* ==========================================================
-     LEVEL CHANGE
-  ========================================================== */
-
-  const handleLevelChange = (
-    level
-  ) => {
-    setForm((previous) => ({
-      ...previous,
-
-      level,
-
-      position: "",
-
-      department: "",
-      scope: "",
-      appointmentType: "",
-
-      /*
-       * Reset term when the leadership
-       * structure changes.
-       */
-      termStart: "",
-      termEnd: "",
-    }));
-  };
+  }, []);
 
   /* ==========================================================
      CATEGORY CHANGE
   ========================================================== */
 
-  const handleCategoryChange = (
-    category
-  ) => {
+  const handleCategoryChange = (category) => {
     const patron =
-      category === "patron" ||
-      category ===
-        LEADERSHIP_CATEGORIES.PATRONAGE;
+      category === LEADERSHIP_CATEGORIES.PATRONAGE;
 
     setForm((previous) => ({
       ...previous,
 
       category,
+      level: patron ? "" : previous.level,
+      position: patron ? LEADERSHIP_OFFICES.PATRON : "",
+      portfolioKey: "",
 
-      position: "",
-
-      level: patron
-        ? ""
-        : previous.level,
-
-      member: patron
-        ? ""
-        : previous.member,
+      member: patron ? "" : previous.member,
+      department: patron ? "" : previous.department,
+      scope: patron ? "" : previous.scope,
 
       appointmentType: patron
-        ? "honorary"
-        : previous.appointmentType,
+        ? APPOINTMENT_TYPES.APPOINTED
+        : "",
 
-      scope: patron
-        ? ""
-        : previous.scope,
+      reportVisibility: patron
+        ? REPORT_VISIBILITY.REGIONAL
+        : REPORT_VISIBILITY.PRIVATE,
 
-      department: patron
-        ? (
-            LEADERSHIP_DEPARTMENTS.PATRONAGE ||
-            "patronage"
-          )
-        : previous.department,
+      county: patron ? "" : previous.county,
+      constituency: patron ? "" : previous.constituency,
+      ward: patron ? "" : previous.ward,
 
-      /*
-       * Patron does not use the elected
-       * leadership term.
-       */
       termStart: patron
-        ? ""
-        : previous.termStart,
-
-      termEnd: patron
-        ? ""
-        : previous.termEnd,
+        ? previous.termStart || getLocalDateString()
+        : "",
+      termEnd: "",
     }));
 
     if (patron) {
@@ -757,129 +680,206 @@ export default function LeaderFormModal({
       setMemberSearch("");
       setMembers([]);
     }
+
+    setError("");
+  };
+
+  /* ==========================================================
+     LEVEL CHANGE
+  ========================================================== */
+
+  const handleLevelChange = (level) => {
+    setForm((previous) => ({
+      ...previous,
+
+      level,
+      position: "",
+      portfolioKey: "",
+
+      department: "",
+      scope: "",
+      appointmentType: "",
+
+      reportVisibility: REPORT_VISIBILITY.PRIVATE,
+
+      county: "",
+      constituency: "",
+      ward: "",
+
+      termStart: "",
+      termEnd: "",
+    }));
+
+    setError("");
   };
 
   /* ==========================================================
      POSITION CHANGE
   ========================================================== */
 
-  const handlePositionChange = (
-    position
-  ) => {
-    const selectedPosition =
-      POSITIONS.find(
-        (item) =>
-          item.value === position
-      );
+  const handlePositionChange = (position) => {
+    const configuration = getOfficeConfiguration(position);
 
-    if (!selectedPosition) {
-      updateField(
-        "position",
-        position
-      );
-
+    if (!configuration) {
+      setError("The selected office is not configured.");
       return;
     }
 
-    const configuration =
-      selectedPosition.configuration;
+    const patron = position === LEADERSHIP_OFFICES.PATRON;
 
-    setForm((previous) => {
-      const appointmentType =
-        configuration.appointmentType ||
-        previous.appointmentType;
+    const appointmentType =
+      configuration.appointmentType ||
+      APPOINTMENT_TYPES.APPOINTED;
 
-      const isPositionElected =
-        appointmentType ===
-        APPOINTMENT_TYPES.ELECTED;
+    const elected =
+      appointmentType === APPOINTMENT_TYPES.ELECTED;
 
-      return {
-        ...previous,
+    setForm((previous) => ({
+      ...previous,
 
-        position,
+      position,
 
-        category:
-          configuration.category ||
-          previous.category,
+      category: configuration.category || previous.category,
+      level: configuration.level || "",
+      department: configuration.department || "",
+      scope: configuration.scope ?? "",
 
-        level:
-          configuration.level ||
-          "",
+      appointmentType,
 
-        department:
-          configuration.department ||
-          "",
+      reportVisibility:
+        configuration.reportVisibility ||
+        (patron
+          ? REPORT_VISIBILITY.REGIONAL
+          : REPORT_VISIBILITY.PRIVATE),
 
-        scope:
-          configuration.scope ?? "",
+      portfolioKey: "",
 
-        appointmentType,
+      member: patron ? "" : previous.member,
 
-        /*
-         * If the office configuration itself
-         * is Elected, apply the standard term.
-         */
-        termStart:
-          isPositionElected
-            ? ELECTED_TERM_START
+      county: patron ? "" : previous.county,
+      constituency: patron ? "" : previous.constituency,
+      ward: patron ? "" : previous.ward,
+
+      termStart: elected
+        ? ELECTED_TERM_START
+        : previous.termStart || getLocalDateString(),
+
+      termEnd: elected
+        ? ELECTED_TERM_END
+        : "",
+    }));
+
+    if (patron) {
+      setSelectedMember(null);
+      setMemberSearch("");
+      setMembers([]);
+    }
+
+    setError("");
+  };
+
+  /* ==========================================================
+     APPOINTMENT CHANGE
+  ========================================================== */
+
+  const handleAppointmentChange = (appointmentType) => {
+    setForm((previous) => ({
+      ...previous,
+
+      appointmentType,
+
+      termStart:
+        appointmentType === APPOINTMENT_TYPES.ELECTED
+          ? ELECTED_TERM_START
+          : previous.appointmentType === APPOINTMENT_TYPES.ELECTED
+            ? getLocalDateString()
             : previous.termStart,
 
-        termEnd:
-          isPositionElected
-            ? ELECTED_TERM_END
+      termEnd:
+        appointmentType === APPOINTMENT_TYPES.ELECTED
+          ? ELECTED_TERM_END
+          : previous.appointmentType === APPOINTMENT_TYPES.ELECTED
+            ? ""
             : previous.termEnd,
-      };
-    });
+    }));
+  };
+
+  /* ==========================================================
+     REPORT VISIBILITY CHANGE
+  ========================================================== */
+
+  const handleReportVisibilityChange = (reportVisibility) => {
+    setForm((previous) => ({
+      ...previous,
+
+      reportVisibility,
+
+      county:
+        reportVisibility === REPORT_VISIBILITY.REGIONAL ||
+        reportVisibility === REPORT_VISIBILITY.PRIVATE
+          ? ""
+          : previous.county,
+
+      constituency:
+        reportVisibility === REPORT_VISIBILITY.CONSTITUENCY ||
+        reportVisibility === REPORT_VISIBILITY.WARD
+          ? previous.constituency
+          : "",
+
+      ward:
+        reportVisibility === REPORT_VISIBILITY.WARD
+          ? previous.ward
+          : "",
+    }));
   };
 
   /* ==========================================================
      MEMBER SELECTION
   ========================================================== */
 
-  const handleSelectMember = (
-    member
-  ) => {
+  const handleSelectMember = (member) => {
     setSelectedMember(member);
 
     setForm((previous) => ({
       ...previous,
 
-      member: member._id,
+      member: getMemberId(member),
 
-      county:
-        member.county || "",
-
+      county: member.county || previous.county,
       constituency:
-        member.constituency || "",
-
-      ward:
-        member.ward || "",
+        member.constituency || previous.constituency,
+      ward: member.ward || previous.ward,
     }));
 
-    setMemberSearch(
-      getMemberName(member)
-    );
-
+    setMemberSearch(getMemberName(member));
     setMembers([]);
     setError("");
   };
 
-  const handleRemoveSelectedMember =
-    () => {
+  const handleRemoveSelectedMember = () => {
+    setSelectedMember(null);
+
+    setForm((previous) => ({
+      ...previous,
+      member: "",
+    }));
+
+    setMemberSearch("");
+    setMembers([]);
+  };
+
+  const handleMemberSearchChange = (value) => {
+    setMemberSearch(value);
+
+    if (form.member) {
       setSelectedMember(null);
 
       setForm((previous) => ({
         ...previous,
-
         member: "",
-        county: "",
-        constituency: "",
-        ward: "",
       }));
-
-      setMemberSearch("");
-      setMembers([]);
-    };
+    }
+  };
 
   /* ==========================================================
      VALIDATION
@@ -898,32 +898,12 @@ export default function LeaderFormModal({
       return "Please select a leadership office.";
     }
 
-    if (
-      !isPatron &&
-      !form.department
-    ) {
+    if (!isPatron && !form.department) {
       return "Please select a department.";
     }
 
-    if (
-      !isPatron &&
-      !form.appointmentType
-    ) {
+    if (!form.appointmentType) {
       return "Please select an appointment type.";
-    }
-
-    if (
-      !isPatron &&
-      !form.member
-    ) {
-      return "Please search for and select a member.";
-    }
-
-    if (
-      isPatron &&
-      !form.patron.fullName.trim()
-    ) {
-      return "Patron full name is required.";
     }
 
     if (!form.termStart) {
@@ -932,10 +912,37 @@ export default function LeaderFormModal({
 
     if (
       form.termEnd &&
-      new Date(form.termEnd) <
-        new Date(form.termStart)
+      new Date(form.termEnd) < new Date(form.termStart)
     ) {
       return "Term end date cannot be before the term start date.";
+    }
+
+    if (isPatron) {
+      if (!form.patron.fullName.trim()) {
+        return "Patron full name is required.";
+      }
+
+      return null;
+    }
+
+    if (!form.member) {
+      return "Please search for and select a member.";
+    }
+
+    if (requiresPortfolio && !form.portfolioKey) {
+      return "Please select a ministry portfolio for this Cabinet Secretary.";
+    }
+
+    if (requiresCounty && !form.county) {
+      return "County is required for this reporting level.";
+    }
+
+    if (requiresConstituency && !form.constituency.trim()) {
+      return "Constituency is required for this reporting level.";
+    }
+
+    if (requiresWard && !form.ward.trim()) {
+      return "Ward is required for ward-level reporting.";
     }
 
     return null;
@@ -945,13 +952,10 @@ export default function LeaderFormModal({
      SUBMIT
   ========================================================== */
 
-  const handleSubmit = async (
-    event
-  ) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const validationError =
-      validate();
+    const validationError = validate();
 
     if (validationError) {
       setError(validationError);
@@ -959,106 +963,95 @@ export default function LeaderFormModal({
     }
 
     setError("");
+    setSaving(true);
 
-    /*
-     * Enforce the standard elected term
-     * again at submission level.
-     *
-     * This guarantees that even if the
-     * form state is changed unexpectedly,
-     * elected leaders are submitted with
-     * the correct term.
-     */
-    const finalTermStart =
-      isElected
+    try {
+      const finalTermStart = isElected
         ? ELECTED_TERM_START
         : form.termStart;
 
-    const finalTermEnd =
-      isElected
+      const finalTermEnd = isElected
         ? ELECTED_TERM_END
         : form.termEnd || null;
 
-    const payload = {
-      category:
-        form.category,
+      const portfolio = requiresPortfolio
+        ? REGIONAL_CABINET_PORTFOLIOS.find(
+            (item) => item.key === form.portfolioKey
+          )
+        : null;
 
-      level:
-        form.level || null,
+      const payload = {
+        category: form.category,
+        level: isPatron ? null : form.level,
+        position: form.position,
 
-      position:
-        form.position,
+        portfolioKey: portfolio?.key || null,
 
-      department:
-        form.department || null,
+        department: isPatron ? null : form.department || null,
+        scope: isPatron ? null : form.scope || null,
 
-      scope:
-        form.scope || null,
+        appointmentType: form.appointmentType,
 
-      appointmentType:
-        form.appointmentType,
+        reportVisibility: isPatron
+          ? REPORT_VISIBILITY.REGIONAL
+          : form.reportVisibility,
 
-      displayOrder:
-        Number(form.displayOrder),
+        displayOrder: Math.max(
+          1,
+          Number(form.displayOrder) || 999
+        ),
 
-      featured:
-        Boolean(form.featured),
+        featured: Boolean(form.featured),
 
-      termStart:
-        finalTermStart,
+        termStart: finalTermStart,
+        termEnd: finalTermEnd,
 
-      termEnd:
-        finalTermEnd,
+        verified: Boolean(form.verified),
+        remarks: form.remarks.trim(),
 
-      verified:
-        Boolean(form.verified),
+        ...(isPatron
+          ? {
+              member: null,
 
-      remarks:
-        form.remarks.trim(),
+              county: null,
+              constituency: null,
+              ward: null,
 
-      ...(isPatron
-        ? {
-            member: null,
+              patron: {
+                fullName: form.patron.fullName.trim(),
+                title: form.patron.title.trim(),
+                organization: form.patron.organization.trim(),
+                photo: form.patron.photo.trim(),
+                bio: form.patron.bio.trim(),
+              },
+            }
+          : {
+              member: form.member,
 
-            patron: {
-              fullName:
-                form.patron.fullName.trim(),
+              county: form.county || null,
+              constituency: form.constituency.trim() || null,
+              ward: form.ward.trim() || null,
 
-              title:
-                form.patron.title.trim(),
+              patron: {
+                fullName: "",
+                title: "",
+                organization: "",
+                photo: "",
+                bio: "",
+              },
+            }),
+      };
 
-              organization:
-                form.patron.organization.trim(),
-
-              photo:
-                form.patron.photo.trim(),
-
-              bio:
-                form.patron.bio.trim(),
-            },
-          }
-        : {
-            member:
-              form.member,
-
-            county:
-              selectedMember?.county ||
-              form.county ||
-              null,
-
-            constituency:
-              selectedMember?.constituency ||
-              form.constituency ||
-              null,
-
-            ward:
-              selectedMember?.ward ||
-              form.ward ||
-              null,
-          }),
-    };
-
-    await onSave(payload);
+      await onSave(payload);
+    } catch (submitError) {
+      setError(
+        submitError?.response?.data?.message ||
+          submitError?.message ||
+          "Failed to save the leadership record."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   /* ==========================================================
@@ -1066,16 +1059,11 @@ export default function LeaderFormModal({
   ========================================================== */
 
   const handleClose = () => {
-    if (loading) {
-      return;
-    }
+    if (isSaving) return;
 
     setForm({
       ...DEFAULT_FORM,
-
-      patron: {
-        ...DEFAULT_FORM.patron,
-      },
+      patron: { ...DEFAULT_FORM.patron },
     });
 
     setSelectedMember(null);
@@ -1083,12 +1071,10 @@ export default function LeaderFormModal({
     setMembers([]);
     setError("");
 
-    onClose();
+    onClose?.();
   };
 
-  if (!open) {
-    return null;
-  }
+  if (!open) return null;
 
   /* ==========================================================
      RENDER
@@ -1099,10 +1085,7 @@ export default function LeaderFormModal({
       className="leader-form-modal-overlay"
       role="presentation"
       onMouseDown={(event) => {
-        if (
-          event.target ===
-          event.currentTarget
-        ) {
+        if (event.target === event.currentTarget) {
           handleClose();
         }
       }}
@@ -1113,10 +1096,6 @@ export default function LeaderFormModal({
         aria-modal="true"
         aria-labelledby="leader-form-title"
       >
-        {/* ==================================================
-            HEADER
-        ================================================== */}
-
         <header className="leader-form-modal-header">
           <div className="leader-form-modal-heading">
             <div className="leader-form-modal-heading-icon">
@@ -1124,9 +1103,7 @@ export default function LeaderFormModal({
             </div>
 
             <div>
-              <span>
-                Leadership administration
-              </span>
+              <span>Leadership administration</span>
 
               <h2 id="leader-form-title">
                 {leader
@@ -1135,9 +1112,8 @@ export default function LeaderFormModal({
               </h2>
 
               <p>
-                Assign an existing
-                member to an official
-                JVP leadership office.
+                Assign a member to an official JVP leadership
+                office or register the organization's patron.
               </p>
             </div>
           </div>
@@ -1146,29 +1122,20 @@ export default function LeaderFormModal({
             type="button"
             className="leader-form-modal-close"
             onClick={handleClose}
-            disabled={loading}
+            disabled={isSaving}
             aria-label="Close leadership form"
           >
             <X size={21} />
           </button>
         </header>
 
-        {/* ==================================================
-            ERROR
-        ================================================== */}
-
         {error && (
-          <div
-            className="leader-form-alert"
-            role="alert"
-          >
+          <div className="leader-form-alert" role="alert">
             <span>{error}</span>
 
             <button
               type="button"
-              onClick={() =>
-                setError("")
-              }
+              onClick={() => setError("")}
               aria-label="Close error"
             >
               <X size={17} />
@@ -1176,15 +1143,9 @@ export default function LeaderFormModal({
           </div>
         )}
 
-        <form
-          className="leader-form"
-          onSubmit={handleSubmit}
-        >
+        <form className="leader-form" onSubmit={handleSubmit}>
           <div className="leader-form-modal-body">
-
-            {/* =================================================
-                SECTION 01
-            ================================================= */}
+            {/* SECTION 01: CLASSIFICATION */}
 
             <section className="leader-form-section">
               <div className="leader-form-section-heading">
@@ -1194,329 +1155,226 @@ export default function LeaderFormModal({
 
                 <div>
                   <small>Section 01</small>
-
-                  <h3>
-                    Leadership Classification
-                  </h3>
-
+                  <h3>Leadership Classification</h3>
                   <p>
-                    Select the leadership
-                    structure and official
-                    office.
+                    Select the leadership category, structure
+                    and office.
                   </p>
                 </div>
               </div>
 
               <div className="leader-form-grid">
-
-                {/* CATEGORY */}
-
                 <div className="leader-form-group">
                   <label htmlFor="leader-category">
-                    Leadership Category
-                    <span>*</span>
+                    Leadership Category <span>*</span>
                   </label>
 
                   <select
                     id="leader-category"
                     value={form.category}
                     onChange={(event) =>
-                      handleCategoryChange(
-                        event.target.value
-                      )
+                      handleCategoryChange(event.target.value)
                     }
-                    disabled={loading}
+                    disabled={isSaving}
+                    required
                   >
-                    <option value="">
-                      Select category
-                    </option>
+                    <option value="">Select category</option>
 
-                    {CATEGORIES.map(
-                      (category) => (
-                        <option
-                          key={
-                            category.value
-                          }
-                          value={
-                            category.value
-                          }
-                        >
-                          {category.label}
-                        </option>
-                      )
-                    )}
+                    {CATEGORIES.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
-
-                {/* LEVEL */}
 
                 {!isPatron && (
                   <div className="leader-form-group">
                     <label htmlFor="leader-level">
-                      Leadership Level
-                      <span>*</span>
+                      Leadership Level <span>*</span>
                     </label>
 
                     <select
                       id="leader-level"
                       value={form.level}
                       onChange={(event) =>
-                        handleLevelChange(
-                          event.target.value
-                        )
+                        handleLevelChange(event.target.value)
                       }
-                      disabled={loading}
+                      disabled={isSaving || !form.category}
+                      required
                     >
-                      <option value="">
-                        Select leadership level
-                      </option>
+                      <option value="">Select level</option>
 
-                      {LEADERSHIP_LEVEL_OPTIONS
-                        .filter(
-                          (level) => {
-                            if (
-                              !form.category
-                            ) {
-                              return true;
-                            }
-
-                            return POSITIONS.some(
-                              (position) =>
-                                position.configuration
-                                  ?.level ===
-                                  level.value &&
-                                position.configuration
-                                  ?.category ===
-                                  form.category
-                            );
-                          }
-                        )
-                        .map((level) => (
-                          <option
-                            key={
-                              level.value
-                            }
-                            value={
-                              level.value
-                            }
-                          >
-                            {level.label}
-                          </option>
-                        ))}
+                      {filteredLevels.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 )}
 
-                {/* POSITION */}
-
                 <div className="leader-form-group">
                   <label htmlFor="leader-position">
-                    Leadership Office
-                    <span>*</span>
+                    Leadership Office <span>*</span>
                   </label>
 
                   <select
                     id="leader-position"
                     value={form.position}
                     onChange={(event) =>
-                      handlePositionChange(
-                        event.target.value
-                      )
+                      handlePositionChange(event.target.value)
                     }
                     disabled={
-                      loading ||
-                      (!isPatron &&
-                        !form.level)
+                      isSaving ||
+                      (!isPatron && (!form.category || !form.level))
                     }
+                    required
                   >
                     <option value="">
-                      {isPatron
-                        ? "Select leadership office"
-                        : form.level
-                          ? "Select leadership office"
-                          : "Select leadership level first"}
+                      {!isPatron && !form.level
+                        ? "Select level first"
+                        : "Select office"}
                     </option>
 
-                    {filteredPositions.map(
-                      (position) => (
-                        <option
-                          key={
-                            position.value
-                          }
-                          value={
-                            position.value
-                          }
-                        >
-                          {position.label}
-                        </option>
-                      )
-                    )}
+                    {filteredPositions.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
                   </select>
+                </div>
 
-                  {!isPatron &&
-                    !form.level && (
+                {!isPatron && (
+                  <>
+                    <div className="leader-form-group">
+                      <label htmlFor="leader-department">
+                        Department <span>*</span>
+                      </label>
+
+                      <select
+                        id="leader-department"
+                        value={form.department}
+                        onChange={(event) =>
+                          updateField("department", event.target.value)
+                        }
+                        disabled={isSaving}
+                        required
+                      >
+                        <option value="">Select department</option>
+
+                        {DEPARTMENTS.map((item) => (
+                          <option key={item.value} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="leader-form-group">
+                      <label htmlFor="leader-scope">
+                        Structural Scope
+                      </label>
+
+                      <select
+                        id="leader-scope"
+                        value={form.scope}
+                        onChange={(event) =>
+                          updateField("scope", event.target.value)
+                        }
+                        disabled={isSaving}
+                      >
+                        <option value="">No structural scope</option>
+
+                        {SCOPES.map((item) => (
+                          <option key={item.value} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
+                      </select>
+
+                      {form.level ===
+                        LEADERSHIP_LEVELS.COUNCIL_OF_GOVERNORS && (
+                        <small className="leader-form-help">
+                          Council of Governors records do not use a
+                          structural scope.
+                        </small>
+                      )}
+                    </div>
+
+                    <div className="leader-form-group">
+                      <label htmlFor="leader-appointment">
+                        Appointment Type <span>*</span>
+                      </label>
+
+                      <select
+                        id="leader-appointment"
+                        value={form.appointmentType}
+                        onChange={(event) =>
+                          handleAppointmentChange(event.target.value)
+                        }
+                        disabled={isSaving}
+                        required
+                      >
+                        <option value="">Select appointment type</option>
+
+                        {APPOINTMENT_TYPE_OPTIONS.map((item) => (
+                          <option key={item.value} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
+                      </select>
+
                       <small className="leader-form-help">
-                        Select a leadership
-                        level first to view
-                        its offices.
+                        The selected office has a default appointment
+                        type. Confirm it against the applicable
+                        appointment or election decision.
                       </small>
-                    )}
-
-                  {!isPatron &&
-                    form.level &&
-                    filteredPositions.length ===
-                      0 && (
-                      <small className="leader-form-help leader-form-help--warning">
-                        No offices are
-                        configured for this
-                        category and level.
-                      </small>
-                    )}
-                </div>
-
-                {/* DEPARTMENT */}
-
-                <div className="leader-form-group">
-                  <label htmlFor="leader-department">
-                    Department
-                    {!isPatron && (
-                      <span>*</span>
-                    )}
-                  </label>
-
-                  <select
-                    id="leader-department"
-                    value={form.department}
-                    onChange={(event) =>
-                      updateField(
-                        "department",
-                        event.target.value
-                      )
-                    }
-                    disabled={loading}
-                  >
-                    <option value="">
-                      Select department
-                    </option>
-
-                    {DEPARTMENTS.map(
-                      (department) => (
-                        <option
-                          key={
-                            department.value
-                          }
-                          value={
-                            department.value
-                          }
-                        >
-                          {department.label}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
-
-                {/* SCOPE */}
-
-                <div className="leader-form-group">
-                  <label htmlFor="leader-scope">
-                    Leadership Scope
-                  </label>
-
-                  <select
-                    id="leader-scope"
-                    value={form.scope}
-                    onChange={(event) =>
-                      updateField(
-                        "scope",
-                        event.target.value
-                      )
-                    }
-                    disabled={
-                      loading ||
-                      isPatron
-                    }
-                  >
-                    <option value="">
-                      {isPatron
-                        ? "Not applicable"
-                        : "Select scope"}
-                    </option>
-
-                    {SCOPES.map(
-                      (scope) => (
-                        <option
-                          key={
-                            scope.value
-                          }
-                          value={
-                            scope.value
-                          }
-                        >
-                          {scope.label}
-                        </option>
-                      )
-                    )}
-                  </select>
-
-                  {!isPatron &&
-                    form.position ===
-                      "council_governor" && (
-                      <small className="leader-form-help">
-                        Council of Governors
-                        does not use a
-                        structural scope.
-                      </small>
-                    )}
-                </div>
-
-                {/* APPOINTMENT */}
-
-                <div className="leader-form-group">
-                  <label htmlFor="leader-appointment">
-                    Appointment Type
-                    {!isPatron && (
-                      <span>*</span>
-                    )}
-                  </label>
-
-                  <select
-                    id="leader-appointment"
-                    value={
-                      form.appointmentType
-                    }
-                    onChange={(event) =>
-                      updateField(
-                        "appointmentType",
-                        event.target.value
-                      )
-                    }
-                    disabled={loading}
-                  >
-                    <option value="">
-                      Select appointment type
-                    </option>
-
-                    {APPOINTMENT_TYPE_OPTIONS.map(
-                      (type) => (
-                        <option
-                          key={type.value}
-                          value={type.value}
-                        >
-                          {type.label}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
+                    </div>
+                  </>
+                )}
               </div>
+
+              {/* REGIONAL CABINET PORTFOLIO */}
+
+              {requiresPortfolio && (
+                <div className="leader-form-group leader-form-group--full">
+                  <label htmlFor="leader-portfolio">
+                    Cabinet Secretary Ministry Docket <span>*</span>
+                  </label>
+
+                  <select
+                    id="leader-portfolio"
+                    value={form.portfolioKey}
+                    onChange={(event) =>
+                      updateField("portfolioKey", event.target.value)
+                    }
+                    disabled={isSaving}
+                    required
+                  >
+                    <option value="">Select ministry docket</option>
+
+                    {REGIONAL_CABINET_PORTFOLIOS.map((portfolio) => (
+                      <option key={portfolio.key} value={portfolio.key}>
+                        {portfolio.title}
+                      </option>
+                    ))}
+                  </select>
+
+                  {form.portfolioKey && (
+                    <small className="leader-form-help">
+                      {REGIONAL_CABINET_PORTFOLIOS.find(
+                        (item) => item.key === form.portfolioKey
+                      )?.description}
+                    </small>
+                  )}
+                </div>
+              )}
             </section>
 
-            {/* =================================================
-                MEMBER ASSIGNMENT
-            ================================================= */}
+            {/* SECTION 02: MEMBER OR PATRON */}
 
-            {!isPatron && (
+            {!isPatron ? (
               <section className="leader-form-section">
                 <div className="leader-form-section-heading">
                   <span className="leader-form-section-icon">
@@ -1525,24 +1383,17 @@ export default function LeaderFormModal({
 
                   <div>
                     <small>Section 02</small>
-
-                    <h3>
-                      Member Assignment
-                    </h3>
-
+                    <h3>Member Assignment</h3>
                     <p>
-                      Search for an active
-                      JVP member and assign
-                      the selected leadership
-                      office.
+                      Search for and select the JVP member who will
+                      occupy this office.
                     </p>
                   </div>
                 </div>
 
                 <div className="leader-form-group leader-form-group--full">
                   <label htmlFor="leader-member-search">
-                    Search and Select Member
-                    <span>*</span>
+                    Search Member <span>*</span>
                   </label>
 
                   <div className="member-search-wrapper">
@@ -1556,28 +1407,10 @@ export default function LeaderFormModal({
                       type="search"
                       placeholder="Search by name, phone, National ID or member number..."
                       value={memberSearch}
-                      onChange={(event) => {
-                        const value =
-                          event.target.value;
-
-                        setMemberSearch(
-                          value
-                        );
-
-                        if (form.member) {
-                          setSelectedMember(
-                            null
-                          );
-
-                          setForm(
-                            (previous) => ({
-                              ...previous,
-                              member: "",
-                            })
-                          );
-                        }
-                      }}
-                      disabled={loading}
+                      onChange={(event) =>
+                        handleMemberSearchChange(event.target.value)
+                      }
+                      disabled={isSaving}
                       autoComplete="off"
                     />
 
@@ -1588,70 +1421,52 @@ export default function LeaderFormModal({
                     )}
 
                     {!membersLoading &&
-                      memberSearch.trim() &&
+                      memberSearch.trim().length >= 2 &&
                       !form.member &&
                       members.length > 0 && (
                         <div className="member-search-results">
-                          {members.map(
-                            (member) => (
-                              <button
-                                type="button"
-                                key={
-                                  member._id
-                                }
-                                className="member-search-result"
-                                onClick={() =>
-                                  handleSelectMember(
-                                    member
-                                  )
-                                }
-                              >
-                                <span className="member-search-result-avatar">
-                                  {member.profilePhoto ? (
-                                    <img
-                                      src={
-                                        member.profilePhoto
-                                      }
-                                      alt=""
-                                    />
-                                  ) : (
-                                    <UserRound
-                                      size={20}
-                                    />
-                                  )}
+                          {members.map((member) => (
+                            <button
+                              type="button"
+                              key={getMemberId(member)}
+                              className="member-search-result"
+                              onClick={() => handleSelectMember(member)}
+                            >
+                              <span className="member-search-result-avatar">
+                                {member.profilePhoto ? (
+                                  <img
+                                    src={member.profilePhoto}
+                                    alt=""
+                                  />
+                                ) : (
+                                  <UserRound size={20} />
+                                )}
+                              </span>
+
+                              <span className="member-search-result-info">
+                                <strong>{getMemberName(member)}</strong>
+
+                                <span>
+                                  {member.memberNumber ||
+                                    "No member number"}
                                 </span>
 
-                                <span className="member-search-result-info">
-                                  <strong>
-                                    {getMemberName(
-                                      member
-                                    )}
-                                  </strong>
-
-                                  <span>
-                                    {member.memberNumber ||
-                                      "No member number"}
-                                  </span>
-
-                                  <small>
-                                    {getMemberLocation(
-                                      member
-                                    ) ||
-                                      "Location not available"}
-                                  </small>
-                                </span>
-                              </button>
-                            )
-                          )}
+                                <small>
+                                  {getMemberLocation(member) ||
+                                    "Location not available"}
+                                </small>
+                              </span>
+                            </button>
+                          ))}
                         </div>
                       )}
 
                     {!membersLoading &&
-                      memberSearch.trim() &&
+                      memberSearch.trim().length >= 2 &&
                       !form.member &&
                       members.length === 0 && (
                         <div className="member-search-empty">
-                          No active members found.
+                          No matching members found.
                         </div>
                       )}
                   </div>
@@ -1662,12 +1477,8 @@ export default function LeaderFormModal({
                     <div className="selected-member-avatar">
                       {selectedMember.profilePhoto ? (
                         <img
-                          src={
-                            selectedMember.profilePhoto
-                          }
-                          alt={getMemberName(
-                            selectedMember
-                          )}
+                          src={selectedMember.profilePhoto}
+                          alt={getMemberName(selectedMember)}
                         />
                       ) : (
                         <UserRound size={30} />
@@ -1679,11 +1490,7 @@ export default function LeaderFormModal({
                         Selected member
                       </span>
 
-                      <strong>
-                        {getMemberName(
-                          selectedMember
-                        )}
-                      </strong>
+                      <strong>{getMemberName(selectedMember)}</strong>
 
                       <span className="selected-member-number">
                         {selectedMember.memberNumber ||
@@ -1691,9 +1498,7 @@ export default function LeaderFormModal({
                       </span>
 
                       <small>
-                        {getMemberLocation(
-                          selectedMember
-                        ) ||
+                        {getMemberLocation(selectedMember) ||
                           "Location not available"}
                       </small>
                     </div>
@@ -1706,10 +1511,8 @@ export default function LeaderFormModal({
                     <button
                       type="button"
                       className="selected-member-remove"
-                      onClick={
-                        handleRemoveSelectedMember
-                      }
-                      disabled={loading}
+                      onClick={handleRemoveSelectedMember}
+                      disabled={isSaving}
                       aria-label="Remove selected member"
                     >
                       <X size={18} />
@@ -1717,13 +1520,7 @@ export default function LeaderFormModal({
                   </article>
                 )}
               </section>
-            )}
-
-            {/* =================================================
-                PATRON
-            ================================================= */}
-
-            {isPatron && (
+            ) : (
               <section className="leader-form-section">
                 <div className="leader-form-section-heading">
                   <span className="leader-form-section-icon">
@@ -1732,15 +1529,10 @@ export default function LeaderFormModal({
 
                   <div>
                     <small>Section 02</small>
-
-                    <h3>
-                      Patron Information
-                    </h3>
-
+                    <h3>Patron Information</h3>
                     <p>
-                      Record the patron's
-                      official details and
-                      organizational profile.
+                      Patronage is separate from the five structural
+                      leadership levels.
                     </p>
                   </div>
                 </div>
@@ -1748,45 +1540,32 @@ export default function LeaderFormModal({
                 <div className="leader-form-grid">
                   <div className="leader-form-group">
                     <label htmlFor="patron-name">
-                      Full Name
-                      <span>*</span>
+                      Full Name <span>*</span>
                     </label>
 
                     <input
                       id="patron-name"
                       type="text"
-                      value={
-                        form.patron.fullName
-                      }
+                      value={form.patron.fullName}
                       onChange={(event) =>
-                        updatePatronField(
-                          "fullName",
-                          event.target.value
-                        )
+                        updatePatronField("fullName", event.target.value)
                       }
-                      disabled={loading}
-                      placeholder="Enter full name"
+                      disabled={isSaving}
+                      required
                     />
                   </div>
 
                   <div className="leader-form-group">
-                    <label htmlFor="patron-title">
-                      Official Title
-                    </label>
+                    <label htmlFor="patron-title">Official Title</label>
 
                     <input
                       id="patron-title"
                       type="text"
-                      value={
-                        form.patron.title
-                      }
+                      value={form.patron.title}
                       onChange={(event) =>
-                        updatePatronField(
-                          "title",
-                          event.target.value
-                        )
+                        updatePatronField("title", event.target.value)
                       }
-                      disabled={loading}
+                      disabled={isSaving}
                       placeholder="e.g. Governor"
                     />
                   </div>
@@ -1799,70 +1578,171 @@ export default function LeaderFormModal({
                     <input
                       id="patron-organization"
                       type="text"
-                      value={
-                        form.patron.organization
-                      }
+                      value={form.patron.organization}
                       onChange={(event) =>
                         updatePatronField(
                           "organization",
                           event.target.value
                         )
                       }
-                      disabled={loading}
-                      placeholder="Enter organization"
+                      disabled={isSaving}
                     />
                   </div>
 
                   <div className="leader-form-group">
-                    <label htmlFor="patron-photo">
-                      Photo URL
-                    </label>
+                    <label htmlFor="patron-photo">Photo URL</label>
 
                     <input
                       id="patron-photo"
                       type="url"
-                      value={
-                        form.patron.photo
-                      }
+                      value={form.patron.photo}
                       onChange={(event) =>
-                        updatePatronField(
-                          "photo",
-                          event.target.value
-                        )
+                        updatePatronField("photo", event.target.value)
                       }
-                      disabled={loading}
+                      disabled={isSaving}
                       placeholder="https://..."
                     />
                   </div>
 
                   <div className="leader-form-group leader-form-group--full">
-                    <label htmlFor="patron-bio">
-                      Biography
-                    </label>
+                    <label htmlFor="patron-bio">Biography</label>
 
                     <textarea
                       id="patron-bio"
                       rows="5"
-                      value={
-                        form.patron.bio
-                      }
+                      value={form.patron.bio}
                       onChange={(event) =>
-                        updatePatronField(
-                          "bio",
-                          event.target.value
-                        )
+                        updatePatronField("bio", event.target.value)
                       }
-                      disabled={loading}
-                      placeholder="Enter a brief professional biography..."
+                      disabled={isSaving}
+                      maxLength={3000}
+                      placeholder="Enter a brief biography..."
                     />
                   </div>
                 </div>
               </section>
             )}
 
-            {/* =================================================
-                TERM
-            ================================================= */}
+            {/* SECTION 03: GEOGRAPHY AND VISIBILITY */}
+
+            {!isPatron && (
+              <section className="leader-form-section">
+                <div className="leader-form-section-heading">
+                  <span className="leader-form-section-icon">
+                    <UsersRound size={20} />
+                  </span>
+
+                  <div>
+                    <small>Section 03</small>
+                    <h3>Geography & Report Visibility</h3>
+                    <p>
+                      Configure the reporting level and the
+                      geographical area represented by this leader.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="leader-form-grid">
+                  <div className="leader-form-group">
+                    <label htmlFor="leader-report-visibility">
+                      Report Visibility <span>*</span>
+                    </label>
+
+                    <select
+                      id="leader-report-visibility"
+                      value={form.reportVisibility}
+                      onChange={(event) =>
+                        handleReportVisibilityChange(event.target.value)
+                      }
+                      disabled={isSaving}
+                      required
+                    >
+                      {REPORT_VISIBILITY_OPTIONS.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {requiresCounty && (
+                    <div className="leader-form-group">
+                      <label htmlFor="leader-county">
+                        County <span>*</span>
+                      </label>
+
+                      <select
+                        id="leader-county"
+                        value={form.county}
+                        onChange={(event) =>
+                          setForm((previous) => ({
+                            ...previous,
+                            county: event.target.value,
+                          }))
+                        }
+                        disabled={isSaving}
+                        required
+                      >
+                        <option value="">Select county</option>
+
+                        {COAST_COUNTIES.map((county) => (
+                          <option key={county} value={county}>
+                            {county}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {requiresConstituency && (
+                    <div className="leader-form-group">
+                      <label htmlFor="leader-constituency">
+                        Constituency <span>*</span>
+                      </label>
+
+                      <input
+                        id="leader-constituency"
+                        type="text"
+                        value={form.constituency}
+                        onChange={(event) =>
+                          updateField("constituency", event.target.value)
+                        }
+                        disabled={isSaving}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {requiresWard && (
+                    <div className="leader-form-group">
+                      <label htmlFor="leader-ward">
+                        Ward <span>*</span>
+                      </label>
+
+                      <input
+                        id="leader-ward"
+                        type="text"
+                        value={form.ward}
+                        onChange={(event) =>
+                          updateField("ward", event.target.value)
+                        }
+                        disabled={isSaving}
+                        required
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <small className="leader-form-help">
+                  The report visibility setting controls which
+                  geographical fields the model requires. Confirm
+                  that the selected level is appropriate for the
+                  office before saving.
+                </small>
+              </section>
+            )}
+
+            {/* SECTION 04: TERM */}
 
             <section className="leader-form-section">
               <div className="leader-form-section-heading">
@@ -1871,118 +1751,73 @@ export default function LeaderFormModal({
                 </span>
 
                 <div>
-                  <small>
-                    Section 03
-                  </small>
-
-                  <h3>
-                    Leadership Term
-                  </h3>
-
+                  <small>Section 04</small>
+                  <h3>Leadership Term & Display</h3>
                   <p>
-                    Set the term period,
-                    display priority and
-                    verification status.
+                    Set the term dates, display order and verification
+                    status.
                   </p>
                 </div>
               </div>
 
               <div className="leader-form-grid leader-form-grid--three">
-
-                {/* TERM START */}
-
                 <div className="leader-form-group">
                   <label htmlFor="term-start">
-                    Term Start
-                    <span>*</span>
+                    Term Start <span>*</span>
                   </label>
 
                   <input
                     id="term-start"
                     type="date"
-                    value={
-                      form.termStart
-                    }
+                    value={form.termStart}
                     onChange={(event) =>
-                      updateField(
-                        "termStart",
-                        event.target.value
-                      )
+                      updateField("termStart", event.target.value)
                     }
-                    disabled={
-                      loading ||
-                      isElected
-                    }
-                    readOnly={
-                      isElected
-                    }
+                    disabled={isSaving || isElected}
+                    readOnly={isElected}
+                    required
                   />
 
                   {isElected && (
                     <small className="leader-form-help">
-                      Standard elected term:
-                      22 December 2025.
+                      Standard elected term: 22 December 2025.
                     </small>
                   )}
                 </div>
 
-                {/* TERM END */}
-
                 <div className="leader-form-group">
-                  <label htmlFor="term-end">
-                    Term End
-                  </label>
+                  <label htmlFor="term-end">Term End</label>
 
                   <input
                     id="term-end"
                     type="date"
-                    value={
-                      form.termEnd
-                    }
+                    value={form.termEnd}
                     onChange={(event) =>
-                      updateField(
-                        "termEnd",
-                        event.target.value
-                      )
+                      updateField("termEnd", event.target.value)
                     }
-                    disabled={
-                      loading ||
-                      isElected
-                    }
-                    readOnly={
-                      isElected
-                    }
+                    disabled={isSaving || isElected}
+                    readOnly={isElected}
                   />
 
                   {isElected && (
                     <small className="leader-form-help">
-                      Standard elected term:
-                      22 December 2028.
+                      Standard elected term: 22 December 2028.
                     </small>
                   )}
                 </div>
 
-                {/* DISPLAY ORDER */}
-
                 <div className="leader-form-group">
-                  <label htmlFor="display-order">
-                    Display Order
-                  </label>
+                  <label htmlFor="display-order">Display Order</label>
 
                   <input
                     id="display-order"
                     type="number"
                     min="1"
-                    value={
-                      form.displayOrder
-                    }
+                    value={form.displayOrder}
                     onChange={(event) =>
-                      updateField(
-                        "displayOrder",
-                        event.target.value
-                      )
+                      updateField("displayOrder", event.target.value)
                     }
-                    disabled={loading}
+                    disabled={isSaving}
                   />
 
                   <small className="leader-form-help">
@@ -1995,58 +1830,38 @@ export default function LeaderFormModal({
                 <label className="leader-form-checkbox">
                   <input
                     type="checkbox"
-                    checked={
-                      form.featured
-                    }
+                    checked={form.featured}
                     onChange={(event) =>
-                      updateField(
-                        "featured",
-                        event.target.checked
-                      )
+                      updateField("featured", event.target.checked)
                     }
-                    disabled={loading}
+                    disabled={isSaving}
                   />
 
                   <span>
-                    <strong>
-                      Featured Leader
-                    </strong>
-
-                    Display this leader
-                    prominently.
+                    <strong>Featured Leader</strong>
+                    Display this leader prominently.
                   </span>
                 </label>
 
                 <label className="leader-form-checkbox">
                   <input
                     type="checkbox"
-                    checked={
-                      form.verified
-                    }
+                    checked={form.verified}
                     onChange={(event) =>
-                      updateField(
-                        "verified",
-                        event.target.checked
-                      )
+                      updateField("verified", event.target.checked)
                     }
-                    disabled={loading}
+                    disabled={isSaving}
                   />
 
                   <span>
-                    <strong>
-                      Verified Assignment
-                    </strong>
-
-                    Confirm the assignment
-                    as official.
+                    <strong>Verified Assignment</strong>
+                    Mark the assignment as verified.
                   </span>
                 </label>
               </div>
             </section>
 
-            {/* =================================================
-                REMARKS
-            ================================================= */}
+            {/* SECTION 05: REMARKS */}
 
             <section className="leader-form-section">
               <div className="leader-form-section-heading">
@@ -2055,63 +1870,43 @@ export default function LeaderFormModal({
                 </span>
 
                 <div>
-                  <small>
-                    Section 04
-                  </small>
-
-                  <h3>
-                    Administrative Remarks
-                  </h3>
-
+                  <small>Section 05</small>
+                  <h3>Administrative Remarks</h3>
                   <p>
-                    Add optional internal
-                    notes about this
-                    assignment.
+                    Add optional internal notes about this assignment.
                   </p>
                 </div>
               </div>
 
               <div className="leader-form-group leader-form-group--full">
-                <label htmlFor="leader-remarks">
-                  Remarks
-                </label>
+                <label htmlFor="leader-remarks">Remarks</label>
 
                 <textarea
                   id="leader-remarks"
                   rows="4"
-                  maxLength="500"
-                  value={
-                    form.remarks
-                  }
+                  maxLength={500}
+                  value={form.remarks}
                   onChange={(event) =>
-                    updateField(
-                      "remarks",
-                      event.target.value
-                    )
+                    updateField("remarks", event.target.value)
                   }
-                  disabled={loading}
+                  disabled={isSaving}
                   placeholder="Optional administrative remarks..."
                 />
 
                 <small className="leader-form-character-count">
-                  {form.remarks.length}
-                  /500
+                  {form.remarks.length}/500
                 </small>
               </div>
             </section>
           </div>
 
-          {/* ==================================================
-              FOOTER
-          ================================================== */}
+          {/* FOOTER */}
 
           <footer className="leader-form-modal-footer">
             <div className="leader-form-footer-note">
               <ShieldCheck size={17} />
-
-              Leadership assignments
-              should only be made by
-              authorized administrators.
+              Only authorized administrators should assign
+              leadership offices.
             </div>
 
             <div className="leader-form-footer-actions">
@@ -2119,7 +1914,7 @@ export default function LeaderFormModal({
                 type="button"
                 className="leader-form-cancel"
                 onClick={handleClose}
-                disabled={loading}
+                disabled={isSaving}
               >
                 Cancel
               </button>
@@ -2127,11 +1922,11 @@ export default function LeaderFormModal({
               <button
                 type="submit"
                 className="leader-form-submit"
-                disabled={loading}
+                disabled={isSaving}
               >
                 <CheckCircle2 size={18} />
 
-                {loading
+                {isSaving
                   ? "Saving..."
                   : leader
                     ? "Update Leader"

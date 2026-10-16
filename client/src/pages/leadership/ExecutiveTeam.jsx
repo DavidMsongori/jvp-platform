@@ -1,3 +1,4 @@
+
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
@@ -13,14 +14,22 @@ export default function ExecutiveTeam() {
     error,
   } = useLeadership();
 
+  // Sort leaders strictly by their configured display order.
+  const executiveLeaders = [...executive]
+    .filter(Boolean)
+    .sort((a, b) => {
+      const orderA = Number(a.displayOrder ?? 0);
+      const orderB = Number(b.displayOrder ?? 0);
+
+      return orderA - orderB;
+    });
+
   return (
     <>
       <Navbar />
 
       <main>
-        <ExecutiveHero
-          count={executive.length}
-        />
+        <ExecutiveHero count={executiveLeaders.length} />
 
         {loading && (
           <div
@@ -43,7 +52,7 @@ export default function ExecutiveTeam() {
 
         {!loading && !error && (
           <ExecutiveDirectory
-            leaders={executive}
+            leaders={executiveLeaders}
           />
         )}
       </main>

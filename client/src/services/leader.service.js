@@ -1,633 +1,777 @@
+
 import api from "./api";
 
+/* ==========================================================
+   RESPONSE HELPERS
+========================================================== */
+
+const getResponseData = (response) => response?.data ?? {};
+
+/**
+ * Returns the first non-empty string/value from the supplied
+ * candidate fields.
+ */
+const firstValue = (...values) => {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Safely resolves common image representations:
+ * - "https://example.com/photo.jpg"
+ * - { url: "https://example.com/photo.jpg" }
+ * - { secure_url: "https://example.com/photo.jpg" }
+ */
+const getImageUrl = (...values) => {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+
+    if (value && typeof value === "object") {
+      const url = firstValue(
+        value.url,
+        value.secure_url,
+        value.src,
+        value.path
+      );
+
+      if (url) return url;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Builds a display name from a populated Member/User object
+ * when the Leader record does not contain a direct name.
+ */
+const getMemberName = (person) => {
+  if (!person || typeof person !== "object") {
+    return null;
+  }
+
+  const directName = firstValue(
+    person.fullName,
+    person.name,
+    person.displayName,
+    person.username
+  );
+
+  if (directName) return directName;
+
+  const firstName = firstValue(
+    person.firstName,
+    person.first_name,
+    person.givenName
+  );
+
+  const middleName = firstValue(
+    person.middleName,
+    person.middle_name
+  );
+
+  const lastName = firstValue(
+    person.lastName,
+    person.last_name,
+    person.surname,
+    person.familyName
+  );
+
+  const combined = [
+    firstName,
+    middleName,
+    lastName,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  return combined || null;
+};
+
+/* ==========================================================
+   LEADER NORMALIZATION
+========================================================== */
+
+/**
+ * Normalizes common Leader response field names while
+ * preserving the original backend properties.
+ *
+ * IMPORTANT:
+ * This is a compatibility layer. The authoritative field
+ * names should ultimately match leader.model.js and the
+ * backend serializeLeader() function.
+ */
+const normalizeLeader = (leader) => {
+  if (!leader || typeof leader !== "object") {
+    return leader;
+  }
+
+  const member =
+    leader.member && typeof leader.member === "object"
+      ? leader.member
+      : null;
+
+  const user =
+    leader.user && typeof leader.user === "object"
+      ? leader.user
+      : null;
+
+  const person = member || user;
+
+  const name = firstValue(
+    leader.name,
+    leader.fullName,
+    leader.displayName,
+    leader.memberName,
+    leader.leaderName,
+    getMemberName(person)
+  );
+
+  const profilePicture = getImageUrl(
+    leader.profilePicture,
+    leader.profileImage,
+    leader.profilePhoto,
+    leader.avatar,
+    leader.photo,
+    leader.image,
+    leader.picture,
+    member?.profilePicture,
+    member?.profileImage,
+    member?.profilePhoto,
+    member?.avatar,
+    member?.photo,
+    member?.image,
+    user?.profilePicture,
+    user?.profileImage,
+    user?.profilePhoto,
+    user?.avatar,
+    user?.photo,
+    user?.image
+  );
+
+  const id = firstValue(
+    leader._id,
+    leader.id,
+    leader.leaderId
+  );
+
+  return {
+    ...leader,
+
+    // Canonical frontend display fields.
+    ...(name ? { name, displayName: name } : {}),
+
+    ...(profilePicture
+      ? {
+          profilePicture,
+          profileImage: profilePicture,
+          avatar: profilePicture,
+        }
+      : {}),
+
+    ...(id ? { id: String(id) } : {}),
+  };
+};
+
+/* ==========================================================
+   NORMALIZE API RESPONSE SHAPES
+========================================================== */
+
+/**
+ * Normalizes standard list responses:
+ *
+ * {
+ *   success: true,
+ *   count: 10,
+ *   data: [...],
+ *   pagination: {...}
+ * }
+ *
+ * Also supports legacy responses containing `leaders`.
+ * The response envelope is preserved.
+ */
+const normalizeListResponse = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload.map(normalizeLeader);
+  }
+
+  if (!payload || typeof payload !== "object") {
+    return payload;
+  }
+
+  if (Array.isArray(payload.data)) {
+    return {
+      ...payload,
+      data: payload.data.map(normalizeLeader),
+      count:
+        typeof payload.count === "number"
+          ? payload.count
+          : payload.data.length,
+    };
+  }
+
+  if (Array.isArray(payload.leaders)) {
+    return {
+      ...payload,
+      leaders: payload.leaders.map(normalizeLeader),
+      count:
+        typeof payload.count === "number"
+          ? payload.count
+          : payload.leaders.length,
+    };
+  }
+
+  return payload;
+};
+
+/**
+ * Normalizes a single-leader response while preserving
+ * the standard { success, data } response envelope.
+ */
+const normalizeSingleResponse = (payload) => {
+  if (!payload || typeof payload !== "object") {
+    return payload;
+  }
+
+  if (
+    payload.data &&
+    typeof payload.data === "object" &&
+    !Array.isArray(payload.data)
+  ) {
+    return {
+      ...payload,
+      data: normalizeLeader(payload.data),
+    };
+  }
+
+  // Supports a service response that returns the leader
+  // directly instead of wrapping it in { data: leader }.
+  if (payload._id || payload.id || payload.leaderId) {
+    return normalizeLeader(payload);
+  }
+
+  return payload;
+};
+
+/**
+ * Encodes dynamic URL segments.
+ */
+const encode = (value) =>
+  encodeURIComponent(String(value));
 
 /* ==========================================================
    PUBLIC LEADERSHIP DIRECTORY
 ========================================================== */
 
 /**
- * Get all active public leadership records.
+ * GET /leaders/public
+ *
+ * Used by the public Leadership Page to load leader cards.
+ * Supports pagination and query filters.
  */
 const getPublicLeaders = async (params = {}) => {
+  const response = await api.get("/leaders/public", {
+    params,
+  });
 
-  const response =
-    await api.get("/leaders/public", {
-      params,
-    });
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
 
-
 /**
- * Get a single leadership record.
+ * GET /leaders/:id
+ *
+ * Used when a visitor taps a leader card to open their
+ * individual profile page.
  */
 const getLeader = async (leaderId) => {
+  if (!leaderId) {
+    throw new Error("A leader ID is required.");
+  }
 
-  const response =
-    await api.get(
-      `/leaders/${leaderId}`
-    );
+  const response = await api.get(
+    `/leaders/${encode(leaderId)}`
+  );
 
-  return response.data;
-
+  return normalizeSingleResponse(
+    getResponseData(response)
+  );
 };
-
 
 /**
- * Get complete public leadership hierarchy.
- *
- * Includes:
- * - Patron
- * - Regional Cabinet
- * - Regional Youth Assembly
- * - Council of Governors
- * - County Cabinets
- * - County Youth Assemblies
+ * GET /leaders/hierarchy
  */
-const getLeadershipHierarchy = async () => {
+const getLeadershipHierarchy = async (params = {}) => {
+  const response = await api.get("/leaders/hierarchy", {
+    params,
+  });
 
-  const response =
-    await api.get(
-      "/leaders/hierarchy"
-    );
-
-  return response.data;
-
+  return getResponseData(response);
 };
-
 
 /* ==========================================================
    REGIONAL LEADERSHIP
 ========================================================== */
 
 /**
- * Get Regional Cabinet.
+ * GET /leaders/regional-cabinet
  */
-const getRegionalCabinet = async () => {
+const getRegionalCabinet = async (params = {}) => {
+  const response = await api.get(
+    "/leaders/regional-cabinet",
+    { params }
+  );
 
-  const response =
-    await api.get(
-      "/leaders/regional-cabinet"
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
 
-
 /**
- * Get Regional Youth Assembly.
+ * GET /leaders/regional-youth-assembly
  */
-const getRegionalYouthAssembly = async () => {
+const getRegionalYouthAssembly = async (
+  params = {}
+) => {
+  const response = await api.get(
+    "/leaders/regional-youth-assembly",
+    { params }
+  );
 
-  const response =
-    await api.get(
-      "/leaders/regional-youth-assembly"
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
 
-
 /**
- * Get Council of Governors.
- *
- * The Council of Governors is a Secretariat structure
- * containing the six Youth Governors.
+ * GET /leaders/council-of-governors
  */
-const getCouncilOfGovernors = async () => {
+const getCouncilOfGovernors = async (params = {}) => {
+  const response = await api.get(
+    "/leaders/council-of-governors",
+    { params }
+  );
 
-  const response =
-    await api.get(
-      "/leaders/council-of-governors"
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
 
-
 /**
- * Get Patron.
- *
- * Patronage is separate from the five structural
- * leadership levels.
+ * GET /leaders/patron
  */
 const getPatron = async () => {
+  const response = await api.get("/leaders/patron");
 
-  const response =
-    await api.get(
-      "/leaders/patron"
-    );
-
-  return response.data;
-
+  return normalizeSingleResponse(
+    getResponseData(response)
+  );
 };
 
+/**
+ * GET /leaders/cabinet-secretaries/:portfolioKey
+ */
+const getCabinetSecretaryByPortfolio = async (
+  portfolioKey
+) => {
+  if (!portfolioKey) {
+    throw new Error("A portfolio key is required.");
+  }
+
+  const response = await api.get(
+    `/leaders/cabinet-secretaries/${encode(portfolioKey)}`
+  );
+
+  return normalizeSingleResponse(
+    getResponseData(response)
+  );
+};
 
 /* ==========================================================
    COUNTY LEADERSHIP
 ========================================================== */
 
 /**
- * Get all County Cabinet leadership.
+ * GET /leaders/county-cabinet
+ * GET /leaders/county-cabinet/:county
  */
 const getCountyCabinet = async (
-  county = null
+  county = null,
+  params = {}
 ) => {
+  const url = county
+    ? `/leaders/county-cabinet/${encode(county)}`
+    : "/leaders/county-cabinet";
 
-  const url =
-    county
-      ? `/leaders/county-cabinet/${encodeURIComponent(county)}`
-      : "/leaders/county-cabinet";
+  const response = await api.get(url, { params });
 
-  const response =
-    await api.get(url);
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
-
 
 /**
- * Get County Youth Assembly leadership.
+ * GET /leaders/county-youth-assembly
+ * GET /leaders/county-youth-assembly/:county
  */
 const getCountyYouthAssembly = async (
-  county = null
+  county = null,
+  params = {}
 ) => {
+  const url = county
+    ? `/leaders/county-youth-assembly/${encode(county)}`
+    : "/leaders/county-youth-assembly";
 
-  const url =
-    county
-      ? `/leaders/county-youth-assembly/${encodeURIComponent(county)}`
-      : "/leaders/county-youth-assembly";
+  const response = await api.get(url, { params });
 
-  const response =
-    await api.get(url);
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
-
 
 /* ==========================================================
    LEADERSHIP DASHBOARD
 ========================================================== */
 
 /**
- * Get the leadership dashboard for the
- * currently authenticated leader.
- *
- * Supports:
- * - pagination
- * - search
- * - membership status
- * - membership type
- * - sorting
+ * GET /leaders/dashboard
+ * Requires authentication.
  */
-const getLeadershipDashboard = async (
-  params = {}
-) => {
+const getLeadershipDashboard = async (params = {}) => {
+  const response = await api.get("/leaders/dashboard", {
+    params,
+  });
 
-  const response =
-    await api.get(
-      "/leaders/dashboard",
-      {
-        params,
-      }
-    );
-
-  return response.data;
-
+  return getResponseData(response);
 };
-
 
 /* ==========================================================
    ADMIN — DIRECTORY
 ========================================================== */
 
 /**
- * Get all leadership records.
- *
- * Supported filters:
- * - category
- * - level
- * - department
- * - scope
- * - reportVisibility
- * - position
- * - county
- * - constituency
- * - ward
- * - member
- * - status
- * - active
+ * GET /leaders/admin/all
+ * Requires admin or super_admin authorization.
  */
-const getLeaders = async (
-  params = {}
-) => {
+const getLeaders = async (params = {}) => {
+  const response = await api.get("/leaders/admin/all", {
+    params,
+  });
 
-  const response =
-    await api.get(
-      "/leaders/admin/all",
-      {
-        params,
-      }
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
 
-
 /**
- * Get leaders by structural scope.
- *
- * Examples:
- * - regional_cabinet
- * - regional_youth_assembly
- * - county_cabinet
- * - county_youth_assembly
+ * GET /leaders/admin/scope/:scope
  */
 const getLeadersByScope = async (
-  scope
+  scope,
+  params = {}
 ) => {
+  const response = await api.get(
+    `/leaders/admin/scope/${encode(scope)}`,
+    { params }
+  );
 
-  const response =
-    await api.get(
-      `/leaders/admin/scope/${encodeURIComponent(scope)}`
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
-
 
 /**
- * Get leaders by report visibility.
- *
- * Examples:
- * - regional
- * - county
- * - constituency
- * - ward
- * - private
+ * GET /leaders/admin/report-visibility/:reportVisibility
  */
 const getLeadersByReportVisibility = async (
-  reportVisibility
+  reportVisibility,
+  params = {}
 ) => {
+  const response = await api.get(
+    `/leaders/admin/report-visibility/${encode(
+      reportVisibility
+    )}`,
+    { params }
+  );
 
-  const response =
-    await api.get(
-      `/leaders/admin/report-visibility/${encodeURIComponent(
-        reportVisibility
-      )}`
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
-
 
 /* ==========================================================
    ADMIN — GEOGRAPHIC FILTERS
 ========================================================== */
 
 /**
- * Get all leadership records within a county.
+ * GET /leaders/admin/county/:county
  */
 const getLeadersByCounty = async (
-  county
+  county,
+  params = {}
 ) => {
+  const response = await api.get(
+    `/leaders/admin/county/${encode(county)}`,
+    { params }
+  );
 
-  const response =
-    await api.get(
-      `/leaders/admin/county/${encodeURIComponent(
-        county
-      )}`
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
 
-
 /**
- * Get leadership records within a constituency.
+ * GET /leaders/admin/county/:county/constituency/:constituency
  */
 const getLeadersByConstituency = async (
   county,
-  constituency
+  constituency,
+  params = {}
 ) => {
+  const response = await api.get(
+    `/leaders/admin/county/${encode(county)}/constituency/${encode(
+      constituency
+    )}`,
+    { params }
+  );
 
-  const response =
-    await api.get(
-      `/leaders/admin/county/${encodeURIComponent(
-        county
-      )}/constituency/${encodeURIComponent(
-        constituency
-      )}`
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
 
-
 /**
- * Get leadership records within a ward.
+ * GET /leaders/admin/county/:county/constituency/:constituency/ward/:ward
  */
 const getLeadersByWard = async (
   county,
   constituency,
-  ward
+  ward,
+  params = {}
 ) => {
+  const response = await api.get(
+    `/leaders/admin/county/${encode(county)}/constituency/${encode(
+      constituency
+    )}/ward/${encode(ward)}`,
+    { params }
+  );
 
-  const response =
-    await api.get(
-      `/leaders/admin/county/${encodeURIComponent(
-        county
-      )}/constituency/${encodeURIComponent(
-        constituency
-      )}/ward/${encodeURIComponent(
-        ward
-      )}`
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
-
 
 /**
- * Get active leaders holding a particular office.
- *
- * Examples:
- * - president
- * - county_governor
- * - elected_mca
- * - elected_mp
+ * GET /leaders/admin/position/:position
  */
 const getLeadersByPosition = async (
-  position
+  position,
+  params = {}
 ) => {
+  const response = await api.get(
+    `/leaders/admin/position/${encode(position)}`,
+    { params }
+  );
 
-  const response =
-    await api.get(
-      `/leaders/admin/position/${encodeURIComponent(
-        position
-      )}`
-    );
-
-  return response.data;
-
+  return normalizeListResponse(
+    getResponseData(response)
+  );
 };
-
 
 /* ==========================================================
    ADMIN — STATISTICS
 ========================================================== */
 
 /**
- * Get leadership statistics.
+ * GET /leaders/statistics
  */
 const getStatistics = async () => {
+  const response = await api.get("/leaders/statistics");
 
-  const response =
-    await api.get(
-      "/leaders/statistics"
-    );
-
-  return response.data;
-
+  return getResponseData(response);
 };
-
-
-/**
- * Get complete leadership dashboard
- * statistics/charts.
- *
- * Note:
- * This requires a corresponding backend
- * controller/route if exposed separately.
- */
-const getDashboardStatistics = async () => {
-
-  const response =
-    await api.get(
-      "/leaders/dashboard-statistics"
-    );
-
-  return response.data;
-
-};
-
 
 /* ==========================================================
    ADMIN — VACANCIES
 ========================================================== */
 
 /**
- * Get currently vacant leadership offices.
+ * GET /leaders/admin/vacancies
  */
-const getVacantPositions = async () => {
+const getVacantPositions = async (params = {}) => {
+  const response = await api.get(
+    "/leaders/admin/vacancies",
+    { params }
+  );
 
-  const response =
-    await api.get(
-      "/leaders/admin/vacancies"
-    );
-
-  return response.data;
-
+  return getResponseData(response);
 };
-
 
 /* ==========================================================
    ADMIN — CREATE
 ========================================================== */
 
 /**
- * Create a new leadership record.
- *
- * The backend derives:
- * - category
- * - level
- * - department
- * - scope
- * - reportVisibility
- * - appointmentType
- *
- * from the selected office.
+ * POST /leaders
  */
-const createLeader = async (
-  data
-) => {
+const createLeader = async (data) => {
+  const response = await api.post("/leaders", data);
 
-  const response =
-    await api.post(
-      "/leaders",
-      data
-    );
-
-  return response.data;
-
+  return normalizeSingleResponse(
+    getResponseData(response)
+  );
 };
-
 
 /* ==========================================================
    ADMIN — UPDATE
 ========================================================== */
 
 /**
- * Update a leadership record.
+ * PUT /leaders/:id
  */
-const updateLeader = async (
-  leaderId,
-  data
-) => {
+const updateLeader = async (leaderId, data) => {
+  const response = await api.put(
+    `/leaders/${encode(leaderId)}`,
+    data
+  );
 
-  const response =
-    await api.put(
-      `/leaders/${leaderId}`,
-      data
-    );
-
-  return response.data;
-
+  return normalizeSingleResponse(
+    getResponseData(response)
+  );
 };
-
 
 /* ==========================================================
    ADMIN — LIFECYCLE
 ========================================================== */
 
 /**
- * Activate a leadership record.
+ * PATCH /leaders/:id/activate
  */
-const activateLeader = async (
-  leaderId
-) => {
+const activateLeader = async (leaderId) => {
+  const response = await api.patch(
+    `/leaders/${encode(leaderId)}/activate`
+  );
 
-  const response =
-    await api.patch(
-      `/leaders/${leaderId}/activate`
-    );
-
-  return response.data;
-
+  return normalizeSingleResponse(
+    getResponseData(response)
+  );
 };
-
 
 /**
- * Deactivate a leadership record.
+ * PATCH /leaders/:id/deactivate
  */
-const deactivateLeader = async (
-  leaderId
-) => {
+const deactivateLeader = async (leaderId) => {
+  const response = await api.patch(
+    `/leaders/${encode(leaderId)}/deactivate`
+  );
 
-  const response =
-    await api.patch(
-      `/leaders/${leaderId}/deactivate`
-    );
-
-  return response.data;
-
+  return normalizeSingleResponse(
+    getResponseData(response)
+  );
 };
-
-
-/**
- * Delete a leadership record.
- */
-const deleteLeader = async (
-  leaderId
-) => {
-
-  const response =
-    await api.delete(
-      `/leaders/${leaderId}`
-    );
-
-  return response.data;
-
-};
-
 
 /* ==========================================================
-   LEADERSHIP SERVICE
+   ADMIN — BULK OPERATIONS
+========================================================== */
+
+/**
+ * PATCH /leaders/bulk/activate
+ *
+ * Body: { ids: [...] }
+ */
+const activateMany = async (ids = []) => {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    throw new Error(
+      "Provide at least one leadership ID to activate."
+    );
+  }
+
+  const response = await api.patch(
+    "/leaders/bulk/activate",
+    { ids }
+  );
+
+  return getResponseData(response);
+};
+
+/* ==========================================================
+   ADMIN — DELETE
+========================================================== */
+
+/**
+ * DELETE /leaders/:id
+ */
+const deleteLeader = async (leaderId) => {
+  const response = await api.delete(
+    `/leaders/${encode(leaderId)}`
+  );
+
+  return getResponseData(response);
+};
+
+/* ==========================================================
+   SERVICE EXPORT
 ========================================================== */
 
 const leaderService = {
-
-  /* --------------------------------------------------------
-     PUBLIC
-  -------------------------------------------------------- */
-
+  // Public directory and profiles
   getPublicLeaders,
   getLeader,
   getLeadershipHierarchy,
 
-  getPatron,
-
+  // Regional leadership
   getRegionalCabinet,
   getRegionalYouthAssembly,
   getCouncilOfGovernors,
+  getPatron,
+  getCabinetSecretaryByPortfolio,
 
+  // County leadership
   getCountyCabinet,
   getCountyYouthAssembly,
 
-
-  /* --------------------------------------------------------
-     LEADERSHIP DASHBOARD
-  -------------------------------------------------------- */
-
+  // Dashboard
   getLeadershipDashboard,
 
-
-  /* --------------------------------------------------------
-     ADMIN — DIRECTORY
-  -------------------------------------------------------- */
-
+  // Admin directory
   getLeaders,
-
   getLeadersByScope,
   getLeadersByReportVisibility,
 
-  getLeadersByPosition,
-
+  // Geographic filters
   getLeadersByCounty,
   getLeadersByConstituency,
   getLeadersByWard,
+  getLeadersByPosition,
 
-
-  /* --------------------------------------------------------
-     ADMIN — STATISTICS
-  -------------------------------------------------------- */
-
+  // Statistics and vacancies
   getStatistics,
-  getDashboardStatistics,
-
-
-  /* --------------------------------------------------------
-     ADMIN — VACANCIES
-  -------------------------------------------------------- */
-
   getVacantPositions,
 
-
-  /* --------------------------------------------------------
-     ADMIN — CRUD
-  -------------------------------------------------------- */
-
+  // CRUD
   createLeader,
   updateLeader,
-
-  activateLeader,
-  deactivateLeader,
   deleteLeader,
 
-};
+  // Lifecycle
+  activateLeader,
+  deactivateLeader,
 
+  // Bulk operations
+  activateMany,
+};
 
 export default leaderService;

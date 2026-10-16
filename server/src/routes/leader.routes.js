@@ -1,3 +1,4 @@
+
 import express from "express";
 
 import {
@@ -8,10 +9,10 @@ import {
   getLeadershipMembers,
   updateLeader,
   activateLeader,
+  activateMany,
   deactivateLeader,
   deleteLeader,
   getLeaderStatistics,
-
   getRegionalCabinet,
   getRegionalYouthAssembly,
   getCouncilOfGovernors,
@@ -20,13 +21,13 @@ import {
   getPatron,
   getLeadershipHierarchy,
   getVacantPositions,
-
   getLeadersByScope,
   getLeadersByReportVisibility,
   getLeadersByCounty,
   getLeadersByConstituency,
   getLeadersByWard,
   getLeadersByPosition,
+  getCabinetSecretaryByPortfolio,
 } from "../controllers/leader.controller.js";
 
 import auth from "../middleware/auth.js";
@@ -34,140 +35,81 @@ import authorize from "../middleware/authorize.js";
 
 const router = express.Router();
 
-
 /* ============================================================
    PUBLIC LEADERSHIP DIRECTORY
 ============================================================ */
 
-/*
- * Main public leadership directory.
- *
- * Returns active public leaders according to the service's
- * public visibility rules.
- */
-router.get(
-  "/",
-  getPublicLeaders
-);
+// Main public leadership page.
+// GET /api/leaders
+router.get("/", getPublicLeaders);
 
-router.get(
-  "/public",
-  getPublicLeaders
-);
-
+// Explicit public directory endpoint.
+// GET /api/leaders/public
+router.get("/public", getPublicLeaders);
 
 /* ============================================================
    PUBLIC GOVERNANCE STRUCTURES
 ============================================================ */
 
-/*
- * Regional Cabinet
- */
-router.get(
-  "/regional-cabinet",
-  getRegionalCabinet
-);
+// Regional Cabinet.
+router.get("/regional-cabinet", getRegionalCabinet);
 
-
-/*
- * Regional Youth Assembly
- */
+// Regional Youth Assembly.
 router.get(
   "/regional-youth-assembly",
   getRegionalYouthAssembly
 );
 
-
-/*
- * Council of Governors
- */
+// Council of Governors.
 router.get(
   "/council-of-governors",
   getCouncilOfGovernors
 );
 
+// County Cabinet.
+router.get("/county-cabinet", getCountyCabinet);
+router.get("/county-cabinet/:county", getCountyCabinet);
 
-/*
- * County Cabinet
- *
- * Optional query:
- * /county-cabinet?county=Kilifi
- */
-router.get(
-  "/county-cabinet",
-  getCountyCabinet
-);
-
-
-/*
- * County Cabinet by county
- *
- * Example:
- * /county-cabinet/Kilifi
- */
-router.get(
-  "/county-cabinet/:county",
-  getCountyCabinet
-);
-
-
-/*
- * County Youth Assembly
- *
- * Optional query:
- * /county-youth-assembly?county=Kilifi
- */
+// County Youth Assembly.
 router.get(
   "/county-youth-assembly",
   getCountyYouthAssembly
 );
 
-
-/*
- * County Youth Assembly by county
- *
- * Example:
- * /county-youth-assembly/Kilifi
- */
 router.get(
   "/county-youth-assembly/:county",
   getCountyYouthAssembly
 );
 
+// Patron.
+router.get("/patron", getPatron);
 
-/*
- * Patron
- */
+// Complete leadership hierarchy.
+router.get("/hierarchy", getLeadershipHierarchy);
+
+// Cabinet Secretary profile lookup by portfolio.
 router.get(
-  "/patron",
-  getPatron
+  "/cabinet-secretaries/:portfolioKey",
+  getCabinetSecretaryByPortfolio
 );
-
-
-/*
- * Complete leadership hierarchy
- */
-router.get(
-  "/hierarchy",
-  getLeadershipHierarchy
-);
-
 
 /* ============================================================
-   LEADERSHIP DASHBOARD
+   LEADERSHIP DASHBOARD — AUTHENTICATED
 ============================================================ */
 
+// GET /api/leaders/dashboard
 router.get(
   "/dashboard",
   auth,
   getLeadershipMembers
 );
 
-
 /* ============================================================
    ADMIN — GENERAL LEADERSHIP
 ============================================================ */
 
+// Get all leadership records for administration.
+// GET /api/leaders/admin/all
 router.get(
   "/admin/all",
   auth,
@@ -175,14 +117,13 @@ router.get(
   getLeaders
 );
 
-
+// Leadership statistics.
 router.get(
   "/statistics",
   auth,
   authorize("admin", "super_admin"),
   getLeaderStatistics
 );
-
 
 /* ============================================================
    ADMIN — VACANCIES
@@ -195,20 +136,15 @@ router.get(
   getVacantPositions
 );
 
-
 /* ============================================================
    ADMIN — STRUCTURAL FILTERS
 ============================================================ */
 
-/*
- * By structural scope.
- *
- * Examples:
- *
- * /admin/scope/regional_cabinet
- * /admin/scope/county_cabinet
- * /admin/scope/county_youth_assembly
- */
+// Examples:
+// /api/leaders/admin/scope/regional_cabinet
+// /api/leaders/admin/scope/county_cabinet
+// /api/leaders/admin/scope/county_youth_assembly
+
 router.get(
   "/admin/scope/:scope",
   auth,
@@ -216,16 +152,11 @@ router.get(
   getLeadersByScope
 );
 
+// Examples:
+// /api/leaders/admin/report-visibility/regional
+// /api/leaders/admin/report-visibility/county
+// /api/leaders/admin/report-visibility/ward
 
-/*
- * By report visibility.
- *
- * Examples:
- *
- * /admin/report-visibility/regional
- * /admin/report-visibility/county
- * /admin/report-visibility/ward
- */
 router.get(
   "/admin/report-visibility/:reportVisibility",
   auth,
@@ -233,14 +164,11 @@ router.get(
   getLeadersByReportVisibility
 );
 
-
 /* ============================================================
    ADMIN — GEOGRAPHIC FILTERS
 ============================================================ */
 
-/*
- * County
- */
+// County.
 router.get(
   "/admin/county/:county",
   auth,
@@ -248,10 +176,7 @@ router.get(
   getLeadersByCounty
 );
 
-
-/*
- * Constituency
- */
+// Constituency.
 router.get(
   "/admin/county/:county/constituency/:constituency",
   auth,
@@ -259,10 +184,7 @@ router.get(
   getLeadersByConstituency
 );
 
-
-/*
- * Ward
- */
+// Ward.
 router.get(
   "/admin/county/:county/constituency/:constituency/ward/:ward",
   auth,
@@ -270,10 +192,7 @@ router.get(
   getLeadersByWard
 );
 
-
-/*
- * Position
- */
+// Position.
 router.get(
   "/admin/position/:position",
   auth,
@@ -281,9 +200,8 @@ router.get(
   getLeadersByPosition
 );
 
-
 /* ============================================================
-   ADMIN — CREATE
+   ADMIN — CREATE LEADER
 ============================================================ */
 
 router.post(
@@ -293,9 +211,24 @@ router.post(
   createLeader
 );
 
+/* ============================================================
+   ADMIN — BULK ACTIVATION
+============================================================ */
+
+// Request body:
+// {
+//   "ids": ["leaderId1", "leaderId2"]
+// }
+
+router.patch(
+  "/bulk/activate",
+  auth,
+  authorize("admin", "super_admin"),
+  activateMany
+);
 
 /* ============================================================
-   ADMIN — UPDATE
+   ADMIN — UPDATE LEADER
 ============================================================ */
 
 router.put(
@@ -305,9 +238,8 @@ router.put(
   updateLeader
 );
 
-
 /* ============================================================
-   ADMIN — ACTIVATE
+   ADMIN — ACTIVATE LEADER
 ============================================================ */
 
 router.patch(
@@ -317,9 +249,8 @@ router.patch(
   activateLeader
 );
 
-
 /* ============================================================
-   ADMIN — DEACTIVATE
+   ADMIN — DEACTIVATE LEADER
 ============================================================ */
 
 router.patch(
@@ -329,9 +260,8 @@ router.patch(
   deactivateLeader
 );
 
-
 /* ============================================================
-   ADMIN — DELETE
+   ADMIN — DELETE LEADER
 ============================================================ */
 
 router.delete(
@@ -341,17 +271,16 @@ router.delete(
   deleteLeader
 );
 
-
 /* ============================================================
-   GET LEADER BY ID
-   ------------------------------------------------------------
-   KEEP THIS ROUTE LAST.
+   PUBLIC — INDIVIDUAL LEADER PROFILE
 ============================================================ */
 
-router.get(
-  "/:id",
-  getLeader
-);
+// Keep this route after all named GET routes.
+// Used when a visitor taps a leader card.
+//
+// Example:
+// GET /api/leaders/LEADER_ID
 
+router.get("/:id", getLeader);
 
 export default router;

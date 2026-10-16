@@ -1,22 +1,58 @@
+
 import {
   BriefcaseBusiness,
   Users,
 } from "lucide-react";
 
 import LeaderCard from "./LeaderCard";
-
 import "./ExecutiveDirectory.css";
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+function normalizePosition(position) {
+  return String(position || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+}
+
+function getDisplayOrder(leader) {
+  const order = Number(leader?.displayOrder ?? 0);
+
+  return Number.isFinite(order) ? order : 0;
+}
+
+/* ==========================================================
+   EXECUTIVE DIRECTORY
+========================================================== */
 
 export default function ExecutiveDirectory({
   leaders = [],
 }) {
-  if (!leaders.length) {
+  const cabinetLeaders = Array.isArray(leaders)
+    ? leaders
+        .filter(
+          (leader) =>
+            leader &&
+            typeof leader === "object"
+        )
+        .sort((a, b) => {
+          // Respect the configured order for every leader.
+          return getDisplayOrder(a) - getDisplayOrder(b);
+        })
+    : [];
+
+  if (!cabinetLeaders.length) {
     return (
       <section className="executive-directory executive-directory--empty">
         <div className="executive-directory__container">
           <div className="executive-directory__empty">
             <BriefcaseBusiness size={22} />
+
             <h2>Executive Team</h2>
+
             <p>
               No executive leadership records are currently
               available.
@@ -57,24 +93,28 @@ export default function ExecutiveDirectory({
 
           <div
             className="executive-directory__count"
-            aria-label={`${leaders.length} cabinet members`}
+            aria-label={`${cabinetLeaders.length} cabinet members`}
           >
             <Users size={14} />
-            <strong>{leaders.length}</strong>
+
+            <strong>{cabinetLeaders.length}</strong>
+
             <span>
-              {leaders.length === 1 ? "Member" : "Members"}
+              {cabinetLeaders.length === 1
+                ? "Member"
+                : "Members"}
             </span>
           </div>
         </header>
 
         <div className="executive-directory__grid">
-          {leaders.map((leader, index) => (
+          {cabinetLeaders.map((leader, index) => (
             <LeaderCard
               key={
-                leader?._id ||
-                leader?.id ||
-                leader?.slug ||
-                index
+                leader._id ||
+                leader.id ||
+                leader.slug ||
+                `${normalizePosition(leader.position)}-${index}`
               }
               leader={leader}
             />

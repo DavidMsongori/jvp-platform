@@ -1,0 +1,550 @@
+
+/* ==========================================================
+   PRESIDENCY TEAM — COMPACT LAYOUT
+========================================================== */
+
+.presidency-team {
+  --pt-navy: #102a43;
+  --pt-teal: #087f8c;
+  --pt-muted: #62748a;
+  --pt-border: #e2e8f0;
+
+  padding: 32px 0 36px;
+  background: #f6f8fb;
+  color: var(--pt-navy);
+}
+
+.presidency-team *,
+.presidency-team *::before,
+.presidency-team *::after {
+  box-sizing: border-box;
+}
+
+.presidency-team__container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* SECTION HEADER */
+
+.presidency-team__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.presidency-team__heading {
+  max-width: 760px;
+}
+
+.presidency-team__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+  color: var(--pt-teal);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.presidency-team__eyebrow svg {
+  width: 14px;
+  height: 14px;
+}
+
+.presidency-team__heading h2 {
+  margin: 0;
+  color: var(--pt-navy);
+  font-size: clamp(1.45rem, 2.4vw, 1.95rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+
+.presidency-team__heading > p {
+  max-width: 680px;
+  margin: 7px 0 0;
+  color: var(--pt-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.presidency-team__header-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border: 1px solid #d4e7e9;
+  border-radius: 10px;
+  background: #e8f5f5;
+  color: var(--pt-teal);
+}
+
+.presidency-team__header-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* COMPACT INTRODUCTION */
+
+.presidency-team__intro {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 17px;
+  padding: 12px 15px;
+  border: 1px solid #dce9ed;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.presidency-team__intro-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: #e6f4f4;
+  color: var(--pt-teal);
+}
+
+.presidency-team__intro-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.presidency-team__intro h3 {
+  margin: 0 0 3px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.presidency-team__intro p {
+  margin: 0;
+  color: var(--pt-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+/* TEAM SUMMARY */
+
+.presidency-team__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.presidency-team__summary > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #42566b;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.presidency-team__summary > span svg {
+  width: 15px;
+  height: 15px;
+}
+
+.presidency-team__summary strong {
+  padding: 5px 10px;
+  border: 1px solid var(--pt-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pt-navy);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* TEAM GRID */
+
+.presidency-team__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.presidency-team__card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--pt-border);
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgb(16 42 67 / 3%);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.presidency-team__card:hover {
+  transform: translateY(-2px);
+  border-color: #c8dfe3;
+  box-shadow: 0 8px 18px rgb(16 42 67 / 7%);
+}
+
+/* SMALLER PROFILE AREA */
+
+.presidency-team__card-top {
+  position: relative;
+  display: flex;
+  min-height: 112px;
+  align-items: center;
+  justify-content: center;
+  padding: 13px;
+  background:
+    radial-gradient(
+      circle at 50% 10%,
+      rgb(8 127 140 / 10%),
+      transparent 58%
+    ),
+    #f0f5f8;
+}
+
+.presidency-team__avatar-wrap {
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #e2e8f0;
+  box-shadow: 0 3px 10px rgb(16 42 67 / 10%);
+}
+
+.presidency-team__avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.presidency-team__member-mark {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--pt-teal);
+  color: #fff;
+}
+
+.presidency-team__member-mark svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* PROFILE DETAILS */
+
+.presidency-team__card-content {
+  flex: 1;
+  padding: 13px 13px 12px;
+}
+
+.presidency-team__position {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--pt-teal);
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  line-height: 1.45;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.presidency-team__card-content h3 {
+  margin: 0;
+  color: var(--pt-navy);
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.presidency-team__department {
+  margin: 5px 0 0;
+  color: var(--pt-muted);
+  font-size: 0.73rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.presidency-team__card-footer {
+  padding: 9px 13px;
+  border-top: 1px solid #edf1f5;
+  color: #718096;
+  font-size: 0.66rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* LOADING, ERROR AND EMPTY STATES */
+
+.presidency-team__state {
+  display: flex;
+  min-height: 125px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 22px 16px;
+  border: 1px dashed #ccd8e3;
+  border-radius: 11px;
+  background: #fff;
+  text-align: center;
+}
+
+.presidency-team__state p {
+  max-width: 560px;
+  margin: 0;
+  color: var(--pt-muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.presidency-team__state h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.presidency-team__state--error {
+  border-color: #efcaca;
+  background: #fffafa;
+}
+
+.presidency-team__spinner {
+  width: 25px;
+  height: 25px;
+  border: 3px solid #dce9ed;
+  border-top-color: var(--pt-teal);
+  border-radius: 50%;
+  animation: presidency-team-spin 750ms linear infinite;
+}
+
+.presidency-team__empty-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  background: #e8f5f5;
+  color: var(--pt-teal);
+}
+
+.presidency-team__empty-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.presidency-team__retry,
+.presidency-team__text-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--pt-teal);
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.presidency-team__retry {
+  padding: 8px 11px;
+  border: 1px solid #c8dfe3;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.presidency-team__retry:hover,
+.presidency-team__text-link:hover {
+  color: #075c65;
+}
+
+/* SECTION FOOTER */
+
+.presidency-team__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--pt-border);
+}
+
+.presidency-team__footer > p {
+  margin: 0;
+  color: var(--pt-muted);
+  font-size: 0.73rem;
+  line-height: 1.5;
+}
+
+.presidency-team__view-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  color: var(--pt-teal);
+  font-size: 0.77rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.presidency-team__view-link:hover {
+  color: #075c65;
+}
+
+/* ANIMATION */
+
+@keyframes presidency-team-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* TABLETS */
+
+@media (max-width: 1000px) {
+  .presidency-team__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .presidency-team {
+    padding: 27px 0 30px;
+  }
+
+  .presidency-team__container {
+    width: calc(100% - 32px);
+  }
+
+  .presidency-team__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .presidency-team__card-content {
+    padding: 12px;
+  }
+
+  .presidency-team__card-footer {
+    padding: 8px 12px;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 480px) {
+  .presidency-team__header {
+    gap: 10px;
+  }
+
+  .presidency-team__heading h2 {
+    font-size: 1.45rem;
+  }
+
+  .presidency-team__heading > p {
+    font-size: 0.78rem;
+  }
+
+  .presidency-team__header-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .presidency-team__header-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .presidency-team__intro {
+    align-items: flex-start;
+    padding: 11px;
+  }
+
+  .presidency-team__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .presidency-team__card {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .presidency-team__card-top {
+    grid-row: 1 / span 2;
+    min-height: 100%;
+    padding: 10px;
+  }
+
+  .presidency-team__avatar-wrap {
+    width: 64px;
+    height: 64px;
+  }
+
+  .presidency-team__member-mark {
+    right: 4px;
+    bottom: 5px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .presidency-team__card-content {
+    padding: 12px 12px 8px;
+  }
+
+  .presidency-team__card-content h3 {
+    font-size: 0.88rem;
+  }
+
+  .presidency-team__card-footer {
+    grid-column: 2;
+    padding: 7px 12px;
+  }
+
+  .presidency-team__footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  .presidency-team__card {
+    transition: none;
+  }
+
+  .presidency-team__card:hover {
+    transform: none;
+  }
+
+  .presidency-team__spinner {
+    animation-duration: 2s;
+  }
+}

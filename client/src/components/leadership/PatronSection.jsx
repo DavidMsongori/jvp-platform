@@ -1,3 +1,4 @@
+
 import {
   Award,
   Building2,
@@ -7,65 +8,141 @@ import "./PatronSection.css";
 
 const DEFAULT_AVATAR = "/avatar.png";
 
-function getPhoto(profile) {
-  const photo = profile?.profilePhoto;
+/* ==========================================================
+   HELPERS
+========================================================== */
 
-  if (!photo) {
-    return DEFAULT_AVATAR;
+function firstText(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
   }
 
-  if (typeof photo === "object") {
-    return (
-      photo?.secureUrl ||
-      photo?.url ||
-      DEFAULT_AVATAR
+  return "";
+}
+
+function getPhotoUrl(value) {
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  if (value && typeof value === "object") {
+    return firstText(
+      value.secureUrl,
+      value.secure_url,
+      value.url,
+      value.imageUrl,
+      value.image_url,
+      value.src,
+      value.path
     );
   }
 
-  return photo;
+  return "";
+}
+
+function getPhoto(leader, profile, patron) {
+  const candidates = [
+    // Patron details stored directly on the leader record.
+    patron?.photo,
+    patron?.profilePhoto,
+    patron?.profilePhotoUrl,
+    patron?.profileImage,
+    patron?.image,
+    patron?.avatar,
+
+    // Patron details nested inside profile.
+    profile?.patron?.photo,
+    profile?.patron?.profilePhoto,
+    profile?.patron?.image,
+    profile?.patron?.avatar,
+
+    // General profile image fields.
+    profile?.profilePhoto,
+    profile?.profilePhotoUrl,
+    profile?.profileImage,
+    profile?.profileImageUrl,
+    profile?.photo,
+    profile?.photoUrl,
+    profile?.image,
+    profile?.imageUrl,
+    profile?.avatar,
+
+    // Root-level image fields.
+    leader?.profilePhoto,
+    leader?.profilePhotoUrl,
+    leader?.profileImage,
+    leader?.profileImageUrl,
+    leader?.photo,
+    leader?.photoUrl,
+    leader?.image,
+    leader?.imageUrl,
+    leader?.avatar,
+  ];
+
+  for (const candidate of candidates) {
+    const url = getPhotoUrl(candidate);
+
+    if (url) return url;
+  }
+
+  return DEFAULT_AVATAR;
 }
 
 function handleImageError(event) {
-  if (
-    event.currentTarget.dataset.fallbackApplied ===
-    "true"
-  ) {
+  const image = event.currentTarget;
+
+  if (image.dataset.fallbackApplied === "true") {
     return;
   }
 
-  event.currentTarget.dataset.fallbackApplied = "true";
-  event.currentTarget.src = DEFAULT_AVATAR;
+  image.dataset.fallbackApplied = "true";
+  image.src = DEFAULT_AVATAR;
 }
 
+/* ==========================================================
+   PATRON SECTION
+========================================================== */
+
 export default function PatronSection({ leader }) {
-  if (!leader) {
-    return null;
-  }
+  if (!leader) return null;
 
   const profile = leader.profile || {};
+  const patron = leader.patron || {};
 
   const fullName =
-    profile.fullName ||
-    leader.name ||
-    "Patron";
+    firstText(
+      patron.fullName,
+      profile.fullName,
+      leader.name,
+      leader.fullName
+    ) || "Patron";
 
   const title =
-    profile.title ||
-    leader.position ||
-    leader.office ||
-    "Patron";
+    firstText(
+      patron.title,
+      profile.title,
+      leader.position,
+      leader.office
+    ) || "Patron";
 
   const organization =
-    profile.organization ||
-    leader.organization ||
-    "";
+    firstText(
+      patron.organization,
+      profile.organization,
+      leader.organization
+    );
 
   const bio =
-    profile.bio ||
-    leader.bio ||
+    firstText(
+      patron.bio,
+      profile.bio,
+      leader.bio
+    ) ||
     "The Patron provides strategic leadership, mentorship and guidance to the organization while championing youth development, partnerships and regional transformation.";
 
-  const photo = getPhoto(profile);
+  const photo = getPhoto(leader, profile, patron);
 
   return (
     <section
@@ -73,7 +150,6 @@ export default function PatronSection({ leader }) {
       aria-labelledby="patron-section-title"
     >
       <div className="patron-section__container">
-        {/* Section Header */}
         <header className="patron-section__header">
           <div className="patron-section__heading">
             <span className="patron-section__eyebrow">
@@ -102,7 +178,6 @@ export default function PatronSection({ leader }) {
           </div>
         </header>
 
-        {/* Patron Profile */}
         <article className="patron-card">
           <div className="patron-card__media">
             <img
@@ -134,6 +209,7 @@ export default function PatronSection({ leader }) {
                   size={13}
                   strokeWidth={1.8}
                 />
+
                 <span>{organization}</span>
               </div>
             )}

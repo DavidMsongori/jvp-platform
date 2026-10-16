@@ -1,0 +1,716 @@
+.presidential-impact {
+  --pi-navy: #102a43;
+  --pi-teal: #087f8c;
+  --pi-muted: #62748a;
+  --pi-border: #e2e8f0;
+
+  padding: 88px 24px;
+  background: #f5f8fb;
+  color: var(--pi-navy);
+}
+
+.presidential-impact__container {
+  width: min(1160px, 100%);
+  margin: 0 auto;
+}
+
+/* ===========================================================
+   HEADER
+=========================================================== */
+
+.presidential-impact__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 35px;
+}
+
+.presidential-impact__heading {
+  max-width: 750px;
+}
+
+.presidential-impact__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  color: var(--pi-teal);
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.presidential-impact__heading h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+.presidential-impact__heading > p {
+  max-width: 700px;
+  margin: 18px 0 0;
+  color: var(--pi-muted);
+  font-size: 0.98rem;
+  line-height: 1.85;
+}
+
+.presidential-impact__all-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 7px;
+  color: var(--pi-teal);
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.presidential-impact__all-link:hover {
+  color: #075c65;
+}
+
+/* ===========================================================
+   IMPACT METRICS
+=========================================================== */
+
+.presidential-impact__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 62px;
+}
+
+.presidential-impact__metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--pi-border);
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgb(16 42 67 / 3%);
+}
+
+.presidential-impact__metric-icon {
+  display: grid;
+  width: 47px;
+  height: 47px;
+  flex: 0 0 47px;
+  place-items: center;
+  border-radius: 14px;
+  background: #e9f5f5;
+  color: var(--pi-teal);
+}
+
+.presidential-impact__metric > div {
+  min-width: 0;
+}
+
+.presidential-impact__metric-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #63758a;
+  font-size: 0.79rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.presidential-impact__metric strong {
+  display: block;
+  color: var(--pi-navy);
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.presidential-impact__metric p {
+  margin: 9px 0 0;
+  color: var(--pi-muted);
+  font-size: 0.77rem;
+  line-height: 1.65;
+}
+
+/* ===========================================================
+   PROGRAMME SECTION INTRO
+=========================================================== */
+
+.presidential-impact__section-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 24px;
+}
+
+.presidential-impact__small-label {
+  display: inline-block;
+  margin-bottom: 9px;
+  color: var(--pi-teal);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.presidential-impact__section-intro h3 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+}
+
+.presidential-impact__section-intro > p {
+  max-width: 420px;
+  margin: 0;
+  color: var(--pi-muted);
+  font-size: 0.87rem;
+  line-height: 1.75;
+}
+
+/* ===========================================================
+   PROGRAMME GRID
+=========================================================== */
+
+.presidential-impact__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.presidential-impact__card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--pi-border);
+  border-radius: 19px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgb(16 42 67 / 3%);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.presidential-impact__card:hover {
+  transform: translateY(-4px);
+  border-color: #c6dfe3;
+  box-shadow: 0 14px 30px rgb(16 42 67 / 8%);
+}
+
+.presidential-impact__image-link {
+  position: relative;
+  display: flex;
+  min-height: 205px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgb(8 127 140 / 17%),
+      transparent 65%
+    ),
+    #eaf1f5;
+  color: var(--pi-teal);
+  text-decoration: none;
+}
+
+.presidential-impact__image {
+  display: block;
+  width: 100%;
+  height: 205px;
+  object-fit: cover;
+  transition: transform 250ms ease;
+}
+
+.presidential-impact__card:hover .presidential-impact__image {
+  transform: scale(1.035);
+}
+
+.presidential-impact__image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #547183;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.presidential-impact__category {
+  position: absolute;
+  bottom: 13px;
+  left: 13px;
+  max-width: calc(100% - 26px);
+  overflow: hidden;
+  padding: 7px 10px;
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: 7px;
+  background: rgb(16 42 67 / 90%);
+  color: #fff;
+  font-size: 0.67rem;
+  font-weight: 750;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+
+.presidential-impact__card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 21px;
+}
+
+.presidential-impact__status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 15px;
+}
+
+.presidential-impact__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: #edf6f3;
+  color: #26735e;
+  font-size: 0.67rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.presidential-impact__status--upcoming {
+  background: #fff4df;
+  color: #98621b;
+}
+
+.presidential-impact__status--completed {
+  background: #e8f1fb;
+  color: #315f91;
+}
+
+.presidential-impact__status--cancelled {
+  background: #fff0f0;
+  color: #a23e3e;
+}
+
+.presidential-impact__date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #78889a;
+  font-size: 0.7rem;
+}
+
+.presidential-impact__card-body > h3 {
+  margin: 0;
+  font-size: 1.13rem;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.presidential-impact__card-body > h3 a {
+  color: var(--pi-navy);
+  text-decoration: none;
+}
+
+.presidential-impact__card-body > h3 a:hover {
+  color: var(--pi-teal);
+}
+
+.presidential-impact__summary {
+  display: -webkit-box;
+  min-height: 4.7em;
+  overflow: hidden;
+  margin: 11px 0 0;
+  color: var(--pi-muted);
+  font-size: 0.83rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.presidential-impact__location {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 13px;
+  color: #728398;
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.presidential-impact__location svg {
+  flex: 0 0 15px;
+  margin-top: 2px;
+  color: var(--pi-teal);
+}
+
+.presidential-impact__results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+  padding: 15px 0;
+  border-top: 1px solid #edf1f5;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.presidential-impact__results > div {
+  min-width: 0;
+}
+
+.presidential-impact__results > div + div {
+  padding-left: 12px;
+  border-left: 1px solid #edf1f5;
+}
+
+.presidential-impact__results span {
+  display: block;
+  margin-bottom: 7px;
+  color: #728398;
+  font-size: 0.69rem;
+  line-height: 1.5;
+}
+
+.presidential-impact__results strong {
+  display: block;
+  color: var(--pi-navy);
+  font-size: 1.2rem;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+.presidential-impact__impact-note {
+  margin-top: 16px;
+  padding: 13px;
+  border-left: 3px solid var(--pi-teal);
+  border-radius: 0 9px 9px 0;
+  background: #f1f8f8;
+}
+
+.presidential-impact__impact-note > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--pi-teal);
+  font-size: 0.69rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.presidential-impact__impact-note p {
+  margin: 0;
+  color: #536b7b;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.presidential-impact__card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: 20px;
+  color: var(--pi-teal);
+  font-size: 0.81rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.presidential-impact__card-link:hover {
+  color: #075c65;
+}
+
+/* ===========================================================
+   LOADING, EMPTY AND ERROR STATES
+=========================================================== */
+
+.presidential-impact__state {
+  display: flex;
+  min-height: 210px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  padding: 30px 22px;
+  border: 1px dashed #cbd8e3;
+  border-radius: 18px;
+  background: #fff;
+  text-align: center;
+}
+
+.presidential-impact__state p {
+  max-width: 530px;
+  margin: 0;
+  color: var(--pi-muted);
+  font-size: 0.9rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.presidential-impact__state h3 {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.presidential-impact__state--error {
+  border-color: #edcccc;
+  background: #fffafa;
+}
+
+.presidential-impact__spinner {
+  width: 31px;
+  height: 31px;
+  border: 3px solid #dce9ed;
+  border-top-color: var(--pi-teal);
+  border-radius: 50%;
+  animation: presidential-impact-spin 750ms linear infinite;
+}
+
+.presidential-impact__empty-icon {
+  display: grid;
+  width: 49px;
+  height: 49px;
+  place-items: center;
+  border-radius: 15px;
+  background: #e9f5f5;
+  color: var(--pi-teal);
+}
+
+.presidential-impact__text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--pi-teal);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+/* ===========================================================
+   CLOSING BANNER
+=========================================================== */
+
+.presidential-impact__closing {
+  display: flex;
+  align-items: center;
+  gap: 19px;
+  margin-top: 48px;
+  padding: 28px;
+  border-radius: 19px;
+  background: var(--pi-navy);
+  color: #fff;
+}
+
+.presidential-impact__closing-icon {
+  display: grid;
+  width: 49px;
+  height: 49px;
+  flex: 0 0 49px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 8%);
+  color: #8fe0df;
+}
+
+.presidential-impact__closing-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.presidential-impact__closing-copy h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.5;
+}
+
+.presidential-impact__closing-copy p {
+  margin: 7px 0 0;
+  color: #c5d3df;
+  font-size: 0.83rem;
+  line-height: 1.75;
+}
+
+.presidential-impact__closing-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 15px;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 180ms ease;
+}
+
+.presidential-impact__closing-link:hover {
+  background: rgb(255 255 255 / 9%);
+}
+
+@keyframes presidential-impact-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===========================================================
+   RESPONSIVE
+=========================================================== */
+
+@media (max-width: 980px) {
+  .presidential-impact {
+    padding: 70px 22px;
+  }
+
+  .presidential-impact__metrics {
+    gap: 13px;
+  }
+
+  .presidential-impact__metric {
+    gap: 12px;
+    padding: 19px;
+  }
+
+  .presidential-impact__metric-icon {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+
+  .presidential-impact__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .presidential-impact__closing {
+    flex-wrap: wrap;
+  }
+
+  .presidential-impact__closing-copy {
+    flex-basis: calc(100% - 75px);
+  }
+
+  .presidential-impact__closing-link {
+    margin-left: 68px;
+  }
+}
+
+@media (max-width: 620px) {
+  .presidential-impact {
+    padding: 54px 16px;
+  }
+
+  .presidential-impact__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .presidential-impact__heading h2 {
+    font-size: 2rem;
+  }
+
+  .presidential-impact__heading > p {
+    font-size: 0.92rem;
+  }
+
+  .presidential-impact__metrics {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin-bottom: 44px;
+  }
+
+  .presidential-impact__metric {
+    padding: 19px;
+  }
+
+  .presidential-impact__metric strong {
+    font-size: 1.8rem;
+  }
+
+  .presidential-impact__section-intro {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .presidential-impact__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 17px;
+  }
+
+  .presidential-impact__image-link,
+  .presidential-impact__image {
+    height: 215px;
+    min-height: 215px;
+  }
+
+  .presidential-impact__card-body {
+    padding: 20px;
+  }
+
+  .presidential-impact__closing {
+    align-items: flex-start;
+    gap: 13px;
+    margin-top: 36px;
+    padding: 21px;
+  }
+
+  .presidential-impact__closing-icon {
+    width: 41px;
+    height: 41px;
+    flex-basis: 41px;
+  }
+
+  .presidential-impact__closing-copy {
+    flex-basis: calc(100% - 54px);
+  }
+
+  .presidential-impact__closing-copy h3 {
+    font-size: 0.98rem;
+  }
+
+  .presidential-impact__closing-link {
+    margin-left: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presidential-impact__card,
+  .presidential-impact__image,
+  .presidential-impact__closing-link {
+    transition: none;
+  }
+
+  .presidential-impact__card:hover,
+  .presidential-impact__card:hover .presidential-impact__image {
+    transform: none;
+  }
+
+  .presidential-impact__spinner {
+    animation-duration: 2s;
+  }
+}

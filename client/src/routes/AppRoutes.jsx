@@ -32,6 +32,11 @@ import SummitPosterForm from "../pages/summit-poster/SummitPosterForm";
 import SummitPosterStatus from "../pages/summit-poster/SummitPosterStatus";
 import Contact from "../pages/contact/Contact";
 import Leadership from "../pages/leadership/Leadership";
+import PresidentPage from "../pages/leadership/PresidentPage";
+import DeputyPresidentPage from "../pages/leadership/DeputyPresidentPage";
+import PrimeCabinetSecretaryPage from "../pages/leadership/PrimeCabinetSecretaryPage";
+import AttorneyGeneralPage from "../pages/leadership/AttorneyGeneralPage";
+import SecretaryToCabinetPage from "../pages/leadership/SecretaryToCabinetPage";
 import ExecutiveTeam from "../pages/leadership/ExecutiveTeam";
 import YouthAssembly from "../pages/leadership/YouthAssembly";
 import CountyLeadership from "../pages/leadership/CountyLeadership";
@@ -180,6 +185,8 @@ import FinancePayments from "../pages/finance/FinancePayments";
 import ManualMpesa from "../pages/finance/ManualMpesa";
 import FinanceReports from "../pages/finance/FinanceReports";
 
+import OfficeAssignments from "../pages/admin/OfficeAssignments";
+
 /* ==========================================
    OTHER
 ========================================== */
@@ -234,10 +241,12 @@ function AppRoutes() {
           element={<Membership />}
         />
 
-        <Route
-          path="/leadership"
-          element={<Leadership />}
-        />
+        <Route path="/leadership" element={<Leadership />} />
+        <Route path="/leadership/president" element={<PresidentPage />}/>  
+        <Route path="/leadership/deputy-president" element={<DeputyPresidentPage />}/>
+        <Route path="/leadership/prime-cabinet-secretary" element={<PrimeCabinetSecretaryPage />}/>
+        <Route path="/leadership/attorney-general" element={<AttorneyGeneralPage />}/>
+        <Route path="/leadership/secretary-to-cabinet" element={<SecretaryToCabinetPage />}/>
 
         <Route
           path="/leadership/executive"
@@ -912,6 +921,10 @@ function AppRoutes() {
   }
 />
 
+<Route
+  path="/admin/office-assignments"
+  element={<OfficeAssignments />}
+/>
 
         </Route>
 

@@ -1,0 +1,540 @@
+.presidential-cta {
+  --pcta-navy: #102b46;
+  --pcta-navy-dark: #0a1d32;
+  --pcta-teal: #0d9488;
+  --pcta-teal-light: #ccfbf1;
+  --pcta-text: #263548;
+  --pcta-muted: #64748b;
+  --pcta-border: #e2e8f0;
+
+  position: relative;
+  overflow: hidden;
+  padding: 84px 24px 72px;
+  background: #f7fafc;
+  color: var(--pcta-text);
+}
+
+.presidential-cta *,
+.presidential-cta *::before,
+.presidential-cta *::after {
+  box-sizing: border-box;
+}
+
+.presidential-cta__container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* Main banner */
+
+.presidential-cta__banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  align-items: center;
+  gap: 40px;
+  min-height: 340px;
+  padding: 54px 58px;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      circle at 82% 20%,
+      rgba(13, 148, 136, 0.23),
+      transparent 31%
+    ),
+    linear-gradient(
+      125deg,
+      var(--pcta-navy-dark) 0%,
+      var(--pcta-navy) 62%,
+      #124f5b 100%
+    );
+  box-shadow: 0 18px 45px rgba(16, 43, 70, 0.12);
+}
+
+.presidential-cta__content {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+}
+
+.presidential-cta__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 19px;
+  color: #99f6e4;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.presidential-cta__eyebrow::before {
+  width: 27px;
+  height: 2px;
+  background: #5eead4;
+  content: "";
+}
+
+.presidential-cta__content h2 {
+  max-width: 700px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2rem, 4vw, 3.15rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.13;
+}
+
+.presidential-cta__intro {
+  max-width: 690px;
+  margin: 21px 0 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+.presidential-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 13px;
+  margin-top: 30px;
+}
+
+.presidential-cta__button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 19px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.presidential-cta__button:hover {
+  transform: translateY(-2px);
+}
+
+.presidential-cta__button:focus-visible,
+.presidential-cta__card-link:focus-visible {
+  outline: 3px solid #5eead4;
+  outline-offset: 4px;
+}
+
+.presidential-cta__button--light {
+  background: #fff;
+  color: var(--pcta-navy);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+}
+
+.presidential-cta__button--light:hover {
+  background: #ccfbf1;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.presidential-cta__button--outline {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+.presidential-cta__button--outline:hover {
+  border-color: #99f6e4;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Decorative elements */
+
+.presidential-cta__decoration {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 50%;
+}
+
+.presidential-cta__decoration--one {
+  top: -170px;
+  right: 80px;
+  width: 450px;
+  height: 450px;
+}
+
+.presidential-cta__decoration--two {
+  top: -110px;
+  right: 140px;
+  width: 330px;
+  height: 330px;
+}
+
+/* Banner's visual side */
+
+.presidential-cta__side {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 235px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 26px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.055);
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.presidential-cta__symbol {
+  display: grid;
+  width: 78px;
+  height: 78px;
+  place-items: center;
+  margin-bottom: 20px;
+  border: 1px solid rgba(153, 246, 228, 0.35);
+  border-radius: 23px;
+  background: rgba(13, 148, 136, 0.18);
+  color: #99f6e4;
+  transform: rotate(-4deg);
+}
+
+.presidential-cta__side-label {
+  color: #99f6e4;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.presidential-cta__side-heading {
+  margin-top: 7px;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.presidential-cta__side-line {
+  width: 42px;
+  height: 3px;
+  margin: 17px 0 13px;
+  border-radius: 99px;
+  background: #5eead4;
+}
+
+.presidential-cta__side-caption {
+  max-width: 200px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.75rem;
+  line-height: 1.7;
+}
+
+/* Supporting CTA cards */
+
+.presidential-cta__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 27px;
+}
+
+.presidential-cta__card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 29px 27px;
+  border: 1px solid var(--pcta-border);
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgba(15, 23, 42, 0.025);
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.presidential-cta__card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(13, 148, 136, 0.4);
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.07);
+}
+
+.presidential-cta__card-icon {
+  display: grid;
+  width: 49px;
+  height: 49px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid #ccfbf1;
+  border-radius: 13px;
+  background: #f0fdfa;
+  color: #0f766e;
+}
+
+.presidential-cta__card h3 {
+  margin: 21px 0 10px;
+  color: var(--pcta-navy);
+  font-size: 1.13rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+}
+
+.presidential-cta__card p {
+  margin: 0;
+  color: var(--pcta-muted);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+.presidential-cta__card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 22px;
+  color: #0f766e;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: gap 180ms ease;
+}
+
+.presidential-cta__card-link:hover {
+  gap: 12px;
+  color: var(--pcta-navy);
+}
+
+/* Closing statement */
+
+.presidential-cta__closing {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  max-width: 900px;
+  margin: 35px auto 0;
+  padding: 0 10px;
+  color: var(--pcta-muted);
+}
+
+.presidential-cta__closing > svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--pcta-teal);
+}
+
+.presidential-cta__closing p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  text-align: center;
+}
+
+.presidential-cta__closing strong {
+  color: var(--pcta-navy);
+  font-weight: 800;
+}
+
+/* Tablet */
+
+@media (max-width: 1000px) {
+  .presidential-cta {
+    padding: 68px 22px 60px;
+  }
+
+  .presidential-cta__banner {
+    grid-template-columns: minmax(0, 1fr) 215px;
+    gap: 27px;
+    padding: 43px 36px;
+  }
+
+  .presidential-cta__content h2 {
+    font-size: clamp(2rem, 4.3vw, 2.7rem);
+  }
+
+  .presidential-cta__side {
+    min-height: 220px;
+    padding: 20px 13px;
+  }
+
+  .presidential-cta__cards {
+    gap: 16px;
+  }
+
+  .presidential-cta__card {
+    padding: 24px 21px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 720px) {
+  .presidential-cta {
+    padding: 52px 17px 46px;
+  }
+
+  .presidential-cta__banner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+    padding: 35px 25px;
+    border-radius: 19px;
+  }
+
+  .presidential-cta__content h2 {
+    font-size: clamp(1.9rem, 7vw, 2.55rem);
+    letter-spacing: -0.035em;
+  }
+
+  .presidential-cta__intro {
+    margin-top: 17px;
+    font-size: 0.93rem;
+    line-height: 1.8;
+  }
+
+  .presidential-cta__actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 11px;
+    margin-top: 25px;
+  }
+
+  .presidential-cta__button {
+    width: 100%;
+    min-height: 47px;
+  }
+
+  .presidential-cta__side {
+    display: grid;
+    min-height: auto;
+    grid-template-columns: 58px minmax(0, 1fr);
+    justify-items: start;
+    column-gap: 16px;
+    padding: 19px;
+    text-align: left;
+  }
+
+  .presidential-cta__symbol {
+    width: 58px;
+    height: 58px;
+    grid-row: 1 / span 4;
+    margin: 0;
+    border-radius: 17px;
+  }
+
+  .presidential-cta__symbol svg {
+    width: 31px;
+    height: 31px;
+  }
+
+  .presidential-cta__side-label {
+    align-self: end;
+  }
+
+  .presidential-cta__side-heading {
+    margin-top: 3px;
+    font-size: 1rem;
+  }
+
+  .presidential-cta__side-line {
+    width: 34px;
+    height: 2px;
+    margin: 9px 0;
+  }
+
+  .presidential-cta__side-caption {
+    max-width: 100%;
+    font-size: 0.73rem;
+  }
+
+  .presidential-cta__cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .presidential-cta__card {
+    padding: 24px;
+  }
+
+  .presidential-cta__card h3 {
+    margin-top: 16px;
+  }
+
+  .presidential-cta__card-link {
+    padding-top: 17px;
+  }
+
+  .presidential-cta__closing {
+    gap: 9px;
+    margin-top: 26px;
+    padding: 0 2px;
+  }
+
+  .presidential-cta__closing p {
+    font-size: 0.82rem;
+    text-align: left;
+  }
+
+  .presidential-cta__decoration--one {
+    top: -90px;
+    right: -230px;
+  }
+
+  .presidential-cta__decoration--two {
+    top: -40px;
+    right: -180px;
+  }
+}
+
+/* Small mobile */
+
+@media (max-width: 380px) {
+  .presidential-cta {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .presidential-cta__banner {
+    padding: 29px 19px;
+  }
+
+  .presidential-cta__content h2 {
+    font-size: 1.8rem;
+  }
+
+  .presidential-cta__card {
+    padding: 21px;
+  }
+}
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+  .presidential-cta *,
+  .presidential-cta *::before,
+  .presidential-cta *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
