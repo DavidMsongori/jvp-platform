@@ -34,6 +34,7 @@ const PAYMENT_STATUSES = [
 
 const PAYMENT_PROVIDERS = [
   "intasend",
+  "payhero",
   "mpesa_direct",
   "manual",
 ];
@@ -445,6 +446,73 @@ const paymentSchema = new mongoose.Schema(
         default: null,
       },
     },
+
+
+      /* ==========================================
+       PAYHERO DETAILS
+    ========================================== */
+
+    payhero: {
+      externalReference: {
+        type: String,
+        default: null,
+        trim: true,
+        index: true,
+      },
+
+      checkoutRequestId: {
+        type: String,
+        default: null,
+        trim: true,
+        index: true,
+      },
+
+      providerReference: {
+        type: String,
+        default: null,
+        trim: true,
+        index: true,
+      },
+
+      channelId: {
+        type: Number,
+        default: null,
+      },
+
+      providerStatus: {
+        type: String,
+        default: null,
+        trim: true,
+      },
+
+      callbackReceived: {
+        type: Boolean,
+        default: false,
+      },
+
+      callbackReceivedAt: {
+        type: Date,
+        default: null,
+      },
+
+      failedReason: {
+        type: String,
+        default: null,
+        trim: true,
+      },
+
+      lastStatusQueryAt: {
+        type: Date,
+        default: null,
+      },
+
+      statusQueryAttempts: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+    },  
+
 
     /* ==========================================
        GATEWAY DETAILS
@@ -1097,6 +1165,191 @@ paymentSchema.methods.markIntaSendFailed =
   };
 
 /* ==========================================
+   PAYHERO PAYMENT METHODS
+========================================== */
+
+paymentSchema.methods.markPayHeroProcessing =
+  function ({
+    externalReference,
+    checkoutRequestId,
+    providerReference,
+    channelId,
+    providerStatus = "QUEUED",
+    gatewayResponse,
+  }) {
+    this.provider = "payhero";
+    this.paymentMethod = "mpesa";
+    this.status = "processing";
+
+    this.initiatedAt =
+      this.initiatedAt || new Date();
+
+    this.payhero.externalReference =
+      externalReference || this.reference;
+
+    this.payhero.checkoutRequestId =
+      checkoutRequestId || null;
+
+    this.payhero.providerReference =
+      providerReference || null;
+
+    this.payhero.channelId =
+      channelId ?? null;
+
+    this.payhero.providerStatus =
+      providerStatus || "QUEUED";
+
+    this.gatewayReference =
+      providerReference ||
+      checkoutRequestId ||
+      this.reference;
+
+    this.gatewayResponse =
+      gatewayResponse || null;
+
+    return this.save();
+  };
+
+paymentSchema.methods.markPayHeroSuccessful =
+  function ({
+    receiptNumber,
+    externalReference,
+    checkoutRequestId,
+    providerReference,
+    transactionDate,
+    resultDescription,
+    callbackPayload,
+    verificationMethod = "callback",
+  }) {
+    const now = new Date();
+
+    this.provider = "payhero";
+    this.paymentMethod = "mpesa";
+    this.status = "successful";
+
+    this.statusMessage =
+      resultDescription ||
+      "Payment completed successfully.";
+
+    this.failureReason = null;
+
+    this.payhero.externalReference =
+      externalReference ||
+      this.payhero.externalReference ||
+      this.reference;
+
+    this.payhero.checkoutRequestId =
+      checkoutRequestId ||
+      this.payhero.checkoutRequestId;
+
+    this.payhero.providerReference =
+      providerReference ||
+      this.payhero.providerReference ||
+      null;
+
+    this.payhero.providerStatus = "Success";
+
+    if (receiptNumber) {
+      this.mpesa.receiptNumber =
+        receiptNumber.toUpperCase();
+
+      this.gatewayReference =
+        receiptNumber.toUpperCase();
+    } else {
+      this.gatewayReference =
+        providerReference ||
+        checkoutRequestId ||
+        this.gatewayReference;
+    }
+
+    this.mpesa.resultCode = 0;
+
+    this.mpesa.resultDescription =
+      resultDescription ||
+      "Payment completed successfully.";
+
+    this.mpesa.transactionDate =
+      transactionDate || now;
+
+    this.payhero.callbackReceived =
+      verificationMethod === "callback";
+
+    if (verificationMethod === "callback") {
+      this.payhero.callbackReceivedAt = now;
+    }
+
+    this.callbackPayload =
+      callbackPayload ||
+      this.callbackPayload;
+
+    this.paidAt = transactionDate || now;
+    this.verifiedAt = now;
+    this.isVerified = true;
+
+    this.verificationMethod =
+      verificationMethod;
+
+    return this.save();
+  };
+
+paymentSchema.methods.markPayHeroFailed =
+  function ({
+    externalReference,
+    checkoutRequestId,
+    providerReference,
+    resultCode,
+    failedReason,
+    callbackPayload,
+  }) {
+    const now = new Date();
+
+    this.provider = "payhero";
+    this.paymentMethod = "mpesa";
+    this.status = "failed";
+
+    this.payhero.externalReference =
+      externalReference ||
+      this.payhero.externalReference ||
+      this.reference;
+
+    this.payhero.checkoutRequestId =
+      checkoutRequestId ||
+      this.payhero.checkoutRequestId;
+
+    this.payhero.providerReference =
+      providerReference ||
+      this.payhero.providerReference ||
+      null;
+
+    this.payhero.providerStatus = "Failed";
+    this.payhero.failedReason =
+      failedReason ||
+      "The PayHero payment was not completed.";
+
+    this.failureReason =
+      this.payhero.failedReason;
+
+    this.statusMessage = this.failureReason;
+
+    this.mpesa.resultCode =
+      resultCode ?? null;
+
+    this.mpesa.resultDescription =
+      this.failureReason;
+
+    this.payhero.callbackReceived = true;
+    this.payhero.callbackReceivedAt = now;
+
+    this.callbackPayload =
+      callbackPayload ||
+      this.callbackPayload;
+
+    this.failedAt = now;
+
+    return this.save();
+  };
+
+/* ==========================================
    STATIC METHODS
 ========================================== */
 
@@ -1132,6 +1385,23 @@ paymentSchema.statics.findByIntaSendApiReference =
           .toUpperCase(),
     });
   };
+
+
+paymentSchema.statics.findByPayHeroExternalReference =
+  function (externalReference) {
+    return this.findOne({
+      "payhero.externalReference":
+        externalReference?.trim(),
+    });
+  };
+
+paymentSchema.statics.findByPayHeroCheckoutRequestId =
+  function (checkoutRequestId) {
+    return this.findOne({
+      "payhero.checkoutRequestId":
+        checkoutRequestId?.trim(),
+    });
+  };  
 
 /* ==========================================
    MODEL

@@ -12,9 +12,12 @@ import {
 } from "../config/membership.js";
 
 import {
-  createIntaSendCheckout,
   queryIntaSendPaymentStatus,
 } from "./intasend.service.js";
+
+import {
+  initiateStkPush,
+} from "./payhero.service.js";
 
 import SummitExhibitor from "../models/summitExhibitor.model.js";
 
@@ -372,7 +375,7 @@ async function getReusablePayment({
 
     paymentFor,
 
-    provider: "intasend",
+    provider: "payhero",
 
     status: {
       $in: PENDING_PAYMENT_STATUSES,
@@ -450,7 +453,7 @@ export const createPayment = async ({
   accountReference,
   description,
 
-  provider = "intasend",
+  provider = "payhero",
   paymentMethod = "unknown",
 
   metadata = {},
@@ -570,18 +573,18 @@ export const createPayment = async ({
       paymentProvider:
         provider,
 
-      environment:
-        provider === "intasend"
-          ? (
-              String(
-                process.env.INTASEND_TEST_MODE ?? "true"
-              )
-                .trim()
-                .toLowerCase() === "true"
-                ? "sandbox"
-                : "production"
-            )
-          : "manual",
+     environment:
+  provider === "intasend"
+    ? (
+        String(
+          process.env.INTASEND_TEST_MODE ?? "true"
+        ).trim().toLowerCase() === "true"
+          ? "sandbox"
+          : "production"
+      )
+    : provider === "payhero"
+      ? "production"
+      : "manual",
     },
   });
 
@@ -1421,8 +1424,9 @@ export const createRenewalPayment =
     };
   };
 
+
 /* ==========================================================
-   INITIATE INTASEND PAYMENT
+   INITIATE PAYHERO PAYMENT
 ========================================================== */
 
 export const initiatePayment = async ({
@@ -1438,26 +1442,14 @@ export const initiatePayment = async ({
 }) => {
   let payment;
 
-  /* ========================================
-     FIND PAYMENT
-  ======================================== */
-
   if (paymentId) {
-    payment =
-      await findPaymentById(
-        paymentId,
-        {
-          includeGatewayData: true,
-        }
-      );
+    payment = await findPaymentById(paymentId, {
+      includeGatewayData: true,
+    });
   } else if (reference) {
-    payment =
-      await findPaymentByReference(
-        reference,
-        {
-          includeGatewayData: true,
-        }
-      );
+    payment = await findPaymentByReference(reference, {
+      includeGatewayData: true,
+    });
   } else {
     throw new AppError(
       "Payment ID or reference is required.",
@@ -1465,52 +1457,23 @@ export const initiatePayment = async ({
     );
   }
 
-  /* ========================================
-     ALREADY COMPLETED
-  ======================================== */
-
-  if (
-    payment.status ===
-    "successful"
-  ) {
+  if (payment.status === "successful" && payment.isVerified) {
     return {
       success: true,
-
       alreadyCompleted: true,
-
-      message:
-        "Payment has already been completed.",
-
+      message: "Payment has already been completed.",
       payment,
-
-      reference:
-        payment.reference,
-
-      checkoutUrl:
-        payment.intasend
-          ?.checkoutUrl ||
-        null,
-
-      invoiceId:
-        payment.intasend
-          ?.invoiceId ||
-        null,
+      reference: payment.reference,
+      checkoutUrl: null,
+      invoiceId: null,
+      checkoutRequestId:
+        payment.payhero?.checkoutRequestId || null,
     };
   }
 
-  /* ========================================
-     VALID STATUS
-  ======================================== */
-
   if (
-    FINAL_PAYMENT_STATUSES.includes(
-      payment.status
-    ) &&
-    ![
-      "failed",
-      "cancelled",
-      "expired",
-    ].includes(payment.status)
+    FINAL_PAYMENT_STATUSES.includes(payment.status) &&
+    !["failed", "cancelled", "expired"].includes(payment.status)
   ) {
     throw new AppError(
       `A ${payment.status} payment cannot be initiated again.`,
@@ -1518,21 +1481,48 @@ export const initiatePayment = async ({
     );
   }
 
-  /* ========================================
-     PAYMENT EXPIRY
-  ======================================== */
+  /*
+   * PayHero integration in this flow supports M-Pesa STK Push.
+   * Do not silently redirect card payments to an M-Pesa gateway.
+   */
+  if (method !== "M-PESA") {
+    throw new AppError(
+      "PayHero supports M-Pesa STK Push in this payment flow. Card payments require a separate supported gateway.",
+      400
+    );
+  }
+
+  /*
+   * Avoid accidentally sending another STK Push when an existing
+   * PayHero request is already being processed.
+   */
+  if (
+    payment.provider === "payhero" &&
+    payment.status === "processing" &&
+    payment.payhero?.checkoutRequestId
+  ) {
+    return {
+      success: true,
+      alreadyInitiated: true,
+      message:
+        "This PayHero payment request is already processing. Check its status before trying again.",
+      payment,
+      reference: payment.reference,
+      checkoutUrl: null,
+      invoiceId: null,
+      checkoutRequestId:
+        payment.payhero.checkoutRequestId,
+      providerReference:
+        payment.payhero.providerReference || null,
+    };
+  }
 
   if (
     payment.expiresAt &&
-    payment.expiresAt <=
-      new Date()
+    payment.expiresAt <= new Date()
   ) {
-    payment.status =
-      "expired";
-
-    payment.statusMessage =
-      "The payment request expired.";
-
+    payment.status = "expired";
+    payment.statusMessage = "The payment request expired.";
     payment.failureReason =
       "Payment request expired before completion.";
 
@@ -1544,24 +1534,13 @@ export const initiatePayment = async ({
     );
   }
 
-  /* ========================================
-     CUSTOMER DETAILS
-  ======================================== */
+  const member = payment.member || null;
 
-  const member =
-    payment.member || null;
-
-  const resolvedPhone =
-    getMemberPhone(
-      member,
-      phoneNumber ||
-        payment.phoneNumber,
-      {
-        required:
-          method ===
-          "M-PESA",
-      }
-    );
+  const resolvedPhone = getMemberPhone(
+    member,
+    phoneNumber || payment.phoneNumber,
+    { required: true }
+  );
 
   const resolvedFullName =
     fullName ||
@@ -1569,228 +1548,126 @@ export const initiatePayment = async ({
       member?.firstName,
       member?.middleName,
       member?.lastName,
-    ]
-      .filter(Boolean)
-      .join(" ") ||
-    payment.metadata
-      ?.customerName ||
+    ].filter(Boolean).join(" ") ||
+    payment.metadata?.customerName ||
     "JVP Customer";
 
-  const resolvedEmail =
-    email ||
-    member?.user?.email ||
-    payment.metadata
-      ?.customerEmail ||
-    "";
+  /*
+   * PayHero STK Push uses its configured callback URL.
+   * redirectUrl and email are retained in this function's
+   * signature for compatibility with existing callers.
+   */
 
-  payment.provider =
-    "intasend";
-
-  payment.paymentMethod =
-    method === "M-PESA"
-      ? "mpesa"
-      : method ===
-          "CARD-PAYMENT"
-        ? "card"
-        : "unknown";
-
-  payment.phoneNumber =
-    resolvedPhone ||
-    payment.phoneNumber ||
-    null;
-
-  payment.status =
-    "pending";
-
-  payment.statusMessage =
-    "Preparing IntaSend checkout.";
-
-  payment.failureReason =
-    null;
-
-  payment.failedAt =
-    null;
-
-  payment.cancelledAt =
-    null;
+  payment.provider = "payhero";
+  payment.paymentMethod = "mpesa";
+  payment.phoneNumber = resolvedPhone;
+  payment.status = "pending";
+  payment.statusMessage = "Preparing PayHero M-Pesa STK Push.";
+  payment.failureReason = null;
+  payment.failedAt = null;
+  payment.cancelledAt = null;
 
   await payment.save();
 
-  /* ========================================
-     CREATE CHECKOUT
-  ======================================== */
-
   try {
-    const result =
-      await createIntaSendCheckout(
-        {
-          paymentId:
-            payment._id,
+    const result = await initiateStkPush({
+      amount: payment.amount,
+      phoneNumber: resolvedPhone,
+      reference: payment.reference,
+      customerName: resolvedFullName,
+    });
 
-          customer: {
-            fullName:
-              resolvedFullName,
-
-            email:
-              resolvedEmail,
-
-            phoneNumber:
-              resolvedPhone,
-          },
-
-          method,
-
-          redirectUrl:
-            redirectUrl ||
-            `${String(
-              process.env
-                .FRONTEND_URL ||
-                "http://localhost:5173"
-            ).replace(
-              /\/+$/,
-              ""
-            )}/payment/success?reference=${encodeURIComponent(
-              payment.reference
-            )}`,
-        }
-      );
+    await payment.markPayHeroProcessing({
+      externalReference: payment.reference,
+      checkoutRequestId: result.checkoutRequestId,
+      providerReference: result.providerReference,
+      channelId: Number(process.env.PAYHERO_CHANNEL_ID),
+      providerStatus: result.status || "QUEUED",
+      gatewayResponse: {
+        success: result.success,
+        status: result.status,
+        providerReference: result.providerReference,
+        checkoutRequestId: result.checkoutRequestId,
+        message: result.message,
+      },
+    });
 
     await createActivityLog({
-      user:
-        getMemberUserId(
-          member
-        ) ||
-        payment.user,
-
-      action:
-        "IntaSend checkout created",
-
+      user: getMemberUserId(member) || payment.user,
+      action: "PayHero STK Push initiated",
       description:
-        "IntaSend payment checkout created successfully.",
-
-      targetId:
-        payment._id,
-
+        "A PayHero M-Pesa payment request was accepted for processing.",
+      targetId: payment._id,
       metadata: {
-        reference:
-          payment.reference,
-
-        invoiceId:
-          result.invoiceId,
-
-        amount:
-          payment.amount,
-
-        paymentMethod:
-          payment.paymentMethod,
-
-        provider:
-          "intasend",
-
-        reused:
-          Boolean(
-            result.reused
-          ),
+        reference: payment.reference,
+        amount: payment.amount,
+        paymentMethod: "mpesa",
+        provider: "payhero",
+        checkoutRequestId: result.checkoutRequestId,
+        providerReference: result.providerReference,
       },
     });
 
     return {
       success: true,
-
       message:
-        result.reused
-          ? "Existing IntaSend checkout retrieved successfully."
-          : "IntaSend checkout created successfully.",
-
-      payment:
-        result.payment,
-
-      reference:
-        payment.reference,
-
-      checkoutUrl:
-        result.checkoutUrl,
-
-      invoiceId:
-        result.invoiceId,
-
-      reused:
-        Boolean(
-          result.reused
-        ),
+        "M-Pesa payment request sent. Complete the prompt on your phone.",
+      payment,
+      reference: payment.reference,
+      checkoutUrl: null,
+      invoiceId: null,
+      checkoutRequestId: result.checkoutRequestId,
+      providerReference: result.providerReference,
+      status: result.status,
     };
   } catch (error) {
     /*
-     * Do not convert the payment to failed when
-     * IntaSend has already created an invoice.
-     * The provider may still send a webhook.
+     * If the request timed out or the connection was lost, PayHero
+     * may have received the STK Push. Do not mark it failed or
+     * automatically issue another request in that ambiguous case.
      */
-
-    if (
-      !payment.intasend
-        ?.invoiceId
-    ) {
-      payment.status =
-        "failed";
-
-      payment.failureReason =
-        error.message ||
-        "Unable to create the IntaSend checkout.";
-
+    if (error.paymentOutcomeUnknown) {
+      payment.status = "processing";
       payment.statusMessage =
-        payment.failureReason;
-
-      payment.failedAt =
-        new Date();
-
-      payment.gatewayResponse =
-        error.details ||
-        null;
-
+        "PayHero's response is unconfirmed. Check payment status before retrying.";
       await payment.save();
+
+throw new AppError(
+  "PayHero's response could not be confirmed. Check payment status before retrying.",
+  502
+);
     }
 
+    payment.status = "failed";
+    payment.failureReason =
+      error.message || "Unable to initiate PayHero STK Push.";
+    payment.statusMessage = payment.failureReason;
+    payment.failedAt = new Date();
+
+    await payment.save();
+
     await createActivityLog({
-      user:
-        getMemberUserId(
-          member
-        ) ||
-        payment.user,
-
-      action:
-        "IntaSend checkout failed",
-
+      user: getMemberUserId(member) || payment.user,
+      action: "PayHero STK Push failed",
       description:
-        "IntaSend payment checkout could not be created.",
-
-      targetId:
-        payment._id,
-
+        "PayHero could not initiate the M-Pesa payment request.",
+      targetId: payment._id,
       metadata: {
-        reference:
-          payment.reference,
-
-        error:
-          error.message,
-
-        code:
-          error.code ||
-          null,
+        reference: payment.reference,
+        provider: "payhero",
+        error: error.message,
       },
     });
 
-    throw new AppError(
-  Number.isInteger(
-    error.statusCode
-  )
+   throw new AppError(
+  error.message || "Unable to initiate PayHero STK Push.",
+  Number.isInteger(error.statusCode)
     ? error.statusCode
-    : 502,
-
-  error.message ||
-    "Unable to create the IntaSend checkout."
+    : 502
 );
   }
 };
+
 
 /* ==========================================================
    INITIATE MEMBERSHIP PAYMENT
@@ -2605,6 +2482,260 @@ export const processMpesaCallback =
       payment,
     };
   };
+
+
+/* ==========================================================
+   PROCESS PAYHERO CALLBACK
+========================================================== */
+
+export const processPayHeroCallback = async (payload) => {
+  const callback = payload?.response;
+
+  if (!callback || typeof callback !== "object") {
+    throw new AppError(
+      "Invalid PayHero callback payload.",
+      400
+    );
+  }
+
+  const externalReference =
+    callback.ExternalReference ||
+    callback.external_reference ||
+    null;
+
+  const checkoutRequestId =
+    callback.CheckoutRequestID ||
+    callback.checkoutRequestId ||
+    null;
+
+  const resultCode = Number(callback.ResultCode);
+  const providerStatus = String(
+    callback.Status || ""
+  ).trim().toLowerCase();
+
+  if (!externalReference && !checkoutRequestId) {
+    throw new AppError(
+      "PayHero callback is missing its payment reference.",
+      400
+    );
+  }
+
+  const lookupConditions = [];
+
+  if (externalReference) {
+    lookupConditions.push(
+      { reference: externalReference },
+      { "payhero.externalReference": externalReference }
+    );
+  }
+
+  if (checkoutRequestId) {
+    lookupConditions.push(
+      { "payhero.checkoutRequestId": checkoutRequestId }
+    );
+  }
+
+  const payment = await Payment.findOne({
+    provider: "payhero",
+    $or: lookupConditions,
+  })
+    .select("+gatewayResponse +callbackPayload")
+    .populate({
+      path: "member",
+      populate: {
+        path: "user",
+        select: "email role isActive",
+      },
+    });
+
+  if (!payment) {
+    console.error("PayHero callback payment not found:", {
+      externalReference,
+      checkoutRequestId,
+    });
+
+    return {
+      success: false,
+      ignored: true,
+      message: "No matching PayHero payment was found.",
+    };
+  }
+
+  // A repeated callback must never activate or charge twice.
+  if (payment.status === "successful" && payment.isVerified) {
+    await processSuccessfulPayment(payment);
+
+    return {
+      success: true,
+      alreadyProcessed: true,
+      reference: payment.reference,
+    };
+  }
+
+  // Preserve the callback for investigation and reconciliation.
+  payment.callbackPayload = payload;
+
+  if (payment.payhero) {
+    payment.payhero.externalReference =
+      externalReference ||
+      payment.payhero.externalReference;
+
+    payment.payhero.checkoutRequestId =
+      checkoutRequestId ||
+      payment.payhero.checkoutRequestId;
+
+    payment.payhero.providerStatus =
+      callback.Status || payment.payhero.providerStatus;
+
+    payment.payhero.callbackReceived = true;
+    payment.payhero.callbackReceivedAt = new Date();
+  }
+
+  payment.gatewayResponse = {
+    ...(payment.gatewayResponse || {}),
+    payheroCallback: payload,
+  };
+
+  // A non-success callback must never mark a payment as paid.
+  const successful =
+    resultCode === 0 &&
+    providerStatus === "success";
+
+  if (!successful) {
+    const description =
+      callback.ResultDesc ||
+      callback.Status ||
+      "PayHero reports that the payment was not completed.";
+
+    const status =
+      providerStatus.includes("cancel")
+        ? "cancelled"
+        : providerStatus.includes("expir")
+          ? "expired"
+          : "failed";
+
+    payment.status = status;
+    payment.statusMessage = description;
+    payment.failureReason = description;
+    payment.failedAt = new Date();
+
+    await payment.save();
+
+    await createActivityLog({
+      user: getMemberUserId(payment.member) || payment.user,
+      action: `PayHero payment ${status}`,
+      description,
+      targetId: payment._id,
+      metadata: {
+        reference: payment.reference,
+        checkoutRequestId,
+        resultCode: callback.ResultCode,
+        provider: "payhero",
+      },
+    });
+
+    return {
+      success: true,
+      completed: false,
+      status,
+      reference: payment.reference,
+    };
+  }
+
+  const receiptNumber =
+    callback.MpesaReceiptNumber ||
+    callback.mpesaReceiptNumber ||
+    null;
+
+  const amount = Number(callback.Amount);
+  const phoneNumber =
+    callback.Phone ||
+    callback.phone ||
+    null;
+
+  // Require essential payment details before verification.
+  if (!receiptNumber) {
+    throw new AppError(
+      "Successful PayHero callback is missing the M-Pesa receipt number.",
+      400
+    );
+  }
+
+  if (
+    !Number.isFinite(amount) ||
+    amount !== Number(payment.amount)
+  ) {
+    throw new AppError(
+      "PayHero callback amount does not match the payment amount.",
+      400
+    );
+  }
+
+  if (!phoneNumber || !payment.phoneNumber) {
+    throw new AppError(
+      "PayHero callback or payment record is missing the phone number.",
+      400
+    );
+  }
+
+  if (
+    normalizeMpesaPhoneNumber(phoneNumber) !==
+    normalizeMpesaPhoneNumber(payment.phoneNumber)
+  ) {
+    throw new AppError(
+      "PayHero callback phone number does not match the payment record.",
+      400
+    );
+  }
+
+  const duplicateReceipt = await Payment.findOne({
+    "mpesa.receiptNumber": receiptNumber,
+    _id: { $ne: payment._id },
+  });
+
+  if (duplicateReceipt) {
+    throw new AppError(
+      "This M-Pesa receipt has already been used for another payment.",
+      409
+    );
+  }
+
+  // Use the model's existing PayHero verification method.
+ await payment.markPayHeroSuccessful({
+  receiptNumber,
+  externalReference,
+  checkoutRequestId,
+  providerReference: callback.MerchantRequestID || null,
+  resultDescription: callback.ResultDesc || "Payment successful.",
+  callbackPayload: payload,
+  verificationMethod: "callback",
+});
+
+  await processSuccessfulPayment(payment);
+
+  await createActivityLog({
+    user: getMemberUserId(payment.member) || payment.user,
+    action: "PayHero payment verified",
+    description:
+      "PayHero confirmed a successful M-Pesa payment.",
+    targetId: payment._id,
+    metadata: {
+      reference: payment.reference,
+      receiptNumber,
+      amount,
+      checkoutRequestId,
+      provider: "payhero",
+    },
+  });
+
+  return {
+    success: true,
+    completed: true,
+    reference: payment.reference,
+    receiptNumber,
+  };
+};
+
 
 /* ==========================================================
    QUERY INTASEND PAYMENT STATUS
@@ -3866,6 +3997,7 @@ export default {
 
   processSuccessfulPayment,
 
+  processPayHeroCallback,
   processMpesaCallback,
   queryPaymentStatus,
   retryPayment,

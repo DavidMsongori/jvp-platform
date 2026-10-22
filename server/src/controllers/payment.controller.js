@@ -65,7 +65,7 @@ export const initiateMembershipPayment = async (
       success: true,
       message:
         result.message ||
-        "IntaSend checkout created successfully.",
+        "PayHero M-Pesa payment initiated successfully.",
       data: {
         payment: result.payment,
         member: result.member,
@@ -165,7 +165,7 @@ export const initiateRenewalPayment = async (
       success: true,
       message:
         result.message ||
-        "IntaSend renewal checkout created successfully.",
+        "PayHero M-Pesa renewal payment initiated successfully.",
       data: {
         payment: result.payment,
         member: result.member,
@@ -228,7 +228,7 @@ export const initiatePayment = async (
       success: true,
       message:
         result.message ||
-        "IntaSend checkout created successfully.",
+        "PayHero M-Pesa payment initiated successfully.",
       data: {
         payment: result.payment,
         reference: result.reference,
@@ -293,6 +293,57 @@ export const mpesaCallback = async (
     });
   }
 };
+
+
+/* ==========================================================
+   PAYHERO CALLBACK
+========================================================== */
+
+
+export const payheroCallback = async (req, res) => {
+  try {
+    const result =
+      await paymentService.processPayHeroCallback(req.body);
+
+    return res.status(200).json({
+      success: true,
+      message: "PayHero callback processed successfully.",
+      data: result,
+    });
+  } catch (error) {
+    console.error("PayHero callback processing error:", {
+      message: error.message,
+      stack:
+        process.env.NODE_ENV === "development"
+          ? error.stack
+          : undefined,
+    });
+
+    /*
+     * Tell PayHero to retry if processing failed because
+     * of a temporary server or database error.
+     * Do not acknowledge an unprocessed payment as complete.
+     */
+    const statusCode = Number(error.statusCode || error.status);
+
+    if (
+      statusCode === 400 ||
+      statusCode === 409
+    ) {
+      return res.status(statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "PayHero callback processing failed.",
+    });
+  }
+};
+
+
 
 /* ==========================================================
    MANUAL M-PESA CONFIRMATION
@@ -485,7 +536,7 @@ export const retryPayment = async (
       success: true,
       message:
         result.message ||
-        "A new IntaSend checkout was created successfully.",
+        "PayHero M-Pesa payment retry initiated successfully.",
       data: {
         payment: result.payment,
         reference: result.reference,
@@ -871,6 +922,7 @@ export default {
   initiatePayment,
 
   mpesaCallback,
+  payheroCallback,
   confirmMpesaPayment,
   approveManualMpesaPayment,
   queryPaymentStatus,

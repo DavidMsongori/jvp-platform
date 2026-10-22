@@ -10,6 +10,7 @@ import {
   initiateRenewalPayment,
   initiatePayment,
   mpesaCallback,
+  payheroCallback,
   confirmMpesaPayment,
   approveManualMpesaPayment,
   queryPaymentStatus,
@@ -71,6 +72,15 @@ router.post(
   mpesaCallbackValidator,
   validate,
   mpesaCallback
+);
+
+/* ==========================================================
+   PAYHERO M-PESA CALLBACK
+========================================================== */
+
+router.post(
+  "/payhero/callback",
+  payheroCallback
 );
 
 /* ==========================================================

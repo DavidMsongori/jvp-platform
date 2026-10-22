@@ -138,7 +138,7 @@ export const createCheckout = async (
       statusCode: 201,
       message: result.reused
         ? "Existing IntaSend checkout retrieved successfully."
-        : "IntaSend checkout created successfully.",
+        : "PayHero M-Pesa payment initiated successfully.",
       data: {
         payment: serializePayment(result.payment),
         checkoutUrl: result.checkoutUrl,
