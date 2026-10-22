@@ -2597,9 +2597,10 @@ export const processPayHeroCallback = async (payload) => {
   };
 
   // A non-success callback must never mark a payment as paid.
-  const successful =
-    resultCode === 0 &&
-    providerStatus === "success";
+ const successful =
+  payload.status === true &&
+  resultCode === 0 &&
+  providerStatus === "success";
 
   if (!successful) {
     const description =
