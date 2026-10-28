@@ -21,6 +21,7 @@ import {
   FaNewspaper,
   FaEnvelope,
   FaBullseye,
+  FaImages,
 } from "react-icons/fa";
 
 import { PERMISSIONS } from "../../utils/permissions";
@@ -161,6 +162,12 @@ function AdminSidebar({ isOpen, onClose }) {
       path: "/admin/events",
       permission: PERMISSIONS.VIEW_EVENTS,
     },
+    {
+  name: "JVP @ 1 Gallery",
+  icon: <FaImages />,
+  path: "/admin/jvp-at-one",
+  permission: PERMISSIONS.VIEW_EVENTS,
+},
     {
       name: "Summit",
       icon: <FaTicketAlt />,

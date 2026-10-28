@@ -29,6 +29,7 @@ import newsRoutes from "./routes/news.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import programRoutes from "./routes/program.routes.js";
 import officeAssignmentRoutes from "./routes/officeAssignment.routes.js";
+import jvpAtOneRoutes from "./routes/jvpAtOne.routes.js";
 
 const app = express();
 
@@ -136,6 +137,7 @@ app.use("/api/contact", contactRoutes);
 
 app.use("/api/programs", programRoutes);
 app.use("/api/office-assignments", officeAssignmentRoutes);
+app.use("/api/jvp-at-one", jvpAtOneRoutes);
 
 /* 404 */
 app.use((req, res) => {

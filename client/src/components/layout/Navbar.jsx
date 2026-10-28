@@ -116,6 +116,17 @@ function Navbar() {
             About Us
           </Link>
 
+        {/* JVP FIRST ANNIVERSARY */}
+
+<Link
+  to="/jvp-at-one"
+  onClick={closeMenu}
+>
+  JVP @ 1
+</Link>
+
+
+
           {/* NEWS */}
 
           <Link

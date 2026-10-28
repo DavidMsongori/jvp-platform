@@ -42,6 +42,10 @@ import YouthAssembly from "../pages/leadership/YouthAssembly";
 import CountyLeadership from "../pages/leadership/CountyLeadership";
 import ProgramDetails from "../pages/programs/ProgramDetails";
 
+import JVPAtOne from "../pages/JVPAtOne";
+import JVPAtOneReister from "../pages/JVPAtOneRegister";
+import JVPAtOneGallery from "../pages/JVPAtOneGallery";
+
 /* ==========================================
    PUBLIC ELECTIONS
 ========================================== */
@@ -147,6 +151,8 @@ import AdminEvents from "../pages/admin/events/Events";
 import CreateEvent from "../pages/admin/events/CreateEvent";
 import EditEvent from "../pages/admin/events/EditEvent";
 import ViewEvent from "../pages/admin/events/ViewEvent";
+
+import JVPAtOneAdmin from "../pages/admin/JVPAtOneAdmin";
 
 /* ==========================================
    ADMIN SUMMIT
@@ -261,6 +267,21 @@ function AppRoutes() {
         <Route
           path="/leadership/county/:countySlug"
           element={<CountyLeadership />}
+        />  
+
+        <Route
+          path="/jvp-at-one"
+          element={<JVPAtOne />}
+        />  
+
+        <Route
+          path="/jvp-at-one/register"
+          element={<JVPAtOneReister />}
+        />  
+
+        <Route
+          path="/jvp-at-one/gallery"
+          element={<JVPAtOneGallery />}
         />  
 
         {/* =====================================
@@ -739,6 +760,15 @@ function AppRoutes() {
               </PermissionRoute>
             }
           />
+
+          <Route
+  path="jvp-at-one"
+  element={
+    <PermissionRoute permission={PERMISSIONS.VIEW_EVENTS}>
+      <JVPAtOneAdmin />
+    </PermissionRoute>
+  }
+/>  
 
           {/* =====================================
               SUMMIT

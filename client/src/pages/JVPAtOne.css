@@ -1,0 +1,966 @@
+
+/* =========================================
+   JVP @ 1 ANNIVERSARY WEBSITE
+   Complete stylesheet for JVPAtOne.jsx
+========================================= */
+
+/* ---------- Theme ---------- */
+
+:root {
+  --jvp-primary: #103b73;
+  --jvp-primary-dark: #0b2c59;
+  --jvp-primary-light: #edf3fb;
+  --jvp-gold: #e9b72e;
+  --jvp-gold-light: #fff4d5;
+  --jvp-text: #142d4e;
+  --jvp-muted: #657387;
+  --jvp-background: #f7f8fa;
+  --jvp-white: #ffffff;
+  --jvp-border: #e5eaf1;
+  --jvp-radius: 14px;
+  --jvp-shadow: 0 5px 18px rgba(16, 59, 115, 0.07);
+}
+
+.jvp-anniversary,
+.jvp-anniversary * {
+  box-sizing: border-box;
+}
+
+.jvp-anniversary {
+  width: 100%;
+  overflow: hidden;
+  background: var(--jvp-background);
+  color: var(--jvp-text);
+  font-family:
+    Inter,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+.jvp-anniversary img,
+.jvp-anniversary iframe {
+  max-width: 100%;
+}
+
+.jvp-anniversary a {
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.jvp-anniversary button,
+.jvp-anniversary input,
+.jvp-anniversary select {
+  font: inherit;
+}
+
+/* ---------- Hero ---------- */
+
+.jvp-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(50px, 7vw, 92px) clamp(20px, 6vw, 80px);
+  background: linear-gradient(
+    125deg,
+    #0b2c59 0%,
+    #103b73 48%,
+    #137b87 100%
+  );
+  color: var(--jvp-white);
+}
+
+.jvp-hero::before,
+.jvp-hero::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  width: 390px;
+  height: 390px;
+  right: -140px;
+  top: -220px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.jvp-hero::after {
+  width: 520px;
+  height: 520px;
+  right: -205px;
+  top: -285px;
+}
+
+.jvp-hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.65fr);
+  align-items: center;
+  gap: clamp(30px, 5vw, 70px);
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.jvp-hero-copy {
+  min-width: 0;
+}
+
+.jvp-eyebrow {
+  display: inline-block;
+  color: #f6cf57;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.17em;
+  line-height: 1.7;
+  text-transform: uppercase;
+}
+
+.jvp-hero h1 {
+  max-width: 780px;
+  margin: 18px 0;
+  font-size: clamp(38px, 5.8vw, 76px);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  overflow-wrap: anywhere;
+}
+
+.jvp-hero h1 span {
+  display: block;
+  margin-top: 8px;
+  color: #f6cf57;
+}
+
+.jvp-hero-copy > p {
+  max-width: 640px;
+  margin: 0;
+  color: #e1ebf8;
+  font-size: clamp(14px, 1.5vw, 17px);
+  line-height: 1.8;
+}
+
+.jvp-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+/* ---------- Buttons ---------- */
+
+.jvp-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.jvp-button:hover {
+  transform: translateY(-2px);
+}
+
+.jvp-button-gold {
+  background: var(--jvp-gold);
+  color: #172f50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.jvp-button-gold:hover {
+  background: #f6ca48;
+  color: #102a4c;
+}
+
+.jvp-button-outline {
+  border-color: rgba(255, 255, 255, 0.65);
+  background: transparent;
+  color: var(--jvp-white);
+}
+
+.jvp-button-outline:hover {
+  border-color: var(--jvp-gold);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- Anniversary emblem ---------- */
+
+.jvp-anniversary-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 290px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  padding: 22px;
+  border: 2px solid #f4cb50;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 30%,
+    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0.015) 68%
+  );
+  box-shadow:
+    0 0 0 10px rgba(244, 203, 80, 0.08),
+    inset 0 0 0 8px rgba(255, 255, 255, 0.07);
+  text-align: center;
+}
+
+.jvp-one {
+  color: #f6cf57;
+  font-size: clamp(78px, 10vw, 116px);
+  font-weight: 950;
+  line-height: 0.9;
+  letter-spacing: -0.08em;
+}
+
+.jvp-one span {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 0.28em;
+  vertical-align: top;
+  letter-spacing: 0;
+}
+
+.jvp-anniversary-mark strong {
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.jvp-anniversary-mark small {
+  margin-top: 8px;
+  color: #dce9f7;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+}
+
+/* ---------- General sections ---------- */
+
+.jvp-section {
+  padding: clamp(42px, 6vw, 72px) clamp(18px, 5vw, 72px);
+  scroll-margin-top: 80px;
+}
+
+.jvp-section-heading {
+  max-width: 700px;
+  margin: 0 auto 30px;
+  text-align: center;
+}
+
+.jvp-kicker {
+  display: inline-block;
+  color: #a47a0c;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.17em;
+  line-height: 1.7;
+  text-transform: uppercase;
+}
+
+.jvp-section-heading h2 {
+  margin: 10px 0 12px;
+  color: var(--jvp-primary);
+  font-size: clamp(27px, 3.8vw, 40px);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+}
+
+.jvp-section-heading p {
+  max-width: 640px;
+  margin: 0 auto;
+  color: var(--jvp-muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* ---------- Compact social media cards ---------- */
+
+.jvp-social-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.jvp-social-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 16px;
+  overflow: hidden;
+  border: 1px solid var(--jvp-border);
+  border-radius: 12px;
+  background: var(--jvp-white);
+  box-shadow: 0 3px 12px rgba(16, 59, 115, 0.045);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.jvp-social-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(16, 59, 115, 0.09);
+}
+
+.jvp-social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 9px;
+  border-radius: 9px;
+  background: var(--jvp-primary-light);
+  color: var(--jvp-primary);
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.jvp-social-card h3 {
+  margin: 0 0 5px;
+  color: var(--jvp-primary);
+  font-size: 16px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.jvp-social-card > p {
+  margin: 0 0 10px;
+  color: var(--jvp-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* Social profile links */
+
+.jvp-social-card > a {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  justify-content: center;
+  margin-top: 8px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  background: var(--jvp-primary);
+  color: var(--jvp-white);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.jvp-social-card > a:hover {
+  background: var(--jvp-primary-dark);
+}
+
+/* Embedded Facebook feed */
+
+.jvp-social-card .meta-embed-frame {
+  width: 100%;
+  height: 235px;
+  min-width: 0;
+  min-height: 0;
+  max-height: 235px;
+  margin: 8px 0 10px;
+  overflow: hidden;
+  border: 1px solid var(--jvp-border);
+  border-radius: 9px;
+  background: #f8fafc;
+}
+
+.jvp-social-card .meta-embed-frame iframe {
+  display: block;
+  width: 100%;
+  height: 235px !important;
+  max-width: 100%;
+  border: 0;
+}
+
+/* Instagram embed */
+
+.jvp-social-card .instagram-media {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+  border: 0 !important;
+  border-radius: 9px !important;
+}
+
+.jvp-social-card blockquote.instagram-media {
+  margin: 0 auto !important;
+}
+
+.jvp-social-card iframe {
+  display: block;
+  max-width: 100%;
+}
+
+/* General note below social cards */
+
+.jvp-note {
+  max-width: 900px;
+  margin: 18px auto 0;
+  color: var(--jvp-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* ---------- Countdown ---------- */
+
+.jvp-countdown-section {
+  background: #edf3f9;
+}
+
+.jvp-countdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.jvp-countdown-item {
+  padding: 22px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 13px;
+  background: var(--jvp-primary);
+  box-shadow: 0 5px 14px rgba(16, 59, 115, 0.09);
+  color: var(--jvp-white);
+  text-align: center;
+}
+
+.jvp-countdown-item strong {
+  display: block;
+  color: #f6cf57;
+  font-size: clamp(27px, 4.5vw, 44px);
+  font-weight: 950;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.jvp-countdown-item span {
+  display: block;
+  margin-top: 8px;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- Gallery ---------- */
+
+.jvp-gallery-placeholder {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.jvp-gallery-placeholder > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  min-height: 180px;
+  padding: 16px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #16416b, #12858b);
+  color: var(--jvp-white);
+  box-shadow: 0 4px 12px rgba(16, 59, 115, 0.08);
+}
+
+.jvp-gallery-placeholder > div:nth-child(2) {
+  background: linear-gradient(145deg, #a66d08, #e6b833);
+  color: #172f50;
+}
+
+.jvp-gallery-placeholder > div:nth-child(3) {
+  background: linear-gradient(145deg, #185d47, #54a47b);
+}
+
+.jvp-gallery-placeholder > div:nth-child(4) {
+  background: linear-gradient(145deg, #463d80, #ba6990);
+}
+
+.jvp-gallery-placeholder > div:nth-child(5) {
+  background: linear-gradient(145deg, #0b2c59, #2878a0);
+}
+
+.jvp-gallery-placeholder span {
+  margin-bottom: auto;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  opacity: 0.8;
+}
+
+.jvp-gallery-placeholder strong {
+  margin-top: 24px;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.4;
+}
+
+/* ---------- Anniversary event section ---------- */
+
+.jvp-celebration {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 60px);
+  padding: clamp(42px, 6vw, 76px) clamp(18px, 5vw, 72px);
+  background: var(--jvp-primary);
+  color: var(--jvp-white);
+}
+
+.jvp-celebration-copy {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.jvp-celebration-copy h2 {
+  margin: 12px 0;
+  color: var(--jvp-white);
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.jvp-celebration-copy > p {
+  margin: 0;
+  color: #dbe6f4;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.jvp-event-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-top: 22px;
+}
+
+.jvp-event-detail > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 19px;
+}
+
+.jvp-event-detail > div {
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.jvp-event-detail strong {
+  display: block;
+  color: var(--jvp-white);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.jvp-event-detail small {
+  display: block;
+  margin-top: 4px;
+  color: #dbe6f4;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ---------- Registration form ---------- */
+
+.jvp-registration-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.jvp-registration-form .jvp-kicker {
+  color: #f6cf57;
+}
+
+.jvp-registration-form h3 {
+  margin: 8px 0 18px;
+  color: var(--jvp-white);
+  font-size: 23px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.jvp-registration-form label {
+  margin: 12px 0 6px;
+  color: #f4d778;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.jvp-registration-form input,
+.jvp-registration-form select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  padding: 11px 12px;
+  border: 1px solid rgba(16, 59, 115, 0.15);
+  border-radius: 8px;
+  outline: none;
+  background: var(--jvp-white);
+  color: #172f50;
+  font-size: 13px;
+  line-height: 1.4;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.jvp-registration-form input::placeholder {
+  color: #8a97a8;
+}
+
+.jvp-registration-form input:focus,
+.jvp-registration-form select:focus {
+  border-color: var(--jvp-gold);
+  box-shadow: 0 0 0 3px rgba(233, 183, 46, 0.2);
+}
+
+.jvp-registration-form select:disabled {
+  cursor: not-allowed;
+  background: #e8edf3;
+  color: #7d8998;
+}
+
+.jvp-registration-form .jvp-button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.jvp-form-message {
+  margin: 12px 0 0;
+  color: #f6cf57;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.6;
+}
+
+.jvp-form-note {
+  display: block;
+  margin-top: 12px;
+  color: #dbe6f4;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+/* ---------- Responsive: tablets ---------- */
+
+@media (max-width: 950px) {
+  .jvp-hero-inner {
+    grid-template-columns: minmax(0, 1.2fr) minmax(200px, 0.8fr);
+    gap: 28px;
+  }
+
+  .jvp-anniversary-mark {
+    width: min(100%, 250px);
+  }
+
+  .jvp-social-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .jvp-social-card {
+    padding: 15px;
+  }
+
+  .jvp-social-card .meta-embed-frame,
+  .jvp-social-card .meta-embed-frame iframe {
+    height: 220px !important;
+    max-height: 220px;
+  }
+
+  .jvp-gallery-placeholder {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .jvp-gallery-placeholder > div {
+    min-height: 160px;
+  }
+
+  .jvp-celebration {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+    gap: 28px;
+  }
+}
+
+/* ---------- Responsive: mobile ---------- */
+
+@media (max-width: 650px) {
+  .jvp-hero {
+    padding: 44px 20px 48px;
+  }
+
+  .jvp-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .jvp-hero h1 {
+    font-size: clamp(38px, 10vw, 58px);
+  }
+
+  .jvp-hero-copy > p {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .jvp-hero-actions {
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .jvp-button {
+    padding: 11px 14px;
+    font-size: 12px;
+  }
+
+  .jvp-anniversary-mark {
+    width: 205px;
+  }
+
+  .jvp-one {
+    font-size: 85px;
+  }
+
+  .jvp-anniversary-mark strong {
+    font-size: 12px;
+  }
+
+  .jvp-anniversary-mark small {
+    font-size: 8px;
+  }
+
+  .jvp-section {
+    padding: 42px 18px;
+  }
+
+  .jvp-section-heading {
+    margin-bottom: 24px;
+  }
+
+  .jvp-section-heading h2 {
+    font-size: clamp(26px, 7vw, 34px);
+  }
+
+  .jvp-section-heading p {
+    font-size: 13px;
+  }
+
+  .jvp-social-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 440px;
+    gap: 14px;
+  }
+
+  .jvp-social-card {
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  .jvp-social-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    font-size: 19px;
+  }
+
+  .jvp-social-card h3 {
+    font-size: 16px;
+  }
+
+  .jvp-social-card > p {
+    font-size: 12px;
+  }
+
+  .jvp-social-card .meta-embed-frame,
+  .jvp-social-card .meta-embed-frame iframe {
+    height: 220px !important;
+    max-height: 220px;
+  }
+
+  .jvp-note {
+    font-size: 11px;
+    text-align: left;
+  }
+
+  .jvp-countdown {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .jvp-countdown-item {
+    padding: 18px 8px;
+  }
+
+  .jvp-countdown-item strong {
+    font-size: 35px;
+  }
+
+  .jvp-countdown-item span {
+    font-size: 10px;
+  }
+
+  .jvp-gallery-placeholder {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .jvp-gallery-placeholder > div {
+    min-height: 145px;
+    padding: 13px;
+  }
+
+  .jvp-gallery-placeholder strong {
+    font-size: 12px;
+  }
+
+  .jvp-celebration {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 42px 18px;
+  }
+
+  .jvp-celebration-copy h2 {
+    font-size: 32px;
+  }
+
+  .jvp-celebration-copy > p {
+    font-size: 13px;
+  }
+
+  .jvp-registration-form {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .jvp-registration-form h3 {
+    font-size: 21px;
+  }
+}
+
+/* ---------- Responsive: small phones ---------- */
+
+@media (max-width: 380px) {
+  .jvp-hero {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .jvp-hero h1 {
+    font-size: 36px;
+  }
+
+  .jvp-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jvp-hero-actions .jvp-button {
+    width: 100%;
+  }
+
+  .jvp-section {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .jvp-countdown-item strong {
+    font-size: 30px;
+  }
+
+  .jvp-gallery-placeholder > div {
+    min-height: 125px;
+    padding: 10px;
+  }
+
+  .jvp-registration-form {
+    padding: 17px 13px;
+  }
+}
+
+/* ---------- Accessibility ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .jvp-anniversary *,
+  .jvp-anniversary *::before,
+  .jvp-anniversary *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+.jvp-gallery-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.jvp-gallery-actions .jvp-button {
+  text-decoration: none;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .jvp-gallery-actions .jvp-button {
+    width: 100%;
+    max-width: 320px;
+  }
+}

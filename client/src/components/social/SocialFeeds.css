@@ -1,0 +1,42 @@
+.jvp-embed-frame,
+.jvp-instagram-feed {
+  width: 100%;
+  min-width: 0;
+  margin-top: 16px;
+}
+
+.jvp-embed-frame iframe {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 600px;
+  border: 0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.jvp-instagram-feed blockquote.instagram-media {
+  width: 100%;
+  max-width: 540px;
+  min-width: 0 !important;
+  margin: 0 auto 16px !important;
+}
+
+.jvp-feed-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: #103b73;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.jvp-feed-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .jvp-embed-frame iframe {
+    min-height: 500px;
+  }
+}
