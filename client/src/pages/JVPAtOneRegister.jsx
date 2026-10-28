@@ -14,7 +14,6 @@ const wardsByConstituency = {
     'Hongwe',
     'Bahari',
     'Witu',
-    'Mpeketoni',
   ],
 }
 
