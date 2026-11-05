@@ -204,6 +204,20 @@ export const checkPaymentStatus = async ({
 };
 
 /* ==========================================
+   VERIFY MEMBERSHIP PAYMENT — COMPATIBILITY
+========================================== */
+
+export const verifyMembershipPayment = async (
+  transactionId
+) => {
+  return checkPaymentStatus({
+    paymentId: transactionId,
+    reference: transactionId,
+  });
+};
+
+
+/* ==========================================
    PAYMENT RETRY
 ========================================== */
 
@@ -289,6 +303,14 @@ export const getPaymentByReference = async (
       }
     );
   }
+};
+
+/* ==========================================
+   GET PAYMENT — COMPATIBILITY
+========================================== */
+
+export const getPayment = async (reference) => {
+  return getPaymentByReference(reference);
 };
 
 /* ==========================================
