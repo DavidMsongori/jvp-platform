@@ -44,7 +44,11 @@ import ProgramDetails from "../pages/programs/ProgramDetails";
 
 import JVPAtOne from "../pages/JVPAtOne";
 import JVPAtOneReister from "../pages/JVPAtOneRegister";
+import JVPAtOneLeadersRegister from "../pages/JVPAtOneLeadersRegister";
 import JVPAtOneGallery from "../pages/JVPAtOneGallery";
+
+import Awards from "../pages/awards/Awards";
+import PublicAwardNomination from "../pages/awards/PublicAwardNomination";
 
 /* ==========================================
    PUBLIC ELECTIONS
@@ -152,7 +156,12 @@ import CreateEvent from "../pages/admin/events/CreateEvent";
 import EditEvent from "../pages/admin/events/EditEvent";
 import ViewEvent from "../pages/admin/events/ViewEvent";
 
-import JVPAtOneAdmin from "../pages/admin/JVPAtOneAdmin";
+import JVPAtOneDashboard from "../pages/admin/JVPAtOneDashboard";
+import JVPAtOneRegistrationsAdmin from "../pages/admin/JVPAtOneRegistrationsAdmin";
+import JVPAtOneLeadersAdmin from "../pages/admin/JVPAtOneLeadersAdmin";
+import JVPAtOnePhotosAdmin from "../pages/admin/JVPAtOnePhotosAdmin";
+
+import AwardsAdmin from "../pages/awards/admin/AwardsAdmin";
 
 /* ==========================================
    ADMIN SUMMIT
@@ -277,11 +286,26 @@ function AppRoutes() {
         <Route
           path="/jvp-at-one/register"
           element={<JVPAtOneReister />}
-        />  
+        />
+
+       <Route
+  path="/jvp-at-one/leaders/register"
+  element={<JVPAtOneLeadersRegister />}
+/> 
 
         <Route
           path="/jvp-at-one/gallery"
           element={<JVPAtOneGallery />}
+        />  
+
+        <Route
+          path="/awards"
+          element={<Awards />}
+        />  
+
+        <Route
+          path="/awards/nominate"
+          element={<PublicAwardNomination />}
         />  
 
         {/* =====================================
@@ -761,14 +785,47 @@ function AppRoutes() {
             }
           />
 
-          <Route
+          {/* =====================================
+    JVP @ 1 MANAGEMENT
+====================================== */}
+
+<Route
   path="jvp-at-one"
   element={
     <PermissionRoute permission={PERMISSIONS.VIEW_EVENTS}>
-      <JVPAtOneAdmin />
+      <JVPAtOneDashboard />
     </PermissionRoute>
   }
-/>  
+/>
+
+<Route
+  path="jvp-at-one/registrations"
+  element={
+    <PermissionRoute permission={PERMISSIONS.VIEW_EVENTS}>
+      <JVPAtOneRegistrationsAdmin />
+    </PermissionRoute>
+  }
+/>
+
+<Route
+  path="jvp-at-one/leaders"
+  element={
+    <PermissionRoute permission={PERMISSIONS.VIEW_EVENTS}>
+      <JVPAtOneLeadersAdmin />
+    </PermissionRoute>
+  }
+/>
+
+<Route
+  path="jvp-at-one/photos"
+  element={
+    <PermissionRoute permission={PERMISSIONS.VIEW_EVENTS}>
+      <JVPAtOnePhotosAdmin />
+    </PermissionRoute>
+  }
+/> 
+
+
 
           {/* =====================================
               SUMMIT
@@ -827,6 +884,17 @@ function AppRoutes() {
             path="summit/posters"
             element={<AdminSummitPosters />}
           />
+
+          <Route
+  path="awards"
+  element={
+    <PermissionRoute
+      permission={PERMISSIONS.VIEW_EVENTS}
+    >
+      <AwardsAdmin />
+    </PermissionRoute>
+  }
+/>
 
           {/* =====================================
               ADMIN ELECTIONS

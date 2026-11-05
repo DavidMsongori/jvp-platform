@@ -1,0 +1,408 @@
+
+/* ==========================================
+   JVP @ 1 LEADERS ADMIN
+========================================== */
+
+.jvp-admin-container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 25px;
+  background: #f8fafc;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+.jvp-admin-container * {
+  box-sizing: border-box;
+}
+
+/* HEADER */
+
+.jvp-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.jvp-admin-header h1 {
+  margin: 15px 0 8px;
+  color: #172554;
+  font-size: 27px;
+  font-weight: 750;
+}
+
+.jvp-admin-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.jvp-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.jvp-back-link:hover {
+  color: #1e40af;
+}
+
+.jvp-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #1e3a8a;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.jvp-refresh-btn:hover {
+  background: #1d4ed8;
+}
+
+.jvp-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* STATISTICS */
+
+.jvp-admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.jvp-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+}
+
+.jvp-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 22px;
+}
+
+.jvp-stat-card h3 {
+  margin: 0 0 5px;
+  color: #172554;
+  font-size: 26px;
+  font-weight: 750;
+}
+
+.jvp-stat-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* MAIN SECTION */
+
+.jvp-section {
+  padding: 23px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+}
+
+.jvp-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.jvp-section-header h2 {
+  margin: 0;
+  color: #172554;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+/* FILTERS */
+
+.jvp-filter-form {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(140px, 1fr)) auto;
+  gap: 12px;
+  margin-bottom: 22px;
+  align-items: center;
+}
+
+.jvp-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+  background: #fff;
+}
+
+.jvp-search-box:focus-within {
+  border-color: #2563eb;
+}
+
+.jvp-search-box input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #334155;
+  font-size: 13px;
+}
+
+.jvp-filter-form select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: #334155;
+  font-size: 13px;
+}
+
+.jvp-filter-form select:focus {
+  border-color: #2563eb;
+}
+
+.jvp-filter-form select:disabled {
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+.jvp-filter-btn {
+  height: 44px;
+  padding: 0 17px;
+  border: none;
+  border-radius: 8px;
+  background: #1e3a8a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.jvp-filter-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ERROR MESSAGE */
+
+.jvp-error-message {
+  padding: 13px 16px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+/* REGISTRATIONS TABLE */
+
+.jvp-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+}
+
+.jvp-registrations-table {
+  width: 100%;
+  min-width: 1150px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.jvp-registrations-table thead th {
+  padding: 15px 13px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.jvp-registrations-table tbody td {
+  padding: 15px 13px;
+  color: #334155;
+  font-size: 13px;
+  white-space: nowrap;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.jvp-registrations-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.jvp-registrations-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.jvp-registrations-table tbody td[colspan] {
+  padding: 30px;
+  text-align: center;
+  color: #64748b;
+}
+
+/* REGISTRATION STATUS */
+
+.jvp-status-badge {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 20px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.jvp-status-badge.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* PAGINATION */
+
+.jvp-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 22px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.jvp-pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jvp-pagination button {
+  padding: 8px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.jvp-pagination button:hover:not(:disabled) {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.jvp-pagination button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 1100px) {
+  .jvp-filter-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .jvp-search-box {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 650px) {
+  .jvp-admin-container {
+    padding: 15px;
+  }
+
+  .jvp-admin-header {
+    flex-direction: column;
+    gap: 17px;
+  }
+
+  .jvp-admin-header h1 {
+    font-size: 21px;
+  }
+
+  .jvp-refresh-btn {
+    width: 100%;
+  }
+
+  .jvp-admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .jvp-section {
+    padding: 15px;
+  }
+
+  .jvp-filter-form {
+    grid-template-columns: 1fr;
+  }
+
+  .jvp-search-box {
+    grid-column: auto;
+  }
+
+  .jvp-filter-btn {
+    width: 100%;
+  }
+
+  .jvp-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .jvp-pagination > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

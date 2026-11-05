@@ -1,0 +1,154 @@
+
+.leaders-registration-page {
+  min-height: 100vh;
+  padding: 60px 20px;
+  background: #f4f6f8;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.leaders-registration-container {
+  width: 100%;
+  max-width: 760px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+}
+
+.leaders-registration-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.leaders-registration-label {
+  display: inline-block;
+  color: #b8860b;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.leaders-registration-header h1 {
+  color: #123c2c;
+  font-size: 32px;
+  margin: 0 0 12px;
+}
+
+.leaders-registration-header p {
+  color: #667085;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0 auto;
+  max-width: 560px;
+}
+
+.leaders-registration-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.leaders-registration-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.leaders-registration-form label {
+  color: #26352e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.leaders-registration-form input,
+.leaders-registration-form select {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #d6ddd8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #26352e;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.leaders-registration-form input:focus,
+.leaders-registration-form select:focus {
+  border-color: #176b45;
+  box-shadow: 0 0 0 3px rgba(23, 107, 69, 0.1);
+}
+
+.leaders-registration-form select:disabled {
+  background: #f1f3f2;
+  color: #98a29b;
+  cursor: not-allowed;
+}
+
+.leaders-submit-button {
+  grid-column: 1 / -1;
+  min-height: 50px;
+  border: none;
+  border-radius: 8px;
+  background: #176b45;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.leaders-submit-button:hover {
+  background: #105536;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .leaders-registration-page {
+    padding: 30px 14px;
+  }
+
+  .leaders-registration-container {
+    padding: 25px 18px;
+  }
+
+  .leaders-registration-header h1 {
+    font-size: 26px;
+  }
+
+  .leaders-registration-form {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+.registration-error,
+.registration-success {
+  grid-column: 1 / -1;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.registration-error {
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+}
+
+.registration-success {
+  color: #067647;
+  background: #ecfdf3;
+  border: 1px solid #abefc6;
+}
+
+.leaders-submit-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+

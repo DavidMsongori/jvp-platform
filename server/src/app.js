@@ -25,6 +25,7 @@ import intasendRoutes from "./routes/intasend.routes.js";
 import summitPosterRoutes from "./routes/summitPoster.routes.js";
 import geographyRoutes from "./routes/geography.routes.js";
 import electionRoutes from "./routes/election.routes.js";
+import awardRoutes from "./routes/award.routes.js";
 import newsRoutes from "./routes/news.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import programRoutes from "./routes/program.routes.js";
@@ -116,6 +117,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/elections", electionRoutes);
+app.use("/api/awards", awardRoutes);
 
 app.use("/api/events", eventRoutes);
 

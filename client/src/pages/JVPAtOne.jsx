@@ -2,9 +2,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import HeroAnniversary from '../components/HeroAnni'
-import FacebookTimeline from "../components/social/FacebookTimeline";
-import InstagramFeed from "../components/social/InstagramFeed";
+
 
 import {
   registerJVPAtOne,
@@ -272,26 +270,35 @@ export default function JVPAtOne() {
               <span>📍</span>
               <div>
                 <strong>Lamu County, Kenya</strong>
-                <small>Venue to be announced</small>
+                <small>Mpeketoni Boys School, Bahari Ward, Lamu West</small>
               </div>
             </div>
           </div>
 
           
 <div className="jvp-registration-invitation">
-  <h3>Do you come from Lamu County?</h3>
+  <h3>Be Part of JVP @ 1</h3>
 
   <p>
-    Join us during our celebrations as we mark one year
-    of youth leadership, unity and impact across the Coast.
+    Whether you are a leader or a young person from Lamu County,
+    register to be part of our first anniversary celebration.
   </p>
 
-  <a
-    className="jvp-button jvp-button-gold"
-    href="/jvp-at-one/register"
-  >
-    Register for JVP @ 1
-  </a>
+  <div className="jvp-registration-actions">
+    <Link
+      to="/jvp-at-one/register"
+      className="jvp-button jvp-button-gold"
+    >
+      Youth Registration
+    </Link>
+
+    <Link
+      to="/jvp-at-one/leaders/register"
+      className="jvp-button jvp-button-gold"
+    >
+      Leaders Registration
+    </Link>
+  </div>
 </div>
 
         </section>

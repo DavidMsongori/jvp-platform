@@ -11,6 +11,11 @@ import {
 } from "../controllers/jvpAtOne.controller.js";
 
 import {
+  registerJVPAtOneLeader,
+   getJVPAtOneLeaderRegistrations,
+} from "../controllers/jvpAtOneLeader.controller.js";
+
+import {
   getJVPAtOnePhotos,
   uploadJVPAtOnePhoto,
   deleteJVPAtOnePhoto,
@@ -18,8 +23,18 @@ import {
 
 const router = Router();
 
-// Public registration
+// Public Lamu youth registration
 router.post("/register", registerJVPAtOne);
+
+// Public leaders registration
+router.post("/leaders/register", registerJVPAtOneLeader);
+// Protected: view registered JVP @ 1 leaders
+router.get(
+  "/leaders/registrations",
+  auth,
+  authorize("admin", "events", "super_admin"),
+  getJVPAtOneLeaderRegistrations
+);
 
 // Protected: view registered youths
 router.get(

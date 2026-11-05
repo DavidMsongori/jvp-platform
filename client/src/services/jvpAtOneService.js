@@ -63,6 +63,32 @@ export async function registerJVPAtOne(registration) {
   });
 }
 
+
+
+/**
+ * Register a leader attending the JVP @ 1 anniversary.
+ * Uses a separate endpoint from Lamu youth registration.
+ */
+export async function registerJVPAtOneLeader(registration) {
+  return request("/leaders/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      fullName: registration.fullName?.trim(),
+      position: registration.position?.trim(),
+      phone: registration.phone?.trim(),
+      county: registration.county,
+      constituency: registration.constituency,
+      ward: registration.ward,
+      pickupTown: registration.pickupTown?.trim(),
+      tShirtSize: registration.tShirtSize,
+    }),
+  });
+}
+
+
 /**
  * Retrieve anniversary registrations.
  * Requires an authenticated admin, events, or super_admin user.
@@ -111,6 +137,59 @@ export async function getJVPAtOneRegistrations(
       Authorization: `Bearer ${token}`,
     },
   });
+}
+
+/**
+ * Retrieve JVP @ 1 leaders registrations.
+ * Requires an authenticated admin, events, or super_admin user.
+ *
+ * Supported filters:
+ * search, county, constituency, status, page, limit
+ */
+export async function getJVPAtOneLeaderRegistrations(
+  {
+    search = "",
+    county = "",
+    constituency = "",
+    status = "registered",
+    page = 1,
+    limit = 20,
+  } = {},
+  token
+) {
+  if (!token) {
+    throw new Error("Administrator authentication is required.");
+  }
+
+  const params = new URLSearchParams();
+
+  if (search.trim()) {
+    params.set("search", search.trim());
+  }
+
+  if (county) {
+    params.set("county", county);
+  }
+
+  if (constituency) {
+    params.set("constituency", constituency);
+  }
+
+  if (status) {
+    params.set("status", status);
+  }
+
+  params.set("page", String(page));
+  params.set("limit", String(limit));
+
+  return request(
+    `/leaders/registrations?${params.toString()}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 }
 
 /**

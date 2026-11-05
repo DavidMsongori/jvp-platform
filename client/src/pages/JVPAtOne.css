@@ -438,6 +438,7 @@
 
 .jvp-countdown-section {
   background: #edf3f9;
+  padding-top: clamp(85px, 10vw, 120px);
 }
 
 .jvp-countdown {
@@ -536,14 +537,16 @@
 
 /* ---------- Anniversary event section ---------- */
 
+/* ---------- Anniversary event section ---------- */
+
 .jvp-celebration {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
   align-items: center;
   gap: clamp(28px, 5vw, 60px);
   padding: clamp(42px, 6vw, 76px) clamp(18px, 5vw, 72px);
-  background: var(--jvp-primary);
-  color: var(--jvp-white);
+  background: #edf5ef;
+  color: #173b2e;
 }
 
 .jvp-celebration-copy {
@@ -552,9 +555,13 @@
   margin: 0 auto;
 }
 
+.jvp-celebration-copy .jvp-eyebrow {
+  color: #a77913;
+}
+
 .jvp-celebration-copy h2 {
   margin: 12px 0;
-  color: var(--jvp-white);
+  color: #124734;
   font-size: clamp(30px, 4vw, 46px);
   font-weight: 900;
   line-height: 1.08;
@@ -563,8 +570,8 @@
 
 .jvp-celebration-copy > p {
   margin: 0;
-  color: #dbe6f4;
-  font-size: 14px;
+  color: #40594b;
+  font-size: 15px;
   line-height: 1.8;
 }
 
@@ -579,12 +586,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 38px;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 19px;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #145c3c;
+  color: #ffffff;
+  font-size: 20px;
 }
 
 .jvp-event-detail > div {
@@ -594,17 +602,114 @@
 
 .jvp-event-detail strong {
   display: block;
-  color: var(--jvp-white);
-  font-size: 14px;
+  color: #173b2e;
+  font-size: 15px;
   line-height: 1.5;
 }
 
 .jvp-event-detail small {
   display: block;
   margin-top: 4px;
-  color: #dbe6f4;
-  font-size: 12px;
-  line-height: 1.5;
+  color: #52675b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Registration invitation */
+
+.jvp-registration-invitation {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid #d8e7dc;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(20, 92, 60, 0.08);
+  text-align: center;
+}
+
+.jvp-registration-invitation h3 {
+  margin: 0 0 12px;
+  color: #145c3c;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.jvp-registration-invitation p {
+  margin: 0;
+  color: #52675b;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* Registration buttons */
+
+.jvp-registration-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.jvp-registration-actions .jvp-button {
+  min-width: 190px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.jvp-registration-actions .jvp-button:last-child {
+  background: #145c3c;
+  color: #ffffff;
+}
+
+.jvp-registration-actions .jvp-button:last-child:hover {
+  background: #0c422b;
+  color: #ffffff;
+}
+
+/* Responsive */
+
+@media (max-width: 950px) {
+  .jvp-celebration {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+    gap: 28px;
+  }
+}
+
+@media (max-width: 650px) {
+  .jvp-celebration {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 42px 18px;
+  }
+
+  .jvp-celebration-copy h2 {
+    font-size: 32px;
+  }
+
+  .jvp-celebration-copy > p {
+    font-size: 14px;
+  }
+
+  .jvp-registration-invitation {
+    padding: 24px 18px;
+  }
+
+  .jvp-registration-invitation h3 {
+    font-size: 22px;
+  }
+
+  .jvp-registration-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jvp-registration-actions .jvp-button {
+    width: 100%;
+  }
 }
 
 /* ---------- Registration form ---------- */
@@ -962,5 +1067,31 @@
   .jvp-gallery-actions .jvp-button {
     width: 100%;
     max-width: 320px;
+  }
+}
+
+.jvp-registration-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 24px;
+}
+
+.jvp-registration-actions .jvp-button {
+  min-width: 190px;
+  text-align: center;
+  text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  .jvp-registration-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jvp-registration-actions .jvp-button {
+    width: 100%;
   }
 }

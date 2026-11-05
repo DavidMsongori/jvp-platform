@@ -1,0 +1,231 @@
+
+.public-nomination-page {
+  min-height: 100vh;
+  padding: 40px 20px 70px;
+  background: #f3f6fa;
+  color: #182d46;
+}
+
+.nomination-header {
+  max-width: 850px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.nomination-back {
+  display: inline-block;
+  margin-bottom: 28px;
+  color: #174b80;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.nomination-eyebrow {
+  color: #9b7510;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nomination-header h1 {
+  margin: 12px 0;
+  color: #102f58;
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1.08;
+}
+
+.nomination-header > p:last-child {
+  max-width: 680px;
+  margin: 0 auto;
+  color: #607086;
+  line-height: 1.7;
+}
+
+.nomination-card {
+  max-width: 850px;
+  margin: auto;
+  padding: clamp(22px, 4vw, 42px);
+  background: #fff;
+  border: 1px solid #e1e7ef;
+  border-radius: 20px;
+  box-shadow: 0 16px 45px rgba(14, 40, 72, 0.07);
+}
+
+.nomination-intro {
+  margin-bottom: 25px;
+}
+
+.nomination-intro h2 {
+  margin: 0 0 8px;
+  color: #102f58;
+}
+
+.nomination-intro p,
+.nomination-privacy-note {
+  color: #607086;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.nomination-card h3 {
+  margin: 30px 0 18px;
+  padding-bottom: 10px;
+  color: #102f58;
+  border-bottom: 1px solid #e1e7ef;
+}
+
+.nomination-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.nomination-field label {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nomination-field input,
+.nomination-field select,
+.nomination-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 13px 14px;
+  color: #182d46;
+  background: #fbfcfe;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+}
+
+.nomination-field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.nomination-field input:focus,
+.nomination-field select:focus,
+.nomination-field textarea:focus {
+  outline: 2px solid #e7b83f;
+  outline-offset: 1px;
+  border-color: #174b80;
+}
+
+.nomination-two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.nomination-evidence-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nomination-remove-link,
+.nomination-add-link {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.nomination-remove-link {
+  flex-shrink: 0;
+  padding: 10px;
+  border-radius: 8px;
+  color: #a32727;
+  background: #fff0f0;
+}
+
+.nomination-add-link {
+  align-self: flex-start;
+  padding: 8px 0;
+  color: #174b80;
+  background: transparent;
+}
+
+.nomination-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 25px 0;
+  color: #42536a;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.nomination-consent input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: #102f58;
+}
+
+.nomination-submit {
+  width: 100%;
+  padding: 15px 20px;
+  color: #172d48;
+  background: #e7b83f;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.nomination-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.nomination-alert {
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.nomination-alert.error {
+  color: #8f2020;
+  background: #fff0f0;
+  border: 1px solid #f1caca;
+}
+
+.nomination-alert.success {
+  color: #17633b;
+  background: #edf9f1;
+  border: 1px solid #c4e8d0;
+}
+
+.nomination-privacy-note {
+  margin: 15px 0 0;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .public-nomination-page {
+    padding: 24px 14px 45px;
+  }
+
+  .nomination-two-columns {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .nomination-card {
+    padding: 22px 17px;
+  }
+
+  .nomination-evidence-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
