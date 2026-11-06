@@ -10,6 +10,7 @@ import errorHandler from "./middleware/errorHandler.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import memberRoutes from "./routes/member.routes.js";
+import messagingRoutes from "./routes/messaging.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import healthRoutes from "./routes/health.routes.js";
@@ -109,6 +110,7 @@ app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 
 app.use("/api/member", memberRoutes);
+app.use("/api/messages", messagingRoutes);
 app.use("/api/users", userRoutes);
 
 app.use("/api/payments/intasend", intasendRoutes);
@@ -153,3 +155,4 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 export default app;
+

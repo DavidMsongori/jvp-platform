@@ -1,6 +1,8 @@
+
 import express from "express";
 
 import auth from "../middleware/auth.js";
+import requireActiveMembership from "../middleware/requireActiveMembership.js";
 import validate from "../middleware/validate.js";
 
 import {
@@ -28,6 +30,7 @@ const router = express.Router();
 router.get(
   "/dashboard",
   auth,
+  requireActiveMembership,
   getDashboard
 );
 
@@ -38,11 +41,13 @@ router.get(
 router.get(
   "/search",
   auth,
+  requireActiveMembership,
   searchMembers
 );
 
 /* ==========================================
    MY PROFILE
+   Remains accessible before payment.
 ========================================== */
 
 router.get(

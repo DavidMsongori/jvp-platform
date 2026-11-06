@@ -31,10 +31,12 @@ async function startServer() {
       { default: app },
       { default: connectDB },
       { default: registerMeetingSocket },
+      { default: registerMessagingSocket },
     ] = await Promise.all([
       import("./app.js"),
       import("./config/db.js"),
       import("./socket/meeting.socket.js"),
+      import("./socket/messaging.socket.js"),
     ]);
 
     await connectDB();
@@ -159,6 +161,7 @@ const io = new Server(
 app.set("io", io);
 
 registerMeetingSocket(io);
+registerMessagingSocket(io);
 
     /* ======================================
        START SERVER
@@ -333,3 +336,5 @@ registerMeetingSocket(io);
 }
 
 startServer();
+
+
