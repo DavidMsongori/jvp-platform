@@ -1,0 +1,133 @@
+# ==========================================
+# Dependencies
+# ==========================================
+
+node_modules/
+
+# ==========================================
+# Build
+# ==========================================
+
+dist/
+build/
+
+# ==========================================
+# Environment Variables
+# ==========================================
+
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# Logs
+# ==========================================
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# Coverage
+# ==========================================
+
+coverage/
+
+# ==========================================
+# Vercel
+# ==========================================
+
+.vercel/
+
+# ==========================================
+# Operating System
+# ==========================================
+
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Editors
+# ==========================================
+
+.vscode/
+.idea/
+
+# ==========================================
+# Temporary Files
+# ==========================================
+
+*.tmp
+*.temp
+
+# ==========================================
+# Uploads (Optional)
+# ==========================================
+
+# Uncomment if uploads should NOT be committed.
+# uploads/
+# Environment variables
+**/.env
+**/.env.*
+!**/.env.example
+
+# ==========================================
+# Exclude unrelated JVP applications
+# ==========================================
+
+/background-removal-service/
+/client/
+/server/
+/docs/
+
+# ==========================================
+# Exclude Git and deployment metadata
+# ==========================================
+
+.git/
+.vercel/
+
+# ==========================================
+# Mobile-specific exclusions
+# ==========================================
+
+/mobile/.expo/
+/mobile/dist/
+/mobile/web-build/
+/mobile/coverage/
+/mobile/android/
+/mobile/ios/
+/mobile/eas-archive-inspect/
+
+# ==========================================
+# Mobile temporary files
+# ==========================================
+
+/mobile/assets/icon-backup/
+/mobile/assets/icon-preview.jpg
+/mobile/prepare-jvp-icons.py
+
+# Mobile environment files
+/mobile/.env
+/mobile/.env.*
+
+# Python temporary files
+**/__pycache__/
+**/*.pyc
+**/.venv/
+
+# Logs and temporary archives
+**/*.log
+**/*.tmp
+
+
+# Explicitly exclude the root Git repository
+/.git
+/.git/
+/.git/**
+**/.git
+**/.git/
+
